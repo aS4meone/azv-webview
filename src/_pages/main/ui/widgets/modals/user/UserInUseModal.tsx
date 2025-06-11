@@ -48,22 +48,22 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
 
   const handleLock = () => {
     setIsLocked(true);
-    showModal({
-      type: "success",
-      description: "Автомобиль заблокирован",
-      buttonText: "ОК",
-      onClose: () => {},
-    });
+    // showModal({
+    //   type: "success",
+    //   description: "Автомобиль заблокирован",
+    //   buttonText: "ОК",
+    //   onClose: () => {},
+    // });
   };
 
   const handleUnlock = () => {
     setIsLocked(false);
-    showModal({
-      type: "success",
-      description: "Автомобиль разблокирован",
-      buttonText: "ОК",
-      onClose: () => {},
-    });
+    // showModal({
+    //   type: "success",
+    //   description: "Автомобиль разблокирован",
+    //   buttonText: "ОК",
+    //   onClose: () => {},
+    // });
   };
 
   return (
@@ -78,8 +78,6 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
           isLocked={isLocked}
           onLock={handleLock}
           onUnlock={handleUnlock}
-          onNavigateLeft={() => console.log("Navigate left")}
-          onNavigateRight={() => console.log("Navigate right")}
         />
 
         <Button onClick={handleEndRental} variant="secondary">

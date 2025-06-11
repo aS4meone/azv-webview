@@ -4,8 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 interface CarControlsSliderProps {
   onLock?: () => void;
   onUnlock?: () => void;
-  onNavigateLeft?: () => void;
-  onNavigateRight?: () => void;
+
   isLocked?: boolean;
 }
 
@@ -36,10 +35,11 @@ const LockOpenIcon = ({ className }: { className?: string }) => (
     height="26"
     viewBox="0 0 26 26"
     fill="none"
+    className={className}
   >
     <path
-      fillRule="evenodd"
-      clipRule="evenodd"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
       d="M19.5 3.25C17.2563 3.25 15.4375 5.06884 15.4375 7.3125V10.5625C17.2324 10.5625 18.6875 12.0176 18.6875 13.8125V21.125C18.6875 22.9199 17.2324 24.375 15.4375 24.375H4.0625C2.26757 24.375 0.8125 22.9199 0.8125 21.125V13.8125C0.8125 12.0176 2.26757 10.5625 4.0625 10.5625H13.8125V7.3125C13.8125 4.17139 16.3589 1.625 19.5 1.625C22.6411 1.625 25.1875 4.17139 25.1875 7.3125V11.375C25.1875 11.8237 24.8237 12.1875 24.375 12.1875C23.9263 12.1875 23.5625 11.8237 23.5625 11.375V7.3125C23.5625 5.06884 21.7437 3.25 19.5 3.25ZM4.0625 12.1875C3.16505 12.1875 2.4375 12.9151 2.4375 13.8125V21.125C2.4375 22.0224 3.16505 22.75 4.0625 22.75H15.4375C16.3349 22.75 17.0625 22.0224 17.0625 21.125V13.8125C17.0625 12.9151 16.3349 12.1875 15.4375 12.1875H4.0625Z"
       fill="#191919"
     />
@@ -53,81 +53,145 @@ const LockOpenIcon = ({ className }: { className?: string }) => (
 export const CarControlsSlider = ({
   onLock,
   onUnlock,
-  onNavigateLeft,
-  onNavigateRight,
+
   isLocked = false,
 }: CarControlsSliderProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [slidePosition, setSlidePosition] = useState(0); // Позиция для анимации
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number>(0);
   const touchEndX = useRef<number>(0);
   const currentTouchX = useRef<number>(0);
-  const minSwipeDistance = 50; // минимальное расстояние для свайпа
+  const animationFrameRef = useRef<number>(0);
+  const minSwipeDistance = 40; // уменьшили для более отзывчивого свайпа
 
-  const handleNavigateLeft = () => {
-    onNavigateLeft?.();
-    setCurrentIndex((prev) => Math.max(0, prev - 1));
+  // Вычисление максимально допустимого смещения
+  const getMaxOffset = () => {
+    if (!containerRef.current || !sliderRef.current) return 50;
+
+    const containerWidth = containerRef.current.clientWidth;
+    const sliderWidth = sliderRef.current.clientWidth;
+    const paddingHorizontal = 0 * 2; // p-4 = 16px с каждой стороны
+
+    // Максимальное смещение = (ширина контейнера - padding - ширина слайдера) / 2
+    const maxOffset = Math.max(
+      0,
+      (containerWidth - paddingHorizontal - sliderWidth) / 2
+    );
+
+    // Минимум 30px для визуального эффекта, максимум вычисленное значение
+    return Math.max(30, Math.min(50, maxOffset));
   };
 
-  const handleNavigateRight = () => {
-    onNavigateRight?.();
-    setCurrentIndex((prev) => prev + 1);
+  const lerp = (start: number, end: number, factor: number) => {
+    return start + (end - start) * factor;
   };
 
-  const handleLockToggle = () => {
-    if (isLocked) {
-      onUnlock?.();
-    } else {
-      onLock?.();
-    }
+  // Функция easing для более естественного движения
+  const easeOutQuart = (t: number) => {
+    return 1 - Math.pow(1 - t, 4);
   };
 
-  // Анимация возврата в исходную позицию
+  // Анимация возврата в исходную позицию с плавной интерполяцией
   const resetPosition = () => {
     setIsAnimating(true);
-    setSlidePosition(0);
-    setTimeout(() => setIsAnimating(false), 300);
+    setIsDragging(false);
+
+    const startPosition = slidePosition;
+    const targetPosition = 0;
+    const duration = 400; // увеличили длительность
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutQuart(progress);
+
+      const currentPosition = lerp(
+        startPosition,
+        targetPosition,
+        easedProgress
+      );
+      setSlidePosition(currentPosition);
+
+      if (progress < 1) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        setIsAnimating(false);
+        setSlidePosition(0);
+      }
+    };
+
+    animationFrameRef.current = requestAnimationFrame(animate);
   };
+
+  // Очистка анимации при размонтировании
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
 
   // Touch событий для свайпов
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
     currentTouchX.current = e.targetTouches[0].clientX;
+    setIsDragging(true);
+
+    // Останавливаем текущую анимацию если она есть
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      setIsAnimating(false);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+
     touchEndX.current = e.targetTouches[0].clientX;
     currentTouchX.current = e.targetTouches[0].clientX;
 
     // Вычисляем смещение для реального времени
-    const currentOffset = currentTouchX.current - touchStartX.current;
-    // Ограничиваем смещение максимум 60px в каждую сторону
-    const limitedOffset = Math.max(-60, Math.min(60, currentOffset));
+    const rawOffset = currentTouchX.current - touchStartX.current;
+    const maxOffset = getMaxOffset();
+
+    // Жесткое ограничение - просто упираемся в границы
+    const limitedOffset = Math.max(-maxOffset, Math.min(maxOffset, rawOffset));
+
     setSlidePosition(limitedOffset);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
+    if (!isDragging) return;
+
+    if (!touchStartX.current || !touchEndX.current) {
+      resetPosition();
+      return;
+    }
 
     const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
+    const maxOffset = getMaxOffset();
 
     if (isLeftSwipe) {
       // Свайп влево = разблокировать (unlock/close)
       onUnlock?.();
-      // Анимация сдвига влево перед возвратом
-      setSlidePosition(-100);
-      setTimeout(resetPosition, 200);
+      // Плавная анимация завершения (ограничиваем границами)
+      setSlidePosition(-Math.min(maxOffset, 100));
+      setTimeout(resetPosition, 150);
     } else if (isRightSwipe) {
       // Свайп вправо = заблокировать (lock)
       onLock?.();
-      // Анимация сдвига вправо перед возвратом
-      setSlidePosition(100);
-      setTimeout(resetPosition, 200);
+      // Плавная анимация завершения (ограничиваем границами)
+      setSlidePosition(Math.min(maxOffset, 80));
+      setTimeout(resetPosition, 150);
     } else {
-      // Если свайп недостаточный, просто возвращаемся в исходную позицию
+      // Если свайп недостаточный, плавно возвращаемся в исходную позицию
       resetPosition();
     }
 
@@ -135,29 +199,29 @@ export const CarControlsSlider = ({
     touchStartX.current = 0;
     touchEndX.current = 0;
     currentTouchX.current = 0;
+    setIsDragging(false);
   };
 
   return (
-    <div className="w-full bg-gray-100 rounded-full p-4 flex items-center justify-between">
-      {/* Left Lock/Unlock Icon */}
-      <button
-        onClick={handleLockToggle}
-        className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
-      >
-        {isLocked ? (
-          <LockClosedIcon className="w-6 h-6 text-gray-700" />
-        ) : (
-          <LockOpenIcon className="w-6 h-6 text-gray-700" />
-        )}
-      </button>
+    <div
+      ref={containerRef}
+      className="w-full bg-gray-100 rounded-full flex items-center justify-between overflow-hidden"
+    >
+      <div className="pl-3">
+        <LockClosedIcon className=" text-gray-700" />
+      </div>
 
       {/* Navigation Controls with Swipe Support */}
       <div
-        className={`flex items-center bg-gray-800 rounded-full px-6 py-3 touch-pan-x ${
-          isAnimating ? "transition-transform duration-300 ease-out" : ""
+        ref={sliderRef}
+        className={`flex items-center bg-gray-800 rounded-full px-6 py-3 touch-pan-x select-none flex-shrink-0 ${
+          !isDragging && !isAnimating
+            ? "transition-transform duration-200 ease-out"
+            : ""
         }`}
         style={{
           transform: `translateX(${slidePosition}px)`,
+          willChange: "transform", // оптимизация для GPU
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -165,7 +229,7 @@ export const CarControlsSlider = ({
       >
         <button
           onClick={() => onUnlock?.()}
-          className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out"
         >
           <ArrowLeftIcon color="white" className="w-6 h-6" />
         </button>
@@ -174,23 +238,15 @@ export const CarControlsSlider = ({
 
         <button
           onClick={() => onLock?.()}
-          className="p-2 hover:bg-gray-700 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out"
         >
           <ArrowRightIcon color="white" className="w-6 h-6" />
         </button>
       </div>
 
-      {/* Right Lock/Unlock Icon */}
-      <button
-        onClick={handleLockToggle}
-        className="p-3 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
-      >
-        {isLocked ? (
-          <LockClosedIcon className="w-6 h-6 text-gray-700" />
-        ) : (
-          <LockOpenIcon className="w-6 h-6 text-gray-700" />
-        )}
-      </button>
+      <div className="pr-5">
+        <LockOpenIcon className=" text-gray-700" />
+      </div>
     </div>
   );
 };
