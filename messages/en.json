@@ -1,0 +1,107 @@
+{
+  "error": "Error",
+  "terms": "Terms and Policy",
+  "faqs": "FAQs",
+  "aboutApp": "About App",
+  "userOffer": "User Agreement",
+  "personalData": "Personal Data",
+  "onlinePayment": "Online Payment Information",
+  "support": "Support",
+  "emergencyNumbers": "Emergency Numbers:",
+  "police": "Police",
+  "ambulance": "Ambulance",
+  "technicalSupport": "Technical Support Number:",
+  "ourTelegram": "Our Telegram:",
+  "wallet": {
+    "title": "Wallet",
+    "currentBalance": "Current Balance",
+    "paymentMethods": "Payment Methods",
+    "mainCard": "Main Card",
+    "addCard": "Add Card",
+    "topUp": "Top Up",
+    "promocodes": "Promocodes",
+    "activate": "Activate"
+  },
+  "profile": {
+    "title": "My Profile",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "documentsAndData": "Documents and Data",
+    "uploadDocumentsRequired": "Documents upload required",
+    "documents": {
+      "idCard": "ID Card",
+      "selfieWithLicense": "Selfie with Driver's License",
+      "driverLicense": "Driver's License",
+      "validUntil": "Valid until",
+      "notUploaded": "Not uploaded"
+    },
+    "replaceDocuments": "Replace Documents",
+    "deleteAccount": "Delete Account",
+    "logout": "Logout"
+  },
+  "onboarding": {
+    "slides": [
+      {
+        "title": "Style, Power, Perfection - Your Choice, Our Execution",
+        "description": "Rent out or hire luxury cars: by minute, hour, or day."
+      },
+      {
+        "title": "Keys to Luxury in Your Phone",
+        "description": "Rent out or hire premium cars whenever you want. Convenient. Reliable. Fast."
+      },
+      {
+        "title": "Premium Cars - One Click Away",
+        "description": "Rent or lease premium cars with comfort and confidence. Comfort. Security. Status."
+      }
+    ],
+    "login": "Login",
+    "termsAgreement": "By clicking 'Login', you agree to the Terms of Service and Privacy Policy."
+  },
+  "auth": {
+    "phoneNumber": {
+      "title": "Phone Number",
+      "description": "We'll send you a one-time code. Don't share it with anyone!",
+      "placeholder": "(747) 206 - 10 - 55"
+    },
+    "otp": {
+      "title": "Enter Code",
+      "description": "We sent an SMS to",
+      "resendCode": "Resend new code in",
+      "seconds": "sec",
+      "sendCode": "Send Code"
+    },
+    "next": "Next"
+  },
+  "main": {
+    "drawer": {
+      "menu": {
+        "tripsAndPayments": "Trips and Fines",
+        "wallet": "Wallet",
+        "support": "Support",
+        "termsAndPolicy": "Terms and Policy"
+      },
+      "logout": "Logout"
+    }
+  },
+  "trips": {
+    "title": "History",
+    "tabs": {
+      "trips": "Trips",
+      "fines": "Fines"
+    },
+    "fine": "Fine",
+    "currency": "₸"
+  },
+  "modal": {
+    "success": {
+      "title": "Successfully booked!",
+      "description": "The car is ready to use.\nYou can go to it.",
+      "button": "Got it"
+    },
+    "error": {
+      "title": "Error completing rental.",
+      "description": "Check that all doors are closed,\nand try again.",
+      "button": "Try again"
+    }
+  }
+}
