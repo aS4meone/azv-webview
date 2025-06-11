@@ -10,12 +10,10 @@ export const userRoleInteraction = ({
   user,
   notRentedCar,
   hideModal,
-  isMap = false,
 }: {
   user: IUser;
   notRentedCar: ICar;
   hideModal: () => void;
-  isMap?: boolean;
 }) => {
   if (user.current_rental === null) {
     return <UserStartCarModal car={notRentedCar} onClose={hideModal} />;

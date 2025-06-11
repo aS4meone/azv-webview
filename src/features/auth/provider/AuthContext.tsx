@@ -3,11 +3,7 @@
 import { createContext, useContext, useEffect, useRef, ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
-import {
-  getAccessToken,
-  getRefreshToken,
-  clearTokens,
-} from "@/shared/utils/tokenStorage";
+import { getRefreshToken, clearTokens } from "@/shared/utils/tokenStorage";
 import { useUserStore } from "@/shared/stores/userStore";
 import { IUser } from "@/shared/models/types/user";
 
@@ -24,6 +20,10 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 const AUTH_ROUTES = [ROUTES.ROOT, ROUTES.AUTH, ROUTES.ONBOARDING] as const;
+
+const isAuthRoute = (path: string): path is (typeof AUTH_ROUTES)[number] => {
+  return AUTH_ROUTES.includes(path as (typeof AUTH_ROUTES)[number]);
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, fetchUser, isLoading } = useUserStore();
@@ -45,13 +45,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const refreshToken = getRefreshToken();
 
       if (!refreshToken) {
-        if (!AUTH_ROUTES.includes(pathname as any)) {
+        if (!isAuthRoute(pathname)) {
           router.push(ROUTES.ROOT);
         }
         return;
       }
 
-      // Если есть токены - загружаем пользователя
+      // Если есть токены - за  гружаем пользователя
       try {
         await fetchUser();
       } catch (error) {
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Отдельный эффект для редиректа с auth страниц
   useEffect(() => {
     const refreshToken = getRefreshToken();
-    if (user && refreshToken && AUTH_ROUTES.includes(pathname as any)) {
+    if (user && refreshToken && isAuthRoute(pathname)) {
       router.push(ROUTES.MAIN);
     }
   }, [user, pathname]);

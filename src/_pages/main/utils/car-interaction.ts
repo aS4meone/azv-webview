@@ -6,12 +6,10 @@ export const handleCarInteraction = ({
   user,
   notRentedCar,
   hideModal,
-  isMap = false,
 }: {
   user: IUser;
   notRentedCar: ICar;
   hideModal: () => void;
-  isMap?: boolean;
 }) => {
   console.log(user.current_rental);
   if (user.current_rental?.car_details.owned_car) {
@@ -23,7 +21,7 @@ export const handleCarInteraction = ({
     //   break;
 
     case UserRole.PENDING:
-      return userRoleInteraction({ user, notRentedCar, hideModal, isMap });
+      return userRoleInteraction({ user, notRentedCar, hideModal });
 
     case UserRole.ADMIN:
       break;
@@ -34,7 +32,7 @@ export const handleCarInteraction = ({
       break;
 
     case UserRole.USER:
-      return userRoleInteraction({ user, notRentedCar, hideModal, isMap });
+      return userRoleInteraction({ user, notRentedCar, hideModal });
 
     default:
       break;

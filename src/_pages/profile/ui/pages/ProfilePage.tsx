@@ -5,9 +5,8 @@ import { useTranslations } from "next-intl";
 import DeleteAccount from "../widgets/DeleteAccount";
 import Logout from "../widgets/Logout";
 import GetUserData from "../widgets/GetUserData";
-import { useEffect, useState } from "react";
-import { IUser } from "@/shared/models/types/user";
-import { userApi } from "@/shared/api/routes/user";
+import { useEffect } from "react";
+
 import { useUserStore } from "@/shared/stores/userStore";
 
 export default function ProfilePage() {

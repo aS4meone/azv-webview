@@ -35,7 +35,7 @@ export const userApi = {
     );
     return response;
   },
-  fcmToken: async (data: any) => {
+  fcmToken: async (data: { token: string }) => {
     const response = await axiosInstance.post(userRoutes.fcmToken, data);
     return response;
   },

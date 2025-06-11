@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRightIcon } from "@/shared/icons";
-import { Splash } from "@/shared/ui";
+
 import { PDFViewer } from "@/widgets/pdf-viewer";
 import { useState } from "react";
 

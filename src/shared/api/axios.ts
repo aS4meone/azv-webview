@@ -10,10 +10,15 @@ const axiosInstance = axios.create({
 });
 
 // Флаг для отслеживания процесса обновления токена
-let isRefreshing = false;
-let failedQueue: any[] = [];
+interface QueueItem {
+  resolve: (value?: unknown) => void;
+  reject: (error: unknown) => void;
+}
 
-const processQueue = (error: any = null) => {
+let isRefreshing = false;
+let failedQueue: QueueItem[] = [];
+
+const processQueue = (error: unknown = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);

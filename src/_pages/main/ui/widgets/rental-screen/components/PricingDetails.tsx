@@ -16,7 +16,6 @@ interface PricingDetailsProps {
 
 export const PricingDetails = ({
   config,
-  car,
   pricePerUnit,
   totalCost,
 }: PricingDetailsProps) => {

@@ -44,10 +44,9 @@ const MOCK_FINES = [
 ];
 
 const TripsAndFinesPage = () => {
-  const [activeTab, setActiveTab] = useState<"trips" | "fines">("trips");
+  const [activeTab] = useState<"trips" | "fines">("trips");
   const t = useTranslations();
-  const [trips, setTrips] = useState(MOCK_TRIPS);
-  const [fines, setFines] = useState(MOCK_FINES);
+  const [, setTrips] = useState(MOCK_TRIPS);
 
   useEffect(() => {
     const fetchTrips = async () => {

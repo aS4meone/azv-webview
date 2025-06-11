@@ -5,11 +5,11 @@ const OTP_LENGTH = 4;
 
 const OTPInput = ({
   onResend,
-  code,
+
   setCode,
 }: {
   onResend: () => void;
-  code: string;
+
   setCode: (code: string) => void;
 }) => {
   const t = useTranslations();

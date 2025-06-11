@@ -8,6 +8,8 @@
 // } from "react";
 // import { PhotoConfig } from "@/widgets/upload-photo/UploadPhoto";
 
+import { PhotoConfig } from "@/widgets/upload-photo/UploadPhoto";
+
 // // Константы статусов из isPhotoSend.ts
 // const USER_UPLOAD_STATUS_AFTER = "userupload_after";
 // const USER_UPLOAD_STATUS_BEFORE = "userupload_before";
@@ -30,23 +32,23 @@
 //   before = "before",
 // }
 
-// export const baseConfig: PhotoConfig[] = [
-//   {
-//     id: "selfie",
-//     title: "Сделайте селфи, перед началом использования авто.",
-//     isSelfy: true,
-//   },
-//   {
-//     id: "car_photos",
-//     title: "Сделайте фото машины со всех сторон. Минимум 6, максимум 10.",
-//     multiple: { min: 1, max: 10 },
-//   },
-//   {
-//     id: "interior_photos",
-//     title: "Сделайте фото салона. Минимум 5, максимум 10.",
-//     multiple: { min: 1, max: 10 },
-//   },
-// ];
+export const baseConfig: PhotoConfig[] = [
+  {
+    id: "selfie",
+    title: "Сделайте селфи, перед началом использования авто.",
+    isSelfy: true,
+  },
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон. Минимум 6, максимум 10.",
+    multiple: { min: 1, max: 10 },
+  },
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона. Минимум 5, максимум 10.",
+    multiple: { min: 1, max: 10 },
+  },
+];
 
 // export interface PhotoUploadConfig {
 //   action: PhotoActions;

@@ -15,7 +15,7 @@ export const authApi = {
         phone_number: phoneNumber,
       });
       return { data: response.data, error: null, statusCode: response.status };
-    } catch (error: any) {
+    } catch (error) {
       return {
         data: null,
         error: error.response?.data.detail || "Failed to send SMS",
@@ -30,7 +30,7 @@ export const authApi = {
         sms_code: code,
       });
       return { data: response.data, error: null, statusCode: response.status };
-    } catch (error: any) {
+    } catch (error) {
       return {
         data: null,
         error: error.response.data.detail || "Failed to verify SMS code",
@@ -55,7 +55,7 @@ export const authApi = {
         refreshToken: response.data.refresh_token,
       });
       return { data: response.data, error: null, statusCode: response.status };
-    } catch (error: any) {
+    } catch (error) {
       return {
         data: null,
         error: error.response?.data.detail || "Failed to refresh token",

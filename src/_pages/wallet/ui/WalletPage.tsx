@@ -13,7 +13,7 @@ const WalletPage = () => {
   const { showModal } = useResponseModal();
   const [balance, setBalance] = useState(0);
   const [promoCode, setPromoCode] = useState("");
-  const [cards, setCards] = useState([{ id: 1, last4: "4242", isMain: true }]);
+  const [cards] = useState([{ id: 1, last4: "4242", isMain: true }]);
 
   const handleTopUp = async () => {
     const response = await userApi.addMoney(100000);

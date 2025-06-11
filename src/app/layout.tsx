@@ -6,7 +6,6 @@ import { AuthProvider } from "@/features/auth/provider/AuthContext";
 import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { ModalProvider, ResponseModalProvider } from "@/shared/ui/modal";
-import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",

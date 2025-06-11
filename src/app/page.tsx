@@ -6,7 +6,7 @@ import { getTokens } from "@/shared/utils/tokenStorage";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
   const { fetchUser } = useUserStore();
 
@@ -23,4 +23,4 @@ const page = () => {
   return <article></article>;
 };
 
-export default page;
+export default Page;

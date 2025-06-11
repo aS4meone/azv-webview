@@ -1,7 +1,6 @@
 "use client";
 import { ArrowLocationIcon, MinusIcon, PlusIcon } from "@/shared/icons";
 import { ICar } from "@/shared/models/types/car";
-import { deduplicateById } from "@/shared/models/types/unique-identifier";
 import { Button } from "@/shared/ui";
 import { useModal } from "@/shared/ui/modal";
 
@@ -17,15 +16,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { handleCarInteraction } from "@/_pages/main/utils/car-interaction";
 
-const MapWithMarkers = ({
-  zoom,
-  setZoom,
-  setCenter,
-}: {
-  zoom: number;
-  setZoom: (zoom: number) => void;
-  setCenter: (center: { lat: number; lng: number }) => void;
-}) => {
+const MapWithMarkers = ({ zoom }: { zoom: number }) => {
   const { showModal, hideModal } = useModal();
   const { fetchAllVehicles, allVehicles } = useVehiclesStore();
   const { user } = useUserStore();
@@ -35,7 +26,6 @@ const MapWithMarkers = ({
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const markerLibraryLoadedRef = useRef(false);
 
-  console.log(user.current_rental);
   // Fetch vehicles only once
   useEffect(() => {
     if (!user.current_rental) {
@@ -133,7 +123,6 @@ const MapWithMarkers = ({
           hideModal: () => {
             hideModal();
           },
-          isMap: true,
         });
 
         if (content === null) {
@@ -226,7 +215,9 @@ const MapWithMarkers = ({
         } else {
           clustererRef.current.addMarkers(newMarkers);
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     initializeMarkers();
@@ -304,7 +295,7 @@ export const MapComponent = () => {
           gestureHandling="greedy"
           disableDefaultUI={true}
         >
-          <MapWithMarkers zoom={zoom} setZoom={setZoom} setCenter={setCenter} />
+          <MapWithMarkers zoom={zoom} />
           {userLocation && (
             <AdvancedMarker position={userLocation}>
               <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg" />

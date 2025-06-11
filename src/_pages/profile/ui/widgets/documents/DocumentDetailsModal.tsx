@@ -1,8 +1,7 @@
 import React from "react";
 import { Input, Button } from "@/shared/ui";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeftIcon } from "@/shared/icons";
+
 import PushScreen from "@/shared/ui/push-screen";
 
 type DocumentDetailsData = Omit<

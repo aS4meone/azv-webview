@@ -13,10 +13,6 @@ import { authApi } from "@/shared/api/routes/auth";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { useUserStore } from "@/shared/stores/userStore";
 
-interface ErrorResponse {
-  detail: string;
-}
-
 const AuthPage = () => {
   const { fetchUser } = useUserStore();
   const router = useRouter();
@@ -92,7 +88,6 @@ const AuthPage = () => {
             <PhoneInput phone={phone} setPhone={setPhone} />
           ) : (
             <OTPInput
-              code={code}
               setCode={setCode}
               onResend={async () => {
                 try {
@@ -105,7 +100,9 @@ const AuthPage = () => {
                       buttonText: t("modal.error.button"),
                     });
                   }
-                } catch (error) {}
+                } catch (error) {
+                  console.log(error);
+                }
               }}
             />
           )}

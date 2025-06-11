@@ -12,10 +12,8 @@ export const WaitingTimer = ({ user, className = "" }: WaitingTimerProps) => {
   const car = user.current_rental.car_details;
   const reservationTime = user.current_rental.rental_details.reservation_time;
 
-  const { isFreePeriod, timeLeft, isPaid, paidMinutes } = useWaitingTimer(
-    reservationTime,
-    car.price_per_minute
-  );
+  const { isFreePeriod, timeLeft, isPaid, paidMinutes } =
+    useWaitingTimer(reservationTime);
 
   const calculatePaidAmount = () => {
     return (car.price_per_minute / 2) * paidMinutes;

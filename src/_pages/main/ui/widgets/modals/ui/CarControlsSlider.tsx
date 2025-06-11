@@ -4,8 +4,6 @@ import React, { useState, useRef, useEffect } from "react";
 interface CarControlsSliderProps {
   onLock?: () => void;
   onUnlock?: () => void;
-
-  isLocked?: boolean;
 }
 
 const LockClosedIcon = ({ className }: { className?: string }) => (
@@ -53,8 +51,6 @@ const LockOpenIcon = ({ className }: { className?: string }) => (
 export const CarControlsSlider = ({
   onLock,
   onUnlock,
-
-  isLocked = false,
 }: CarControlsSliderProps) => {
   const [slidePosition, setSlidePosition] = useState(0); // Позиция для анимации
   const [isAnimating, setIsAnimating] = useState(false);
@@ -232,8 +228,6 @@ export const CarControlsSlider = ({
         >
           <ArrowLeftIcon color="white" className="w-6 h-6" />
         </button>
-
-        <div className="mx-4 w-8 h-1 bg-gray-600 rounded-full" />
 
         <button
           onClick={() => onLock?.()}

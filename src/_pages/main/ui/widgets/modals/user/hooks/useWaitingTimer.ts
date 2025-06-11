@@ -8,8 +8,7 @@ interface WaitingTimerResult {
 }
 
 export const useWaitingTimer = (
-  reservationTime: string,
-  pricePerMinute: number
+  reservationTime: string
 ): WaitingTimerResult => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
