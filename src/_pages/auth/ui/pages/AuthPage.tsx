@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 import { authApi } from "@/shared/api/routes/auth";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { useUserStore } from "@/shared/stores/userStore";
+import Loader from "@/shared/ui/loader";
 
 const AuthPage = () => {
   const { fetchUser } = useUserStore();
@@ -21,6 +22,7 @@ const AuthPage = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const isDisabled =
     activeStep === 0
@@ -40,20 +42,23 @@ const AuthPage = () => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      const res = await authApi.sendSms(phone);
+      setIsLoading(true);
+      const res = await authApi.sendSms("7" + phone);
       if (res.statusCode === 200) {
         setActiveStep(1);
+        setIsLoading(false);
       } else {
-        console.log(res);
         showModal({
           type: "error",
           title: t("error"),
           description: res.error,
           buttonText: t("modal.error.button"),
         });
+        setIsLoading(false);
       }
     } else {
-      const res = await authApi.verifySms(phone, code);
+      setIsLoading(true);
+      const res = await authApi.verifySms("7" + phone, code);
       if (res.statusCode === 200) {
         setTokens({
           accessToken: res.data.access_token,
@@ -61,6 +66,7 @@ const AuthPage = () => {
         });
         fetchUser();
         router.push(ROUTES.MAIN);
+        setIsLoading(false);
       } else {
         showModal({
           type: "error",
@@ -68,6 +74,7 @@ const AuthPage = () => {
           description: res.error,
           buttonText: t("modal.error.button"),
         });
+        setIsLoading(false);
       }
     }
   };
@@ -101,7 +108,12 @@ const AuthPage = () => {
                     });
                   }
                 } catch (error) {
-                  console.log(error);
+                  showModal({
+                    type: "error",
+                    title: t("error"),
+                    description: error.response.data.detail,
+                    buttonText: t("modal.error.button"),
+                  });
                 }
               }}
             />
@@ -109,8 +121,12 @@ const AuthPage = () => {
         </section>
         <section className="flex flex-col gap-6">
           <ProgressIndicator current={activeStep} total={2} />
-          <Button variant="primary" disabled={isDisabled} onClick={handleNext}>
-            {t("auth.next")}
+          <Button
+            variant="primary"
+            disabled={isDisabled || isLoading}
+            onClick={handleNext}
+          >
+            {isLoading ? <Loader color="#fff" /> : t("auth.next")}
           </Button>
         </section>
       </div>

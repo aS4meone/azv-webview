@@ -56,7 +56,7 @@ export const PDFViewer = ({ file, onClose }: PDFViewerProps) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-50 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-lg transition-colors"
+          className="absolute top-[60px] right-4 z-50 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-lg transition-colors"
           aria-label="Close PDF"
         >
           <svg

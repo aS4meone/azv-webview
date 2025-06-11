@@ -10,7 +10,7 @@ export const rentRoutes = {
   startRent: `/rent/start`,
 
   uploadBeforeRent: `/rent/upload-photos-before`,
-  uploadAfterRent: `/rent/upload=photos-after`,
+  uploadAfterRent: `/rent/upload-photos-after`,
 
   uploadOwnerBeforeRent: `/rent/upload-photos-before-owner`,
   uploadOwnerAfterRent: `/rent/upload-photos-after-owner`,
@@ -55,8 +55,16 @@ export const rentApi = {
     );
     return response;
   },
-  uploadAfterRent: async () => {
-    const response = await axiosInstance.post(rentRoutes.uploadAfterRent);
+  uploadAfterRent: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadAfterRent,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response;
   },
   uploadOwnerBeforeRent: async () => {

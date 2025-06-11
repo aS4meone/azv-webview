@@ -22,7 +22,7 @@ const WalletPage = () => {
       setPromoCode("");
       showModal({
         type: "success",
-        description: `Баланс успешно пополнен на ${response.data.wallet_balance} ₸`,
+        description: `Баланс успешно пополнен на 100000 ₸`,
         buttonText: "Хорошо",
       });
     }

@@ -3,6 +3,7 @@ import { Input, Button } from "@/shared/ui";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 
 import PushScreen from "@/shared/ui/push-screen";
+import Loader from "@/shared/ui/loader";
 
 type DocumentDetailsData = Omit<
   UploadDocumentsDto,
@@ -14,6 +15,7 @@ interface DocumentDetailsModalProps {
   onClose: () => void;
   onSubmit: (data: DocumentDetailsData) => void;
   initialData: DocumentDetailsData;
+  isLoading?: boolean;
 }
 
 export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
@@ -21,6 +23,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   onClose,
   onSubmit,
   initialData,
+  isLoading = false,
 }) => {
   const [formData, setFormData] =
     React.useState<DocumentDetailsData>(initialData);
@@ -52,7 +55,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
 
   return (
     isOpen && (
-      <PushScreen onClose={onClose}>
+      <PushScreen onClose={onClose} withCloseButton={false}>
         <form onSubmit={handleSubmit} className="space-y-4 pt-8">
           <Input
             label="ФИО"
@@ -103,8 +106,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                 variant="secondary"
                 onClick={handleSubmit}
                 className="w-full"
+                disabled={isLoading}
               >
-                Отправить
+                {isLoading ? <Loader color="#fff" /> : "Отправить"}
               </Button>
             </div>
           )}

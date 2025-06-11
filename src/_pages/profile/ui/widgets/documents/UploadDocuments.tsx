@@ -18,6 +18,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [files, setFiles] = useState<DocumentFiles>({});
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<
     Omit<
       UploadDocumentsDto,
@@ -35,6 +36,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
     [key: string]: File[];
   }) => {
     try {
+      setIsLoading(true);
       setIsUploadOpen(false);
 
       const newFiles: DocumentFiles = {};
@@ -62,11 +64,14 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         description: errorMessage,
         buttonText: "Понятно",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDetailsSubmit = async (formData: typeof data) => {
     try {
+      setIsLoading(true);
       const form = new FormData();
 
       if (files.id_front) form.append("id_front", files.id_front);
@@ -127,6 +132,8 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         description: error.response.data.detail,
         buttonText: "Понятно",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -161,6 +168,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         onPhotoUpload={handlePhotoUpload}
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
+        isLoading={isLoading}
       />
 
       <DocumentDetailsModal
@@ -168,6 +176,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         onClose={() => setIsDetailsOpen(false)}
         onSubmit={handleDetailsSubmit}
         initialData={data}
+        isLoading={isLoading}
       />
     </>
   );

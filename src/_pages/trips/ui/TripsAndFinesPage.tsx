@@ -62,8 +62,8 @@ const TripsAndFinesPage = () => {
       <div className="px-4 mt-6">
         <Tabs defaultValue="trips" className="w-full">
           <TabsList className="mb-6">
-            <TabsTrigger value="trips">Trips</TabsTrigger>
-            <TabsTrigger value="fines">Fines</TabsTrigger>
+            <TabsTrigger value="trips">Поездки</TabsTrigger>
+            <TabsTrigger value="fines">Штрафы</TabsTrigger>
           </TabsList>
 
           <TabsContent value="trips" className="flex flex-col gap-4">

@@ -32,19 +32,21 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   const hideModal = () => {
     setIsOpen(false);
+    setTimeout(() => {
+      setModalConfig(null);
+    }, 300);
+  };
+
+  const handleClose = () => {
+    hideModal();
+    modalConfig?.onClose?.();
   };
 
   return (
     <ModalContext.Provider value={{ showModal, hideModal }}>
       {children}
       {modalConfig && (
-        <BottomModal
-          isOpen={isOpen}
-          onClose={() => {
-            hideModal();
-            modalConfig.onClose?.();
-          }}
-        >
+        <BottomModal isOpen={isOpen} onClose={handleClose}>
           {modalConfig.children}
         </BottomModal>
       )}

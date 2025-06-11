@@ -47,4 +47,8 @@ export const vehicleActionsApi = {
     const response = await axiosInstance.post(vehicleActionsRoutes.giveKey);
     return response.data;
   },
+  takeKey: async () => {
+    const response = await axiosInstance.post(vehicleActionsRoutes.takeKey);
+    return response.data;
+  },
 };

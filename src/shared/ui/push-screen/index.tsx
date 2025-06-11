@@ -6,12 +6,14 @@ interface PushScreenProps {
   onClose?: () => void;
   children: React.ReactNode;
   withOutStyles?: boolean;
+  withCloseButton?: boolean;
 }
 
 const PushScreen = ({
   onClose,
   children,
   withOutStyles = false,
+  withCloseButton = false,
 }: PushScreenProps) => {
   if (withOutStyles != null && withOutStyles) {
     return (
@@ -45,11 +47,13 @@ const PushScreen = ({
         className="fixed inset-0 bg-white z-50 px-8 py-10"
       >
         <div className="min-h-screen">
-          <div className="flex items-center h-[48px]">
-            <button onClick={onClose} className="text-[#007AFF]">
-              <ArrowLeftIcon className="w-7 h-7" />
-            </button>
-          </div>
+          {withCloseButton && (
+            <div className="flex items-center h-[48px]">
+              <button onClick={onClose} className="text-[#007AFF]">
+                <ArrowLeftIcon className="w-7 h-7" />
+              </button>
+            </div>
+          )}
           {children}
         </div>
       </motion.div>

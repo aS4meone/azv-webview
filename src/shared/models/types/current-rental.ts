@@ -8,9 +8,9 @@ export interface ICurrentRental {
 
 export interface RentalDetails {
   reservation_time: string;
-  start_time: null;
+  start_time: null | string;
   rental_type: string;
-  duration: null;
+  duration: null | number;
   already_payed: number;
   status: string;
   delivery_in_progress: boolean;

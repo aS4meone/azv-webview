@@ -19,9 +19,6 @@ export const DurationSelector = ({
 }: DurationSelectorProps) => {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-lg font-medium text-[#191919]">
-        Продолжительность
-      </span>
       <div className="flex flex-col justify-center items-center">
         <div className="flex items-center gap-4">
           <button

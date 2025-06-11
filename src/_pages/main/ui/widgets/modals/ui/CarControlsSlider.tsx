@@ -237,7 +237,7 @@ export const CarControlsSlider = ({
         </button>
       </div>
 
-      <div className="pr-7">
+      <div className="pr-5">
         <LockOpenIcon className=" text-gray-700" />
       </div>
     </div>

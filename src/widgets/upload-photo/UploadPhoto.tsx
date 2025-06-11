@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { CameraIcon, GoodIcon, BadIcon } from "@/shared/icons";
+import { CameraIcon, GoodIcon, BadIcon, ArrowLeftIcon } from "@/shared/icons";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { Button } from "@/shared/ui";
 import PushScreen from "@/shared/ui/push-screen";
+import Loader from "@/shared/ui/loader";
 
 export interface PhotoConfig {
   id: string;
@@ -20,6 +21,7 @@ interface UploadPhotoProps {
   isOpen?: boolean;
   onClose?: () => void;
   withCloseButton?: boolean;
+  isLoading?: boolean;
 }
 
 export const UploadPhoto: React.FC<UploadPhotoProps> = ({
@@ -28,6 +30,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   isOpen = false,
   onClose,
   withCloseButton = false,
+  isLoading = false,
 }) => {
   const { showModal } = useResponseModal();
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
@@ -98,7 +101,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   );
 
   const content = (
-    <div className="flex flex-col gap-8 pb-[100px] px-8 pt-8">
+    <div className="flex flex-col gap-8 pb-[100px]">
       {config.map((photo) => (
         <div key={photo.id} className="flex flex-col gap-2">
           <div className="flex items-start gap-2">
@@ -154,24 +157,25 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   }
 
   return (
-    <PushScreen onClose={onClose} withOutStyles>
+    <PushScreen onClose={onClose}>
       {withCloseButton && (
-        <div className="absolute top-0 right-0">
-          <Button variant="outline" onClick={onClose}>
-            Закрыть
-          </Button>
+        <div className="absolute top-10 left-4">
+          <button onClick={onClose} className="text-[#007AFF]">
+            <ArrowLeftIcon className="w-7 h-7" />
+          </button>
         </div>
       )}
-      <div className="pt-8">
+      <div className="pt-4">
         {content}
         {allPhotosUploaded && (
-          <div className="fixed bottom-0 left-0 right-0 p-8 bg-white ">
+          <div className="fixed bottom-12 left-8 right-8  ">
             <Button
               variant="secondary"
               onClick={handleSubmit}
               className="w-full"
+              disabled={isLoading}
             >
-              Отправить
+              {isLoading ? <Loader color="#fff" /> : "Отправить"}
             </Button>
           </div>
         )}
