@@ -1,5 +1,4 @@
 import axiosInstance from "../axios";
-import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 
 export const userRoutes = {
   getUser: "/auth/user/me",

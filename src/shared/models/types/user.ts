@@ -1,3 +1,4 @@
+import { ICar } from "./car";
 import { ICurrentRental } from "./current-rental";
 
 export enum UserRole {
@@ -34,5 +35,5 @@ export interface IUser {
   wallet_balance: number;
   current_rental: ICurrentRental | null;
   documents: Documents;
-  owned_cars: any[];
+  owned_cars: ICar[];
 }

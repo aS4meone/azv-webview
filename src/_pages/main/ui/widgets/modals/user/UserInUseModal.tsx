@@ -73,6 +73,10 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         {/* Car Title and Plate */}
         <CarInfoHeader car={car} />
 
+        <div className="flex justify-between gap-2">
+          <Button variant="outline">Пауза</Button>
+          <Button variant="outline">Начать поездку</Button>
+        </div>
         {/* Car Controls Slider */}
         <CarControlsSlider
           isLocked={isLocked}

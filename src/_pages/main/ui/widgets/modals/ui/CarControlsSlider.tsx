@@ -38,8 +38,8 @@ const LockOpenIcon = ({ className }: { className?: string }) => (
     className={className}
   >
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M19.5 3.25C17.2563 3.25 15.4375 5.06884 15.4375 7.3125V10.5625C17.2324 10.5625 18.6875 12.0176 18.6875 13.8125V21.125C18.6875 22.9199 17.2324 24.375 15.4375 24.375H4.0625C2.26757 24.375 0.8125 22.9199 0.8125 21.125V13.8125C0.8125 12.0176 2.26757 10.5625 4.0625 10.5625H13.8125V7.3125C13.8125 4.17139 16.3589 1.625 19.5 1.625C22.6411 1.625 25.1875 4.17139 25.1875 7.3125V11.375C25.1875 11.8237 24.8237 12.1875 24.375 12.1875C23.9263 12.1875 23.5625 11.8237 23.5625 11.375V7.3125C23.5625 5.06884 21.7437 3.25 19.5 3.25ZM4.0625 12.1875C3.16505 12.1875 2.4375 12.9151 2.4375 13.8125V21.125C2.4375 22.0224 3.16505 22.75 4.0625 22.75H15.4375C16.3349 22.75 17.0625 22.0224 17.0625 21.125V13.8125C17.0625 12.9151 16.3349 12.1875 15.4375 12.1875H4.0625Z"
       fill="#191919"
     />
@@ -206,7 +206,7 @@ export const CarControlsSlider = ({
       ref={containerRef}
       className="w-full bg-gray-100 rounded-full flex items-center justify-between overflow-hidden"
     >
-      <div className="pl-3">
+      <div className="pl-5">
         <LockClosedIcon className=" text-gray-700" />
       </div>
 
@@ -243,7 +243,7 @@ export const CarControlsSlider = ({
         </button>
       </div>
 
-      <div className="pr-5">
+      <div className="pr-7">
         <LockOpenIcon className=" text-gray-700" />
       </div>
     </div>

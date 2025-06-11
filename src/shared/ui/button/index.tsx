@@ -8,7 +8,6 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: "primary" | "secondary" | "outline" | "icon" | "danger";
   link?: string;
-  splashColor?: string;
   asChild?: boolean;
 }
 
@@ -17,7 +16,6 @@ const Button = ({
   variant = "primary",
   link,
   className,
-  splashColor,
   asChild,
   ...props
 }: ButtonProps) => {
