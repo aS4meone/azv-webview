@@ -1,4 +1,3 @@
-import { ROUTES } from "@/shared/constants/routes";
 import { ArrowLeftIcon, LogoIcon } from "@/shared/icons";
 import { Button } from "@/shared/ui";
 import Link from "next/link";

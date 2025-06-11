@@ -69,20 +69,19 @@ export const CarControlsSlider = ({
 
   // Вычисление максимально допустимого смещения
   const getMaxOffset = () => {
-    if (!containerRef.current || !sliderRef.current) return 50;
+    if (!containerRef.current || !sliderRef.current) return 100;
 
     const containerWidth = containerRef.current.clientWidth;
     const sliderWidth = sliderRef.current.clientWidth;
-    const paddingHorizontal = 0 * 2; // p-4 = 16px с каждой стороны
+    const leftIconWidth = 44; // примерная ширина левой иконки + отступы
+    const rightIconWidth = 44; // примерная ширина правой иконки + отступы
 
-    // Максимальное смещение = (ширина контейнера - padding - ширина слайдера) / 2
-    const maxOffset = Math.max(
-      0,
-      (containerWidth - paddingHorizontal - sliderWidth) / 2
-    );
+    // Максимальное смещение = расстояние до края минус ширина иконок
+    const availableSpace =
+      containerWidth - leftIconWidth - rightIconWidth - sliderWidth;
+    const maxOffset = Math.max(availableSpace / 2, containerWidth * 0.3); // минимум 30% от ширины контейнера
 
-    // Минимум 30px для визуального эффекта, максимум вычисленное значение
-    return Math.max(30, Math.min(50, maxOffset));
+    return Math.min(maxOffset, containerWidth * 0.4); // максимум 40% от ширины контейнера
   };
 
   const lerp = (start: number, end: number, factor: number) => {
@@ -181,14 +180,14 @@ export const CarControlsSlider = ({
     if (isLeftSwipe) {
       // Свайп влево = разблокировать (unlock/close)
       onUnlock?.();
-      // Плавная анимация завершения (ограничиваем границами)
-      setSlidePosition(-Math.min(maxOffset, 100));
+      // Плавная анимация завершения - до самого края
+      setSlidePosition(-maxOffset);
       setTimeout(resetPosition, 150);
     } else if (isRightSwipe) {
       // Свайп вправо = заблокировать (lock)
       onLock?.();
-      // Плавная анимация завершения (ограничиваем границами)
-      setSlidePosition(Math.min(maxOffset, 80));
+      // Плавная анимация завершения - до самого края
+      setSlidePosition(maxOffset);
       setTimeout(resetPosition, 150);
     } else {
       // Если свайп недостаточный, плавно возвращаемся в исходную позицию

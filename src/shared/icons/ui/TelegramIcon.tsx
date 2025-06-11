@@ -1,7 +1,6 @@
 import React from "react";
-import { IIcon } from "../types/IIcon";
 
-const TelegramIcon = ({ className, width, height }: IIcon) => {
+const TelegramIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -31,11 +31,6 @@ export interface UploadDocumentsDto {
    */
   birth_date: string;
 
-  /**
-   * IIN (Individual Identification Number)
-   * @minLength 12
-   * @maxLength 12
-   */
   iin: string;
 
   /**
