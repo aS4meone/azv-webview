@@ -27,9 +27,3 @@ html {
   touch-action: none;
   scroll-padding-top: 100px;
 }
-
-.otp-container {
-  overscroll-behavior: contain;
-  touch-action: none;
-  -ms-touch-action: none;
-}

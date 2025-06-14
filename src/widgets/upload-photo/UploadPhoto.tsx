@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { CameraIcon, GoodIcon, BadIcon, ArrowLeftIcon } from "@/shared/icons";
+import { createPortal } from "react-dom";
+import { CameraIcon, GoodIcon, BadIcon } from "@/shared/icons";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { Button } from "@/shared/ui";
 import PushScreen from "@/shared/ui/push-screen";
 import Loader from "@/shared/ui/loader";
+import { FlutterCamera } from "@/shared/utils/flutter-camera";
 
 export interface PhotoConfig {
   id: string;
@@ -36,8 +38,145 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
     {}
   );
+  const [loadingStates, setLoadingStates] = useState<{
+    [key: string]: boolean;
+  }>({});
 
-  const handlePhotoSelect = (
+  const setPhotoLoading = (photoId: string, loading: boolean) => {
+    setLoadingStates((prev) => ({ ...prev, [photoId]: loading }));
+  };
+
+  // Универсальная обработка выбора фото через Flutter
+  const handleFlutterPhotoSelect = async (
+    photoId: string,
+    photoConfig: PhotoConfig
+  ) => {
+    try {
+      setPhotoLoading(photoId, true);
+
+      let files: File[] = [];
+
+      if (photoConfig.multiple) {
+        // Множественные фото только с камеры
+        console.log(
+          `📷 Множественные фото с камеры: ${photoConfig.multiple.min}-${photoConfig.multiple.max}`
+        );
+
+        const base64Images = await FlutterCamera.captureMultiplePhotos(
+          photoConfig.multiple.min,
+          photoConfig.multiple.max
+        );
+
+        if (base64Images.length < photoConfig.multiple.min) {
+          showModal({
+            type: "error",
+            title: "Ошибка",
+            description: `Минимальное количество фото: ${photoConfig.multiple.min}`,
+            buttonText: "Понятно",
+          });
+          return;
+        }
+
+        files = FlutterCamera.base64ArrayToFiles(base64Images, photoId);
+      } else {
+        // Одиночное фото с камеры (включая селфи)
+        console.log(
+          `📸 ${photoConfig.isSelfy ? "Селфи" : "Фото"} с камеры для ${photoId}`
+        );
+
+        const base64Image = await FlutterCamera.capturePhoto();
+        if (base64Image) {
+          const fileName = photoConfig.isSelfy
+            ? `${photoId}_selfie.jpg`
+            : `${photoId}.jpg`;
+          files = [FlutterCamera.base64ToFile(base64Image, fileName)];
+        }
+      }
+
+      if (files.length === 0) {
+        showModal({
+          type: "error",
+          title: "Ошибка",
+          description: "Не удалось сделать фотографии",
+          buttonText: "Понятно",
+        });
+        return;
+      }
+
+      console.log(`✅ Успешно сделано ${files.length} фото для ${photoId}`);
+      setSelectedFiles((prev) => ({
+        ...prev,
+        [photoId]: files,
+      }));
+    } catch (error) {
+      console.error("Flutter camera error:", error);
+      showModal({
+        type: "error",
+        title: "Ошибка",
+        description:
+          error instanceof Error ? error.message : "Ошибка работы с камерой",
+        buttonText: "Понятно",
+      });
+    } finally {
+      setPhotoLoading(photoId, false);
+    }
+  };
+
+  // Функция для исправления реверса изображения
+  const flipImageHorizontally = (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      if (!ctx) {
+        console.error("Canvas context не поддерживается");
+        resolve(file); // Fallback если Canvas не поддерживается
+        return;
+      }
+
+      img.onload = () => {
+        try {
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Отражаем изображение горизонтально
+          ctx.scale(-1, 1);
+          ctx.drawImage(img, -img.width, 0);
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const flippedFile = new File([blob], file.name, {
+                  type: file.type,
+                });
+                console.log("✅ Изображение успешно отражено горизонтально");
+                resolve(flippedFile);
+              } else {
+                console.error("Не удалось создать blob из canvas");
+                resolve(file); // Fallback
+              }
+            },
+            file.type,
+            0.9
+          );
+        } catch (error) {
+          console.error("Ошибка при обработке изображения:", error);
+          resolve(file); // Fallback
+        }
+      };
+
+      img.onerror = () => {
+        console.error("Ошибка загрузки изображения");
+        resolve(file); // Fallback
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Обработка выбора фото через HTML input (fallback)
+  const handlePhotoSelect = async (
     photoId: string,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -86,9 +225,36 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       return;
     }
 
+    // Исправляем реверс для селфи камеры
+    let processedFiles = files;
+    if (photoConfig?.isSelfy) {
+      console.log(`🔄 Обнаружено селфи для ${photoId}, применяем flip`);
+      try {
+        setPhotoLoading(photoId, true);
+        processedFiles = await Promise.all(
+          files.map((file, index) => {
+            console.log(
+              `Обрабатываем файл ${index + 1}/${files.length}: ${file.name}`
+            );
+            return flipImageHorizontally(file);
+          })
+        );
+        console.log(
+          `✅ Успешно обработано ${processedFiles.length} файлов для селфи ${photoId}`
+        );
+      } catch (error) {
+        console.error("❌ Ошибка обработки изображения:", error);
+        // Используем исходные файлы в случае ошибки
+      } finally {
+        setPhotoLoading(photoId, false);
+      }
+    } else {
+      console.log(`📷 Обычное фото для ${photoId}, flip не применяется`);
+    }
+
     setSelectedFiles((prev) => ({
       ...prev,
-      [photoId]: files,
+      [photoId]: processedFiles,
     }));
   };
 
@@ -99,6 +265,8 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const allPhotosUploaded = config.every(
     (photo) => selectedFiles[photo.id]?.length > 0
   );
+
+  const isFlutterAvailable = FlutterCamera.isAvailable();
 
   const content = (
     <div className="flex flex-col gap-8 pb-[100px]">
@@ -124,29 +292,71 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
             </div>
           </div>
 
-          <label className="block w-full">
-            <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
-              <div className="flex items-center gap-2">
-                <CameraIcon
-                  className="w-5 h-5"
-                  width={24}
-                  height={24}
-                  color="#191919"
-                />
-                <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
-                  {selectedFiles[photo.id] ? "Фото загружено" : "Сделать фото"}
-                </span>
+          {isFlutterAvailable ? (
+            // Flutter камера доступна - используем везде
+            <button
+              onClick={() => handleFlutterPhotoSelect(photo.id, photo)}
+              disabled={loadingStates[photo.id] || isLoading}
+              className="block w-full"
+            >
+              <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
+                <div className="flex items-center gap-2">
+                  {loadingStates[photo.id] ? (
+                    <Loader color="#191919" />
+                  ) : (
+                    <CameraIcon
+                      className="w-5 h-5"
+                      width={24}
+                      height={24}
+                      color="#191919"
+                    />
+                  )}
+                  <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
+                    {loadingStates[photo.id]
+                      ? "Обработка..."
+                      : selectedFiles[photo.id]
+                      ? `${selectedFiles[photo.id].length} фото готово`
+                      : photo.multiple
+                      ? "Сделать фото"
+                      : photo.isSelfy
+                      ? "Сделать селфи"
+                      : "Сделать фото"}
+                  </span>
+                </div>
               </div>
-            </div>
-            <input
-              type="file"
-              accept="image/*"
-              multiple={!!photo.multiple}
-              className="hidden"
-              onChange={(e) => handlePhotoSelect(photo.id, e)}
-              {...(photo.isSelfy ? { capture: "user" } : {})}
-            />
-          </label>
+            </button>
+          ) : (
+            // Fallback на HTML input (только если Flutter недоступен)
+            <label className="block w-full">
+              <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
+                <div className="flex items-center gap-2">
+                  <CameraIcon
+                    className="w-5 h-5"
+                    width={24}
+                    height={24}
+                    color="#191919"
+                  />
+                  <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
+                    {selectedFiles[photo.id]
+                      ? `${selectedFiles[photo.id].length} фото сделано`
+                      : photo.multiple
+                      ? "Сделать фото"
+                      : photo.isSelfy
+                      ? "Сделать селфи"
+                      : "Сделать фото"}
+                  </span>
+                </div>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                multiple={!!photo.multiple}
+                className="hidden"
+                onChange={(e) => handlePhotoSelect(photo.id, e)}
+                capture={photo.isSelfy ? "user" : undefined}
+              />
+            </label>
+          )}
         </div>
       ))}
     </div>
@@ -156,19 +366,12 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     return null;
   }
 
-  return (
-    <PushScreen onClose={onClose}>
-      {withCloseButton && (
-        <div className="absolute top-10 left-4">
-          <button onClick={onClose} className="text-[#007AFF]">
-            <ArrowLeftIcon className="w-7 h-7" />
-          </button>
-        </div>
-      )}
-      <div className="pt-4">
-        {content}
+  const modalContent = (
+    <PushScreen onClose={onClose} withCloseButton={withCloseButton}>
+      <div className="flex flex-col min-h-full bg-white py-10">
+        <div className="flex-1 pt-4">{content}</div>
         {allPhotosUploaded && (
-          <div className="fixed bottom-12 left-8 right-8  ">
+          <div className="sticky bottom-0  pt-4 pb-8">
             <Button
               variant="secondary"
               onClick={handleSubmit}
@@ -182,4 +385,9 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       </div>
     </PushScreen>
   );
+
+  // Рендерим через Portal в корень DOM
+  return typeof window !== "undefined"
+    ? createPortal(modalContent, document.body)
+    : null;
 };

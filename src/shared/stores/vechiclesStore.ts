@@ -8,9 +8,10 @@ interface VehiclesStore {
   // User
   allVehicles: ICar[];
   frequentlyUsedVehicles: ICar[];
-  // User
+  // Mechanic
   pendingVehicles: ICar[];
   deliveryVehicles: ICar[];
+  inUseVehicles: ICar[];
   searchResults: ICar[];
 
   // Loading states
@@ -18,6 +19,7 @@ interface VehiclesStore {
   isLoadingPending: boolean;
   isLoadingDelivery: boolean;
   isLoadingFrequent: boolean;
+  isLoadingInUse: boolean;
   isLoadingSearch: boolean;
 
   // Error states
@@ -28,9 +30,11 @@ interface VehiclesStore {
   //User
   fetchAllVehicles: () => Promise<void>;
   fetchFrequentlyUsedVehicles: () => Promise<void>;
-  //User
+  //Mechani
   fetchPendingVehicles: () => Promise<void>;
   fetchDeliveryVehicles: () => Promise<void>;
+  fetchInUseVehicles: () => Promise<void>;
+
   searchVehiclesForUser: (query: string, userRole: UserRole) => Promise<void>;
   clearSearch: () => void;
   clearAll: () => void;
@@ -39,9 +43,11 @@ interface VehiclesStore {
 export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   // States
   allVehicles: [],
+  frequentlyUsedVehicles: [],
+  //Mechanic
   pendingVehicles: [],
   deliveryVehicles: [],
-  frequentlyUsedVehicles: [],
+  inUseVehicles: [],
   searchResults: [],
 
   // Loading states
@@ -49,6 +55,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   isLoadingPending: false,
   isLoadingDelivery: false,
   isLoadingFrequent: false,
+  isLoadingInUse: false,
   isLoadingSearch: false,
 
   // Error state
@@ -71,12 +78,33 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
     }
   },
 
+  fetchInUseVehicles: async () => {
+    try {
+      set({ isLoadingInUse: true, error: null });
+      const response = await mechanicApi.getInUseVehicles();
+      console.log(response);
+      set({
+        pendingVehicles: response.data.vehicles || [],
+        isLoadingInUse: false,
+      });
+    } catch (error) {
+      console.error("Failed to fetch pending vehicles:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch pending vehicles",
+        isLoadingInUse: false,
+      });
+    }
+  },
+
   fetchPendingVehicles: async () => {
     try {
       set({ isLoadingPending: true, error: null });
       const response = await mechanicApi.getPendingVehicles();
       set({
-        pendingVehicles: response?.vehicles || [],
+        pendingVehicles: response.data.vehicles || [],
         isLoadingPending: false,
       });
     } catch (error) {
@@ -96,7 +124,12 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       set({ isLoadingDelivery: true, error: null });
       const response = await mechanicApi.getDeliveryVehicles();
       set({
-        deliveryVehicles: response?.vehicles || [],
+        deliveryVehicles:
+          response.data.delivery_vehicles.map((car) => ({
+            ...car,
+            name: car.car_name,
+            id: car.car_id,
+          })) || [],
         isLoadingDelivery: false,
       });
     } catch (error) {

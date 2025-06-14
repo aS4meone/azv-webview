@@ -11,10 +11,10 @@ import { useUserStore } from "@/shared/stores/userStore";
 
 export default function ProfilePage() {
   const t = useTranslations("profile");
-  const { user, fetchUser, isLoading, refreshUser } = useUserStore();
+  const { user, isLoading, refreshUser } = useUserStore();
 
   useEffect(() => {
-    fetchUser();
+    refreshUser();
   }, []);
 
   if (isLoading) {
@@ -26,10 +26,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <article className="flex flex-col min-h-screen bg-white pt-10">
+    <article className="flex flex-col min-h-screen bg-white py-10">
       <CustomAppBar backHref={ROUTES.MAIN} title={t("title")} />
       <GetUserData user={user} getUser={refreshUser} isLoading={isLoading} />
-      <div className="px-4 py-6 space-y-4">
+      <div className="px-4 py-6 space-y-4 ">
         <DeleteAccount />
         <Logout />
       </div>

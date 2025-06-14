@@ -1,21 +1,22 @@
 import { ICar } from "@/shared/models/types/car";
 import { IUser, UserRole } from "@/shared/models/types/user";
 import { userRoleInteraction } from "./user-role.interaction";
+import { mechaniRoleInteraction } from "./mechanic-role";
+import { DeliveryData } from "@/shared/hooks/useCurrentDelivery";
 
 export const handleCarInteraction = ({
   user,
   notRentedCar,
   hideModal,
+  deliveryData,
+  isDeliveryMode,
 }: {
   user: IUser;
   notRentedCar: ICar;
   hideModal: () => void;
+  deliveryData?: DeliveryData | null;
+  isDeliveryMode?: boolean;
 }) => {
-  console.log(user.current_rental);
-  if (user.current_rental?.car_details.owned_car) {
-    return null;
-  }
-
   switch (user.role) {
     case UserRole.FIRST:
       return userRoleInteraction({ user, notRentedCar, hideModal });
@@ -26,7 +27,13 @@ export const handleCarInteraction = ({
     case UserRole.ADMIN:
       break;
     case UserRole.MECHANIC:
-      break;
+      return mechaniRoleInteraction({
+        user,
+        notRentedCar,
+        hideModal,
+        deliveryData,
+        isDeliveryMode,
+      });
 
     case UserRole.REJECTED:
       break;

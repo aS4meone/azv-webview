@@ -7,14 +7,107 @@ import { MapComponent } from "../widgets/map/Map";
 import { FooterBtns } from "../widgets/footer-btns";
 import SearchIcon from "@/shared/icons/ui/SearchIcon";
 import { useUserStore } from "@/shared/stores/userStore";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useModal } from "@/shared/ui/modal";
+import { RentalStatus } from "@/shared/models/types/current-rental";
+import { handleCarInteraction } from "../../utils/car-interaction";
 
 export default function GoogleMapsPage() {
-  const { fetchUser } = useUserStore();
+  const { refreshUser, user } = useUserStore();
+  const { showModal, hideModal } = useModal();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const previousStatusRef = useRef<RentalStatus | null>(null);
+  const [isModalCurrentlyOpen, setIsModalCurrentlyOpen] = useState(false);
 
   useEffect(() => {
-    fetchUser();
-  }, []);
+    refreshUser();
+  }, [refreshUser]);
+
+  // Отслеживание изменений статуса аренды и автоматическое переключение модалок
+  useEffect(() => {
+    if (user?.current_rental) {
+      const currentStatus = user.current_rental.rental_details.status;
+
+      // Если статус изменился и модалка открыта, обновляем её
+      if (
+        previousStatusRef.current !== null &&
+        previousStatusRef.current !== currentStatus &&
+        isModalCurrentlyOpen
+      ) {
+        // Закрываем текущую модалку
+        hideModal();
+        setIsModalCurrentlyOpen(false);
+
+        // Небольшая задержка для плавного перехода
+        setTimeout(() => {
+          // Показываем новую модалку соответствующую новому статусу
+          const content = handleCarInteraction({
+            user,
+            notRentedCar: user.current_rental!.car_details,
+            hideModal: () => {
+              hideModal();
+              setIsModalCurrentlyOpen(false);
+            },
+          });
+
+          if (content) {
+            showModal({
+              children: content,
+            });
+            setIsModalCurrentlyOpen(true);
+          }
+        }, 100);
+      }
+
+      // Обновляем предыдущий статус
+      previousStatusRef.current = currentStatus;
+    } else {
+      // Если аренды нет, сбрасываем предыдущий статус
+      previousStatusRef.current = null;
+      setIsModalCurrentlyOpen(false);
+    }
+  }, [
+    user?.current_rental?.rental_details.status,
+    user,
+    showModal,
+    hideModal,
+    isModalCurrentlyOpen,
+  ]);
+
+  // Интервал для обновления пользователя с разной частотой в зависимости от статуса
+  useEffect(() => {
+    if (user?.current_rental) {
+      // Очищаем предыдущий интервал если он был
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      // Определяем частоту обновления в зависимости от статуса
+      const isDelivering =
+        user.current_rental.rental_details.status === "delivering";
+      const intervalTime = isDelivering ? 10000 : 60000; // 10 сек для доставки, 60 сек для остальных
+
+      // Запускаем интервал с нужной частотой
+      intervalRef.current = setInterval(() => {
+        refreshUser();
+      }, intervalTime);
+    } else {
+      // Очищаем интервал если аренды нет
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    }
+
+    // Очистка при размонтировании компонента
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [user?.current_rental?.rental_details.status, refreshUser]);
 
   return (
     <div className="relative h-screen w-full overflow-hidden">

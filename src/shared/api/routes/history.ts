@@ -8,12 +8,12 @@ export const historyRoutes = {
 export const historyApi = {
   getHistories: async () => {
     const response = await axiosInstance.get(historyRoutes.getHistories);
-    return response.data;
+    return response;
   },
   getHistoryOfRent: async (id: number) => {
     const response = await axiosInstance.get(
       historyRoutes.getHistoryOfRent(id)
     );
-    return response.data;
+    return response;
   },
 };

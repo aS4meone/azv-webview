@@ -8,7 +8,7 @@ const GetUserData = ({
   getUser,
   isLoading,
 }: {
-  user: IUser;
+  user: IUser | null;
   getUser: () => void;
   isLoading: boolean;
 }) => {

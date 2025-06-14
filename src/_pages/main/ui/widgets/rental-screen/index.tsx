@@ -9,9 +9,17 @@ interface RentalPageProps {
   car: ICar;
   onBack: () => void;
   onRent: (rentalData: RentalData) => void;
+  isDelivery: boolean;
+  deliveryAddress?: string;
 }
 
-export const RentalPage = ({ car, onBack, onRent }: RentalPageProps) => {
+export const RentalPage = ({
+  car,
+  onBack,
+  onRent,
+  isDelivery,
+  deliveryAddress,
+}: RentalPageProps) => {
   const {
     activeTab,
     duration,
@@ -28,68 +36,58 @@ export const RentalPage = ({ car, onBack, onRent }: RentalPageProps) => {
   };
 
   return (
-    <article className="bg-white min-h-screen">
+    <article
+      className="bg-white h-screen overflow-y-auto overflow-x-hidden scrollable"
+      data-scrollable="true"
+    >
       {/* Header with car image */}
       <CarImageCarousel car={car} height="h-80" onBack={onBack} />
 
-      {/* Content */}
-      <div className="px-4 py-6 space-y-6">
+      {/* Content - добавляем больше контента чтобы был скролл */}
+      <div className="px-4 py-6 space-y-6 pb-20">
         {/* Car Info */}
         <CarInfoHeader car={car} />
 
         {/* Car Specs */}
         <CarSpecs car={car} />
 
+        {/* Delivery Address Info */}
+        {isDelivery && deliveryAddress && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-blue-800 mb-2">
+              Адрес доставки:
+            </h3>
+            <p className="text-sm text-blue-700">{deliveryAddress}</p>
+          </div>
+        )}
+
         {/* Rental Type Tabs */}
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsList>
+          <TabsList variant="rounded">
             <TabsTrigger value="minutes">Минуты</TabsTrigger>
             <TabsTrigger value="hours">Часы</TabsTrigger>
             <TabsTrigger value="days">Дни</TabsTrigger>
           </TabsList>
 
-          {/* Rental Details for each tab */}
-          <TabsContent value="minutes" className="mt-6">
-            <RentalTabContent
-              rentalType="minutes"
-              car={car}
-              duration={duration}
-              totalCost={calculateCost("minutes").totalCost}
-              onIncrement={incrementDuration}
-              onDecrement={decrementDuration}
-              onDurationChange={setDurationDirect}
-            />
-          </TabsContent>
-
-          <TabsContent value="hours" className="mt-6">
-            <RentalTabContent
-              rentalType="hours"
-              car={car}
-              duration={duration}
-              totalCost={calculateCost("hours").totalCost}
-              onIncrement={incrementDuration}
-              onDecrement={decrementDuration}
-              onDurationChange={setDurationDirect}
-            />
-          </TabsContent>
-
-          <TabsContent value="days" className="mt-6">
-            <RentalTabContent
-              rentalType="days"
-              car={car}
-              duration={duration}
-              totalCost={calculateCost("days").totalCost}
-              onIncrement={incrementDuration}
-              onDecrement={decrementDuration}
-              onDurationChange={setDurationDirect}
-            />
-          </TabsContent>
+          {(["minutes", "hours", "days"] as const).map((rentalType) => (
+            <TabsContent key={rentalType} value={rentalType} className="mt-6">
+              <RentalTabContent
+                rentalType={rentalType}
+                car={car}
+                duration={duration}
+                totalCost={calculateCost(rentalType).totalCost}
+                onIncrement={incrementDuration}
+                onDecrement={decrementDuration}
+                onDurationChange={setDurationDirect}
+              />
+            </TabsContent>
+          ))}
         </Tabs>
 
         {/* Rent Button */}
         <div className="pt-4">
-          <Button variant="secondary" onClick={handleRent}>
-            Забронировать
+          <Button variant="secondary" onClick={handleRent} className="w-full">
+            {isDelivery ? "Заказать доставку" : "Забронировать"}
           </Button>
         </div>
       </div>

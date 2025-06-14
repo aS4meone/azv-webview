@@ -8,7 +8,7 @@ import { IUser } from "@/shared/models/types/user";
 import { WaitingTimer } from "../../components/WaitingTimer";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
-import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
+import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
 
 interface UserCarInWaitingModalProps {
   user: IUser;
@@ -22,7 +22,9 @@ export const UserCarInWaitingModal = ({
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
-  const car = user.current_rental.car_details;
+  const [isLoading, setIsLoading] = useState(false);
+  const car = user.current_rental!.car_details;
+
   // onClose();
   async function handleRent() {
     try {
@@ -74,6 +76,7 @@ export const UserCarInWaitingModal = ({
   };
 
   const handlePhotoUpload = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
     const formData = new FormData();
     for (const key in files) {
       for (const file of files[key]) {
@@ -82,6 +85,31 @@ export const UserCarInWaitingModal = ({
     }
     const res = await rentApi.uploadBeforeRent(formData);
     if (res.status === 200) {
+      setIsLoading(false);
+      setShowUploadPhoto(false);
+      showModal({
+        type: "success",
+        description: "Фотографии успешно загружены",
+        buttonText: "Отлично",
+        onClose: async () => {
+          onClose();
+          await refreshUser();
+        },
+      });
+    }
+  };
+
+  const handleOwnerPhotoUpload = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    const res = await rentApi.uploadOwnerBeforeRent(formData);
+    if (res.status === 200) {
+      setIsLoading(false);
       setShowUploadPhoto(false);
       showModal({
         type: "success",
@@ -98,9 +126,12 @@ export const UserCarInWaitingModal = ({
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
       <UploadPhoto
-        config={baseConfig}
-        onPhotoUpload={handlePhotoUpload}
+        config={car.owned_car ? ownerConfig : baseConfig}
+        onPhotoUpload={
+          car.owned_car ? handleOwnerPhotoUpload : handlePhotoUpload
+        }
         isOpen={showUploadPhoto}
+        isLoading={isLoading}
         onClose={() => setShowUploadPhoto(false)}
       />
 

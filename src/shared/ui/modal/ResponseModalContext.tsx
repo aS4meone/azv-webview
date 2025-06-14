@@ -69,8 +69,9 @@ export const ResponseModalProvider = ({
             hideModal();
             modalConfig.onClose?.();
           }}
+          closeOnScroll
           type={modalConfig.type}
-          title={modalConfig.title}
+          title={modalConfig.title || ""}
           description={modalConfig.description}
           buttonText={modalConfig.buttonText}
           onButtonClick={handleButtonClick}

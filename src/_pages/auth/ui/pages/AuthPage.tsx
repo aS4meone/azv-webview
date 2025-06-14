@@ -15,7 +15,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import Loader from "@/shared/ui/loader";
 
 const AuthPage = () => {
-  const { fetchUser } = useUserStore();
+  const { fetchUser, refreshUser } = useUserStore();
   const router = useRouter();
   const t = useTranslations();
   const { showModal } = useResponseModal();
@@ -66,6 +66,7 @@ const AuthPage = () => {
         });
         fetchUser();
         router.push(ROUTES.MAIN);
+        refreshUser();
         setIsLoading(false);
       } else {
         showModal({

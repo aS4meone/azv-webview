@@ -29,7 +29,7 @@ const SearchPage = () => {
     }
 
     try {
-      if (user.role === UserRole.MECHANIC) {
+      if (user!.role === UserRole.MECHANIC) {
         setIsLoading(true);
         const response = await mechanicApi.searchVehicles(query);
 
@@ -74,7 +74,7 @@ const SearchPage = () => {
           />
           <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2" />
         </div>
-        <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)]">
+        <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
           {isLoading ? (
             <div className="text-center py-4 text-[#191919] text-[16px]">
               Загрузка...

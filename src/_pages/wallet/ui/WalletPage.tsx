@@ -13,113 +13,176 @@ const WalletPage = () => {
   const { showModal } = useResponseModal();
   const [balance, setBalance] = useState(0);
   const [promoCode, setPromoCode] = useState("");
-  const [cards] = useState([{ id: 1, last4: "4242", isMain: true }]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isTopUpLoading, setIsTopUpLoading] = useState(false);
 
   const handleTopUp = async () => {
-    const response = await userApi.addMoney(100000);
-    if (response.status === 200) {
-      getBalance();
-      setPromoCode("");
-      showModal({
-        type: "success",
-        description: `Баланс успешно пополнен на 100000 ₸`,
-        buttonText: "Хорошо",
-      });
+    setIsTopUpLoading(true);
+    try {
+      const response = await userApi.addMoney(100000);
+      if (response.status === 200) {
+        await getBalance();
+        setPromoCode("");
+        showModal({
+          type: "success",
+          description: `Баланс успешно пополнен на 100000 ₸`,
+          buttonText: "Хорошо",
+        });
+      }
+    } catch (error) {
+      console.error("Error topping up:", error);
+    } finally {
+      setIsTopUpLoading(false);
     }
   };
 
-  const handleApplyPromoCode = () => {
-    console.log("Applying promo code:", promoCode);
-    setPromoCode("");
-  };
-
-  const handleAddCard = () => {
-    console.log("Adding new card");
+  const handleApplyPromoCode = async () => {
+    if (!promoCode.trim()) return;
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Applying promo code:", promoCode);
+      setPromoCode("");
+      showModal({
+        type: "success",
+        description: `Промокод "${promoCode}" успешно активирован!`,
+        buttonText: "Отлично",
+      });
+    } catch (error) {
+      console.error("Error applying promo code:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getBalance = async () => {
-    const response = await userApi.getUser();
-    setBalance(response.data.wallet_balance);
+    try {
+      const response = await userApi.getUser();
+      setBalance(response.data.wallet_balance);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+    }
   };
+
   useEffect(() => {
     getBalance();
   }, []);
 
+  const formatBalance = (amount: number) => {
+    return new Intl.NumberFormat("ru-RU").format(amount);
+  };
+
   return (
-    <article className="flex flex-col min-h-screen bg-white pt-10">
+    <article className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10">
       <CustomAppBar backHref={ROUTES.MAIN} title={t("title")} />
 
       {/* Balance Section */}
-      <section className="px-8 mt-6">
-        <div className="bg-[#191919] rounded-[20px] p-6 text-white">
-          <p className="text-[16px] text-white/80 mb-2">
-            {t("currentBalance")}
-          </p>
-          <h1 className="text-[32px] font-medium">{balance} ₸</h1>
+      <section className="px-6 mt-8">
+        <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-[40px] p-8 text-white shadow-2xl shadow-gray-900/25">
+          {/* Background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full transform translate-x-16 -translate-y-16"></div>
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/30 rounded-full transform -translate-x-8 translate-y-8"></div>
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm text-white/60 font-medium uppercase tracking-wider">
+                {t("currentBalance")}
+              </p>
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            </div>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+              {formatBalance(balance)} ₸
+            </h1>
+            <p className="text-xs text-white/50">Доступно для использования</p>
+          </div>
         </div>
       </section>
 
-      {/* Cards Section */}
-      <section className="px-8 mt-6">
-        <h2 className="text-[20px] text-[#191919] mb-4">
-          {t("paymentMethods")}
-        </h2>
-        {cards.map((card) => (
-          <div key={card.id} className="bg-[#F8F8F8] rounded-[20px] p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[16px] text-[#191919]">•••• {card.last4}</p>
-                {card.isMain && (
-                  <span className="text-[14px] text-[#6F6F6F]">
-                    {t("mainCard")}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* Top Up Button */}
+      <section className="px-6 mt-8">
         <Button
           variant="secondary"
-          className="w-full mt-2"
-          onClick={handleAddCard}
-        >
-          {t("addCard")}
-        </Button>
-      </section>
-
-      {/* Top Up Button */}
-      <section className="px-8 mt-6">
-        <Button
-          className="flex items-center justify-center gap-2 text-[#191919]"
           onClick={handleTopUp}
+          disabled={isTopUpLoading}
         >
-          <PlusIcon color="#191919" />
-          <span>{t("topUp")}</span>
+          <div className="flex items-center justify-center gap-3">
+            <div
+              className={`transition-transform duration-300 ${
+                isTopUpLoading ? "animate-spin" : "group-hover:rotate-12"
+              }`}
+            >
+              {isTopUpLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <PlusIcon color="white" />
+              )}
+            </div>
+            <span className="font-semibold text-lg text-white">
+              {isTopUpLoading ? "Пополняем..." : t("topUp")}
+            </span>
+          </div>
         </Button>
       </section>
 
       {/* Spacer to push promocodes to bottom */}
-      <div className="flex-grow" />
+      <div className="flex-grow min-h-8" />
 
       {/* Promocodes Section */}
-      <section className="px-8 mb-8">
-        <h2 className="text-[20px] text-[#191919] mb-4">{t("promocodes")}</h2>
+      <section className="px-6 pb-8 pt-4">
+        <div className="bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 border border-gray-200">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="text-2xl">🎁</div>
+            <h2 className="text-xl font-bold text-gray-900">
+              {t("promocodes")}
+            </h2>
+          </div>
 
-        <input
-          type="text"
-          value={promoCode}
-          onChange={(e) => setPromoCode(e.target.value)}
-          placeholder="AZVMotors"
-          className="w-full text-[16px] bg-[#F7F7F7] text-[#191919] outline-none mb-4 placeholder:text-[#6F6F6F] p-4 rounded-full"
-        />
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={handleApplyPromoCode}
-          disabled={!promoCode}
-        >
-          {t("activate")}
-        </Button>
+          <div className="space-y-4">
+            <div className="relative">
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="Введите промокод"
+                className="w-full text-base bg-gray-50 text-gray-900 outline-none border-2 border-transparent
+                         focus:border-gray-800 focus:bg-white placeholder:text-gray-400 p-4 rounded-2xl
+                         transition-all duration-300 shadow-inner focus:shadow-lg"
+                disabled={isLoading}
+              />
+              {promoCode && (
+                <button
+                  onClick={() => setPromoCode("")}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <Button
+              variant="secondary"
+              className={`font-semibold text-lg text-white
+                        ${
+                          promoCode
+                            ? ""
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        }
+                        disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]`}
+              onClick={handleApplyPromoCode}
+              disabled={!promoCode.trim() || isLoading}
+            >
+              <div className="flex items-center justify-center gap-2">
+                {isLoading && (
+                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                )}
+                <span>{isLoading ? "Активируем..." : t("activate")}</span>
+              </div>
+            </Button>
+          </div>
+        </div>
       </section>
     </article>
   );

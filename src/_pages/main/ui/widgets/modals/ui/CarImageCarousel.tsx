@@ -1,5 +1,6 @@
 import { ICar } from "@/shared/models/types/car";
 import { Button, ProgressIndicator } from "@/shared/ui";
+import Loader from "@/shared/ui/loader";
 import Image from "next/image";
 import React, { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -35,10 +36,7 @@ export const CarImageCarousel = ({
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [initialImageSlide, setInitialImageSlide] = useState(0);
 
-  const photos =
-    car.photos && car.photos.length > 0
-      ? car.photos
-      : ["/images/car-placeholder.jpg"];
+  const photos = car.photos && car.photos.length > 0 ? car.photos : [];
 
   const handleImageError = (index: number) => {
     setImageErrors((prev) => ({ ...prev, [index]: true }));
@@ -58,13 +56,40 @@ export const CarImageCarousel = ({
     setShowImageViewer(true);
   };
 
+  // Если нет фотографий, показываем заглушку сразу
+  if (photos.length === 0) {
+    return (
+      <div
+        className={`relative ${height} bg-gray-100 overflow-hidden ${
+          rounded ? "rounded-t-[24px]" : ""
+        }`}
+      >
+        {/* Back Button */}
+        {onBack && (
+          <Button
+            variant="icon"
+            onClick={onBack}
+            className="absolute left-4 top-10 bg-white z-10"
+          >
+            <ArrowLeftIcon />
+          </Button>
+        )}
+
+        <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center">
+          <InfoIcon />
+          <p className="text-gray-500 text-sm font-medium">Фото недоступно</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative ${height} bg-gray-100 overflow-hidden ${
         rounded ? "rounded-t-[24px]" : ""
       }`}
     >
-      {showImageViewer && car.photos.length > 0 && (
+      {showImageViewer && (
         <ImageViewerPage
           car={car}
           onBack={() => setShowImageViewer(false)}
@@ -110,7 +135,7 @@ export const CarImageCarousel = ({
                   {imageLoading[index] && (
                     // Показываем индикатор загрузки
                     <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-10">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#191919]"></div>
+                      <Loader color="#191919" />
                     </div>
                   )}
                   <Image
@@ -121,8 +146,6 @@ export const CarImageCarousel = ({
                     onError={() => handleImageError(index)}
                     onLoad={() => handleImageLoad(index)}
                     onLoadStart={() => handleImageLoadStart(index)}
-                    placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                   />
                 </>
               )}

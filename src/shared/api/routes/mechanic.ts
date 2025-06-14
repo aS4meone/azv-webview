@@ -1,3 +1,4 @@
+import { CompleteRentDto } from "@/shared/models/dto/rent.dto";
 import axiosInstance from "../axios";
 
 export const mechanicRoutes = {
@@ -36,15 +37,15 @@ export const mechanicActionsRoutes = {
 export const mechanicApi = {
   getPendingVehicles: async () => {
     const response = await axiosInstance.get(mechanicRoutes.getPendingVehicles);
-    return response.data;
+    return response;
   },
   getInUseVehicles: async () => {
     const response = await axiosInstance.get(mechanicRoutes.getInUseVehicles);
-    return response.data;
+    return response;
   },
   searchVehicles: async (search: string) => {
     const response = await axiosInstance.get(mechanicRoutes.searchVehicles, {
-      params: { search },
+      params: { query: search },
     });
     return response.data;
   },
@@ -52,63 +53,92 @@ export const mechanicApi = {
     const response = await axiosInstance.post(
       mechanicRoutes.reserveCheckCar(id)
     );
-    return response.data;
+    return response;
   },
   startCheckCar: async () => {
     const response = await axiosInstance.post(mechanicRoutes.startCheckCar);
-    return response.data;
+    return response;
   },
   cancelCheckCar: async () => {
     const response = await axiosInstance.post(mechanicRoutes.cancelCheckCar);
-    return response.data;
+    return response;
   },
-  uploadBeforeCheckCar: async () => {
+  uploadBeforeCheckCar: async (formData: FormData) => {
     const response = await axiosInstance.post(
-      mechanicRoutes.uploadBeforeCheckCar
+      mechanicRoutes.uploadBeforeCheckCar,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
-    return response.data;
+    return response;
   },
-  uploadAfterCheckCar: async () => {
+
+  uploadAfterCheckCar: async (formData: FormData) => {
     const response = await axiosInstance.post(
-      mechanicRoutes.uploadAfterCheckCar
+      mechanicRoutes.uploadAfterCheckCar,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
-    return response.data;
+    return response;
   },
-  completeCheckCar: async () => {
-    const response = await axiosInstance.post(mechanicRoutes.completeCheckCar);
-    return response.data;
+  completeCheckCar: async (rentData: CompleteRentDto) => {
+    const response = await axiosInstance.post(
+      mechanicRoutes.completeCheckCar,
+      rentData
+    );
+    return response;
   },
   getDeliveryVehicles: async () => {
     const response = await axiosInstance.get(
       mechanicRoutes.getDeliveryVehicles
     );
-    return response.data;
+    return response;
   },
   acceptDelivery: async (id: number) => {
     const response = await axiosInstance.post(
       mechanicRoutes.acceptDelivery(id)
     );
-    return response.data;
+    return response;
   },
   completeDelivery: async () => {
     const response = await axiosInstance.post(mechanicRoutes.completeDelivery);
-    return response.data;
+    return response;
   },
   getCurrentDelivery: async () => {
     const response = await axiosInstance.get(mechanicRoutes.getCurrentDelivery);
-    return response.data;
+    return response;
   },
-  uploadBeforeDelivery: async () => {
+  uploadBeforeDelivery: async (formData: FormData) => {
     const response = await axiosInstance.post(
-      mechanicRoutes.uploadBeforeDelivery
+      mechanicRoutes.uploadBeforeDelivery,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
-    return response.data;
+
+    return response;
   },
-  uploadAfterDelivery: async () => {
+  uploadAfterDelivery: async (formData: FormData) => {
     const response = await axiosInstance.post(
-      mechanicRoutes.uploadAfterDelivery
+      mechanicRoutes.uploadAfterDelivery,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
-    return response.data;
+    return response;
   },
 };
 

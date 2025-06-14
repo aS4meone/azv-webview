@@ -16,7 +16,7 @@ import { ArrowRightIcon } from "@/shared/icons";
 import { cn } from "@/shared/utils/cn";
 import { RENTAL_CONFIG } from "../../rental-screen/hooks/usePricingCalculator";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
-import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
+import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { ICar } from "@/shared/models/types/car";
 
@@ -222,7 +222,7 @@ const HoursRentalContent = ({
       >
         <p>Тариф</p>
         <p>
-          {rentalDetails.duration} {config.getUnitText(rentalDetails.duration)}
+          {rentalDetails.duration} {config.getUnitText(rentalDetails.duration!)}
         </p>
       </div>
       {isOvertime && (
@@ -279,7 +279,7 @@ const DaysRentalContent = ({
       >
         <p>Тариф</p>
         <p>
-          {rentalDetails.duration} {config.getUnitText(rentalDetails.duration)}
+          {rentalDetails.duration} {config.getUnitText(rentalDetails.duration!)}
         </p>
       </div>
       {isOvertime && (
@@ -298,6 +298,7 @@ const DaysRentalContent = ({
 export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [showMore, setShowMore] = useState(false);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -308,6 +309,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
 
   const handlePhotoUpload = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
     const formData = new FormData();
     for (const key in files) {
       for (const file of files[key]) {
@@ -316,6 +318,23 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
     }
     const res = await rentApi.uploadAfterRent(formData);
     if (res.status === 200) {
+      setIsLoading(false);
+      setShowUploadPhoto(false);
+      setShowRatingModal(true);
+    }
+  };
+
+  const handleOwnerPhotoUpload = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    const res = await rentApi.uploadOwnerAfterRent(formData);
+    if (res.status === 200) {
+      setIsLoading(false);
       setShowUploadPhoto(false);
       setShowRatingModal(true);
     }
@@ -334,8 +353,8 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
     }
   }, [isSuccessOpen]);
 
-  const car = user.current_rental.car_details;
-  const rentalDetails = user.current_rental.rental_details;
+  const car = user.current_rental!.car_details;
+  const rentalDetails = user.current_rental!.rental_details;
   const rentalType = rentalDetails.rental_type as RentalType;
 
   // Vehicle action handlers
@@ -484,12 +503,15 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         onClose={() => {
           setIsSuccessOpen(false);
         }}
-        actionType={actionType}
+        actionType={actionType!}
       />
 
       <UploadPhoto
-        config={baseConfig}
-        onPhotoUpload={handlePhotoUpload}
+        config={car.owned_car ? ownerConfig : baseConfig}
+        onPhotoUpload={
+          car.owned_car ? handleOwnerPhotoUpload : handlePhotoUpload
+        }
+        isLoading={isLoading}
         isOpen={showUploadPhoto}
         withCloseButton
         onClose={() => setShowUploadPhoto(false)}
@@ -508,28 +530,38 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         />
       )}
 
-      <button
-        onClick={() => setShowMore(!showMore)}
-        className={cn(
-          "w-full h-auto bg-[#F3F3F3] text-left text-[#191919] p-5 text-[16px]",
-          showMore && "bg-[#F1F7FF]"
-        )}
-      >
-        {showMore ? (
-          renderRentalTypeContent()
-        ) : (
-          <div className="text-center flex items-center justify-start gap-2">
-            <span>Подробнее</span> <ArrowRightIcon />
-          </div>
-        )}
-      </button>
+      {car.owned_car ? null : (
+        <button
+          onClick={() => setShowMore(!showMore)}
+          className={cn(
+            "w-full h-auto bg-[#F3F3F3] text-left text-[#191919] p-5 text-[16px]",
+            showMore && "bg-[#F1F7FF]"
+          )}
+        >
+          {showMore ? (
+            renderRentalTypeContent()
+          ) : (
+            <div className="text-center flex items-center justify-start gap-2">
+              <span>Подробнее</span> <ArrowRightIcon />
+            </div>
+          )}
+        </button>
+      )}
 
       <div className="p-6 pt-4 space-y-6">
         <div className="flex justify-between gap-2">
-          <Button variant="outline" onClick={handlePause}>
+          <Button
+            variant="outline"
+            className="text-[14px]"
+            onClick={handlePause}
+          >
             Пауза
           </Button>
-          <Button variant="outline" onClick={handleStartTrip}>
+          <Button
+            variant="outline"
+            className="text-[14px]"
+            onClick={handleStartTrip}
+          >
             Начать поездку
           </Button>
         </div>
@@ -587,7 +619,11 @@ const RatingModal = ({
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Комментарий"
+          placeholder={
+            rating === 1
+              ? "Комментарий (обязательно при оценке 1 звезда)"
+              : "Комментарий (необязательно)"
+          }
           maxLength={255}
           className="w-full h-[200px] p-5 rounded-[30px] border border-[#E0E0E0]  mb-4 bg-[#F9F9F9] outline-none"
         />
@@ -595,21 +631,25 @@ const RatingModal = ({
         <div className="flex justify-between items-center border-t border-[#E0E0E0] mt-2 pt-2">
           <p className="text-[16px] text-[#191919]">Тариф</p>
           <p className="text-[16px] text-[#191919]">
-            {user.current_rental.rental_details.rental_type === "minutes"
+            {user.current_rental!.rental_details.rental_type === "minutes"
               ? `${car.price_per_minute} ₸/мин`
-              : user.current_rental.rental_details.rental_type === "hours"
-              ? `${user.current_rental.rental_details.duration} ${RENTAL_CONFIG[
-                  user.current_rental.rental_details.rental_type as RentalType
-                ].getUnitText(user.current_rental.rental_details.duration)}`
-              : `${user.current_rental.rental_details.duration} ${RENTAL_CONFIG[
-                  user.current_rental.rental_details.rental_type as RentalType
-                ].getUnitText(user.current_rental.rental_details.duration)}`}
+              : user.current_rental!.rental_details.rental_type === "hours"
+              ? `${
+                  user.current_rental!.rental_details.duration
+                } ${RENTAL_CONFIG[
+                  user.current_rental!.rental_details.rental_type as RentalType
+                ].getUnitText(user.current_rental!.rental_details.duration!)}`
+              : `${
+                  user.current_rental!.rental_details.duration
+                } ${RENTAL_CONFIG[
+                  user.current_rental!.rental_details.rental_type as RentalType
+                ].getUnitText(user.current_rental!.rental_details.duration!)}`}
           </p>
         </div>
       </div>
       <Button
         variant="secondary"
-        disabled={rating === 0 || comment.length === 0}
+        disabled={rating === 0 || (rating === 1 && comment.length === 0)}
         onClick={handleEndRental}
         className="w-full"
       >

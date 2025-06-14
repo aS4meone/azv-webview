@@ -19,7 +19,7 @@ export const AdditionalInfo = ({ rentalType }: AdditionalInfoProps) => {
         return "/docs/about_minute.pdf";
 
       default:
-        break;
+        return "/docs/about_minute.pdf";
     }
   };
 

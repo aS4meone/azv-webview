@@ -40,4 +40,5 @@ export interface ICar extends UniqueIdentifier {
   status: CarStatus;
   open_price: number;
   owned_car: boolean;
+  rental_id: number;
 }

@@ -64,8 +64,10 @@ const UserDocumentsData = ({
                   <div className="text-[10px] text-[#191919]">Загружено</div>
                 ) : (
                   <div className="text-[10px] text-[#191919]">
-                    Действителены до{" "}
-                    {new Date(doc.expiry).toLocaleDateString("ru-RU")}
+                    Действителен до{" "}
+                    {doc.expiry
+                      ? new Date(doc.expiry).toLocaleDateString("ru-RU")
+                      : "не указан"}
                   </div>
                 )
               ) : (
@@ -74,8 +76,8 @@ const UserDocumentsData = ({
             </div>
           ))}
         </div>
-        <UploadDocuments getUser={getUser} />
       </div>
+      <UploadDocuments getUser={getUser} />
     </>
   );
 };

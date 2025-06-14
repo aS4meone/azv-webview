@@ -27,8 +27,19 @@ export const rentApi = {
     );
     return response;
   },
-  reserveDelivery: async (id: number) => {
-    const response = await axiosInstance.post(rentRoutes.reserveDelivery(id));
+  reserveDelivery: async (
+    id: number,
+    data: RentCarDto,
+    lng: number,
+    lat: number
+  ) => {
+    const response = await axiosInstance.post(
+      `${rentRoutes.reserveDelivery(id)}?rental_type=${
+        data.rentalType
+      }&delivery_latitude=${lat}&delivery_longitude=${lng}${
+        data.rentalType == "minutes" ? "" : `&duration=${data.duration}`
+      }`
+    );
     return response;
   },
   cancelReservation: async () => {
@@ -67,12 +78,28 @@ export const rentApi = {
     );
     return response;
   },
-  uploadOwnerBeforeRent: async () => {
-    const response = await axiosInstance.post(rentRoutes.uploadOwnerBeforeRent);
+  uploadOwnerBeforeRent: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadOwnerBeforeRent,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response;
   },
-  uploadOwnerAfterRent: async () => {
-    const response = await axiosInstance.post(rentRoutes.uploadOwnerAfterRent);
+  uploadOwnerAfterRent: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadOwnerAfterRent,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     return response;
   },
   completeRent: async (data: CompleteRentDto) => {

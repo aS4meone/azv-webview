@@ -3,7 +3,7 @@ import axiosInstance from "../axios";
 export const vehiclesRoutes = {
   getVehicles: "/vehicles/get_vehicles",
   searchVehicles: "/vehicles/search",
-  frequentlyUsedVehicles: "/vehicles/frequently_used",
+  frequentlyUsedVehicles: "/vehicles/frequently-used",
 };
 
 export const vehicleActionsRoutes = {

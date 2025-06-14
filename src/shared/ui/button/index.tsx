@@ -34,7 +34,7 @@ const Button = ({
     return (
       <div
         className={cn(
-          "relative select-none text-[16px] overflow-hidden px-4 py-2 rounded-full w-full h-[56px] active:scale-95 transition-all duration-300",
+          "relative font-semibold select-none text-[16px] overflow-hidden px-4 py-2 rounded-full w-full h-[56px] active:scale-95 transition-all duration-300",
           buttonClasses[variant],
           disabled && "opacity-50 cursor-not-allowed active:scale-100",
           className
@@ -51,7 +51,7 @@ const Button = ({
         <button
           ref={buttonRef}
           className={cn(
-            "relative select-none text-[18px] overflow-hidden px-4 py-2 rounded-full w-full h-[56px] active:scale-95 transition-all duration-300",
+            "relative select-none font-semibold text-[16px] overflow-hidden px-4 py-2 rounded-full w-full h-[56px] active:scale-95 transition-all duration-300",
             disabled && "opacity-50 cursor-not-allowed active:scale-100",
             buttonClasses[variant],
             className
@@ -67,7 +67,7 @@ const Button = ({
     <button
       ref={buttonRef}
       className={cn(
-        "relative select-none text-[16px] overflow-hidden px-4 py-2 rounded-full w-full h-[56px] active:scale-95 transition-all duration-300",
+        "relative select-none text-[16px] font-semibold overflow-hidden px-4 py-2 rounded-full w-full h-[56px] active:scale-95 transition-all duration-300",
         buttonClasses[variant],
         disabled && "opacity-50 cursor-not-allowed active:scale-100",
         className

@@ -57,7 +57,7 @@ const SupportPage = () => {
               {t("ourTelegram")}
             </h2>
             <a
-              href="https://t.me/your_telegram_channel"
+              href="https://t.me/azv_motors_support"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center h-[66px] justify-between px-7 py-5 border-[#E8E8E8] border gap-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-[#191919]"

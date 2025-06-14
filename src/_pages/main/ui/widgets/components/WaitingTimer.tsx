@@ -9,8 +9,8 @@ interface WaitingTimerProps {
 }
 
 export const WaitingTimer = ({ user, className = "" }: WaitingTimerProps) => {
-  const car = user.current_rental.car_details;
-  const reservationTime = user.current_rental.rental_details.reservation_time;
+  const car = user.current_rental!.car_details;
+  const reservationTime = user.current_rental!.rental_details.reservation_time;
 
   const { isFreePeriod, timeLeft, isPaid, paidMinutes } =
     useWaitingTimer(reservationTime);
@@ -19,7 +19,7 @@ export const WaitingTimer = ({ user, className = "" }: WaitingTimerProps) => {
     return (car.price_per_minute / 2) * paidMinutes;
   };
 
-  return (
+  return car.owned_car ? null : (
     <div
       className={`bg-[#1D77FF] p-3 px-4 rounded-[40px] flex flex-row justify-between items-center ${className}`}
     >

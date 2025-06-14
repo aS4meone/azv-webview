@@ -9,6 +9,7 @@ import { useResponseModal } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
+import { DeliveryAddressScreen } from "./DeliveryAddressScreen";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -19,6 +20,13 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [showRentalPage, setShowRentalPage] = useState(false);
+  const [showAddressScreen, setShowAddressScreen] = useState(false);
+  const [isDelivery, setIsDelivery] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState<{
+    lat: number;
+    lng: number;
+    address: string;
+  } | null>(null);
 
   const handleRent = async (rentalData: RentalData) => {
     onClose();
@@ -45,20 +53,123 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: "Попробвать сново",
+        buttonText: "Попробовать снова",
         onClose: () => {},
       });
     }
   };
 
+  const handleDelivery = async (rentalData: RentalData) => {
+    if (!deliveryAddress) return;
+
+    onClose();
+    try {
+      const data: RentCarDto = {
+        carId: rentalData.carId,
+        duration: rentalData.duration,
+        rentalType: rentalData.rentalType,
+      };
+
+      const res = await rentApi.reserveDelivery(
+        car.id,
+        data,
+        deliveryAddress.lng,
+        deliveryAddress.lat
+      );
+
+      if (res.status === 200) {
+        showModal({
+          type: "success",
+          description: "Доставка успешно заказана",
+          buttonText: "Отлично",
+          onClose: async () => {
+            await refreshUser();
+            setShowRentalPage(false);
+            setShowAddressScreen(false);
+            setDeliveryAddress(null);
+          },
+        });
+      }
+    } catch (error) {
+      showModal({
+        type: "error",
+        description: error.response.data.detail,
+        buttonText: "Попробовать снова",
+        onClose: () => {},
+      });
+    }
+  };
+
+  const handleOwnerRent = async () => {
+    onClose();
+    try {
+      const data: RentCarDto = {
+        carId: car.id,
+        duration: 0,
+        rentalType: "minutes",
+      };
+
+      const res = await rentApi.reserveCar(data);
+      if (res.status === 200) {
+        showModal({
+          type: "success",
+          description: "Успешно забронированно",
+          buttonText: "Отлично",
+          onClose: async () => {
+            await refreshUser();
+          },
+        });
+      }
+    } catch (error) {
+      showModal({
+        type: "error",
+        description: error.response.data.detail,
+        buttonText: "Попробовать снова",
+        onClose: () => {},
+      });
+    }
+  };
+
+  const handleAddressSelected = (lat: number, lng: number, address: string) => {
+    setDeliveryAddress({ lat, lng, address });
+    setShowAddressScreen(false);
+    setShowRentalPage(true);
+  };
+
+  const handleDeliveryClick = () => {
+    setIsDelivery(true);
+    setShowAddressScreen(true);
+  };
+
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
+      {/* Address Selection Screen */}
+      {showAddressScreen && (
+        <PushScreen withOutStyles={true}>
+          <DeliveryAddressScreen
+            onBack={() => {
+              setShowAddressScreen(false);
+              setIsDelivery(false);
+            }}
+            onAddressSelected={handleAddressSelected}
+          />
+        </PushScreen>
+      )}
+
+      {/* Rental Page */}
       {showRentalPage && (
         <PushScreen withOutStyles={true}>
           <RentalPage
+            isDelivery={isDelivery}
             car={car}
-            onBack={() => setShowRentalPage(false)}
-            onRent={handleRent}
+            onBack={() => {
+              setShowRentalPage(false);
+              if (isDelivery) {
+                setShowAddressScreen(true);
+              }
+            }}
+            onRent={isDelivery ? handleDelivery : handleRent}
+            deliveryAddress={deliveryAddress?.address}
           />
         </PushScreen>
       )}
@@ -81,10 +192,19 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <Button variant="secondary" onClick={() => setShowRentalPage(true)}>
-            Забронировать авто
+          <Button
+            variant="secondary"
+            onClick={() => {
+              if (car.owned_car) {
+                handleOwnerRent();
+              } else {
+                setShowRentalPage(true);
+              }
+            }}
+          >
+            {car.owned_car ? "Снять с аренды" : "Забронировать авто"}
           </Button>
-          <Button onClick={() => {}} variant="outline">
+          <Button onClick={handleDeliveryClick} variant="outline">
             Заказать доставку
           </Button>
         </div>

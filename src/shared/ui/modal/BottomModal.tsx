@@ -8,18 +8,89 @@ interface BottomModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  closeOnScroll?: boolean;
 }
 
 export const BottomModal = ({
   isOpen,
   onClose,
   children,
+  closeOnScroll = false,
 }: BottomModalProps) => {
   const [isBrowser, setIsBrowser] = useState(false);
 
   useEffect(() => {
     setIsBrowser(true);
   }, []);
+
+  useEffect(() => {
+    if (!closeOnScroll || !onClose || !isOpen) return;
+
+    let startY = 0;
+    let currentY = 0;
+    let isSwipeStarted = false;
+    let startScrollTop = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startY = e.touches[0].clientY;
+      isSwipeStarted = true;
+
+      // Запоминаем начальную позицию скролла
+      const scrollableElement = document.querySelector(
+        ".overflow-y-auto, .overflow-scroll"
+      );
+      startScrollTop = scrollableElement?.scrollTop || window.scrollY || 0;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isSwipeStarted) return;
+      currentY = e.touches[0].clientY;
+    };
+
+    const handleTouchEnd = () => {
+      if (!isSwipeStarted) return;
+
+      const deltaY = currentY - startY;
+
+      // Проверяем, был ли скролл во время свайпа
+      const scrollableElement = document.querySelector(
+        ".overflow-y-auto, .overflow-scroll"
+      );
+      const currentScrollTop =
+        scrollableElement?.scrollTop || window.scrollY || 0;
+      const scrolledDuringSwipe =
+        Math.abs(currentScrollTop - startScrollTop) > 10;
+
+      // Закрываем только если:
+      // 1. Свайп вниз больше 100px
+      // 2. Не было скролла во время свайпа
+      // 3. Скролл находится в самом верху (scrollTop близко к 0)
+      if (deltaY > 100 && !scrolledDuringSwipe && startScrollTop < 50) {
+        onClose();
+      }
+
+      isSwipeStarted = false;
+      startY = 0;
+      currentY = 0;
+    };
+
+    // Добавляем слушатели на body, чтобы ловить touch события везде
+    document.body.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    document.body.addEventListener("touchmove", handleTouchMove, {
+      passive: true,
+    });
+    document.body.addEventListener("touchend", handleTouchEnd, {
+      passive: true,
+    });
+
+    return () => {
+      document.body.removeEventListener("touchstart", handleTouchStart);
+      document.body.removeEventListener("touchmove", handleTouchMove);
+      document.body.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [closeOnScroll, onClose, isOpen]);
 
   const modalContent = (
     <AnimatePresence>

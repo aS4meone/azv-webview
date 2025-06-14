@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/shared/ui";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
-import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
+import { PhotoConfig, UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { userApi } from "@/shared/api/routes/user";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { DocumentDetailsModal } from "./DocumentDetailsModal";
@@ -137,23 +137,39 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
     }
   };
 
-  const uploadConfig = [
+  const uploadConfig: PhotoConfig[] = [
     {
       id: "id_front",
       title: "Сфотографируйте лицевую сторону удостоверения личности",
+      multiple: {
+        min: 1,
+        max: 1,
+      },
     },
     {
       id: "id_back",
       title: "Сфотографируйте обратную сторону удостоверения личности",
+      multiple: {
+        min: 1,
+        max: 1,
+      },
     },
     {
       id: "selfie",
       title: "Сделайте селфи, держа водительское удостоверение рядом с лицом",
-      isSelfy: true,
+      isSelfy: true, // Только это селфи!
+      multiple: {
+        min: 1,
+        max: 1,
+      },
     },
     {
       id: "drivers_license",
       title: "Сфотографируйте лицевую сторону водительского удостоверения",
+      multiple: {
+        min: 1,
+        max: 1,
+      },
     },
   ];
 
@@ -165,6 +181,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
 
       <UploadPhoto
         config={uploadConfig}
+        withCloseButton
         onPhotoUpload={handlePhotoUpload}
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}

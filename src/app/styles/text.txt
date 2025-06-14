@@ -1,0 +1,194 @@
+🔒 Отключение браузерных функций
+* {
+  /* Отключаем выделение текста */
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+
+  /* Отключаем drag and drop */
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+
+  /* Отключаем подсветку при нажатии на мобильных */
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-focus-ring-color: transparent !important;
+  outline: none !important;
+}
+
+/* Исключения для скроллируемых элементов */
+.scrollable,
+.overflow-y-auto,
+.overflow-auto,
+[data-scrollable="true"] {
+  /* Переопределяем глобальные правила для скролла */
+  touch-action: pan-y pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Разрешаем скролл, но запрещаем зум на мобильных устройствах */
+html {
+  /* Разрешаем только вертикальный и горизонтальный скролл */
+  touch-action: pan-y pan-x !important;
+  -ms-touch-action: pan-y pan-x !important;
+
+  /* Отключаем overscroll только по Y для предотвращения pull-to-refresh */
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: auto !important;
+}
+
+body {
+  /* Разрешаем скролл */
+  touch-action: pan-y pan-x !important;
+  -ms-touch-action: pan-y pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+
+  /* Отключаем pull-to-refresh */
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: auto !important;
+}
+
+/* Отключаем зум для input элементов на iOS */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Отключаем контекстное меню для изображений */
+img {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  pointer-events: none !important;
+}
+
+/* Разрешаем выделение только для редактируемых элементов */
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Скрываем полосы прокрутки */
+::-webkit-scrollbar {
+  display: none !important;
+}
+
+* {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Отключаем выделение для ссылок */
+a,
+button {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+
+  /* Убираем стандартную подсветку ссылок */
+  text-decoration: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Отключаем стандартное поведение для touch устройств */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+}
+
+/* Дополнительная защита от копирования */
+.no-copy,
+.no-select {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Специальные классы для скролла */
+.scrollable {
+  touch-action: pan-y pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: auto !important;
+}
+
+.scroll-vertical {
+  touch-action: pan-y !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: none !important;
+}
+
+.scroll-horizontal {
+  touch-action: pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-x: auto !important;
+}
+
+/* Принудительное включение скролла для контейнеров */
+.force-scroll {
+  touch-action: pan-y pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: auto !important;
+  /* Переопределяем глобальные правила */
+  overflow: auto !important;
+}
+
+/* Дополнительные правила для надежного скролла */
+[data-scrollable="true"] {
+  /* Принудительное включение скролла */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  touch-action: pan-y pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: none !important;
+  overscroll-behavior-x: auto !important;
+
+  /* Убираем возможные блокировки */
+  pointer-events: auto !important;
+  position: relative !important;
+}
+
+/* Для мобильных устройств - дополнительная защита */
+@media (hover: none) and (pointer: coarse) {
+  [data-scrollable="true"] {
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y pan-x !important;
+  }
+}
+
+/* Мобильные оптимизации для карт */
+.touch-manipulation {
+  touch-action: manipulation !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* Исправления для Google Maps в мобильных устройствах */
+[data-map-container="true"] {
+  touch-action: pan-x pan-y pinch-zoom !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Переопределение для элементов карты */
+[data-map-container="true"] .gm-style,
+[data-map-container="true"] .gm-style * {
+  touch-action: pan-x pan-y pinch-zoom !important;
+  pointer-events: auto !important;
+}

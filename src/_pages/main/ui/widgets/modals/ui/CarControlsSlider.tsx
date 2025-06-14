@@ -209,7 +209,7 @@ export const CarControlsSlider = ({
       {/* Navigation Controls with Swipe Support */}
       <div
         ref={sliderRef}
-        className={`flex items-center bg-gray-800 rounded-full px-6 py-3 touch-pan-x select-none flex-shrink-0 ${
+        className={`flex items-center bg-[#191919] rounded-full px-6 py-3 touch-pan-x select-none flex-shrink-0 ${
           !isDragging && !isAnimating
             ? "transition-transform duration-200 ease-out"
             : ""

@@ -46,7 +46,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
     <ModalContext.Provider value={{ showModal, hideModal }}>
       {children}
       {modalConfig && (
-        <BottomModal isOpen={isOpen} onClose={handleClose}>
+        <BottomModal isOpen={isOpen} onClose={handleClose} closeOnScroll>
           {modalConfig.children}
         </BottomModal>
       )}
