@@ -16,7 +16,7 @@ export const BrowserProtectionProvider: React.FC<
 > = ({ children }) => {
   // Инициализируем защиту браузера
   // ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ РАЗРАБОТКИ
-  useBrowserProtection();
+  // useBrowserProtection();
 
   return <>{children}</>;
 };

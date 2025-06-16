@@ -51,42 +51,54 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
       </div>
       <div className="px-6 py-4">
         <div className="space-y-3 mb-4">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Базовая стоимость</span>
-            <span className="text-gray-900 font-medium">
-              {formatPrice(basePrice)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Плата за открытие</span>
-            <span className="text-gray-900 font-medium">
-              {formatPrice(openFee)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Плата за доставку</span>
-            <span className="text-gray-900 font-medium">
-              {formatPrice(deliveryFee)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Плата за ожидание</span>
-            <span className="text-gray-900 font-medium">
-              {formatPrice(waitingFee)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Штраф за превышение</span>
-            <span className="text-gray-900 font-medium">
-              {formatPrice(overtimeFee)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-gray-500 text-sm">Плата за расстояние</span>
-            <span className="text-gray-900 font-medium">
-              {formatPrice(distanceFee)}
-            </span>
-          </div>
+          {basePrice > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-sm">Базовая стоимость</span>
+              <span className="text-gray-900 font-medium">
+                {formatPrice(basePrice)}
+              </span>
+            </div>
+          )}
+          {openFee > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-sm">Плата за открытие</span>
+              <span className="text-gray-900 font-medium">
+                {formatPrice(openFee)}
+              </span>
+            </div>
+          )}
+          {deliveryFee > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-sm">Плата за доставку</span>
+              <span className="text-gray-900 font-medium">
+                {formatPrice(deliveryFee)}
+              </span>
+            </div>
+          )}
+          {waitingFee > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-sm">Плата за ожидание</span>
+              <span className="text-gray-900 font-medium">
+                {formatPrice(waitingFee)}
+              </span>
+            </div>
+          )}
+          {overtimeFee > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-sm">Штраф за превышение</span>
+              <span className="text-gray-900 font-medium">
+                {formatPrice(overtimeFee)}
+              </span>
+            </div>
+          )}
+          {distanceFee > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500 text-sm">Плата за расстояние</span>
+              <span className="text-gray-900 font-medium">
+                {formatPrice(distanceFee)}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="border-t border-gray-200 pt-4 space-y-3">

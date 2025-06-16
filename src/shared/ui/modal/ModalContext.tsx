@@ -9,6 +9,7 @@ interface ModalContextType {
     onClose?: () => void;
   }) => void;
   hideModal: () => void;
+  isModalOpen: boolean;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -43,7 +44,9 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <ModalContext.Provider value={{ showModal, hideModal }}>
+    <ModalContext.Provider
+      value={{ showModal, hideModal, isModalOpen: isOpen }}
+    >
       {children}
       {modalConfig && (
         <BottomModal isOpen={isOpen} onClose={handleClose} closeOnScroll>

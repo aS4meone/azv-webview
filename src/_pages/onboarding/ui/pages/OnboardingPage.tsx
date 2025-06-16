@@ -39,8 +39,8 @@ const OnboardingPage = () => {
         </Swiper>
       </section>
       <section className="px-10 py-4 pb-10 flex flex-col gap-4 justify-end">
-        <div className="flex flex-col gap-4 h-[170px] justify-center">
-          <h2 className="text-[26px] leading-[30px]">
+        <div className="flex flex-col gap-2 h-[165px] justify-center">
+          <h2 className="text-[24px] leading-[30px]">
             {slides[activeSlide].title}
           </h2>
           <p className="text-[18px] leading-[20px] text-[#CFCFCF]">

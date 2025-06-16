@@ -97,7 +97,6 @@ const RentalHistoryDetailPage = () => {
           {/* Trip Information */}
           <TripInfoCard
             rentalType={detail.rental_type}
-            rentalStatus={detail.rental_status}
             reservationTime={detail.reservation_time}
             startTime={detail.start_time}
             endTime={detail.end_time}

@@ -193,4 +193,12 @@ const POLYGON_COORDS = [
   { lat: 43.1248919, lng: 77.0824955 },
 ];
 
-export { POLYGON_COORDS };
+// Background polygon coordinates (covers a larger area around the service zone)
+const BACKGROUND_POLYGON_COORDS = [
+  { lat: 44.0, lng: 75.0 }, // Северо-западный угол
+  { lat: 44.0, lng: 79.0 }, // Северо-восточный угол
+  { lat: 42.0, lng: 79.0 }, // Юго-восточный угол
+  { lat: 42.0, lng: 75.0 }, // Юго-западный угол
+];
+
+export { POLYGON_COORDS, BACKGROUND_POLYGON_COORDS };

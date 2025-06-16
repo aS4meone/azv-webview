@@ -116,14 +116,14 @@ export default function GoogleMapsPage() {
       <Drawer />
       <Button
         variant="icon"
-        className="absolute top-10 right-20 h-12 w-12 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
+        className="absolute top-10 right-20 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
         link={ROUTES.SEARCH}
       >
         <SearchIcon />
       </Button>
       <Button
         variant="icon"
-        className="absolute top-10 right-4 h-12 w-12 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
+        className="absolute top-10 right-4 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
         link={ROUTES.SUPPORT}
       >
         <ChatIcon />

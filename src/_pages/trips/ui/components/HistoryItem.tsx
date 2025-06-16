@@ -53,7 +53,6 @@ export const HistoryItem = ({
       <div className="flex items-center gap-1">
         <span className="text-[#191919]">{amount}</span>
         <span className="text-[#191919]">{t("trips.currency")}</span>
-        {historyId && !isFine && <span className="text-gray-400 ml-2">›</span>}
       </div>
     </div>
   );

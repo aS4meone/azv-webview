@@ -1,7 +1,7 @@
 import { ICar } from "@/shared/models/types/car";
 import { Button, Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui";
 import React from "react";
-import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../modals/ui";
+import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../../modals/ui";
 import { usePricingCalculator, RentalData } from "./hooks/usePricingCalculator";
 import { RentalTabContent } from "./components";
 

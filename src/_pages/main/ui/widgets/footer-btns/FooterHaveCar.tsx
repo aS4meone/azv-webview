@@ -2,34 +2,22 @@ import { IUser, UserRole } from "@/shared/models/types/user";
 import { CarInfoHeader, CarSpecs } from "../modals/ui";
 import { handleCarInteraction } from "@/_pages/main/utils/car-interaction";
 import { useModal } from "@/shared/ui/modal";
-import { WaitingTimer } from "../components/WaitingTimer";
-import { useState } from "react";
+import { WaitingTimer } from "../timers/WaitingTimer";
+
 import { CarStatus } from "@/shared/models/types/car";
-import { MechanicWaitingTimer } from "../components/MechanicTimer";
-import { useCurrentDelivery } from "@/shared/hooks/useCurrentDelivery";
+import { MechanicWaitingTimer } from "../timers/MechanicTimer";
 
 const FooterHaveCar = ({ user }: { user: IUser }) => {
-  const { showModal, hideModal } = useModal();
-  const { deliveryData, isDeliveryMode } = useCurrentDelivery();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { showModal, hideModal, isModalOpen } = useModal();
 
   const handleOpenModal = () => {
-    console.log("FooterHaveCar: Opening modal with delivery data:", {
-      deliveryData,
-      isDeliveryMode,
-    });
-    setIsModalOpen(true);
     showModal({
       children: handleCarInteraction({
         user,
         notRentedCar: user.current_rental!.car_details,
         hideModal: () => {
           hideModal();
-          setIsModalOpen(false);
         },
-        deliveryData,
-        isDeliveryMode,
       }),
     });
   };

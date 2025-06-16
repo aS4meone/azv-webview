@@ -13,8 +13,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FooterHaveCar from "./FooterHaveCar";
 import { ROUTES } from "@/shared/constants/routes";
-import { useCurrentDelivery } from "@/shared/hooks/useCurrentDelivery";
-import FooterDelivery from "./FooterDelivery";
 
 enum ServiceButtonType {
   CHECK = "check",
@@ -28,13 +26,7 @@ const FooterBtns = () => {
   const [activeServiceButton, setActiveServiceButton] =
     useState<ServiceButtonType>(ServiceButtonType.CHECK);
 
-  const { deliveryData } = useCurrentDelivery();
-
   if (!user) return null;
-
-  if (deliveryData) {
-    return <FooterDelivery deliveryData={deliveryData} user={user} />;
-  }
 
   if (user.current_rental != null && user.current_rental) {
     return <FooterHaveCar user={user} />;

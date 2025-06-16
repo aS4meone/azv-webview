@@ -19,7 +19,7 @@ const TermsViewCard = ({ title, url }: ITermsViewCard) => {
         onClick={() => setOpen(true)}
         className="pb-4 w-full flex items-center justify-between border-b border-[#DADADA] px-1 cursor-pointer"
       >
-        <p className="text-[18px] text-[#191919]">{title}</p>
+        <p className="text-[18px] text-[#191919] text-left">{title}</p>
         <ArrowRightIcon />
       </button>
 

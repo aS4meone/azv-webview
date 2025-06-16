@@ -15,11 +15,11 @@ interface VehicleActionSuccessModalProps {
 
 const successConfig = {
   takeKey: {
-    title: "Ключ забран",
+    title: "Пауза",
     description: "Автомобиль поставлен на паузу",
   },
   giveKey: {
-    title: "Ключ выдан",
+    title: "Поездка начата",
     description: "Можете начинать поездку",
   },
   lock: {

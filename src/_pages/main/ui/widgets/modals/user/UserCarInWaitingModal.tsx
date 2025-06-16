@@ -5,7 +5,7 @@ import { useResponseModal } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
 import { IUser } from "@/shared/models/types/user";
-import { WaitingTimer } from "../../components/WaitingTimer";
+import { WaitingTimer } from "../../timers/WaitingTimer";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";

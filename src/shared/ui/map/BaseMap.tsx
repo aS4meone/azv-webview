@@ -14,6 +14,7 @@ import {
   Map,
   MapCameraChangedEvent,
   MapCameraProps,
+  AdvancedMarker,
 } from "@vis.gl/react-google-maps";
 import { Button } from "@/shared/ui";
 import { ArrowLocationIcon, MinusIcon, PlusIcon } from "@/shared/icons";
@@ -182,6 +183,23 @@ export const BaseMap = ({
   const handleCameraChanged = useCallback(
     (event: MapCameraChangedEvent) => {
       const { center, zoom, heading, tilt } = event.detail;
+
+      // Проверяем, действительно ли изменились параметры камеры
+      const currentCamera = lastCameraUpdateRef.current;
+      const hasSignificantChange =
+        !currentCamera ||
+        Math.abs((currentCamera.zoom || 0) - (zoom || 0)) >= 0.1 ||
+        Math.abs((currentCamera.center?.lat || 0) - (center?.lat || 0)) >=
+          0.0001 ||
+        Math.abs((currentCamera.center?.lng || 0) - (center?.lng || 0)) >=
+          0.0001 ||
+        Math.abs((currentCamera.heading || 0) - (heading || 0)) >= 1 ||
+        Math.abs((currentCamera.tilt || 0) - (tilt || 0)) >= 1;
+
+      if (!hasSignificantChange) {
+        return;
+      }
+
       const newCameraProps = { center, zoom, heading, tilt };
 
       setCameraProps(newCameraProps);
@@ -211,12 +229,12 @@ export const BaseMap = ({
       maxZoom,
       restriction: restriction || {
         latLngBounds: {
-          north: 45.0,
-          south: 41.0,
-          east: 80.0,
-          west: 73.0,
+          north: 44.0, // Соответствует background полигону
+          south: 42.0, // Соответствует background полигону
+          east: 79.0, // Соответствует background полигону
+          west: 75.0, // Соответствует background полигону
         },
-        strictBounds: false,
+        strictBounds: true, // Строгие ограничения - пользователь не может выйти за границы
       },
       controlSize: 32,
       scrollwheel: true,
@@ -224,80 +242,10 @@ export const BaseMap = ({
       draggable: true,
       tilt: 0,
       heading: 0,
-      styles: styles || [
-        {
-          featureType: "all",
-          elementType: "all",
-          stylers: [
-            { saturation: "32" },
-            { lightness: "-3" },
-            { visibility: "on" },
-            { weight: "1.18" },
-          ],
-        },
-        {
-          featureType: "administrative",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "landscape",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "landscape.man_made",
-          elementType: "all",
-          stylers: [{ saturation: "-70" }, { lightness: "14" }],
-        },
-        {
-          featureType: "poi",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "road",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "transit",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-        {
-          featureType: "water",
-          elementType: "all",
-          stylers: [{ saturation: "100" }, { lightness: "-14" }],
-        },
-        {
-          featureType: "water",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }, { lightness: "12" }],
-        },
-      ],
+      styles: styles,
     }),
     [gestureHandling, minZoom, maxZoom, restriction, styles]
   );
-
-  // Мемоизированный маркер пользователя
-  const userMarker = useMemo(() => {
-    if (!userLocation) return null;
-
-    return (
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          zIndex: 1000,
-        }}
-      >
-        <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg animate-pulse" />
-      </div>
-    );
-  }, [userLocation]);
 
   // Эффект для вызова onMapReady
   useEffect(() => {
@@ -343,11 +291,15 @@ export const BaseMap = ({
           {...mapSettings}
         >
           {children}
+
+          {/* Маркер пользователя (если есть) */}
+          {userLocation && (
+            <AdvancedMarker position={userLocation}>
+              <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg animate-pulse" />
+            </AdvancedMarker>
+          )}
         </Map>
       </APIProvider>
-
-      {/* Маркер пользователя (если есть) */}
-      {userMarker}
 
       {/* Оптимизированные контролы карты */}
       {showZoomControls && (
@@ -355,7 +307,7 @@ export const BaseMap = ({
           <Button
             onClick={zoomIn}
             variant="icon"
-            className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
+            className="shadow-lg h-14 w-14 hover:shadow-xl transition-shadow duration-200 touch-manipulation"
             disabled={(cameraProps.zoom || 0) >= maxZoom}
           >
             <PlusIcon color="#191919" />
@@ -363,7 +315,7 @@ export const BaseMap = ({
           <Button
             onClick={zoomOut}
             variant="icon"
-            className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
+            className="shadow-lg h-14 w-14 hover:shadow-xl transition-shadow duration-200 touch-manipulation"
             disabled={(cameraProps.zoom || 0) <= minZoom}
           >
             <MinusIcon />
@@ -372,7 +324,7 @@ export const BaseMap = ({
             <Button
               onClick={centerToUser}
               variant="icon"
-              className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
+              className="shadow-lg hover:shadow-xl h-14 w-14 transition-shadow duration-200 touch-manipulation"
               disabled={isLocationLoadingRef.current}
             >
               {isLocationLoadingRef.current ? (

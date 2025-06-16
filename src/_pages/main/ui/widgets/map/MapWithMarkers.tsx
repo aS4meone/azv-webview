@@ -9,8 +9,6 @@ import { MarkerClusterer } from "@googlemaps/markerclusterer";
 import { useMap } from "@vis.gl/react-google-maps";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useCurrentDelivery } from "@/shared/hooks/useCurrentDelivery";
-import { createCarFromDeliveryData } from "@/shared/utils/deliveryUtils";
 import {
   getPerformanceSettings,
   createHash,
@@ -21,7 +19,6 @@ import {
 // Получаем настройки производительности для устройства
 const PERFORMANCE_SETTINGS = getPerformanceSettings();
 
-// Константы для оптимизации зума
 const ZOOM_LEVELS = {
   CLUSTER_ONLY: 8,
   SMALL_MARKERS: 10,
@@ -32,7 +29,6 @@ const ZOOM_LEVELS = {
   MAX_MARKERS_HIGH_ZOOM: 200,
 } as const;
 
-// Предзагружаем изображения маркеров
 preloadMarkerImages(["/images/carmarker.png"]).catch(console.error);
 
 export const MapWithMarkers = ({
@@ -45,17 +41,10 @@ export const MapWithMarkers = ({
   const {
     fetchAllVehicles,
     allVehicles,
-    fetchPendingVehicles,
-    fetchDeliveryVehicles,
-    deliveryVehicles,
-    pendingVehicles,
-    fetchInUseVehicles,
-    inUseVehicles,
+    fetchAllMechanicVehicles,
+    allMechanicVehicles,
   } = useVehiclesStore();
   const { user } = useUserStore();
-
-  // Хук для получения текущей доставки механика
-  const { deliveryData, isDeliveryMode } = useCurrentDelivery();
 
   const map = useMap();
   const searchParams = useSearchParams();
@@ -97,27 +86,15 @@ export const MapWithMarkers = ({
   // Refs для оптимизации зума
   const lastVehiclesHashRef = useRef<string>("");
   const lastZoomLevelRef = useRef<number>(Math.round(zoom));
-  const markersMapRef = useRef<
-    Map<number, google.maps.marker.AdvancedMarkerElement>
-  >(new Map());
-  const isUpdatingMarkersRef = useRef(false);
 
   // Функция для загрузки автомобилей в зависимости от роли
   const fetchVehiclesByRole = useCallback(() => {
     if (user?.role === UserRole.MECHANIC) {
-      fetchPendingVehicles();
-      fetchDeliveryVehicles();
-      fetchInUseVehicles();
+      fetchAllMechanicVehicles();
     } else {
       fetchAllVehicles();
     }
-  }, [
-    fetchAllVehicles,
-    fetchPendingVehicles,
-    fetchDeliveryVehicles,
-    fetchInUseVehicles,
-    user?.role,
-  ]);
+  }, [fetchAllVehicles, fetchAllMechanicVehicles, user?.role]);
 
   // Fetch vehicles based on user role - первоначальная загрузка
   useEffect(() => {
@@ -127,16 +104,11 @@ export const MapWithMarkers = ({
   // Интервал для обновления списка автомобилей с адаптивной частотой
   useEffect(() => {
     if (user) {
-      // Адаптивная частота обновления в зависимости от зума
-      const updateInterval =
-        zoom > ZOOM_LEVELS.LARGE_MARKERS
-          ? PERFORMANCE_SETTINGS.markerUpdateInterval / 2 // Чаще обновляем на высоком зуме
-          : PERFORMANCE_SETTINGS.markerUpdateInterval;
+      // Более частое обновление для отображения всех машин
+      const updateInterval = 30000; // 3 секунды для всех случаев
 
       intervalRef.current = setInterval(() => {
-        if (!isUpdatingMarkersRef.current) {
-          fetchVehiclesByRole();
-        }
+        fetchVehiclesByRole();
       }, updateInterval);
     } else {
       if (intervalRef.current) {
@@ -151,7 +123,7 @@ export const MapWithMarkers = ({
         intervalRef.current = null;
       }
     };
-  }, [user, fetchVehiclesByRole, zoom]);
+  }, [user, fetchVehiclesByRole]);
 
   // Handle car selection from URL parameters - only once per carId
   useEffect(() => {
@@ -159,15 +131,7 @@ export const MapWithMarkers = ({
       let vehiclesList: ICar[] = [];
 
       if (user.role === UserRole.MECHANIC) {
-        if (isDeliveryMode && deliveryData) {
-          vehiclesList = [createCarFromDeliveryData(deliveryData)];
-        } else {
-          vehiclesList = [
-            ...pendingVehicles,
-            ...deliveryVehicles,
-            ...inUseVehicles,
-          ];
-        }
+        vehiclesList = allMechanicVehicles;
       } else {
         vehiclesList = allVehicles;
       }
@@ -190,8 +154,6 @@ export const MapWithMarkers = ({
               removeAllQueries();
               processedCarIdRef.current = null;
             },
-            deliveryData,
-            isDeliveryMode,
           });
 
           if (content) {
@@ -210,48 +172,38 @@ export const MapWithMarkers = ({
     carId,
     user,
     allVehicles,
-    pendingVehicles,
-    deliveryVehicles,
-    isDeliveryMode,
-    inUseVehicles,
-    deliveryData,
+    allMechanicVehicles,
+    onCarFound,
+    showModal,
+    hideModal,
+    removeAllQueries,
   ]);
 
   // Мемоизированный список уникальных машин с фильтрацией по зуму
   const uniqueVehicles = useMemo(() => {
     let vehicles: ICar[] = [];
 
-    // Если у пользователя есть аренда, показываем только его машину
-    if (user?.current_rental?.car_details) {
-      vehicles = [user.current_rental.car_details];
-    } else if (user?.role === UserRole.MECHANIC) {
-      // Если у механика есть текущая доставка, показываем только автомобиль доставки
-      if (isDeliveryMode && deliveryData) {
-        vehicles = [createCarFromDeliveryData(deliveryData)];
+    // Если у пользователя есть текущая аренда, показываем только эту машину
+    if (user?.current_rental) {
+      const rentalVehicle = user.current_rental.car_details;
+
+      // Ищем машину в зависимости от роли пользователя
+      if (user.role === UserRole.MECHANIC) {
+        vehicles = [rentalVehicle];
       } else {
-        vehicles = [...pendingVehicles, ...deliveryVehicles];
+        vehicles = [rentalVehicle];
       }
     } else {
-      vehicles = [...allVehicles];
+      // Показываем все машины в зависимости от роли пользователя
+      if (user?.role === UserRole.MECHANIC) {
+        vehicles = allMechanicVehicles;
+      } else {
+        vehicles = allVehicles;
+      }
     }
 
-    // Ограничиваем количество маркеров в зависимости от зума для производительности
-    const maxMarkers =
-      zoom < ZOOM_LEVELS.MEDIUM_MARKERS
-        ? ZOOM_LEVELS.MAX_MARKERS_LOW_ZOOM
-        : ZOOM_LEVELS.MAX_MARKERS_HIGH_ZOOM;
-
-    return vehicles.slice(0, maxMarkers);
-  }, [
-    allVehicles,
-    pendingVehicles,
-    deliveryVehicles,
-    user?.current_rental,
-    user?.role,
-    isDeliveryMode,
-    deliveryData,
-    zoom,
-  ]);
+    return vehicles;
+  }, [allVehicles, allMechanicVehicles, user?.role, user?.current_rental]);
 
   // Хеш для определения изменений в списке автомобилей
   const vehiclesHash = useMemo(() => {
@@ -296,81 +248,11 @@ export const MapWithMarkers = ({
     };
   }, [zoom]);
 
-  // Optimized marker creation function с улучшенным кешированием
+  // Marker creation function без кэширования
   const createAdvancedMarker = useCallback(
     (vehicle: ICar) => {
       if (!window.google?.maps?.marker?.AdvancedMarkerElement) {
         return null;
-      }
-
-      // Проверяем, есть ли уже маркер для этого автомобиля
-      const existingMarker = markersMapRef.current.get(vehicle.id);
-      if (existingMarker) {
-        // Обновляем позицию существующего маркера
-        existingMarker.position = {
-          lat: vehicle.latitude,
-          lng: vehicle.longitude,
-        };
-
-        // Обновляем содержимое маркера если изменился зум
-        const currentZoomLevel = Math.round(zoom);
-        if (currentZoomLevel !== lastZoomLevelRef.current) {
-          const content = existingMarker.content as HTMLElement;
-          if (content) {
-            // Обновляем размеры и стили
-            const img = content.querySelector("img");
-            if (img) {
-              img.style.width = `${markerSizes.width}px`;
-              img.style.height = `${markerSizes.height}px`;
-            }
-
-            // Обновляем название маркера и его стили
-            const nameDiv = content.querySelector(
-              ".marker-name"
-            ) as HTMLElement;
-            if (nameDiv) {
-              nameDiv.style.display = markerSizes.showNames ? "block" : "none";
-
-              // Обновляем цвета в зависимости от роли пользователя и статуса автомобиля
-              if (markerSizes.showNames) {
-                let backgroundColor = "rgba(255, 255, 255, 0.95)";
-                let borderColor = "#e5e7eb";
-                let textColor = "#374151";
-
-                if (user?.role === UserRole.MECHANIC) {
-                  switch (vehicle.status) {
-                    case CarStatus.pending:
-                      backgroundColor = "rgba(255, 228, 148, 0.95)"; // Желтый
-                      borderColor = "#f59e0b";
-                      textColor = "#92400e";
-                      break;
-                    case CarStatus.delivering:
-                      backgroundColor = "rgba(34, 197, 94, 0.95)"; // Зеленый
-                      borderColor = "#16a34a";
-                      textColor = "#15803d";
-                      break;
-                    case CarStatus.inUse:
-                      backgroundColor = "rgba(239, 124, 124, 0.95)"; // Красный
-                      borderColor = "#dc2626";
-                      textColor = "#991b1b";
-                      break;
-                    default:
-                      // Оставляем стандартные цвета для других статусов
-                      break;
-                  }
-                }
-
-                nameDiv.style.backgroundColor = backgroundColor;
-                nameDiv.style.borderColor = borderColor;
-                nameDiv.style.color = textColor;
-              }
-            }
-
-            content.style.transform = `rotate(${vehicle.course}deg)`;
-          }
-        }
-
-        return existingMarker;
       }
 
       const {
@@ -482,18 +364,17 @@ export const MapWithMarkers = ({
       });
 
       // Add click handler
-      marker.addListener("click", () => {
+      marker.addListener("click", async () => {
         if (user === null) {
           return;
         }
+
         const content = handleCarInteraction({
           user,
           notRentedCar: vehicle,
           hideModal: () => {
             hideModal();
           },
-          deliveryData,
-          isDeliveryMode,
         });
 
         if (content === null) {
@@ -505,104 +386,10 @@ export const MapWithMarkers = ({
         });
       });
 
-      // Сохраняем маркер в кеше
-      markersMapRef.current.set(vehicle.id, marker);
-
       return marker;
     },
-    [
-      markerSizes,
-      showModal,
-      hideModal,
-      user,
-      deliveryData,
-      isDeliveryMode,
-      zoom,
-    ]
+    [markerSizes, showModal, hideModal, user, zoom]
   );
-
-  // Функция для создания маркера точки доставки
-  const createDeliveryMarker = useCallback(() => {
-    if (!window.google?.maps?.marker?.AdvancedMarkerElement || !deliveryData) {
-      return null;
-    }
-
-    const { textSize, showNames } = markerSizes;
-
-    // Create delivery marker content
-    const markerDiv = document.createElement("div");
-    markerDiv.style.cssText = `
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          cursor: pointer;
-          animation: pulse 2s infinite;
-        `;
-
-    // Add delivery label if zoom is sufficient
-    if (showNames) {
-      const labelDiv = document.createElement("div");
-      labelDiv.style.cssText = `
-            background-color: rgba(34, 197, 94, 0.95);
-            border: 1px solid #16a34a;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-size: ${textSize}px;
-            font-weight: 700;
-            color: white;
-            white-space: nowrap;
-            margin-bottom: 6px;
-            box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
-            backdrop-filter: blur(4px);
-          `;
-      labelDiv.textContent = "Точка доставки";
-      markerDiv.appendChild(labelDiv);
-    }
-
-    // Add delivery icon (pin icon)
-    const iconDiv = document.createElement("div");
-    const iconSize = Math.max(20, Math.min(32, zoom * 1.5));
-    iconDiv.style.cssText = `
-          width: ${iconSize}px;
-          height: ${iconSize}px;
-          background-color: #22c55e;
-          border: 3px solid white;
-          border-radius: 50% 50% 50% 0;
-          transform: rotate(-45deg);
-          box-shadow: 0 3px 10px rgba(34, 197, 94, 0.4);
-          position: relative;
-          transition: all 0.3s ease;
-        `;
-
-    // Add inner dot
-    const innerDot = document.createElement("div");
-    const dotSize = iconSize * 0.3;
-    innerDot.style.cssText = `
-          width: ${dotSize}px;
-          height: ${dotSize}px;
-          background-color: white;
-          border-radius: 50%;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-        `;
-    iconDiv.appendChild(innerDot);
-    markerDiv.appendChild(iconDiv);
-
-    // Create delivery marker
-    const deliveryMarker = new window.google.maps.marker.AdvancedMarkerElement({
-      position: {
-        lat: deliveryData.delivery_coordinates.latitude,
-        lng: deliveryData.delivery_coordinates.longitude,
-      },
-      content: markerDiv,
-      title: "Точка доставки",
-    });
-
-    return deliveryMarker;
-  }, [deliveryData, markerSizes, zoom]);
 
   // Optimized effect to manage markers with zoom-aware updates
   useEffect(() => {
@@ -615,15 +402,12 @@ export const MapWithMarkers = ({
       Math.abs(currentZoomLevel - lastZoomLevelRef.current) >= 1;
     const vehiclesChanged = vehiclesHash !== lastVehiclesHashRef.current;
 
-    // Обновляем только при значительных изменениях
-    if (!zoomChanged && !vehiclesChanged && clustererRef.current) {
+    // Обновляем при любых изменениях
+    if (!zoomChanged && !vehiclesChanged) {
       return;
     }
 
     const initializeMarkers = async () => {
-      if (isUpdatingMarkersRef.current) return;
-      isUpdatingMarkersRef.current = true;
-
       const startTime = performance.now();
       try {
         if (
@@ -634,20 +418,16 @@ export const MapWithMarkers = ({
           await window.google.maps.importLibrary("marker");
         }
 
-        // Очищаем маркеры только при изменении списка автомобилей
-        if (vehiclesChanged) {
-          const currentVehicleIds = new Set(uniqueVehicles.map((v) => v.id));
-          for (const [id, marker] of markersMapRef.current.entries()) {
-            if (!currentVehicleIds.has(id)) {
-              marker.map = null;
-              markersMapRef.current.delete(id);
-            }
+        // Очищаем все старые маркеры
+        markersRef.current.forEach((marker) => {
+          if (marker.map) {
+            marker.map = null;
           }
+        });
 
-          if (deliveryMarkerRef.current) {
-            deliveryMarkerRef.current.map = null;
-            deliveryMarkerRef.current = null;
-          }
+        if (deliveryMarkerRef.current) {
+          deliveryMarkerRef.current.map = null;
+          deliveryMarkerRef.current = null;
         }
 
         // Create or update markers
@@ -657,24 +437,11 @@ export const MapWithMarkers = ({
 
         markersRef.current = newMarkers;
 
-        // Create delivery marker if there's an active delivery
-        if (
-          isDeliveryMode &&
-          deliveryData &&
-          user?.role === UserRole.MECHANIC
-        ) {
-          const deliveryMarker = createDeliveryMarker();
-          if (deliveryMarker) {
-            deliveryMarker.map = map;
-            deliveryMarkerRef.current = deliveryMarker;
-          }
-        }
-
-        // Управление кластеризацией в зависимости от зума
+        // Улучшенная кластеризация для большого количества машин
         const shouldCluster =
           zoom < ZOOM_LEVELS.MEDIUM_MARKERS &&
           PERFORMANCE_SETTINGS.clusteringEnabled &&
-          newMarkers.length > 10;
+          newMarkers.length > 20; // Снижаем порог для кластеризации
 
         if (shouldCluster && !clustererRef.current) {
           clustererRef.current = new MarkerClusterer({
@@ -685,7 +452,7 @@ export const MapWithMarkers = ({
             },
             renderer: {
               render: ({ count, position }) => {
-                const size = Math.max(35, Math.min(55, count * 1.5 + 25));
+                const size = Math.max(40, Math.min(60, count * 1.2 + 30));
                 const clusterDiv = document.createElement("div");
                 clusterDiv.style.cssText = `
                       width: ${size}px;
@@ -741,22 +508,11 @@ export const MapWithMarkers = ({
         );
       } catch (error) {
         console.error("Error updating markers:", error);
-      } finally {
-        isUpdatingMarkersRef.current = false;
       }
     };
 
     initializeMarkers();
-  }, [
-    map,
-    vehiclesHash,
-    zoom,
-    createAdvancedMarker,
-    isDeliveryMode,
-    deliveryData,
-    createDeliveryMarker,
-    user?.role,
-  ]);
+  }, [map, vehiclesHash, zoom, createAdvancedMarker, user?.role]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -770,13 +526,6 @@ export const MapWithMarkers = ({
         deliveryMarkerRef.current.map = null;
         deliveryMarkerRef.current = null;
       }
-
-      for (const marker of markersMapRef.current.values()) {
-        if (marker.map) {
-          marker.map = null;
-        }
-      }
-      markersMapRef.current.clear();
 
       markersRef.current.forEach((marker) => {
         if (marker.map) {

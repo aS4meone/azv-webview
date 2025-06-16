@@ -40,7 +40,7 @@ const Drawer = () => {
     <>
       <Button
         variant="icon"
-        className=" absolute top-10 left-4 h-12 w-12 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
+        className=" absolute top-10 left-4 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
         onClick={() => setIsDrawerOpen(true)}
       >
         <MenuIcon />

@@ -12,6 +12,7 @@ interface VehiclesStore {
   pendingVehicles: ICar[];
   deliveryVehicles: ICar[];
   inUseVehicles: ICar[];
+  allMechanicVehicles: ICar[];
   searchResults: ICar[];
 
   // Loading states
@@ -20,6 +21,7 @@ interface VehiclesStore {
   isLoadingDelivery: boolean;
   isLoadingFrequent: boolean;
   isLoadingInUse: boolean;
+  isLoadingAllMechanic: boolean;
   isLoadingSearch: boolean;
 
   // Error states
@@ -30,10 +32,11 @@ interface VehiclesStore {
   //User
   fetchAllVehicles: () => Promise<void>;
   fetchFrequentlyUsedVehicles: () => Promise<void>;
-  //Mechani
+  //Mechanic
   fetchPendingVehicles: () => Promise<void>;
   fetchDeliveryVehicles: () => Promise<void>;
   fetchInUseVehicles: () => Promise<void>;
+  fetchAllMechanicVehicles: () => Promise<void>;
 
   searchVehiclesForUser: (query: string, userRole: UserRole) => Promise<void>;
   clearSearch: () => void;
@@ -48,6 +51,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   pendingVehicles: [],
   deliveryVehicles: [],
   inUseVehicles: [],
+  allMechanicVehicles: [],
   searchResults: [],
 
   // Loading states
@@ -56,6 +60,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   isLoadingDelivery: false,
   isLoadingFrequent: false,
   isLoadingInUse: false,
+  isLoadingAllMechanic: false,
   isLoadingSearch: false,
 
   // Error state
@@ -164,6 +169,53 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
     }
   },
 
+  fetchAllMechanicVehicles: async () => {
+    try {
+      set({ isLoadingAllMechanic: true, error: null });
+
+      // Выполняем все запросы параллельно
+      const [pendingResponse, deliveryResponse, inUseResponse] =
+        await Promise.all([
+          mechanicApi.getPendingVehicles(),
+          mechanicApi.getDeliveryVehicles(),
+          mechanicApi.getInUseVehicles(),
+        ]);
+
+      const pendingVehicles = pendingResponse.data.vehicles || [];
+      const deliveryVehicles =
+        deliveryResponse.data.delivery_vehicles.map((car) => ({
+          ...car,
+          name: car.car_name,
+          id: car.car_id,
+        })) || [];
+      const inUseVehicles = inUseResponse.data.vehicles || [];
+
+      // Объединяем все машины механика
+      const allMechanicVehicles = [
+        ...pendingVehicles,
+        ...deliveryVehicles,
+        ...inUseVehicles,
+      ];
+
+      set({
+        pendingVehicles,
+        deliveryVehicles,
+        inUseVehicles,
+        allMechanicVehicles,
+        isLoadingAllMechanic: false,
+      });
+    } catch (error) {
+      console.error("Failed to fetch all mechanic vehicles:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch all mechanic vehicles",
+        isLoadingAllMechanic: false,
+      });
+    }
+  },
+
   searchVehiclesForUser: async (query: string, userRole: UserRole) => {
     try {
       set({ isLoadingSearch: true, error: null });
@@ -189,6 +241,8 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       allVehicles: [],
       pendingVehicles: [],
       deliveryVehicles: [],
+      inUseVehicles: [],
+      allMechanicVehicles: [],
       frequentlyUsedVehicles: [],
       searchResults: [],
       error: null,
@@ -205,6 +259,8 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       allVehicles: updateVehicleInArray(state.allVehicles),
       pendingVehicles: updateVehicleInArray(state.pendingVehicles),
       deliveryVehicles: updateVehicleInArray(state.deliveryVehicles),
+      inUseVehicles: updateVehicleInArray(state.inUseVehicles),
+      allMechanicVehicles: updateVehicleInArray(state.allMechanicVehicles),
       frequentlyUsedVehicles: updateVehicleInArray(
         state.frequentlyUsedVehicles
       ),

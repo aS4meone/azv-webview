@@ -7,32 +7,11 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
-import { MechanicWaitingTimer } from "../../components/MechanicTimer";
+import { MechanicWaitingTimer } from "../../timers/MechanicTimer";
 
 interface MechanicCarInWaitingModalProps {
   user: IUser;
   onClose: () => void;
-}
-
-interface DeliveryData {
-  rental_id: number;
-  car_id: number;
-  car_name: string;
-  plate_number: string;
-  fuel_level: number;
-  latitude: number;
-  longitude: number;
-  course: number;
-  engine_volume: number;
-  drive_type: number;
-  photos: string[];
-  year: number;
-  delivery_coordinates: {
-    latitude: number;
-    longitude: number;
-  };
-  reservation_time: string;
-  status: string;
 }
 
 export const MechanicCarInWaitingModal = ({
@@ -40,35 +19,10 @@ export const MechanicCarInWaitingModal = ({
   onClose,
 }: MechanicCarInWaitingModalProps) => {
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
-  const [isDeliveryMode, setIsDeliveryMode] = useState(false);
-  const [deliveryData, setDeliveryData] = useState<DeliveryData | null>(null);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
-
-  // Проверяем, есть ли текущая доставка
-  useEffect(() => {
-    const checkCurrentDelivery = async () => {
-      try {
-        const response = await mechanicApi.getCurrentDelivery();
-        if (response.status === 200 && response.data) {
-          setIsDeliveryMode(true);
-          setDeliveryData(response.data);
-          console.log("Current delivery:", response.data);
-        } else {
-          setIsDeliveryMode(false);
-          setDeliveryData(null);
-        }
-      } catch (error) {
-        console.log(error);
-        setIsDeliveryMode(false);
-        setDeliveryData(null);
-      }
-    };
-
-    checkCurrentDelivery();
-  }, []);
 
   async function handleStartInspection() {
     try {
@@ -128,9 +82,7 @@ export const MechanicCarInWaitingModal = ({
       if (res.status === 200) {
         showModal({
           type: "success",
-          description: isDeliveryMode
-            ? "Доставка успешно отменена"
-            : "Осмотр успешно отменен",
+          description: "Осмотр успешно отменен",
           buttonText: "Отлично",
           onClose: async () => {
             await refreshUser();
@@ -203,11 +155,7 @@ export const MechanicCarInWaitingModal = ({
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
       <UploadPhoto
         config={baseConfig}
-        onPhotoUpload={
-          isDeliveryMode
-            ? handleUploadBeforeDelivery
-            : handleUploadBeforeInspection
-        }
+        onPhotoUpload={handleUploadBeforeInspection}
         isLoading={isLoading}
         isOpen={showUploadPhoto}
         onClose={() => setShowUploadPhoto(false)}
@@ -234,47 +182,23 @@ export const MechanicCarInWaitingModal = ({
         {/* Car Specs */}
         <CarSpecs car={car} />
 
-        {/* Delivery Info */}
-        {isDeliveryMode && deliveryData && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">
-              Адрес доставки:
-            </h3>
-            <p className="text-sm text-blue-700">
-              Координаты:{" "}
-              {deliveryData.delivery_coordinates.latitude.toFixed(6)},{" "}
-              {deliveryData.delivery_coordinates.longitude.toFixed(6)}
-            </p>
-            <p className="text-xs text-blue-600 mt-1">
-              Заказ от:{" "}
-              {new Date(deliveryData.reservation_time).toLocaleString()}
-            </p>
-          </div>
-        )}
-
         <div>
           <h4 className="text-[20px] font-semibold text-[#191919]">
-            {isDeliveryMode ? "Подготовка к доставке" : "Подготовка к осмотру"}
+            Подготовка к осмотру
           </h4>
           <h4 className="text-[18px] text-[#191919]">
-            {isDeliveryMode
-              ? "Сфотографируйте автомобиль перед доставкой, зафиксировав текущее состояние."
-              : "Сфотографируйте автомобиль перед началом осмотра, зафиксировав все повреждения, дефекты и состояние салона."}
+            Сфотографируйте автомобиль перед началом осмотра, зафиксировав все
+            повреждения, дефекты и состояние салона.
           </h4>
         </div>
 
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button variant="outline" onClick={handleCancelInspection}>
-            {isDeliveryMode ? "Отменить доставку" : "Отменить осмотр"}
+            Отменить осмотр
           </Button>
-          <Button
-            onClick={
-              isDeliveryMode ? handleStartDelivery : handleStartInspection
-            }
-            variant="secondary"
-          >
-            {isDeliveryMode ? "Начать доставку" : "Начать осмотр"}
+          <Button onClick={handleStartInspection} variant="secondary">
+            Начать осмотр
           </Button>
         </div>
       </div>

@@ -8,12 +8,8 @@ import { ServiceZonePolygon } from "./ServiceZonePolygon";
 export const MapComponent = () => {
   const { user } = useUserStore();
 
-  const handleCarFound = useCallback(() => {
-    // Этот коллбек будет вызываться через MapWithMarkers
-    // для центрирования карты на найденном автомобиле
-  }, []);
+  const handleCarFound = useCallback(() => {}, []);
 
-  // Автоматическое центрирование на автомобиль из активной аренды
   const initialCenter = useMemo(() => {
     if (user?.current_rental?.car_details) {
       const rentalCar = user.current_rental.car_details;

@@ -1,15 +1,16 @@
 import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
-import { RentalPage } from "../../rental-screen";
+
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import PushScreen from "@/shared/ui/push-screen";
-import { RentalData } from "../../rental-screen/hooks/usePricingCalculator";
 import { useResponseModal } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
-import { DeliveryAddressScreen } from "./DeliveryAddressScreen";
+import { DeliveryAddressScreen } from "../../screens/delivery-screen/DeliveryAddressScreen";
+import { RentalData } from "../../screens/rental-screen/hooks/usePricingCalculator";
+import { RentalPage } from "../../screens/rental-screen";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -49,10 +50,11 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           },
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      const apiError = error as { response: { data: { detail: string } } };
       showModal({
         type: "error",
-        description: error.response.data.detail,
+        description: apiError.response.data.detail,
         buttonText: "Попробовать снова",
         onClose: () => {},
       });
@@ -90,10 +92,11 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           },
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      const apiError = error as { response: { data: { detail: string } } };
       showModal({
         type: "error",
-        description: error.response.data.detail,
+        description: apiError.response.data.detail,
         buttonText: "Попробовать снова",
         onClose: () => {},
       });
@@ -120,13 +123,28 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           },
         });
       }
-    } catch (error) {
-      showModal({
-        type: "error",
-        description: error.response.data.detail,
-        buttonText: "Попробовать снова",
-        onClose: () => {},
-      });
+    } catch (error: unknown) {
+      const apiError = error as { response: { data: { detail: string } } };
+      console.log(
+        apiError,
+        apiError.response.data.detail,
+        apiError.response.data.detail.startsWith("Для")
+      );
+      if (apiError.response.data.detail.startsWith("Для")) {
+        showModal({
+          type: "error",
+          description: apiError.response.data.detail,
+          buttonText: "Пополнить",
+          onClose: () => {},
+        });
+      } else {
+        showModal({
+          type: "error",
+          description: apiError.response.data.detail,
+          buttonText: "Попробовать снова",
+          onClose: () => {},
+        });
+      }
     }
   };
 
@@ -144,7 +162,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
       {/* Address Selection Screen */}
-      {showAddressScreen && (
+      {/* {showAddressScreen && (
         <PushScreen withOutStyles={true}>
           <DeliveryAddressScreen
             onBack={() => {
@@ -154,7 +172,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
             onAddressSelected={handleAddressSelected}
           />
         </PushScreen>
-      )}
+      )} */}
 
       {/* Rental Page */}
       {showRentalPage && (

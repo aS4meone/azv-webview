@@ -1,6 +1,6 @@
 import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
-import { CarInfoHeader, CarControlsSlider } from "../ui";
+import { CarInfoHeader, CarControlsSlider } from "../../ui";
 import {
   useResponseModal,
   VehicleActionSuccessModal,
@@ -14,286 +14,19 @@ import { RentalType } from "@/shared/models/dto/rent.dto";
 import { RentalDetails } from "@/shared/models/types/current-rental";
 import { ArrowRightIcon } from "@/shared/icons";
 import { cn } from "@/shared/utils/cn";
-import { RENTAL_CONFIG } from "../../rental-screen/hooks/usePricingCalculator";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { ICar } from "@/shared/models/types/car";
+import { RENTAL_CONFIG } from "../../../screens/rental-screen/hooks/usePricingCalculator";
+import { MinutesRentalContent } from "./components/MinutesRentalContent";
+import { HoursRentalContent } from "./components/HoursRentalContent";
+import { DaysRentalContent } from "./components/DaysRentalContent";
 
 interface UserInUseModalProps {
   user: IUser;
   onClose: () => void;
 }
-
-const useMinutesTimer = (
-  startTime: string | null,
-  pricePerMinute: number,
-  openPrice: number
-) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    if (!startTime) return;
-
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [startTime]);
-
-  if (!startTime) {
-    return {
-      elapsedTime: "00:00:00",
-      currentCost: openPrice,
-    };
-  }
-
-  const start = new Date(startTime);
-  // Добавляем 5 часов к серверному времени для корректировки часового пояса
-  start.setHours(start.getHours() + 5);
-  const diffMs = currentTime.getTime() - start.getTime();
-  const elapsedMinutes = Math.floor(diffMs / (1000 * 60));
-  const elapsedSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-  const elapsedHours = Math.floor(elapsedMinutes / 60);
-  const remainingMinutes = elapsedMinutes % 60;
-
-  const elapsedTime = `${elapsedHours
-    .toString()
-    .padStart(2, "0")}:${remainingMinutes
-    .toString()
-    .padStart(2, "0")}:${elapsedSeconds.toString().padStart(2, "0")}`;
-  const currentCost = elapsedMinutes * pricePerMinute;
-
-  return {
-    elapsedTime,
-    currentCost,
-  };
-};
-
-// Hook for hours and days countdown timer
-const useCountdownTimer = (
-  startTime: string | null,
-  duration: number | null,
-  rentalType: "hours" | "days",
-  pricePerMinute: number
-) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    if (!startTime || !duration) return;
-
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [startTime, duration]);
-
-  if (!startTime || !duration) {
-    return {
-      timeLeft: "00:00:00",
-      isOvertime: false,
-      overtimeText: "",
-      overtimeMinutes: 0,
-      penaltyCost: 0,
-    };
-  }
-
-  const start = new Date(startTime);
-  // Добавляем 5 часов к серверному времени для корректировки часового пояса
-  start.setHours(start.getHours() + 5);
-
-  // Рассчитываем время окончания
-  const endTime = new Date(start);
-  if (rentalType === "hours") {
-    endTime.setHours(endTime.getHours() + duration);
-  } else {
-    endTime.setDate(endTime.getDate() + duration);
-  }
-
-  const diffMs = endTime.getTime() - currentTime.getTime();
-  const isOvertime = diffMs < 0;
-  const absDiffMs = Math.abs(diffMs);
-
-  const totalSeconds = Math.floor(absDiffMs / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  let timeDisplay;
-  if (rentalType === "days") {
-    const days = Math.floor(hours / 24);
-    const remainingHours = hours % 24;
-    if (days === 0) {
-      timeDisplay = `${remainingHours.toString().padStart(2, "0")}:${minutes
-        .toString()
-        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-    } else {
-      timeDisplay = `${days} дней ${remainingHours
-        .toString()
-        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
-        .toString()
-        .padStart(2, "0")}`;
-    }
-  } else {
-    timeDisplay = `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-  }
-
-  // Рассчитываем штрафные минуты и стоимость
-  const overtimeMinutes = isOvertime ? Math.floor(absDiffMs / (1000 * 60)) : 0;
-  const penaltyCost = overtimeMinutes * pricePerMinute;
-
-  return {
-    timeLeft: timeDisplay,
-    isOvertime,
-    overtimeText: isOvertime ? "Штрафное время" : "Осталось времени",
-    overtimeMinutes,
-    penaltyCost,
-  };
-};
-
-const MinutesRentalContent = ({
-  rentalDetails,
-  car,
-}: {
-  rentalDetails: RentalDetails;
-  car: {
-    price_per_minute: number;
-    open_price: number;
-  };
-}) => {
-  const { elapsedTime, currentCost } = useMinutesTimer(
-    rentalDetails.start_time,
-    car.price_per_minute,
-    car.open_price
-  );
-
-  return (
-    <div className="flex flex-row items-center justify-between gap-2">
-      <p className="text-[16px] text-[#191919]">Время аренды</p>
-      <p className="text-[16px] font-semibold text-[#191919]">
-        {elapsedTime} <span className="font-normal ">/ {currentCost} ₸</span>
-      </p>
-    </div>
-  );
-};
-
-const HoursRentalContent = ({
-  rentalDetails,
-  car,
-}: {
-  rentalDetails: RentalDetails;
-  car: {
-    price_per_minute: number;
-  };
-}) => {
-  const { timeLeft, isOvertime, overtimeText, penaltyCost } = useCountdownTimer(
-    rentalDetails.start_time,
-    rentalDetails.duration,
-    "hours",
-    car.price_per_minute
-  );
-
-  const config = RENTAL_CONFIG[rentalDetails.rental_type as RentalType];
-
-  return (
-    <div className="flex items-center justify-between gap-2 flex-col w-full">
-      {!isOvertime && (
-        <div className="flex flex-row items-center justify-between gap-2 w-full">
-          <p className="text-[16px] text-[#191919]">{overtimeText}</p>
-          <p
-            className={cn(
-              "text-[16px] font-semibold text-center",
-              "text-[#191919]"
-            )}
-          >
-            {timeLeft}
-          </p>
-        </div>
-      )}
-      <div
-        className={cn(
-          "flex flex-row items-center justify-between gap-2 w-full border-t border-[#E0E0E0] pt-2",
-          isOvertime && "border-t-0"
-        )}
-      >
-        <p>Тариф</p>
-        <p>
-          {rentalDetails.duration} {config.getUnitText(rentalDetails.duration!)}
-        </p>
-      </div>
-      {isOvertime && (
-        <div className="flex flex-row items-center justify-between gap-2 w-full border-t border-[#E0E0E0] pt-2 text-[16px] text-red-600">
-          <p>Время вне тарифа</p>
-          <p className="text-red-600 font-semibold">
-            {timeLeft}{" "}
-            <span className="text-red-600 font-normal">/ {penaltyCost} ₸</span>
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const DaysRentalContent = ({
-  rentalDetails,
-  car,
-}: {
-  rentalDetails: RentalDetails;
-  car: {
-    price_per_minute: number;
-  };
-}) => {
-  const { timeLeft, isOvertime, overtimeText, penaltyCost } = useCountdownTimer(
-    rentalDetails.start_time,
-    rentalDetails.duration,
-    "days",
-    car.price_per_minute
-  );
-
-  const config = RENTAL_CONFIG[rentalDetails.rental_type as RentalType];
-
-  return (
-    <div className="flex items-center justify-between gap-2 flex-col w-full">
-      {!isOvertime && (
-        <div className="flex flex-row items-center justify-between gap-2 w-full">
-          <p className="text-[16px] text-[#191919]">{overtimeText}</p>
-          <p
-            className={cn(
-              "text-[16px] font-semibold text-center",
-              "text-[#191919]"
-            )}
-          >
-            {timeLeft}
-          </p>
-        </div>
-      )}
-      <div
-        className={cn(
-          "flex flex-row items-center justify-between gap-2 w-full border-t border-[#E0E0E0] pt-2",
-          isOvertime && "border-t-0"
-        )}
-      >
-        <p>Тариф</p>
-        <p>
-          {rentalDetails.duration} {config.getUnitText(rentalDetails.duration!)}
-        </p>
-      </div>
-      {isOvertime && (
-        <div className="flex flex-row items-center justify-between gap-2 w-full border-t border-[#E0E0E0] pt-2 text-[16px] text-red-600">
-          <p>Время вне тарифа</p>
-          <p className="text-red-600 font-semibold">
-            {timeLeft}{" "}
-            <span className="text-red-600 font-normal">/ {penaltyCost} ₸</span>
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
 
 export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   const { showModal } = useResponseModal();
@@ -567,7 +300,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         </div>
 
         {/* Car Controls Slider */}
-        <CarControlsSlider onLock={handleLock} onUnlock={handleUnlock} />
+        <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
         <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
           Завершить аренду

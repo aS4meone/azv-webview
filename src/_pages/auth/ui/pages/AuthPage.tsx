@@ -127,7 +127,7 @@ const AuthPage = () => {
             disabled={isDisabled || isLoading}
             onClick={handleNext}
           >
-            {isLoading ? <Loader color="#fff" /> : t("auth.next")}
+            {isLoading ? <Loader color="black" /> : t("auth.next")}
           </Button>
         </section>
       </div>

@@ -3,7 +3,6 @@ import { formatDate } from "@/shared/utils/formate-date";
 
 interface TripInfoCardProps {
   rentalType: string;
-  rentalStatus: string;
   reservationTime: string;
   startTime: string;
   endTime: string;
@@ -26,7 +25,6 @@ const ClockIcon = () => (
 
 export const TripInfoCard: React.FC<TripInfoCardProps> = ({
   rentalType,
-  rentalStatus,
   reservationTime,
   startTime,
   endTime,
@@ -35,22 +33,26 @@ export const TripInfoCard: React.FC<TripInfoCardProps> = ({
   const getRentalTypeText = (type: string) => {
     switch (type) {
       case "minutes":
-        return "минуты";
+        return "минутный";
       case "hours":
-        return "часы";
+        return "часовой";
       case "days":
-        return "дни";
+        return "дневной";
       default:
         return type;
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "ЗАВЕРШЕНО";
+  const getDurationText = (duration: number, rentalType: string) => {
+    switch (rentalType) {
+      case "minutes":
+        return duration === 1 ? "минуту" : duration < 5 ? "минуты" : "минут";
+      case "hours":
+        return duration === 1 ? "час" : duration < 5 ? "часа" : "часов";
+      case "days":
+        return duration === 1 ? "день" : duration < 5 ? "дня" : "дней";
       default:
-        return status;
+        return "минут";
     }
   };
 
@@ -68,21 +70,9 @@ export const TripInfoCard: React.FC<TripInfoCardProps> = ({
       </div>
       <div className="px-6 py-4 space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-gray-500 text-sm font-medium">Тип</span>
+          <span className="text-gray-500 text-sm font-medium">Тариф</span>
           <span className="text-gray-900 font-medium capitalize">
             {getRentalTypeText(rentalType)}
-          </span>
-        </div>
-        <div className="flex justify-between items-center">
-          <span className="text-gray-500 text-sm font-medium">Статус</span>
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
-              rentalStatus === "completed"
-                ? "bg-black text-white"
-                : "bg-gray-100 text-gray-700"
-            }`}
-          >
-            {getStatusText(rentalStatus)}
           </span>
         </div>
         <div className="space-y-3 pt-2">
@@ -116,7 +106,7 @@ export const TripInfoCard: React.FC<TripInfoCardProps> = ({
                 Продолжительность
               </span>
               <span className="text-gray-900 font-medium">
-                {duration} минут
+                {duration} {getDurationText(duration, rentalType)}
               </span>
             </div>
           )}
