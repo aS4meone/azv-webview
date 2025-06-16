@@ -152,17 +152,9 @@ export const MapWithMarkers = ({
 
       if (vehiclesList.length > 0) {
         const needCar = vehiclesList.find((car) => car.id === carId);
-        console.log("baha", needCar);
+
         if (needCar) {
           processedCarIdRef.current = carId;
-
-          if (map) {
-            map.setCenter({
-              lat: needCar.latitude,
-              lng: needCar.longitude,
-            });
-            map.setZoom(16); // Устанавливаем хороший зум для просмотра машины
-          }
 
           if (onCarFound) {
             onCarFound(needCar);
@@ -199,7 +191,6 @@ export const MapWithMarkers = ({
     showModal,
     hideModal,
     removeAllQueries,
-    map,
   ]);
 
   // Функция создания маркера

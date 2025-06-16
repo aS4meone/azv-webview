@@ -1,14 +1,14 @@
 "use client";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { BaseMap, ZOOM_CONSTRAINTS } from "@/shared/ui/map";
 import { useUserStore } from "@/shared/stores/userStore";
 import { MapWithMarkers } from "./MapWithMarkers";
 import { ServiceZonePolygon } from "./ServiceZonePolygon";
+import { MapCameraProps } from "@vis.gl/react-google-maps";
+import { ICar } from "@/shared/models/types/car";
 
 export const MapComponent = () => {
   const { user } = useUserStore();
-
-  const handleCarFound = useCallback(() => {}, []);
 
   const initialCenter = useMemo(() => {
     if (user?.current_rental?.car_details) {
@@ -26,6 +26,31 @@ export const MapComponent = () => {
       ? ZOOM_CONSTRAINTS.CAR_FOCUS
       : ZOOM_CONSTRAINTS.DEFAULT;
   }, [user?.current_rental?.car_details]);
+
+  // Состояние камеры карты
+  const [cameraProps, setCameraProps] = useState<MapCameraProps>({
+    center: initialCenter,
+    zoom: initialZoom,
+  });
+
+  // Функция для центрирования карты на машине
+  const centerOnCar = useCallback((car: ICar) => {
+    console.log("Centering map on car:", car.latitude, car.longitude);
+    setCameraProps({
+      center: {
+        lat: car.latitude,
+        lng: car.longitude,
+      },
+      zoom: ZOOM_CONSTRAINTS.CAR_FOCUS,
+    });
+  }, []);
+
+  const handleCarFound = useCallback(
+    (car: ICar) => {
+      centerOnCar(car);
+    },
+    [centerOnCar]
+  );
 
   // Мемоизируем компоненты карты для предотвращения ненужных ре-рендеров
   const MemoizedServiceZonePolygon = useMemo(() => <ServiceZonePolygon />, []);
@@ -45,8 +70,8 @@ export const MapComponent = () => {
 
   return (
     <BaseMap
-      initialCenter={initialCenter}
-      initialZoom={initialZoom}
+      cameraProps={cameraProps}
+      onCameraPropsChange={setCameraProps}
       enableMyLocationAutoCenter={true}
       showZoomControls={true}
       showMyLocationButton={true}
