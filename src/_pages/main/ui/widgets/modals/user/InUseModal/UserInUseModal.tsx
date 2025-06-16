@@ -21,6 +21,7 @@ import { RENTAL_CONFIG } from "../../../screens/rental-screen/hooks/usePricingCa
 import { MinutesRentalContent } from "./components/MinutesRentalContent";
 import { HoursRentalContent } from "./components/HoursRentalContent";
 import { DaysRentalContent } from "./components/DaysRentalContent";
+import Loader from "@/shared/ui/loader";
 
 interface UserInUseModalProps {
   user: IUser;
@@ -39,6 +40,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [isEndLoading, setIsEndLoading] = useState(false);
 
   const handlePhotoUpload = async (files: { [key: string]: File[] }) => {
     setIsLoading(true);
@@ -132,11 +134,13 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
 
   const handleEndRental = async () => {
     try {
+      setIsEndLoading(true);
       const res = await rentApi.completeRent({
         rating,
         comment,
       });
       if (res.status === 200) {
+        setIsEndLoading(false);
         setShowRatingModal(false);
         onClose();
         showModal({
@@ -149,6 +153,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         });
       }
     } catch (error: unknown) {
+      setIsEndLoading(false);
       const errorMessage =
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
@@ -251,6 +256,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
 
       {showRatingModal && (
         <RatingModal
+          isLoading={isEndLoading}
           onClose={() => setShowRatingModal(false)}
           handleEndRental={handleEndRental}
           rating={rating}
@@ -318,6 +324,7 @@ interface RatingModalProps {
   setComment: (comment: string) => void;
   car: ICar;
   user: IUser;
+  isLoading: boolean;
 }
 
 const RatingModal = ({
@@ -329,6 +336,7 @@ const RatingModal = ({
   setComment,
   car,
   user,
+  isLoading,
 }: RatingModalProps) => (
   <PushScreen onClose={onClose} withOutStyles>
     <div className="bg-white px-8 py-10 pt-[140px] text-[#191919] flex flex-col justify-between h-full">
@@ -385,7 +393,7 @@ const RatingModal = ({
         onClick={handleEndRental}
         className="w-full"
       >
-        Завершить
+        {isLoading ? <Loader /> : "Завершить"}
       </Button>
     </div>
   </PushScreen>

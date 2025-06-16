@@ -16,6 +16,7 @@ import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
+import Loader from "@/shared/ui/loader";
 
 interface MechanicInUseModalProps {
   user: IUser;
@@ -37,6 +38,7 @@ export const MechanicInUseModal = ({
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [isEndLoading, setIsEndLoading] = useState(false);
 
   const car: ICar = user.current_rental?.car_details || ({} as ICar);
 
@@ -122,12 +124,13 @@ export const MechanicInUseModal = ({
 
   const handleCompleteInspection = async () => {
     try {
-      // Для осмотра используем completeCheckCar с рейтингом
+      setIsEndLoading(true);
       const res = await mechanicApi.completeCheckCar({
         rating,
         comment,
       });
       if (res.status === 200) {
+        setIsEndLoading(false);
         setShowRatingModal(false);
         onClose();
         showModal({
@@ -141,6 +144,7 @@ export const MechanicInUseModal = ({
         });
       }
     } catch (error: unknown) {
+      setIsEndLoading(false);
       const errorMessage =
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
@@ -231,6 +235,7 @@ export const MechanicInUseModal = ({
 
       {showRatingModal && (
         <RatingModal
+          isLoading={isEndLoading}
           onClose={() => setShowRatingModal(false)}
           handleCompleteInspection={handleCompleteInspection}
           rating={rating}
@@ -280,6 +285,7 @@ interface RatingModalProps {
   setComment: (comment: string) => void;
   car: ICar;
   user: IUser;
+  isLoading: boolean;
 }
 
 const RatingModal = ({
@@ -290,6 +296,7 @@ const RatingModal = ({
   comment,
   setComment,
   car,
+  isLoading,
 }: RatingModalProps) => (
   <PushScreen onClose={onClose} withOutStyles>
     <div className="bg-white px-8 py-10 pt-[140px] text-[#191919] flex flex-col justify-between h-full">
@@ -342,7 +349,7 @@ const RatingModal = ({
         onClick={handleCompleteInspection}
         className="w-full"
       >
-        Завершить осмотр
+        {isLoading ? <Loader /> : "Завершить осмотр"}
       </Button>
     </div>
   </PushScreen>
