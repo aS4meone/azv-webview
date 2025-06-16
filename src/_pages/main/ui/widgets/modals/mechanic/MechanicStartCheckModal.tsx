@@ -18,6 +18,7 @@ export const MechanicStartCheckModal = ({
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const delivering = car.status === CarStatus.delivering;
+  const tracking = car.status === CarStatus.inUse;
 
   const handleStartInspection = async () => {
     try {
@@ -29,30 +30,6 @@ export const MechanicStartCheckModal = ({
           buttonText: "Отлично",
           onClose: async () => {
             onClose();
-            await refreshUser();
-          },
-        });
-      }
-    } catch (error) {
-      showModal({
-        type: "error",
-        description: error.response.data.detail,
-        buttonText: "Попробовать снова",
-        onClose: () => {},
-      });
-    }
-  };
-
-  const handleStartDelivery = async () => {
-    onClose();
-    try {
-      const res = await mechanicApi.acceptDelivery(car.rental_id);
-      if (res.status === 200) {
-        showModal({
-          type: "success",
-          description: "Доставка успешно принята",
-          buttonText: "Отлично",
-          onClose: async () => {
             await refreshUser();
           },
         });
@@ -92,12 +69,14 @@ export const MechanicStartCheckModal = ({
             onClick={() => {
               if (car.status === CarStatus.pending) {
                 handleStartInspection();
-              } else {
-                handleStartDelivery();
               }
             }}
           >
-            {delivering ? "Начать доставку" : "Принять осмотр"}
+            {delivering
+              ? "Начать доставку"
+              : tracking
+              ? "Начать слежку"
+              : "Принять осмотр"}
           </Button>
         </div>
       </div>

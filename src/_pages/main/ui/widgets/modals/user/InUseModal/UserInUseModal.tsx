@@ -11,7 +11,6 @@ import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { useUserStore } from "@/shared/stores/userStore";
 import { IUser } from "@/shared/models/types/user";
 import { RentalType } from "@/shared/models/dto/rent.dto";
-import { RentalDetails } from "@/shared/models/types/current-rental";
 import { ArrowRightIcon } from "@/shared/icons";
 import { cn } from "@/shared/utils/cn";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";

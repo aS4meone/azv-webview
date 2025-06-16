@@ -114,13 +114,15 @@ export default function GoogleMapsPage() {
       <MapComponent />
 
       <Drawer />
-      <Button
-        variant="icon"
-        className="absolute top-10 right-20 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
-        link={ROUTES.SEARCH}
-      >
-        <SearchIcon />
-      </Button>
+      {user?.current_rental === null ? (
+        <Button
+          variant="icon"
+          className="absolute top-10 right-20 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
+          link={ROUTES.SEARCH}
+        >
+          <SearchIcon />
+        </Button>
+      ) : null}
       <Button
         variant="icon"
         className="absolute top-10 right-4 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"

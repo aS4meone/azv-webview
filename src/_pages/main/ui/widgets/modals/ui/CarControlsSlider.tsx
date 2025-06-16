@@ -222,17 +222,11 @@ export const CarControlsSlider = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <button
-          onClick={() => onUnlock?.()}
-          className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out"
-        >
+        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out">
           <ArrowLeftIcon color="white" className="w-6 h-6" />
         </button>
 
-        <button
-          onClick={() => onLock?.()}
-          className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out"
-        >
+        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out">
           <ArrowRightIcon color="white" className="w-6 h-6" />
         </button>
       </div>

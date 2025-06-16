@@ -9,6 +9,7 @@ import { WaitingTimer } from "../../timers/WaitingTimer";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
+import { useRouter } from "next/navigation";
 
 interface UserCarInWaitingModalProps {
   user: IUser;
@@ -24,6 +25,7 @@ export const UserCarInWaitingModal = ({
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
+  const router = useRouter();
 
   // onClose();
   async function handleRent() {
@@ -94,6 +96,7 @@ export const UserCarInWaitingModal = ({
         onClose: async () => {
           onClose();
           await refreshUser();
+          router.refresh();
         },
       });
     }

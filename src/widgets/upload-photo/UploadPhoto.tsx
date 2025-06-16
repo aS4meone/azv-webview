@@ -11,6 +11,7 @@ export interface PhotoConfig {
   id: string;
   title: string;
   isSelfy?: boolean;
+  cameraType?: "front" | "back";
   multiple?: {
     min: number;
     max: number;
@@ -56,15 +57,37 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
 
       let files: File[] = [];
 
+      // Определяем тип камеры
+      let cameraType: "front" | "back" =
+        photoConfig.cameraType || (photoConfig.isSelfy ? "front" : "back");
+
+      console.log(`🔍 Отладка для ${photoId}:`, {
+        "photoConfig.cameraType": photoConfig.cameraType,
+        "photoConfig.isSelfy": photoConfig.isSelfy,
+        "итоговый cameraType": cameraType,
+        photoConfig: photoConfig,
+      });
+
+      // Дополнительная проверка типа
+      if (cameraType !== "front" && cameraType !== "back") {
+        console.warn(
+          `⚠️ Некорректный cameraType: ${cameraType}, используем 'back'`
+        );
+        cameraType = "back";
+      }
+
+      console.log(`📱 Финальный cameraType для съемки: ${cameraType}`);
+
       if (photoConfig.multiple) {
         // Множественные фото только с камеры
         console.log(
-          `📷 Множественные фото с камеры: ${photoConfig.multiple.min}-${photoConfig.multiple.max}`
+          `📷 Множественные фото с камеры: ${photoConfig.multiple.min}-${photoConfig.multiple.max}, камера: ${cameraType}`
         );
 
         const base64Images = await FlutterCamera.captureMultiplePhotos(
           photoConfig.multiple.min,
-          photoConfig.multiple.max
+          photoConfig.multiple.max,
+          cameraType
         );
 
         if (base64Images.length < photoConfig.multiple.min) {
@@ -81,10 +104,12 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       } else {
         // Одиночное фото с камеры (включая селфи)
         console.log(
-          `📸 ${photoConfig.isSelfy ? "Селфи" : "Фото"} с камеры для ${photoId}`
+          `📸 ${
+            photoConfig.isSelfy ? "Селфи" : "Фото"
+          } с камеры ${cameraType} для ${photoId}`
         );
 
-        const base64Image = await FlutterCamera.capturePhoto();
+        const base64Image = await FlutterCamera.capturePhoto(cameraType);
         if (base64Image) {
           const fileName = photoConfig.isSelfy
             ? `${photoId}_selfie.jpg`
@@ -353,7 +378,15 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                 multiple={!!photo.multiple}
                 className="hidden"
                 onChange={(e) => handlePhotoSelect(photo.id, e)}
-                capture={photo.isSelfy ? "user" : undefined}
+                capture={
+                  photo.cameraType === "front"
+                    ? "user"
+                    : photo.cameraType === "back"
+                    ? "environment"
+                    : photo.isSelfy
+                    ? "user"
+                    : undefined
+                }
               />
             </label>
           )}

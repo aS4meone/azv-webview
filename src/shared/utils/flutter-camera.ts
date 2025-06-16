@@ -33,7 +33,9 @@ export class FlutterCamera {
   /**
    * Сделать фото с камеры
    */
-  static async capturePhoto(): Promise<string | null> {
+  static async capturePhoto(
+    cameraType: "front" | "back" = "back"
+  ): Promise<string | null> {
     if (!this.isAvailable()) {
       throw new Error("Flutter camera is not available");
     }
@@ -51,8 +53,10 @@ export class FlutterCamera {
       // Устанавливаем глобальный callback
       window.flutterCameraResult = this.resultCallback;
 
-      // Вызываем Flutter handler
-      window.flutter_inappwebview?.callHandler("capturePhoto").catch(reject);
+      // Вызываем Flutter handler с параметром типа камеры
+      window.flutter_inappwebview
+        ?.callHandler("capturePhoto", cameraType)
+        .catch(reject);
 
       // Таймаут на случай если результат не придет
       setTimeout(() => {
@@ -133,7 +137,8 @@ export class FlutterCamera {
    */
   static async captureMultiplePhotos(
     minPhotos: number = 1,
-    maxPhotos: number = 10
+    maxPhotos: number = 10,
+    cameraType: "front" | "back" = "back"
   ): Promise<string[]> {
     if (!this.isAvailable()) {
       throw new Error("Flutter camera is not available");
@@ -154,7 +159,7 @@ export class FlutterCamera {
       window.flutterCameraResult = this.resultCallback;
 
       window.flutter_inappwebview
-        ?.callHandler("captureMultiplePhotos", minPhotos, maxPhotos)
+        ?.callHandler("captureMultiplePhotos", minPhotos, maxPhotos, cameraType)
         .catch(reject);
 
       setTimeout(() => {

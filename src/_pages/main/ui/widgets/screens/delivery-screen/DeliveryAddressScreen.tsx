@@ -11,14 +11,13 @@ import { BaseMap, CenterMarker, ZOOM_CONSTRAINTS } from "@/shared/ui/map";
 import { useMap } from "@vis.gl/react-google-maps";
 import { getAddressFromCoordinates } from "@/shared/utils/googleMaps";
 import {
-  getPerformanceSettings,
   calculateDistance,
   logPerformance,
 } from "@/shared/utils/mapOptimization";
 import { MapCameraProps } from "@vis.gl/react-google-maps";
 
 // Получаем настройки производительности для устройства
-const PERFORMANCE_SETTINGS = getPerformanceSettings();
+
 const MIN_DISTANCE_THRESHOLD = 0.0001; // Минимальное расстояние для обновления адреса
 
 const CAMERA_DEBOUNCE_MS = 150;
@@ -128,7 +127,7 @@ export const DeliveryAddressScreen = ({
       // Устанавливаем новый таймер с адаптивной задержкой
       debounceTimeoutRef.current = setTimeout(() => {
         updateAddress(lat, lng);
-      }, PERFORMANCE_SETTINGS.debounceDelay);
+      });
     },
     [updateAddress]
   );

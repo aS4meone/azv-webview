@@ -8,7 +8,6 @@ import { useResponseModal } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
-import { DeliveryAddressScreen } from "../../screens/delivery-screen/DeliveryAddressScreen";
 import { RentalData } from "../../screens/rental-screen/hooks/usePricingCalculator";
 import { RentalPage } from "../../screens/rental-screen";
 
@@ -21,7 +20,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [showRentalPage, setShowRentalPage] = useState(false);
-  const [showAddressScreen, setShowAddressScreen] = useState(false);
+  const [, setShowAddressScreen] = useState(false);
   const [isDelivery, setIsDelivery] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState<{
     lat: number;
@@ -148,11 +147,11 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
     }
   };
 
-  const handleAddressSelected = (lat: number, lng: number, address: string) => {
-    setDeliveryAddress({ lat, lng, address });
-    setShowAddressScreen(false);
-    setShowRentalPage(true);
-  };
+  // const handleAddressSelected = (lat: number, lng: number, address: string) => {
+  //   setDeliveryAddress({ lat, lng, address });
+  //   setShowAddressScreen(false);
+  //   setShowRentalPage(true);
+  // };
 
   const handleDeliveryClick = () => {
     setIsDelivery(true);

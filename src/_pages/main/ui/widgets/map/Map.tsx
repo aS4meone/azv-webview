@@ -27,6 +27,14 @@ export const MapComponent = () => {
       : ZOOM_CONSTRAINTS.DEFAULT;
   }, [user?.current_rental?.car_details]);
 
+  // Мемоизируем компоненты карты для предотвращения ненужных ре-рендеров
+  const MemoizedServiceZonePolygon = useMemo(() => <ServiceZonePolygon />, []);
+
+  const MemoizedMapWithMarkers = useMemo(
+    () => <MapWithMarkers onCarFound={handleCarFound} />,
+    [handleCarFound]
+  );
+
   if (!user) {
     return (
       <div className="flex items-center justify-center h-screen w-full bg-gray-100">
@@ -44,11 +52,11 @@ export const MapComponent = () => {
       showMyLocationButton={true}
       className="relative h-screen w-full map-container"
     >
-      {/* Зона обслуживания - рендерим только если зум больше 10 для производительности */}
-      <ServiceZonePolygon />
+      {/* Зона обслуживания - мемоизированный компонент */}
+      {MemoizedServiceZonePolygon}
 
-      {/* Маркеры автомобилей */}
-      <MapWithMarkers onCarFound={handleCarFound} />
+      {/* Маркеры автомобилей - мемоизированный компонент */}
+      {MemoizedMapWithMarkers}
     </BaseMap>
   );
 };

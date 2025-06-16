@@ -9,12 +9,12 @@ import {
 } from "@/shared/ui/modal";
 import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { useUserStore } from "@/shared/stores/userStore";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { IUser } from "@/shared/models/types/user";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { CarStatus, ICar } from "@/shared/models/types/car";
-import { MechanicWaitingTimer } from "../../timers/MechanicTimer";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 
 interface MechanicInUseModalProps {
@@ -28,6 +28,7 @@ export const MechanicInUseModal = ({
 }: MechanicInUseModalProps) => {
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
+  const { fetchAllMechanicVehicles } = useVehiclesStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -50,24 +51,6 @@ export const MechanicInUseModal = ({
       }
     }
     const res = await mechanicApi.uploadAfterCheckCar(formData);
-    if (res.status === 200) {
-      setIsLoading(false);
-      setShowUploadPhoto(false);
-      setShowRatingModal(true);
-    }
-  };
-
-  const handleUploadAfterDelivery = async (files: {
-    [key: string]: File[];
-  }) => {
-    setIsLoading(true);
-    const formData = new FormData();
-    for (const key in files) {
-      for (const file of files[key]) {
-        formData.append(key, file);
-      }
-    }
-    const res = await mechanicApi.uploadAfterDelivery(formData);
     if (res.status === 200) {
       setIsLoading(false);
       setShowUploadPhoto(false);
@@ -153,6 +136,7 @@ export const MechanicInUseModal = ({
           buttonText: "Отлично",
           onClose: async () => {
             await refreshUser();
+            await fetchAllMechanicVehicles();
           },
         });
       }

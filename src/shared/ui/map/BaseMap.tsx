@@ -10,11 +10,11 @@ import React, {
   SetStateAction,
 } from "react";
 import {
+  AdvancedMarker,
   APIProvider,
   Map,
   MapCameraChangedEvent,
   MapCameraProps,
-  AdvancedMarker,
 } from "@vis.gl/react-google-maps";
 import { Button } from "@/shared/ui";
 import { ArrowLocationIcon, MinusIcon, PlusIcon } from "@/shared/icons";
@@ -119,21 +119,6 @@ export const BaseMap = ({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const lastCameraUpdateRef = useRef<MapCameraProps>(cameraProps);
 
-  // Оптимизированные функции зума с ограничениями
-  const zoomIn = useCallback(() => {
-    setCameraProps((prev) => ({
-      ...prev,
-      zoom: Math.min((prev.zoom || initialZoom) + 1, maxZoom),
-    }));
-  }, [setCameraProps, initialZoom, maxZoom]);
-
-  const zoomOut = useCallback(() => {
-    setCameraProps((prev) => ({
-      ...prev,
-      zoom: Math.max((prev.zoom || initialZoom) - 1, minZoom),
-    }));
-  }, [setCameraProps, initialZoom, minZoom]);
-
   const centerToUser = useCallback(async () => {
     if (isLocationLoadingRef.current) return;
 
@@ -179,27 +164,25 @@ export const BaseMap = ({
     }
   }, [enableMyLocationAutoCenter, onLocationFound, setCameraProps]);
 
+  // Оптимизированные функции зума с ограничениями
+  const zoomIn = useCallback(() => {
+    setCameraProps((prev) => ({
+      ...prev,
+      zoom: Math.min((prev.zoom || initialZoom) + 1, maxZoom),
+    }));
+  }, [setCameraProps, initialZoom, maxZoom]);
+
+  const zoomOut = useCallback(() => {
+    setCameraProps((prev) => ({
+      ...prev,
+      zoom: Math.max((prev.zoom || initialZoom) - 1, minZoom),
+    }));
+  }, [setCameraProps, initialZoom, minZoom]);
+
   // Обработчик изменения камеры
   const handleCameraChanged = useCallback(
     (event: MapCameraChangedEvent) => {
       const { center, zoom, heading, tilt } = event.detail;
-
-      // Проверяем, действительно ли изменились параметры камеры
-      const currentCamera = lastCameraUpdateRef.current;
-      const hasSignificantChange =
-        !currentCamera ||
-        Math.abs((currentCamera.zoom || 0) - (zoom || 0)) >= 0.1 ||
-        Math.abs((currentCamera.center?.lat || 0) - (center?.lat || 0)) >=
-          0.0001 ||
-        Math.abs((currentCamera.center?.lng || 0) - (center?.lng || 0)) >=
-          0.0001 ||
-        Math.abs((currentCamera.heading || 0) - (heading || 0)) >= 1 ||
-        Math.abs((currentCamera.tilt || 0) - (tilt || 0)) >= 1;
-
-      if (!hasSignificantChange) {
-        return;
-      }
-
       const newCameraProps = { center, zoom, heading, tilt };
 
       setCameraProps(newCameraProps);
@@ -242,7 +225,6 @@ export const BaseMap = ({
       draggable: true,
       tilt: 0,
       heading: 0,
-      styles: styles,
     }),
     [gestureHandling, minZoom, maxZoom, restriction, styles]
   );
@@ -291,8 +273,6 @@ export const BaseMap = ({
           {...mapSettings}
         >
           {children}
-
-          {/* Маркер пользователя (если есть) */}
           {userLocation && (
             <AdvancedMarker position={userLocation}>
               <div className="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg animate-pulse" />
@@ -301,13 +281,15 @@ export const BaseMap = ({
         </Map>
       </APIProvider>
 
+      {/* Маркер пользователя (если есть) */}
+
       {/* Оптимизированные контролы карты */}
       {showZoomControls && (
         <div className="absolute right-4 top-1/2 flex flex-col gap-2 transform -translate-y-1/2 map-zoom-controls">
           <Button
             onClick={zoomIn}
             variant="icon"
-            className="shadow-lg h-14 w-14 hover:shadow-xl transition-shadow duration-200 touch-manipulation"
+            className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
             disabled={(cameraProps.zoom || 0) >= maxZoom}
           >
             <PlusIcon color="#191919" />
@@ -315,7 +297,7 @@ export const BaseMap = ({
           <Button
             onClick={zoomOut}
             variant="icon"
-            className="shadow-lg h-14 w-14 hover:shadow-xl transition-shadow duration-200 touch-manipulation"
+            className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
             disabled={(cameraProps.zoom || 0) <= minZoom}
           >
             <MinusIcon />
@@ -324,7 +306,7 @@ export const BaseMap = ({
             <Button
               onClick={centerToUser}
               variant="icon"
-              className="shadow-lg hover:shadow-xl h-14 w-14 transition-shadow duration-200 touch-manipulation"
+              className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
               disabled={isLocationLoadingRef.current}
             >
               {isLocationLoadingRef.current ? (

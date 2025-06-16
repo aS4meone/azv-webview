@@ -1,7 +1,6 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { useBrowserProtection } from "@/shared/hooks/useBrowserProtection";
 
 interface BrowserProtectionProviderProps {
   children: ReactNode;

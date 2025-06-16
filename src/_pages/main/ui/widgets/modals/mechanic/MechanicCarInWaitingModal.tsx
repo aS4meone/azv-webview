@@ -1,5 +1,5 @@
 import { Button } from "@/shared/ui";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
@@ -32,32 +32,6 @@ export const MechanicCarInWaitingModal = ({
           type: "success",
           title: "Осмотр успешно начат",
           description: "Загрузите фотографии автомобиля перед началом осмотра",
-          buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-            setShowUploadPhoto(true);
-          },
-        });
-      }
-    } catch (error) {
-      showModal({
-        type: "error",
-        description: error.response.data.detail,
-        buttonText: "Попробовать снова",
-        onClose: () => {},
-      });
-    }
-  }
-
-  async function handleStartDelivery() {
-    try {
-      // Для доставки используем тот же API что и для осмотра
-      const res = await mechanicApi.startCheckCar();
-      if (res.status === 200) {
-        showModal({
-          type: "success",
-          title: "Доставка успешно начата",
-          description: "Загрузите фотографии автомобиля перед началом доставки",
           buttonText: "Отлично",
           onClose: async () => {
             await refreshUser();
@@ -116,32 +90,6 @@ export const MechanicCarInWaitingModal = ({
       showModal({
         type: "success",
         description: "Фотографии успешно загружены, можно начинать осмотр",
-        buttonText: "Отлично",
-        onClose: async () => {
-          onClose();
-          await refreshUser();
-        },
-      });
-    }
-  };
-
-  const handleUploadBeforeDelivery = async (files: {
-    [key: string]: File[];
-  }) => {
-    setIsLoading(true);
-    const formData = new FormData();
-    for (const key in files) {
-      for (const file of files[key]) {
-        formData.append(key, file);
-      }
-    }
-    const res = await mechanicApi.uploadBeforeDelivery(formData);
-    if (res.status === 200) {
-      setIsLoading(false);
-      setShowUploadPhoto(false);
-      showModal({
-        type: "success",
-        description: "Фотографии перед доставкой успешно загружены",
         buttonText: "Отлично",
         onClose: async () => {
           onClose();

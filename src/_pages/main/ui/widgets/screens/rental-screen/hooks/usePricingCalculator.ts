@@ -32,7 +32,11 @@ export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
   },
   hours: {
     title: "Почасовая аренда",
-    description: "Удобный тариф для коротких поездок и дел в городе.",
+    description: "",
+    getDescription: (car: ICar) => {
+      const openingFee = car.open_price as number;
+      return `Удобный тариф для коротких поездок и дел в городе. Взимается доплата ${openingFee.toLocaleString()} ₸ за открытие.`;
+    },
     unit: "в час",
     maxDuration: 24,
     priceKey: "price_per_hour",

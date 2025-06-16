@@ -4,18 +4,21 @@ export const baseConfig: PhotoConfig[] = [
   {
     id: "selfie",
     title: "Сделайте селфи.",
+    cameraType: "front",
     multiple: { min: 1, max: 1 },
   },
   {
     id: "car_photos",
     title: "Сделайте фото машины со всех сторон.",
     multiple: { min: 1, max: 1 },
+    cameraType: "back",
     // multiple: { min: 6, max: 10 },
   },
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
     multiple: { min: 1, max: 1 },
+    cameraType: "back",
     // multiple: { min: 4, max: 10 },
   },
 ];

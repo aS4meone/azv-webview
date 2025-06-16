@@ -36,6 +36,37 @@ export const throttle = <T extends (...args: unknown[]) => unknown>(
   };
 };
 
+// Комбинированный debounce + throttle для оптимальной производительности
+export const smartDelay = <T extends (...args: unknown[]) => unknown>(
+  func: T,
+  throttleMs: number,
+  debounceMs: number
+): ((...args: Parameters<T>) => void) => {
+  let debounceTimeout: NodeJS.Timeout | null = null;
+  let lastExecTime = 0;
+
+  return (...args: Parameters<T>) => {
+    const now = Date.now();
+
+    // Очищаем debounce timeout
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Если прошло достаточно времени с последнего выполнения, выполняем сразу
+    if (now - lastExecTime >= throttleMs) {
+      func(...args);
+      lastExecTime = now;
+    } else {
+      // Иначе устанавливаем debounce
+      debounceTimeout = setTimeout(() => {
+        func(...args);
+        lastExecTime = Date.now();
+      }, debounceMs);
+    }
+  };
+};
+
 // Функция для вычисления расстояния между двумя точками
 export const calculateDistance = (
   lat1: number,
@@ -77,17 +108,18 @@ export const createHash = (objects: unknown[]): string => {
     .join("|");
 };
 
-// Функция для оптимизации маркеров по зуму
+// Оптимизированная функция для определения настроек маркеров по зуму
 export const getOptimizedMarkerSettings = (zoom: number) => {
   const roundedZoom = Math.round(zoom);
 
   return {
-    showNames: roundedZoom >= 12,
+    showNames: roundedZoom >= 11, // Снижаем порог для показа имен
     showDetails: roundedZoom >= 14,
-    enableClustering: roundedZoom < 15,
+    enableClustering: roundedZoom < 13, // Увеличиваем порог для кластеризации
     markerSize:
       roundedZoom < 10 ? "small" : roundedZoom < 13 ? "medium" : "large",
-    updateFrequency: roundedZoom > 16 ? 15000 : 30000, // Более частые обновления на высоком зуме
+    updateFrequency: roundedZoom > 16 ? 15000 : 30000,
+    maxMarkers: roundedZoom < 10 ? 30 : roundedZoom < 13 ? 100 : 200,
   };
 };
 
@@ -125,7 +157,14 @@ export const getDevicePerformance = (): "low" | "medium" | "high" => {
     typeof (window as { flutter_inappwebview?: unknown })
       .flutter_inappwebview !== "undefined";
 
-  if (isWebView && cores <= 2 && memory <= 2) {
+  // Проверяем тип соединения
+  const connection = (navigator as { connection?: { effectiveType?: string } })
+    .connection;
+  const slowConnection =
+    connection?.effectiveType === "slow-2g" ||
+    connection?.effectiveType === "2g";
+
+  if (isWebView && (cores <= 2 || memory <= 2 || slowConnection)) {
     return "low";
   } else if (cores <= 4 && memory <= 4) {
     return "medium";
@@ -134,46 +173,58 @@ export const getDevicePerformance = (): "low" | "medium" | "high" => {
   }
 };
 
-// Настройки производительности в зависимости от устройства
+// Улучшенные настройки производительности
 export const getPerformanceSettings = () => {
   const performance = getDevicePerformance();
 
   switch (performance) {
     case "low":
       return {
-        markerUpdateInterval: 60000, // 1 минута
-        debounceDelay: 1500,
-        maxMarkersVisible: 50,
+        markerUpdateInterval: 45000, // 45 секунд
+        zoomDebounceDelay: 300, // Больше дебаунс для зума
+        cameraDebounceDelay: 200,
+        maxMarkersVisible: 30,
         enableAnimations: false,
         clusteringEnabled: true,
-        minZoomForNames: 14,
+        minZoomForNames: 13,
+        batchSizeLimit: 10,
+        enableLazyLoading: true,
       };
     case "medium":
       return {
         markerUpdateInterval: 30000, // 30 секунд
-        debounceDelay: 1000,
-        maxMarkersVisible: 100,
+        zoomDebounceDelay: 200,
+        cameraDebounceDelay: 150,
+        maxMarkersVisible: 80,
         enableAnimations: true,
         clusteringEnabled: true,
-        minZoomForNames: 12,
+        minZoomForNames: 11,
+        batchSizeLimit: 25,
+        enableLazyLoading: true,
       };
     case "high":
       return {
-        markerUpdateInterval: 15000, // 15 секунд
-        debounceDelay: 500,
-        maxMarkersVisible: 200,
+        markerUpdateInterval: 20000, // 20 секунд
+        zoomDebounceDelay: 150,
+        cameraDebounceDelay: 100,
+        maxMarkersVisible: 150,
         enableAnimations: true,
         clusteringEnabled: false,
         minZoomForNames: 10,
+        batchSizeLimit: 50,
+        enableLazyLoading: false,
       };
     default:
       return {
         markerUpdateInterval: 30000,
-        debounceDelay: 1000,
-        maxMarkersVisible: 100,
+        zoomDebounceDelay: 200,
+        cameraDebounceDelay: 150,
+        maxMarkersVisible: 80,
         enableAnimations: true,
         clusteringEnabled: true,
-        minZoomForNames: 12,
+        minZoomForNames: 11,
+        batchSizeLimit: 25,
+        enableLazyLoading: true,
       };
   }
 };
@@ -183,14 +234,60 @@ export const logPerformance = (operation: string, startTime: number): void => {
   const endTime = performance.now();
   const duration = endTime - startTime;
 
-  if (duration > 100) {
-    // Логируем только медленные операции
+  if (duration > 200) {
+    // Логируем только очень медленные операции
     console.warn(
-      `🐌 Slow operation: ${operation} took ${duration.toFixed(2)}ms`
+      `🐌 Very slow operation: ${operation} took ${duration.toFixed(2)}ms`
+    );
+  } else if (duration > 100) {
+    console.warn(
+      `⚠️ Slow operation: ${operation} took ${duration.toFixed(2)}ms`
     );
   } else if (duration > 50) {
     console.log(`⚡ ${operation} took ${duration.toFixed(2)}ms`);
   }
+};
+
+// Оптимизатор зума для предотвращения лагов
+export const createZoomOptimizer = () => {
+  let lastZoom = 0;
+  let pendingUpdate: NodeJS.Timeout | null = null;
+  let isUpdating = false;
+
+  return {
+    shouldUpdate: (newZoom: number, threshold = 0.5): boolean => {
+      const zoomDiff = Math.abs(newZoom - lastZoom);
+
+      // Обновляем только при значительных изменениях
+      if (zoomDiff >= threshold && !isUpdating) {
+        lastZoom = newZoom;
+        return true;
+      }
+
+      return false;
+    },
+
+    scheduleUpdate: (callback: () => void, delay = 200): void => {
+      if (pendingUpdate) {
+        clearTimeout(pendingUpdate);
+      }
+
+      pendingUpdate = setTimeout(() => {
+        isUpdating = true;
+        callback();
+        isUpdating = false;
+        pendingUpdate = null;
+      }, delay);
+    },
+
+    cleanup: (): void => {
+      if (pendingUpdate) {
+        clearTimeout(pendingUpdate);
+        pendingUpdate = null;
+      }
+      isUpdating = false;
+    },
+  };
 };
 
 // Хук для мониторинга производительности
@@ -203,65 +300,6 @@ export const usePerformanceMonitor = () => {
     },
     reset: () => {
       return performance.now();
-    },
-  };
-};
-
-// Дополнительные утилиты для оптимизации зума
-export const createZoomOptimizer = () => {
-  let lastZoomTime = 0;
-  let zoomAnimationFrame: number | null = null;
-
-  return {
-    // Оптимизированное изменение зума с RAF
-    smoothZoom: (
-      currentZoom: number,
-      targetZoom: number,
-      onUpdate: (zoom: number) => void,
-      duration = 300
-    ) => {
-      if (zoomAnimationFrame) {
-        cancelAnimationFrame(zoomAnimationFrame);
-      }
-
-      const startTime = performance.now();
-      const zoomDiff = targetZoom - currentZoom;
-
-      const animate = (currentTime: number) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // Easing function для плавности
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        const newZoom = currentZoom + zoomDiff * easeProgress;
-
-        onUpdate(newZoom);
-
-        if (progress < 1) {
-          zoomAnimationFrame = requestAnimationFrame(animate);
-        } else {
-          zoomAnimationFrame = null;
-        }
-      };
-
-      zoomAnimationFrame = requestAnimationFrame(animate);
-    },
-
-    // Дебаунс для зума с учетом производительности
-    debouncedZoom: (callback: () => void, delay = 100) => {
-      const now = performance.now();
-      if (now - lastZoomTime > delay) {
-        lastZoomTime = now;
-        callback();
-      }
-    },
-
-    // Очистка анимации
-    cleanup: () => {
-      if (zoomAnimationFrame) {
-        cancelAnimationFrame(zoomAnimationFrame);
-        zoomAnimationFrame = null;
-      }
     },
   };
 };
@@ -384,6 +422,7 @@ export const createMarkerUpdateOptimizer = () => {
 const mapOptimizationUtils = {
   debounce,
   throttle,
+  smartDelay,
   calculateDistance,
   isPointInBounds,
   createHash,

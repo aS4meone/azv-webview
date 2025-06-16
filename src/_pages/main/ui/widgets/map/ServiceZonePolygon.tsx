@@ -11,6 +11,8 @@ export const ServiceZonePolygon = () => {
   const polygonsRef = useRef<google.maps.Polygon[]>([]);
   const currentZoomRef = useRef<number>(10);
   const isInitializedRef = useRef<boolean>(false);
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSignificantZoomRef = useRef<number>(10);
 
   useEffect(() => {
     if (!map) return;
@@ -23,24 +25,34 @@ export const ServiceZonePolygon = () => {
 
     // Функция для обновления полигонов в зависимости от зума (локальная версия)
     const updatePolygonsByZoomLocal = (zoom: number) => {
-      // Проверяем, изменился ли зум достаточно значительно
-      const shouldUpdate = Math.abs(currentZoomRef.current - zoom) >= 0.5;
-      const crossedThreshold =
-        (currentZoomRef.current < 10 && zoom >= 10) ||
-        (currentZoomRef.current >= 10 && zoom < 10);
+      const roundedZoom = Math.round(zoom);
 
-      if (!shouldUpdate && !crossedThreshold && isInitializedRef.current) {
+      // Проверяем, пересек ли зум критический порог (10)
+      const crossedThreshold =
+        (lastSignificantZoomRef.current < 10 && roundedZoom >= 10) ||
+        (lastSignificantZoomRef.current >= 10 && roundedZoom < 10);
+
+      // Проверяем значительное изменение зума (больше 1 уровня)
+      const significantZoomChange =
+        Math.abs(lastSignificantZoomRef.current - roundedZoom) >= 2;
+
+      if (
+        !crossedThreshold &&
+        !significantZoomChange &&
+        isInitializedRef.current
+      ) {
         return;
       }
 
-      currentZoomRef.current = zoom;
+      currentZoomRef.current = roundedZoom;
+      lastSignificantZoomRef.current = roundedZoom;
 
       // Очищаем существующие полигоны
       clearPolygonsLocal();
 
       const newPolygons: google.maps.Polygon[] = [];
 
-      if (zoom >= 10) {
+      if (roundedZoom >= 10) {
         // При зуме >= 10: показываем background полигон с дыркой + основной полигон
         const backgroundPolygon = new google.maps.Polygon({
           paths: [
@@ -130,22 +142,29 @@ export const ServiceZonePolygon = () => {
     const initialZoom = map.getZoom() || 10;
     updatePolygonsByZoomLocal(initialZoom);
 
-    // Добавляем слушатель изменения зума с дебаунсом
-    let timeoutId: NodeJS.Timeout;
+    // Добавляем слушатель изменения зума с улучшенным дебаунсом
     const zoomChangedListener = map.addListener("zoom_changed", () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
+      // Очищаем предыдущий timeout
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
+
+      // Дебаунс с проверкой на значительные изменения
+      updateTimeoutRef.current = setTimeout(() => {
         const newZoom = map.getZoom() || 10;
         updatePolygonsByZoomLocal(newZoom);
-      }, 100); // Дебаунс 100мс
+      }, 250); // Увеличиваем дебаунс до 250мс для лучшей производительности
     });
 
     return () => {
       // Очищаем полигоны и слушатели при размонтировании
-      clearTimeout(timeoutId);
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current);
+      }
       clearPolygonsLocal();
       google.maps.event.removeListener(zoomChangedListener);
       isInitializedRef.current = false;
+      lastSignificantZoomRef.current = 10;
     };
   }, [map]); // Только map в зависимостях!
 
