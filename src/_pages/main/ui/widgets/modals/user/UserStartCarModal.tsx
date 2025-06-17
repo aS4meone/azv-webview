@@ -10,7 +10,6 @@ import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
 import { RentalData } from "../../screens/rental-screen/hooks/usePricingCalculator";
 import { RentalPage } from "../../screens/rental-screen";
-import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
 import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
 
@@ -39,7 +38,6 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
     lng: number;
     address: string;
   } | null>(null);
-  const router = useRouter();
 
   const handleRent = async (rentalData: RentalData) => {
     onClose();

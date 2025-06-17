@@ -31,7 +31,7 @@ export const UserCarInWaitingModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
   const router = useRouter();
-  const { setUploadRequired, isUserUploadRequired } = usePhotoUpload();
+  const { setUploadRequired } = usePhotoUpload();
 
   // onClose();
   async function handleRent() {

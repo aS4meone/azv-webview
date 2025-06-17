@@ -443,8 +443,8 @@ export const MapWithMarkers = ({
                 const size = Math.min(maxSize, baseSize + Math.log(count) * 8);
 
                 // Цвет кластера в зависимости от количества маркеров
-                let bgColor = "#191919";
-                let borderColor = "#333";
+                const bgColor = "#191919";
+                const borderColor = "#333";
 
                 const clusterDiv = document.createElement("div");
                 clusterDiv.style.cssText = `

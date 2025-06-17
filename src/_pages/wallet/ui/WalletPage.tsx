@@ -8,7 +8,6 @@ import { useTranslations } from "next-intl";
 import { userApi } from "@/shared/api/routes/user";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { useSearchParams } from "next/navigation";
-import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
 
 const WalletPage = () => {
   const t = useTranslations("wallet");

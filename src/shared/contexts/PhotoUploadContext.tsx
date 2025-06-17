@@ -124,6 +124,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
         });
       }
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
       showModal({
         type: "error",
@@ -156,6 +157,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
         });
       }
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
       showModal({
         type: "error",
@@ -188,6 +190,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
         });
       }
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
       showModal({
         type: "error",
@@ -224,6 +227,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
         });
       }
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
       showModal({
         type: "error",
