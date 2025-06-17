@@ -71,9 +71,10 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           type: "error",
           description: apiError.response.data.detail,
           buttonText: "Пополнить баланс",
-          onClose: () => {
+          onButtonClick: () => {
             redirectToCar();
           },
+          onClose: () => {},
         });
       } else {
         showModal({
@@ -238,6 +239,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           <Button
             variant="secondary"
             onClick={() => {
+              setIsDelivery(false);
               if (car.owned_car) {
                 handleOwnerRent();
               } else {
