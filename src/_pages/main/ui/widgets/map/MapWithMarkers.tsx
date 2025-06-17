@@ -10,25 +10,9 @@ import { useMap } from "@vis.gl/react-google-maps";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  getPerformanceSettings,
   logPerformance,
   preloadMarkerImages,
 } from "@/shared/utils/mapOptimization";
-
-// Добавляем CSS для анимации кластеров
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.8; }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-// Получаем настройки производительности для устройства
-const PERFORMANCE_SETTINGS = getPerformanceSettings();
 
 const ZOOM_LEVELS = {
   CLUSTER_ONLY: 8,
@@ -38,18 +22,6 @@ const ZOOM_LEVELS = {
   SHOW_NAMES: 12,
   MAX_MARKERS_LOW_ZOOM: 50,
   MAX_MARKERS_HIGH_ZOOM: 200,
-} as const;
-
-// Расширенные настройки кластеризации
-const CLUSTER_SETTINGS = {
-  // Минимальное количество маркеров для активации кластеризации
-  MIN_MARKERS_FOR_CLUSTERING: 3,
-  // Максимальный зум для кластеризации
-  MAX_CLUSTER_ZOOM: ZOOM_LEVELS.LARGE_MARKERS - 1, // Увеличиваем до 15 зума
-  // Минимальный размер кластера (количество маркеров)
-  MIN_CLUSTER_SIZE: 2,
-  // Расстояние между маркерами для группировки (в пикселях)
-  GRID_SIZE: 500,
 } as const;
 
 preloadMarkerImages(["/images/carmarker.png"]).catch(console.error);
@@ -225,7 +197,7 @@ export const MapWithMarkers = ({
     const roundedZoom = Math.round(zoom);
 
     // Расчет размеров маркеров
-    let baseWidth: number = 12;
+    const baseWidth: number = 12;
 
     const aspectRatio = 29 / 12;
     const markerWidth = Math.max(6, Math.min(24, baseWidth));
@@ -464,7 +436,7 @@ export const MapWithMarkers = ({
               gridSize: 80, // Расстояние между маркерами для группировки (в пикселях)
             }),
             renderer: {
-              render: ({ count, position, markers }) => {
+              render: ({ count, position }) => {
                 // Динамический размер кластера в зависимости от количества
                 const baseSize = 40;
                 const maxSize = 80;
