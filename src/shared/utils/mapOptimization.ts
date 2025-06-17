@@ -209,7 +209,7 @@ export const getPerformanceSettings = () => {
         cameraDebounceDelay: 100,
         maxMarkersVisible: 150,
         enableAnimations: true,
-        clusteringEnabled: false,
+        clusteringEnabled: true, // Включаем кластеризацию для высокопроизводительных устройств
         minZoomForNames: 10,
         batchSizeLimit: 50,
         enableLazyLoading: false,

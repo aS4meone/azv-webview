@@ -5,7 +5,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { useModal } from "@/shared/ui/modal";
 import { useRemoveAllQueries } from "@/shared/utils/urlUtils";
-import { MarkerClusterer } from "@googlemaps/markerclusterer";
+import { MarkerClusterer, GridAlgorithm } from "@googlemaps/markerclusterer";
 import { useMap } from "@vis.gl/react-google-maps";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -14,6 +14,18 @@ import {
   logPerformance,
   preloadMarkerImages,
 } from "@/shared/utils/mapOptimization";
+
+// Добавляем CSS для анимации кластеров
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 // Получаем настройки производительности для устройства
 const PERFORMANCE_SETTINGS = getPerformanceSettings();
@@ -26,6 +38,18 @@ const ZOOM_LEVELS = {
   SHOW_NAMES: 12,
   MAX_MARKERS_LOW_ZOOM: 50,
   MAX_MARKERS_HIGH_ZOOM: 200,
+} as const;
+
+// Расширенные настройки кластеризации
+const CLUSTER_SETTINGS = {
+  // Минимальное количество маркеров для активации кластеризации
+  MIN_MARKERS_FOR_CLUSTERING: 3,
+  // Максимальный зум для кластеризации
+  MAX_CLUSTER_ZOOM: ZOOM_LEVELS.LARGE_MARKERS - 1, // Увеличиваем до 15 зума
+  // Минимальный размер кластера (количество маркеров)
+  MIN_CLUSTER_SIZE: 2,
+  // Расстояние между маркерами для группировки (в пикселях)
+  GRID_SIZE: 500,
 } as const;
 
 preloadMarkerImages(["/images/carmarker.png"]).catch(console.error);
@@ -139,7 +163,6 @@ export const MapWithMarkers = ({
     };
   }, [user, fetchVehiclesByRole]);
 
-  // Handle car selection from URL parameters - only once per carId
   useEffect(() => {
     if (carId && user && processedCarIdRef.current !== carId) {
       let vehiclesList: ICar[] = [];
@@ -202,16 +225,7 @@ export const MapWithMarkers = ({
     const roundedZoom = Math.round(zoom);
 
     // Расчет размеров маркеров
-    let baseWidth: number;
-    if (roundedZoom < ZOOM_LEVELS.SMALL_MARKERS) {
-      baseWidth = 6;
-    } else if (roundedZoom < ZOOM_LEVELS.MEDIUM_MARKERS) {
-      baseWidth = 8 + (roundedZoom - ZOOM_LEVELS.SMALL_MARKERS) * 1.5;
-    } else if (roundedZoom < ZOOM_LEVELS.LARGE_MARKERS) {
-      baseWidth = 12 + (roundedZoom - ZOOM_LEVELS.MEDIUM_MARKERS) * 2;
-    } else {
-      baseWidth = 18 + (roundedZoom - ZOOM_LEVELS.LARGE_MARKERS) * 1;
-    }
+    let baseWidth: number = 12;
 
     const aspectRatio = 29 / 12;
     const markerWidth = Math.max(6, Math.min(24, baseWidth));
@@ -225,12 +239,15 @@ export const MapWithMarkers = ({
     markerDiv.style.cssText = `
           position: relative;
           display: flex;
-          flex-direction: column;
           align-items: center;
+          justify-content: center;
           cursor: pointer;
-          transform: rotate(${vehicle.course}deg);
+          // transform: rotate(${vehicle.course}deg);
           will-change: transform;
           transition: transform 0.2s ease;
+          background-color: transparent;
+          min-width: ${markerWidth + 15}px;
+          min-height: ${markerHeight + 15}px;
         `;
 
     // Add vehicle name if zoom is sufficient
@@ -267,6 +284,10 @@ export const MapWithMarkers = ({
       }
 
       nameDiv.style.cssText = `
+            position: absolute;
+            top: -${markerHeight + 8}px;
+            left: 50%;
+            transform: translateX(-50%);
             background-color: ${backgroundColor};
             border: 1px solid ${borderColor};
             border-radius: 6px;
@@ -275,12 +296,13 @@ export const MapWithMarkers = ({
             font-weight: 600;
             color: ${textColor};
             white-space: nowrap;
-            margin-bottom: 4px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(4px);
             max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
+            z-index: 10;
+            pointer-events: none;
           `;
       nameDiv.textContent = vehicle.name;
       markerDiv.appendChild(nameDiv);
@@ -324,6 +346,12 @@ export const MapWithMarkers = ({
     marker.addListener("click", async () => {
       if (user === null) {
         return;
+      }
+
+      // Автоматический зум до 16 уровня и центрирование на машине
+      if (map) {
+        map.setZoom(16);
+        map.setCenter({ lat: vehicle.latitude, lng: vehicle.longitude });
       }
 
       const content = handleCarInteraction({
@@ -410,54 +438,102 @@ export const MapWithMarkers = ({
 
         const currentZoomLevel = Math.round(zoom);
 
-        // Логика кластеризации
-        const shouldCluster =
-          currentZoomLevel < ZOOM_LEVELS.MEDIUM_MARKERS &&
-          PERFORMANCE_SETTINGS.clusteringEnabled &&
-          newMarkers.length > 15;
+        // Логика кластеризации: показываем индивидуальные маркеры только на зуме 16+
+        const shouldCluster = currentZoomLevel < 16;
+
+        // Отладочная информация
+        console.log("Clustering debug:", {
+          currentZoomLevel,
+          showIndividualMarkers: currentZoomLevel >= 16,
+          markersCount: newMarkers.length,
+          shouldCluster,
+        });
 
         if (shouldCluster) {
-          if (!clustererRef.current) {
-            clustererRef.current = new MarkerClusterer({
-              map,
-              markers: newMarkers,
-              algorithmOptions: {
-                maxZoom: ZOOM_LEVELS.MEDIUM_MARKERS - 1,
-              },
-              renderer: {
-                render: ({ count, position }) => {
-                  const size = Math.max(40, Math.min(60, count * 1.2 + 30));
-                  const clusterDiv = document.createElement("div");
-                  clusterDiv.style.cssText = `
-                      width: ${size}px;
-                      height: ${size}px;
-                      background: linear-gradient(135deg, #191919, #333);
-                      color: white;
-                      border-radius: 50%;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                      font-weight: bold;
-                      font-size: ${count > 99 ? 11 : count > 9 ? 13 : 15}px;
-                      border: 3px solid white;
-                      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
-                      cursor: pointer;
-                      transition: all 0.2s ease;
-                    `;
-                  clusterDiv.textContent =
-                    count > 999 ? "999+" : count.toString();
-
-                  return new google.maps.marker.AdvancedMarkerElement({
-                    position,
-                    content: clusterDiv,
-                  });
-                },
-              },
-            });
-          } else {
+          // Всегда пересоздаем кластеризатор для корректного переключения
+          if (clustererRef.current) {
             clustererRef.current.clearMarkers();
-            clustererRef.current.addMarkers(newMarkers);
+            clustererRef.current = null;
           }
+
+          clustererRef.current = new MarkerClusterer({
+            map,
+            markers: newMarkers,
+            algorithm: new GridAlgorithm({
+              maxZoom: 15, // Кластеризация до зума 15 включительно
+              gridSize: 80, // Расстояние между маркерами для группировки (в пикселях)
+            }),
+            renderer: {
+              render: ({ count, position, markers }) => {
+                // Динамический размер кластера в зависимости от количества
+                const baseSize = 40;
+                const maxSize = 80;
+                const size = Math.min(maxSize, baseSize + Math.log(count) * 8);
+
+                // Цвет кластера в зависимости от количества маркеров
+                let bgColor = "#191919";
+                let borderColor = "#333";
+
+                if (count >= 50) {
+                  bgColor = "#dc2626"; // Красный для больших кластеров
+                  borderColor = "#991b1b";
+                } else if (count >= 20) {
+                  bgColor = "#f59e0b"; // Оранжевый для средних кластеров
+                  borderColor = "#92400e";
+                } else if (count >= 10) {
+                  bgColor = "#059669"; // Зеленый для малых кластеров
+                  borderColor = "#047857";
+                }
+
+                const clusterDiv = document.createElement("div");
+                clusterDiv.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: linear-gradient(135deg, ${bgColor}, ${borderColor});
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    font-size: ${count > 99 ? 10 : count > 9 ? 12 : 14}px;
+                    border: 2px solid white;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    position: relative;
+                    overflow: hidden;
+                  `;
+
+                // Добавляем анимацию пульсации для больших кластеров
+                if (count >= 50) {
+                  clusterDiv.style.animation = "pulse 2s infinite";
+                }
+
+                clusterDiv.textContent =
+                  count > 999 ? "999+" : count.toString();
+
+                // Добавляем hover эффект
+                clusterDiv.addEventListener("mouseenter", () => {
+                  clusterDiv.style.transform = "scale(1.1)";
+                  clusterDiv.style.boxShadow =
+                    "0 6px 20px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3)";
+                });
+
+                clusterDiv.addEventListener("mouseleave", () => {
+                  clusterDiv.style.transform = "scale(1)";
+                  clusterDiv.style.boxShadow =
+                    "0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2)";
+                });
+
+                return new google.maps.marker.AdvancedMarkerElement({
+                  position,
+                  content: clusterDiv,
+                  zIndex: 1000 + count, // Большие кластеры поверх маленьких
+                });
+              },
+            },
+          });
         } else {
           // Отключаем кластеризацию
           if (clustererRef.current) {

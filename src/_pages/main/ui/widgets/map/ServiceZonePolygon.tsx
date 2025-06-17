@@ -97,46 +97,91 @@ export const ServiceZonePolygon = () => {
       isInitializedRef.current = true;
     };
 
-    // Определяем стиль для карты
-    const redStyle = [
+    // Определяем серо-бело-черный стиль для карты
+    const grayscaleStyle = [
       {
         featureType: "all",
         elementType: "all",
-        stylers: [
-          { saturation: "32" },
-          { lightness: "-3" },
-          { visibility: "on" },
-          { weight: "1.18" },
-        ],
+        stylers: [{ saturation: -100 }, { lightness: 50 }],
+      },
+      {
+        featureType: "road",
+        elementType: "all",
+        stylers: [{ saturation: -100 }, { lightness: 45 }],
+      },
+      {
+        featureType: "road.highway",
+        elementType: "all",
+        stylers: [{ visibility: "simplified" }],
+      },
+      {
+        featureType: "road.arterial",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }],
       },
       {
         featureType: "administrative",
-        elementType: "labels",
-        stylers: [{ visibility: "off" }],
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#444444" }],
       },
       {
         featureType: "landscape",
-        elementType: "labels",
-        stylers: [{ visibility: "off" }],
-      },
-      {
-        featureType: "landscape.man_made",
         elementType: "all",
-        stylers: [{ saturation: "-70" }, { lightness: "14" }],
+        stylers: [{ color: "#f2f2f2" }],
       },
       {
         featureType: "poi",
-        elementType: "labels",
+        elementType: "all",
         stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "road",
+        elementType: "all",
+        stylers: [{ saturation: -100 }, { lightness: 45 }],
+      },
+      {
+        featureType: "road.highway",
+        elementType: "all",
+        stylers: [{ visibility: "simplified" }],
+      },
+      {
+        featureType: "road.arterial",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "transit",
+        elementType: "all",
+        stylers: [{ visibility: "off" }],
+      },
+      {
+        featureType: "water",
+        elementType: "all",
+        stylers: [{ color: "#4A90E2" }, { visibility: "on" }],
+      },
+      {
+        featureType: "water",
+        elementType: "geometry.fill",
+        stylers: [{ color: "#4A90E2" }],
+      },
+      {
+        featureType: "water",
+        elementType: "labels.text.fill",
+        stylers: [{ color: "#ffffff" }],
+      },
+      {
+        featureType: "water",
+        elementType: "labels.text.stroke",
+        stylers: [{ color: "#4A90E2" }],
       },
     ];
 
     // Создаём новый тип карты
-    const styledMapType = new google.maps.StyledMapType(redStyle, {
-      name: "Red Map",
+    const styledMapType = new google.maps.StyledMapType(grayscaleStyle, {
+      name: "Grayscale Map",
     });
-    map.mapTypes.set("red_map", styledMapType);
-    map.setMapTypeId("red_map");
+    map.mapTypes.set("grayscale_map", styledMapType);
+    map.setMapTypeId("grayscale_map");
 
     // Получаем начальный зум
     const initialZoom = map.getZoom() || 10;
