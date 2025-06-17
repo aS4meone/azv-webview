@@ -446,17 +446,6 @@ export const MapWithMarkers = ({
                 let bgColor = "#191919";
                 let borderColor = "#333";
 
-                if (count >= 50) {
-                  bgColor = "#dc2626"; // Красный для больших кластеров
-                  borderColor = "#991b1b";
-                } else if (count >= 20) {
-                  bgColor = "#f59e0b"; // Оранжевый для средних кластеров
-                  borderColor = "#92400e";
-                } else if (count >= 10) {
-                  bgColor = "#059669"; // Зеленый для малых кластеров
-                  borderColor = "#047857";
-                }
-
                 const clusterDiv = document.createElement("div");
                 clusterDiv.style.cssText = `
                     width: ${size}px;

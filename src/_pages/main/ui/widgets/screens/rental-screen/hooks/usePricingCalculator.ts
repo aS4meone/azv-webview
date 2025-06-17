@@ -14,6 +14,27 @@ interface RentalConfig {
   openingFeeKey?: keyof ICar;
 }
 
+// Функция для правильного склонения русских слов
+const getRussianPlural = (
+  count: number,
+  one: string,
+  few: string,
+  many: string
+): string => {
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+
+  // Исключения для 11-14
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+    return many;
+  }
+
+  // Обычные правила
+  if (lastDigit === 1) return one;
+  if (lastDigit >= 2 && lastDigit <= 4) return few;
+  return many;
+};
+
 export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
   minutes: {
     title: "Поминутная аренда",
@@ -26,7 +47,7 @@ export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
     maxDuration: 120,
     priceKey: "price_per_minute",
     getUnitText: (duration: number) =>
-      duration === 1 ? "минута" : duration < 5 ? "минуты" : "минут",
+      getRussianPlural(duration, "минута", "минуты", "минут"),
     hasOpeningFee: true,
     openingFeeKey: "open_price",
   },
@@ -35,13 +56,13 @@ export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
     description: "",
     getDescription: (car: ICar) => {
       const openingFee = car.open_price as number;
-      return `Удобный тариф для коротких поездок и дел в городе. Взимается доплата ${openingFee.toLocaleString()} ₸ за открытие.`;
+      return `Удобный тариф для коротких поездок и дел в городе. За открытие двери автомобиля взимается доплата ${openingFee.toLocaleString()} ₸ за открытие.`;
     },
     unit: "в час",
     maxDuration: 24,
     priceKey: "price_per_hour",
     getUnitText: (duration: number) =>
-      duration === 1 ? "час" : duration < 5 ? "часа" : "часов",
+      getRussianPlural(duration, "час", "часа", "часов"),
     hasOpeningFee: false,
   },
   days: {
@@ -51,7 +72,7 @@ export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
     maxDuration: 365,
     priceKey: "price_per_day",
     getUnitText: (duration: number) =>
-      duration === 1 ? "день" : duration < 5 ? "дня" : "дней",
+      getRussianPlural(duration, "день", "дня", "дней"),
     hasOpeningFee: false,
   },
 } as const;

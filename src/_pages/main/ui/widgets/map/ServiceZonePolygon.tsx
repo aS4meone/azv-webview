@@ -100,53 +100,8 @@ export const ServiceZonePolygon = () => {
     // Определяем серо-бело-черный стиль для карты
     const grayscaleStyle = [
       {
-        featureType: "all",
-        elementType: "all",
-        stylers: [{ saturation: -100 }, { lightness: 50 }],
-      },
-      {
-        featureType: "road",
-        elementType: "all",
-        stylers: [{ saturation: -100 }, { lightness: 45 }],
-      },
-      {
-        featureType: "road.highway",
-        elementType: "all",
-        stylers: [{ visibility: "simplified" }],
-      },
-      {
-        featureType: "road.arterial",
-        elementType: "labels.icon",
-        stylers: [{ visibility: "off" }],
-      },
-      {
-        featureType: "administrative",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#444444" }],
-      },
-      {
-        featureType: "landscape",
-        elementType: "all",
-        stylers: [{ color: "#f2f2f2" }],
-      },
-      {
         featureType: "poi",
         elementType: "all",
-        stylers: [{ visibility: "off" }],
-      },
-      {
-        featureType: "road",
-        elementType: "all",
-        stylers: [{ saturation: -100 }, { lightness: 45 }],
-      },
-      {
-        featureType: "road.highway",
-        elementType: "all",
-        stylers: [{ visibility: "simplified" }],
-      },
-      {
-        featureType: "road.arterial",
-        elementType: "labels.icon",
         stylers: [{ visibility: "off" }],
       },
       {
@@ -155,24 +110,14 @@ export const ServiceZonePolygon = () => {
         stylers: [{ visibility: "off" }],
       },
       {
-        featureType: "water",
-        elementType: "all",
-        stylers: [{ color: "#4A90E2" }, { visibility: "on" }],
+        featureType: "road",
+        elementType: "labels.icon",
+        stylers: [{ visibility: "off" }],
       },
       {
-        featureType: "water",
-        elementType: "geometry.fill",
-        stylers: [{ color: "#4A90E2" }],
-      },
-      {
-        featureType: "water",
-        elementType: "labels.text.fill",
-        stylers: [{ color: "#ffffff" }],
-      },
-      {
-        featureType: "water",
-        elementType: "labels.text.stroke",
-        stylers: [{ color: "#4A90E2" }],
+        featureType: "administrative",
+        elementType: "labels",
+        stylers: [{ visibility: "off" }],
       },
     ];
 

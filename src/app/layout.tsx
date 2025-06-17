@@ -7,6 +7,7 @@ import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import { ModalProvider, ResponseModalProvider } from "@/shared/ui/modal";
 import { BrowserProtectionProvider } from "@/shared/contexts/BrowserProtectionProvider";
+import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -46,7 +47,6 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <head>
-        {/* 🔒 Дополнительные мета-теги для защиты */}
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -100,15 +100,17 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${montserrat.variable} antialiased`}>
-        <BrowserProtectionProvider>
-          <NextIntlClientProvider>
-            <AuthProvider>
-              <ResponseModalProvider>
-                <ModalProvider>{children}</ModalProvider>
-              </ResponseModalProvider>
-            </AuthProvider>
-          </NextIntlClientProvider>
-        </BrowserProtectionProvider>
+        <ResponseModalProvider>
+          <PhotoUploadProvider>
+            <ModalProvider>
+              <BrowserProtectionProvider>
+                <NextIntlClientProvider>
+                  <AuthProvider>{children}</AuthProvider>
+                </NextIntlClientProvider>
+              </BrowserProtectionProvider>
+            </ModalProvider>
+          </PhotoUploadProvider>
+        </ResponseModalProvider>
       </body>
     </html>
   );

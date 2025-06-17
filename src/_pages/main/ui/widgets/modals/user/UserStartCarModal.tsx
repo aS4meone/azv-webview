@@ -10,6 +10,9 @@ import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
 import { RentalData } from "../../screens/rental-screen/hooks/usePricingCalculator";
 import { RentalPage } from "../../screens/rental-screen";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/shared/constants/routes";
+import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -22,11 +25,21 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const [showRentalPage, setShowRentalPage] = useState(false);
   const [, setShowAddressScreen] = useState(false);
   const [isDelivery, setIsDelivery] = useState(false);
+
+  const { redirectToCar } = useFormatCarInUrl({
+    car: {
+      id: car.id,
+      lat: car.latitude,
+      lng: car.longitude,
+    },
+    route: ROUTES.WALLET,
+  });
   const [deliveryAddress, setDeliveryAddress] = useState<{
     lat: number;
     lng: number;
     address: string;
   } | null>(null);
+  const router = useRouter();
 
   const handleRent = async (rentalData: RentalData) => {
     onClose();
@@ -51,12 +64,27 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       }
     } catch (error: unknown) {
       const apiError = error as { response: { data: { detail: string } } };
-      showModal({
-        type: "error",
-        description: apiError.response.data.detail,
-        buttonText: "Попробовать снова",
-        onClose: () => {},
-      });
+      console.log(apiError.response.data.detail);
+
+      if (
+        apiError.response.data.detail.includes("Пожалуйста, пополните счёт")
+      ) {
+        showModal({
+          type: "error",
+          description: apiError.response.data.detail,
+          buttonText: "Пополнить баланс",
+          onClose: () => {
+            redirectToCar();
+          },
+        });
+      } else {
+        showModal({
+          type: "error",
+          description: apiError.response.data.detail,
+          buttonText: "Повторить попытку",
+          onClose: () => {},
+        });
+      }
     }
   };
 

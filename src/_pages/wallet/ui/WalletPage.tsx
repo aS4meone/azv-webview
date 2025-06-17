@@ -7,6 +7,8 @@ import { PlusIcon } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { userApi } from "@/shared/api/routes/user";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
+import { useSearchParams } from "next/navigation";
+import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
 
 const WalletPage = () => {
   const t = useTranslations("wallet");
@@ -15,6 +17,15 @@ const WalletPage = () => {
   const [promoCode, setPromoCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isTopUpLoading, setIsTopUpLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const carId = Number(searchParams?.get("carId")) || 0;
+  const lat = Number(searchParams?.get("lat")) || 0;
+  const lng = Number(searchParams?.get("lng")) || 0;
+
+  const redirectRoute =
+    carId !== 0
+      ? `${ROUTES.MAIN}?carId=${carId}&lat=${lat}&lng=${lng}`
+      : ROUTES.MAIN;
 
   const handleTopUp = async () => {
     setIsTopUpLoading(true);
@@ -75,7 +86,7 @@ const WalletPage = () => {
 
   return (
     <article className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10">
-      <CustomAppBar backHref={ROUTES.MAIN} title={t("title")} />
+      <CustomAppBar backHref={redirectRoute} title={t("title")} />
 
       {/* Balance Section */}
       <section className="px-6 mt-8">
