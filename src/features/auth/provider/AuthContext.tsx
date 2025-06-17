@@ -4,19 +4,20 @@ import { createContext, useContext, useEffect, useRef, ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
 import { getRefreshToken, clearTokens } from "@/shared/utils/tokenStorage";
+import { callFlutterLogout } from "@/shared/utils/flutterLogout";
 import { useUserStore } from "@/shared/stores/userStore";
 import { IUser } from "@/shared/models/types/user";
 
 type AuthContextType = {
   user: IUser | null;
   loading: boolean;
-  logout: () => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  logout: () => {},
+  logout: async () => {},
 });
 
 const AUTH_ROUTES = [ROUTES.ROOT, ROUTES.AUTH, ROUTES.ONBOARDING] as const;
@@ -31,8 +32,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const initializationRef = useRef(false);
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Clear FCM token first
+      await callFlutterLogout();
+      console.log("FCM token cleared successfully");
+    } catch (error) {
+      console.error("Error clearing FCM token:", error);
+    }
+
+    // Clear local tokens
     clearTokens();
+
+    // Navigate to root
     router.push(ROUTES.ROOT);
   };
 
@@ -56,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await fetchUser();
       } catch (error) {
         if (error?.response?.status !== 403) {
-          logout();
+          logout().catch(console.error);
         }
       }
     };

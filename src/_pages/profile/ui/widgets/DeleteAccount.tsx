@@ -4,6 +4,7 @@ import { ROUTES } from "@/shared/constants/routes";
 import { Button } from "@/shared/ui/button";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { clearTokens } from "@/shared/utils/tokenStorage";
+import { callFlutterLogout } from "@/shared/utils/flutterLogout";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -16,6 +17,22 @@ const DeleteAccount = () => {
   const t2 = useTranslations("profile");
   const { showModal } = useResponseModal();
 
+  const handleLogoutAndRedirect = async () => {
+    try {
+      // Clear FCM token first
+      await callFlutterLogout();
+      console.log("FCM token cleared successfully");
+    } catch (error) {
+      console.error("Error clearing FCM token:", error);
+    }
+
+    // Clear local tokens
+    clearTokens();
+
+    // Navigate to onboarding
+    router.push(ROUTES.ONBOARDING);
+  };
+
   const handleDelete = async () => {
     const res = await userApi.deleteUser();
     if (res.status === 200) {
@@ -24,14 +41,8 @@ const DeleteAccount = () => {
         title: "Действие выполнено",
         description: "Аккаунт удален",
         buttonText: t("modal.success.button"),
-        onButtonClick: () => {
-          clearTokens();
-          router.push(ROUTES.ONBOARDING);
-        },
-        onClose: () => {
-          clearTokens();
-          router.push(ROUTES.ONBOARDING);
-        },
+        onButtonClick: handleLogoutAndRedirect,
+        onClose: handleLogoutAndRedirect,
       });
     } else {
       showModal({

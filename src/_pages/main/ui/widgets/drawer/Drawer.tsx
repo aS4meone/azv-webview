@@ -9,6 +9,7 @@ import { ROUTES } from "@/shared/constants/routes";
 import { useTranslations } from "next-intl";
 import { useUserStore } from "@/shared/stores/userStore";
 import { clearTokens } from "@/shared/utils/tokenStorage";
+import { callFlutterLogout } from "@/shared/utils/flutterLogout";
 import { useRouter } from "next/navigation";
 
 const Drawer = () => {
@@ -100,9 +101,21 @@ const Drawer = () => {
         </div>
         <button
           className="flex items-center space-x-3 w-full text-left py-3 px-8 rounded-lg transition-colors"
-          onClick={(e) => {
+          onClick={async (e) => {
             e.preventDefault();
+
+            try {
+              // Clear FCM token first
+              await callFlutterLogout();
+              console.log("FCM token cleared successfully");
+            } catch (error) {
+              console.error("Error clearing FCM token:", error);
+            }
+
+            // Clear local tokens
             clearTokens();
+
+            // Navigate to root
             router.push(ROUTES.ROOT);
           }}
         >
