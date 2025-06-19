@@ -79,7 +79,7 @@ export const PaymentContent = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-gray-900">Оплата и тарифы</h1>
         <p className="text-gray-600">

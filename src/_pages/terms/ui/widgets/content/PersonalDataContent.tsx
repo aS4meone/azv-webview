@@ -59,14 +59,14 @@ export const PersonalDataContent = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center space-y-4">
         <div className="flex justify-center">
           <div className="p-3 bg-blue-100 rounded-full">
             <Shield className="w-8 h-8 text-blue-600" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900">
           Политика конфиденциальности
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">

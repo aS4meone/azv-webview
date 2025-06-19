@@ -77,7 +77,7 @@ export const AboutContent = () => {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-12">
+    <div className="max-w-6xl mx-auto space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="flex justify-center">
