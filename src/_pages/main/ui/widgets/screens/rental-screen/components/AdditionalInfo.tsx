@@ -1,50 +1,50 @@
 import { ArrowRightIcon } from "@/shared/icons";
 import { RentalType } from "@/shared/models/dto/rent.dto";
 import { Button } from "@/shared/ui";
-import { ViewPdfTrigger } from "@/widgets/pdf-viewer";
-import React from "react";
+import React, { useState } from "react";
+import PushScreen from "@/shared/ui/push-screen";
+import { TermsContent } from "@/_pages/terms/ui/widgets/TermsContent";
+import { ICar } from "@/shared/models/types/car";
 
 interface AdditionalInfoProps {
   rentalType: RentalType;
+  car: ICar;
 }
 
-export const AdditionalInfo = ({ rentalType }: AdditionalInfoProps) => {
-  const returnTarrif = () => {
-    switch (rentalType) {
-      case "days":
-        return "/docs/about_day.pdf";
-      case "hours":
-        return "/docs/about_hour.pdf";
-      case "minutes":
-        return "/docs/about_minute.pdf";
-
-      default:
-        return "/docs/about_minute.pdf";
-    }
-  };
+export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
+  const [showTariff, setShowTariff] = useState(false);
+  const [showAgreement, setShowAgreement] = useState(false);
 
   return (
     <div className="space-y-3 pt-2 flex flex-col items-start">
-      <ViewPdfTrigger url={returnTarrif()}>
-        <Button
-          asChild
-          variant="outline"
-          className="flex items-center rounded-[10px] w-auto text-[14px] px-2 py-1 h-auto"
-        >
-          <span>О тарифе</span>
-          <ArrowRightIcon />
-        </Button>
-      </ViewPdfTrigger>
+      <Button
+        variant="outline"
+        className="flex items-center rounded-[10px] w-auto text-[14px] px-2 py-1 h-auto"
+        onClick={() => setShowTariff(true)}
+      >
+        <span>О тарифе</span>
+        <ArrowRightIcon />
+      </Button>
 
-      <ViewPdfTrigger url="/docs/user_agreement.pdf" className="w-full">
-        <Button
-          asChild
-          className="rounded-none items-center flex justify-between w-full"
-        >
-          <span className="text-[#191919] font-medium">Договор аренды</span>
-          <ArrowRightIcon />
-        </Button>
-      </ViewPdfTrigger>
+      <Button
+        className="rounded-none items-center flex justify-between w-full"
+        onClick={() => setShowAgreement(true)}
+      >
+        <span className="text-[#191919] font-medium">Договор аренды</span>
+        <ArrowRightIcon />
+      </Button>
+
+      {showTariff && (
+        <PushScreen onClose={() => setShowTariff(false)} withCloseButton>
+          <TermsContent contentKey="tariff" rentalType={rentalType} car={car} />
+        </PushScreen>
+      )}
+
+      {showAgreement && (
+        <PushScreen onClose={() => setShowAgreement(false)} withCloseButton>
+          <TermsContent contentKey="agreement" />
+        </PushScreen>
+      )}
     </div>
   );
 };

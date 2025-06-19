@@ -15,6 +15,9 @@ import {
   logPerformance,
 } from "@/shared/utils/mapOptimization";
 import { MapCameraProps } from "@vis.gl/react-google-maps";
+import InfoIcon from "@/shared/icons/ui/InfoIcon";
+import { ServiceZonePolygon } from "../../map/ServiceZonePolygon";
+import { checkDeliveryAvailability } from "@/shared/utils/polygon";
 
 // Получаем настройки производительности для устройства
 
@@ -93,6 +96,11 @@ export const DeliveryAddressScreen = ({
 
   const [address, setAddress] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [deliveryStatus, setDeliveryStatus] = useState<{
+    isAvailable: boolean;
+    message: string;
+  }>({ isAvailable: true, message: "" });
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingAddressRef = useRef(false);
@@ -105,12 +113,20 @@ export const DeliveryAddressScreen = ({
     const startTime = performance.now();
 
     try {
+      // Проверяем доступность доставки
+      const deliveryCheck = checkDeliveryAvailability(lat, lng);
+      setDeliveryStatus(deliveryCheck);
+
       const addressResult = await getAddressFromCoordinates(lat, lng);
       setAddress(addressResult);
       logPerformance("Address geocoding", startTime);
     } catch (error) {
       console.error("Error getting address:", error);
       setAddress("Ошибка определения адреса");
+      setDeliveryStatus({
+        isAvailable: false,
+        message: "Ошибка проверки зоны доставки",
+      });
     } finally {
       setIsLoading(false);
       isUpdatingAddressRef.current = false;
@@ -143,20 +159,57 @@ export const DeliveryAddressScreen = ({
     [debouncedUpdateAddress]
   );
 
-  const handleMyLocationFound = useCallback(
-    (location: { lat: number; lng: number }) => {
-      // Для геолокации обновляем адрес сразу без debounce
-      updateAddress(location.lat, location.lng);
-    },
-    [updateAddress]
-  );
+  const goToMyLocation = useCallback(() => {
+    setIsGettingLocation(true);
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          // Обновляем камеру карты
+          setCameraProps((prev) => ({
+            ...prev,
+            center: { lat: latitude, lng: longitude },
+            zoom: 16, // Приближаем для точности
+          }));
+
+          // Обновляем адрес
+          updateAddress(latitude, longitude);
+          setIsGettingLocation(false);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setIsGettingLocation(false);
+
+          // Показываем сообщение об ошибке
+          alert(
+            "Не удалось получить вашу локацию. Проверьте разрешения для доступа к геолокации."
+          );
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000,
+        }
+      );
+    } else {
+      setIsGettingLocation(false);
+      alert("Геолокация не поддерживается вашим браузером");
+    }
+  }, [updateAddress]);
 
   const handleConfirm = useCallback(() => {
     const center = cameraProps.center;
-    if (center) {
+    if (center && deliveryStatus.isAvailable) {
       onAddressSelected(center.lat, center.lng, address);
     }
-  }, [onAddressSelected, cameraProps.center, address]);
+  }, [
+    onAddressSelected,
+    cameraProps.center,
+    address,
+    deliveryStatus.isAvailable,
+  ]);
 
   // Получаем адрес для начальных координат при загрузке
   useEffect(() => {
@@ -190,7 +243,7 @@ export const DeliveryAddressScreen = ({
         >
           <ArrowLeftIcon />
         </button>
-        <h1 className="text-lg font-semibold">Выберите адрес доставки</h1>
+        <h1 className=" text-[#191919]">Выберите адрес доставки</h1>
       </div>
 
       {/* Map */}
@@ -202,11 +255,11 @@ export const DeliveryAddressScreen = ({
           maxZoom={ZOOM_CONSTRAINTS.DELIVERY_MAX}
           restriction={deliveryRestriction}
           className="w-full h-full"
-          onLocationFound={handleMyLocationFound}
           showZoomControls={true}
-          showMyLocationButton={true}
+          showMyLocationButton={false}
         >
           <MapWithCenterListener onCenterChange={handleCenterChange} />
+          <ServiceZonePolygon />
         </BaseMap>
 
         {/* Center Marker (Fixed in center) */}
@@ -214,36 +267,56 @@ export const DeliveryAddressScreen = ({
 
         {/* Instructions */}
         <div className="absolute top-4 left-4 right-4 bg-white rounded-lg shadow-lg p-3 border border-gray-100">
-          <p className="text-sm text-gray-600 flex items-center">
-            <svg
-              className="w-4 h-4 mr-2 text-blue-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            Перемещайте карту, чтобы выбрать адрес доставки
+          <p className="text-sm text-gray-600 flex items-center gap-2">
+            <InfoIcon />
+            <span>
+              Перемещайте карту, чтобы выбрать адрес доставки в синей зоне
+              обслуживания
+            </span>
           </p>
         </div>
 
-        {/* Zoom Indicator */}
-        <div className="absolute top-4 right-4 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs">
-          Zoom: {Math.round(cameraProps.zoom || 0)}
+        {/* My Location Button */}
+        <div className="absolute bottom-4 right-4">
+          <button
+            onClick={goToMyLocation}
+            disabled={isGettingLocation}
+            className="bg-white rounded-full p-3 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow disabled:opacity-50"
+            title="Перейти к моей локации"
+          >
+            {isGettingLocation ? (
+              <div className="w-6 h-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500"></div>
+            ) : (
+              <svg
+                className="w-6 h-6 text-[#191919]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 
       {/* Address Info */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+      <div className="p-4 ">
         <div className="mb-4">
           <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
             <svg
-              className="w-4 h-4 mr-2 text-red-500"
+              className="w-4 h-4 mr-2 text-[#191919]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -263,14 +336,62 @@ export const DeliveryAddressScreen = ({
             </svg>
             Адрес доставки:
           </h3>
-          <div className="bg-white rounded-lg p-3 min-h-[60px] flex items-center border border-gray-200">
+          <div
+            className={`bg-white rounded-lg p-3 min-h-[70px] flex items-center border ${
+              !deliveryStatus.isAvailable && !isLoading
+                ? "border-red-300 bg-red-50"
+                : "border-gray-200"
+            }`}
+          >
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500"></div>
                 <p className="text-sm text-gray-500">Определение адреса...</p>
               </div>
             ) : (
-              <p className="text-sm text-gray-900">{address}</p>
+              <div className="w-full">
+                <p className="text-sm text-gray-900 mb-1">{address}</p>
+                {!deliveryStatus.isAvailable && (
+                  <div className="flex items-start space-x-2">
+                    <svg
+                      className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
+                    </svg>
+                    <p className="text-xs text-red-600">
+                      {deliveryStatus.message}
+                    </p>
+                  </div>
+                )}
+                {deliveryStatus.isAvailable && deliveryStatus.message && (
+                  <div className="flex items-center space-x-2">
+                    <svg
+                      className="w-4 h-4 text-green-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <p className="text-xs text-green-600">
+                      {deliveryStatus.message}
+                    </p>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -279,11 +400,20 @@ export const DeliveryAddressScreen = ({
           onClick={handleConfirm}
           variant="secondary"
           disabled={
-            isLoading || !address || address === "Ошибка определения адреса"
+            isLoading ||
+            !address ||
+            address === "Ошибка определения адреса" ||
+            !deliveryStatus.isAvailable
           }
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors duration-200"
+          className={` ${
+            !deliveryStatus.isAvailable
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : ""
+          }`}
         >
-          Подтвердить адрес
+          {!deliveryStatus.isAvailable
+            ? "Доставка недоступна"
+            : "Подтвердить адрес"}
         </Button>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { RentalData } from "../../screens/rental-screen/hooks/usePricingCalculat
 import { RentalPage } from "../../screens/rental-screen";
 import { ROUTES } from "@/shared/constants/routes";
 import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
+import { DeliveryAddressScreen } from "../../screens/delivery-screen/DeliveryAddressScreen";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -22,7 +23,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [showRentalPage, setShowRentalPage] = useState(false);
-  const [, setShowAddressScreen] = useState(false);
+  const [showAddressScreen, setShowAddressScreen] = useState(false);
   const [isDelivery, setIsDelivery] = useState(false);
 
   const { redirectToCar } = useFormatCarInUrl({
@@ -174,11 +175,11 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
     }
   };
 
-  // const handleAddressSelected = (lat: number, lng: number, address: string) => {
-  //   setDeliveryAddress({ lat, lng, address });
-  //   setShowAddressScreen(false);
-  //   setShowRentalPage(true);
-  // };
+  const handleAddressSelected = (lat: number, lng: number, address: string) => {
+    setDeliveryAddress({ lat, lng, address });
+    setShowAddressScreen(false);
+    setShowRentalPage(true);
+  };
 
   const handleDeliveryClick = () => {
     setIsDelivery(true);
@@ -187,9 +188,15 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
-      {/* Address Selection Screen */}
-      {/* {showAddressScreen && (
-        <PushScreen withOutStyles={true}>
+      {showAddressScreen && (
+        <PushScreen
+          withOutStyles={true}
+          closeOnScroll={true}
+          onClose={() => {
+            setShowAddressScreen(false);
+            setIsDelivery(false);
+          }}
+        >
           <DeliveryAddressScreen
             onBack={() => {
               setShowAddressScreen(false);
@@ -198,11 +205,20 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
             onAddressSelected={handleAddressSelected}
           />
         </PushScreen>
-      )} */}
+      )}
 
       {/* Rental Page */}
       {showRentalPage && (
-        <PushScreen withOutStyles={true}>
+        <PushScreen
+          withOutStyles={true}
+          closeOnScroll={true}
+          onClose={() => {
+            setShowRentalPage(false);
+            if (isDelivery) {
+              setShowAddressScreen(true);
+            }
+          }}
+        >
           <RentalPage
             isDelivery={isDelivery}
             car={car}

@@ -400,7 +400,11 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   }
 
   const modalContent = (
-    <PushScreen onClose={onClose} withCloseButton={withCloseButton}>
+    <PushScreen
+      closeOnScroll={false}
+      onClose={onClose}
+      withCloseButton={withCloseButton}
+    >
       <div className="flex flex-col min-h-full bg-white py-10">
         <div className="flex-1 pt-4">{content}</div>
         {allPhotosUploaded && (

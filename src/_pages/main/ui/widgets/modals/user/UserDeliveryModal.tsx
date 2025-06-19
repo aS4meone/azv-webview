@@ -1,8 +1,8 @@
 import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { CarInfoHeader } from "../ui";
-import { useResponseModal } from "@/shared/ui/modal";
+import { useModal, useResponseModal } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import { useUserStore } from "@/shared/stores/userStore";
 import { RentalStatus } from "@/shared/models/types/current-rental";
@@ -10,45 +10,16 @@ import { RentalStatus } from "@/shared/models/types/current-rental";
 interface UserDeliveryModalProps {
   car: ICar;
   onClose: () => void;
-  deliveryStatus: "in_progress" | "searching_driver";
 }
 
-export const UserDeliveryModal = ({
-  car,
-  onClose,
-  deliveryStatus: initialDeliveryStatus,
-}: UserDeliveryModalProps) => {
+export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
   const { showModal } = useResponseModal();
+  const { hideModal } = useModal();
   const { refreshUser, user } = useUserStore();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const [currentDeliveryStatus, setCurrentDeliveryStatus] = useState(
-    initialDeliveryStatus
-  );
 
-  useEffect(() => {
-    if (user?.current_rental?.rental_details) {
-      const status = user.current_rental.rental_details.status;
-      const newStatus = user.current_rental.rental_details.delivery_in_progress
-        ? "in_progress"
-        : "searching_driver";
+  const rentalStatus = user?.current_rental?.rental_details.status;
 
-      if (status !== RentalStatus.DELIVERING) {
-        onClose();
-      }
-
-      if (newStatus !== currentDeliveryStatus) {
-        console.log(
-          `Delivery status changed: ${currentDeliveryStatus} → ${newStatus}`
-        );
-        setCurrentDeliveryStatus(newStatus);
-      }
-    }
-  }, [
-    user?.current_rental?.rental_details.delivery_in_progress,
-    currentDeliveryStatus,
-  ]);
-
-  // Polling каждые 10 секунд для обновления статуса доставки
   useEffect(() => {
     // Запускаем интервал каждые 10 секунд
     intervalRef.current = setInterval(() => {
@@ -96,23 +67,31 @@ export const UserDeliveryModal = ({
   };
 
   const getStatusInfo = () => {
-    switch (currentDeliveryStatus) {
-      case "in_progress":
+    switch (rentalStatus) {
+      case RentalStatus.DELIVERY_RESERVED:
         return {
-          title: "Ваша машина в пути",
-          description: "Скоро машина будет доставлена к вам",
+          title: "Водитель найден",
+          description: "Водитель принял ваш заказ и готовится к выезду",
           buttonText: "Отменить доставку",
         };
-      case "searching_driver":
+      case RentalStatus.DELIVERY_IN_PROGRESS:
         return {
-          title: "Поиск...",
-          description: "Ищем водителя, он уже рядом!",
+          title: "Машина в пути",
+          description: "Водитель уже выехал и направляется к вам",
+          buttonText: "Отменить доставку",
+        };
+      case RentalStatus.DELIVERING:
+        return {
+          title: "Поиск водителя",
+          description:
+            "Мы ищем ближайшего свободного водителя для вашего заказа",
           buttonText: "Отменить доставку",
         };
       default:
+        hideModal();
         return {
           title: "Доставка",
-          description: "Обрабатываем ваш заказ",
+          description: "Проверяем наличие свободных водителей в вашем районе",
           buttonText: "Отменить доставку",
         };
     }

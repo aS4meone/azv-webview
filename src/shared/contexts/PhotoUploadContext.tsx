@@ -11,6 +11,8 @@ import { rentApi } from "@/shared/api/routes/rent";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "../stores/userStore";
+import { useModal } from "../ui/modal";
 
 export const USER_UPLOAD = "user-upload";
 export const OWNER_UPLOAD = "owner-upload";
@@ -43,10 +45,11 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
   const [isDeliveryUploadRequired, setIsDeliveryUploadRequired] =
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { hideModal } = useModal();
   const { showModal } = useResponseModal();
+  const { refreshUser } = useUserStore();
   const router = useRouter();
 
-  // Check localStorage on mount
   useEffect(() => {
     const checkUploadRequirements = () => {
       const userUpload = localStorage.getItem(USER_UPLOAD);
@@ -120,6 +123,8 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
+            refreshUser();
+            hideModal();
           },
         });
       }
@@ -153,6 +158,8 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
+            refreshUser();
+            hideModal();
           },
         });
       }
@@ -186,6 +193,8 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
+            refreshUser();
+            hideModal();
           },
         });
       }
@@ -211,9 +220,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
       }
     }
     try {
-      // You can create a specific API endpoint for delivery uploads
-      // For now using the same as user upload
-      const res = await rentApi.uploadBeforeRent(formData);
+      const res = await mechanicApi.uploadBeforeDelivery(formData);
       if (res.status === 200) {
         setIsLoading(false);
         setUploadCompleted(DELIVERY_UPLOAD);
@@ -223,6 +230,8 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
+            refreshUser();
+            hideModal();
           },
         });
       }

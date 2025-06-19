@@ -81,12 +81,12 @@ const AuthPage = () => {
   };
 
   return (
-    <article className="h-screen flex flex-col py-10">
+    <article className="h-screen flex flex-col py-10 bg-[#191919]">
       <DefaultAppBar
         link={activeStep === 0 ? ROUTES.ONBOARDING : undefined}
         onClick={activeStep === 1 ? () => setActiveStep(0) : undefined}
       />
-      <div className="px-10 flex flex-col justify-between h-full mt-[20%]">
+      <div className="px-10 flex flex-col justify-between h-full mt-[20%] text-white">
         <section>
           <h2 className="text-[24px] font-medium mt-2">
             {stepText[activeStep].title}

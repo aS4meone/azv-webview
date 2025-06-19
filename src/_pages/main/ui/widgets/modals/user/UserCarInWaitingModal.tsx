@@ -10,6 +10,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import {
   baseConfig,
+  OWNER_UPLOAD,
   ownerConfig,
   usePhotoUpload,
   USER_UPLOAD,
@@ -38,6 +39,7 @@ export const UserCarInWaitingModal = ({
     try {
       const res = await rentApi.startRent();
       if (res.status === 200) {
+        setUploadRequired(car.owned_car ? OWNER_UPLOAD : USER_UPLOAD, true);
         showModal({
           type: "success",
           title: "Аренда успешно начата",

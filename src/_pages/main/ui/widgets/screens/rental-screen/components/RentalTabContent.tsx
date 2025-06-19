@@ -59,7 +59,7 @@ export const RentalTabContent = ({
       />
 
       {/* Additional Info */}
-      <AdditionalInfo rentalType={rentalType} />
+      <AdditionalInfo rentalType={rentalType} car={car} />
     </div>
   );
 };

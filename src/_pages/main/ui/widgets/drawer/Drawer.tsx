@@ -74,7 +74,7 @@ const Drawer = () => {
           >
             <div className="flex items-center space-x-3">
               <div>
-                <h2 className="text-lg font-semibold">
+                <h2 className="text-lg font-semibold text-white">
                   {user?.full_name || "Пользователь"}
                 </h2>
               </div>
@@ -116,7 +116,7 @@ const Drawer = () => {
             clearTokens();
 
             // Navigate to root
-            router.push(ROUTES.ROOT);
+            router.push(ROUTES.ONBOARDING);
           }}
         >
           <LogoutIcon />

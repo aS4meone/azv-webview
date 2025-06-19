@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import { BottomModal } from "./BottomModal";
 
 interface ModalContextType {
   showModal: (params: {
@@ -10,9 +9,20 @@ interface ModalContextType {
   }) => void;
   hideModal: () => void;
   isModalOpen: boolean;
+  modalConfig: {
+    children: React.ReactNode;
+    onClose?: () => void;
+  } | null;
+  handleClose: () => void;
 }
 
-const ModalContext = createContext<ModalContextType | undefined>(undefined);
+export const ModalContext = createContext<ModalContextType | undefined>(
+  undefined
+);
+
+const ModalContentWrapper = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
 
 export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -45,14 +55,15 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ModalContext.Provider
-      value={{ showModal, hideModal, isModalOpen: isOpen }}
+      value={{
+        showModal,
+        hideModal,
+        isModalOpen: isOpen,
+        modalConfig,
+        handleClose,
+      }}
     >
-      {children}
-      {modalConfig && (
-        <BottomModal isOpen={isOpen} onClose={handleClose} closeOnScroll>
-          {modalConfig.children}
-        </BottomModal>
-      )}
+      <ModalContentWrapper>{children}</ModalContentWrapper>
     </ModalContext.Provider>
   );
 };

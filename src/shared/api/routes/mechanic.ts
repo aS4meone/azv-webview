@@ -2,11 +2,13 @@ import { CompleteRentDto } from "@/shared/models/dto/rent.dto";
 import axiosInstance from "../axios";
 
 export const mechanicRoutes = {
+  getAllVehicles: "/mechanic/all_vehicles",
   getPendingVehicles: "/mechanic/get_pending_vehicles",
   getInUseVehicles: "/mechanic/get_in_use_vehicles",
   searchVehicles: "/mechanic/search",
 
   reserveCheckCar: (id: number) => `/mechanic/check-car/${id}`,
+  startDeliveryCar: `mechanic/start-delivery`,
 
   startCheckCar: "/mechanic/start",
   cancelCheckCar: "/mechanic/cancel",
@@ -35,6 +37,10 @@ export const mechanicActionsRoutes = {
 };
 
 export const mechanicApi = {
+  getAllVehicles: async () => {
+    const response = await axiosInstance.get(mechanicRoutes.getAllVehicles);
+    return response;
+  },
   getPendingVehicles: async () => {
     const response = await axiosInstance.get(mechanicRoutes.getPendingVehicles);
     return response;
@@ -53,6 +59,10 @@ export const mechanicApi = {
     const response = await axiosInstance.post(
       mechanicRoutes.reserveCheckCar(id)
     );
+    return response;
+  },
+  startDeliveryCar: async () => {
+    const response = await axiosInstance.post(mechanicRoutes.startDeliveryCar);
     return response;
   },
   startCheckCar: async () => {

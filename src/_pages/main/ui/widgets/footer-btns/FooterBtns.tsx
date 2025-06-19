@@ -8,11 +8,16 @@ import {
 } from "@/shared/icons";
 import { UserRole } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { Button } from "@/shared/ui";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import FooterHaveCar from "./FooterHaveCar";
 import { ROUTES } from "@/shared/constants/routes";
+import FooterDeliveryCar from "./FooterDeliveryCar";
+import { ICar } from "@/shared/models/types/car";
+import FooterTrackingCar from "./FooterTracking";
+import { CarStatus } from "@/shared/models/types/car";
 
 enum ServiceButtonType {
   CHECK = "check",
@@ -22,14 +27,40 @@ enum ServiceButtonType {
 
 const FooterBtns = () => {
   const { user } = useUserStore();
+  const { currentDeliveryVehicle, allMechanicVehicles } = useVehiclesStore();
   const router = useRouter();
   const [activeServiceButton, setActiveServiceButton] =
     useState<ServiceButtonType>(ServiceButtonType.CHECK);
+  const trackingCarId = localStorage.getItem("tracking_car_id");
+
+  console.log(currentDeliveryVehicle);
+  let trackingCar: ICar | undefined = undefined;
+  if (trackingCarId) {
+    trackingCar = allMechanicVehicles.find(
+      (car) => car.id === Number(trackingCarId)
+    );
+  }
 
   if (!user) return null;
 
+  if (trackingCarId && trackingCar) {
+    return <FooterTrackingCar user={user} car={trackingCar} />;
+  }
+
+  // Если у пользователя есть текущая аренда - показываем FooterHaveCar
   if (user.current_rental != null && user.current_rental) {
     return <FooterHaveCar user={user} />;
+  }
+
+  // Если это механик и у него есть текущая доставка - показываем FooterHaveCar
+  if (
+    user.role === UserRole.MECHANIC &&
+    currentDeliveryVehicle &&
+    currentDeliveryVehicle.id !== 0 &&
+    currentDeliveryVehicle.status !== CarStatus.reserved &&
+    currentDeliveryVehicle.status !== CarStatus.free
+  ) {
+    return <FooterDeliveryCar car={currentDeliveryVehicle} user={user} />;
   }
 
   const handleServiceButtonClick = (buttonType: ServiceButtonType) => {

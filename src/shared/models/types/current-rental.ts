@@ -23,4 +23,6 @@ export enum RentalStatus {
   COMPLETED = "completed",
   DELIVERING = "delivering",
   CANCELLED = "CANCELLED",
+  DELIVERY_RESERVED = "delivery_reserved",
+  DELIVERY_IN_PROGRESS = "delivering_in_progress",
 }

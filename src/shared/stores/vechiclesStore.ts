@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ICar } from "../models/types/car";
+import { CarStatus, ICar } from "../models/types/car";
 import { vehicleApi } from "../api/routes/vehicles";
 import { mechanicApi } from "../api/routes/mechanic";
 import { UserRole } from "../models/types/user";
@@ -14,8 +14,10 @@ interface VehiclesStore {
   inUseVehicles: ICar[];
   allMechanicVehicles: ICar[];
   searchResults: ICar[];
+  currentDeliveryVehicle: ICar;
 
   // Loading states
+  isCurrentDeliveryVehicle: boolean;
   isLoadingAll: boolean;
   isLoadingPending: boolean;
   isLoadingDelivery: boolean;
@@ -33,6 +35,7 @@ interface VehiclesStore {
   fetchAllVehicles: () => Promise<void>;
   fetchFrequentlyUsedVehicles: () => Promise<void>;
   //Mechanic
+  fetchCurrentDeliveryVehicle: () => Promise<void>;
   fetchPendingVehicles: () => Promise<void>;
   fetchDeliveryVehicles: () => Promise<void>;
   fetchInUseVehicles: () => Promise<void>;
@@ -41,6 +44,8 @@ interface VehiclesStore {
   searchVehiclesForUser: (query: string, userRole: UserRole) => Promise<void>;
   clearSearch: () => void;
   clearAll: () => void;
+  updateVehicle: (id: number, updates: Partial<ICar>) => void;
+  getVehiclesByRole: (userRole: UserRole) => ICar[];
 }
 
 export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
@@ -52,9 +57,33 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   deliveryVehicles: [],
   inUseVehicles: [],
   allMechanicVehicles: [],
+  currentDeliveryVehicle: {
+    id: 0,
+    name: "",
+    plate_number: "",
+    latitude: 0,
+    longitude: 0,
+    course: 0,
+    fuel_level: 0,
+    price_per_minute: 0,
+    price_per_hour: 0,
+    price_per_day: 0,
+    engine_volume: 0,
+    year: 0,
+    drive_type: 0,
+    photos: [],
+    owner_id: 0,
+    current_renter_id: null,
+    status: CarStatus.free,
+    open_price: 0,
+    owned_car: false,
+    rental_id: 0,
+  },
+
   searchResults: [],
 
   // Loading states
+  isCurrentDeliveryVehicle: false,
   isLoadingAll: false,
   isLoadingPending: false,
   isLoadingDelivery: false,
@@ -65,6 +94,62 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
 
   // Error state
   error: null,
+
+  fetchCurrentDeliveryVehicle: async () => {
+    try {
+      set({ isCurrentDeliveryVehicle: true, error: null });
+      const response = await mechanicApi.getCurrentDelivery();
+
+      // Если есть данные и это не пустой объект
+      if (response.data && Object.keys(response.data).length > 0) {
+        const car: ICar = {
+          ...response.data,
+          name: response.data.car_name,
+          id: response.data.car_id,
+        };
+        set({
+          currentDeliveryVehicle: car,
+          isCurrentDeliveryVehicle: false,
+        });
+      } else {
+        // Если нет текущей доставки, устанавливаем пустой объект с id: 0
+        set({
+          currentDeliveryVehicle: {
+            id: 0,
+            name: "",
+            plate_number: "",
+            latitude: 0,
+            longitude: 0,
+            course: 0,
+            fuel_level: 0,
+            price_per_minute: 0,
+            price_per_hour: 0,
+            price_per_day: 0,
+            engine_volume: 0,
+            year: 0,
+            drive_type: 0,
+            photos: [],
+            owner_id: 0,
+            current_renter_id: null,
+            status: CarStatus.free,
+            open_price: 0,
+            owned_car: false,
+            rental_id: 0,
+          },
+          isCurrentDeliveryVehicle: false,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch current delivery vehicle:", error);
+      set({
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch current delivery vehicle",
+        isCurrentDeliveryVehicle: false,
+      });
+    }
+  },
 
   fetchAllVehicles: async () => {
     try {
@@ -87,9 +172,8 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
     try {
       set({ isLoadingInUse: true, error: null });
       const response = await mechanicApi.getInUseVehicles();
-      console.log(response);
       set({
-        pendingVehicles: response.data.vehicles || [],
+        inUseVehicles: response.data.vehicles || [],
         isLoadingInUse: false,
       });
     } catch (error) {
@@ -174,34 +258,10 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       set({ isLoadingAllMechanic: true, error: null });
 
       // Выполняем все запросы параллельно
-      const [pendingResponse, deliveryResponse, inUseResponse] =
-        await Promise.all([
-          mechanicApi.getPendingVehicles(),
-          mechanicApi.getDeliveryVehicles(),
-          mechanicApi.getInUseVehicles(),
-        ]);
-
-      const pendingVehicles = pendingResponse.data.vehicles || [];
-      const deliveryVehicles =
-        deliveryResponse.data.delivery_vehicles.map((car) => ({
-          ...car,
-          name: car.car_name,
-          id: car.car_id,
-        })) || [];
-      const inUseVehicles = inUseResponse.data.vehicles || [];
-
-      // Объединяем все машины механика
-      const allMechanicVehicles = [
-        ...pendingVehicles,
-        ...deliveryVehicles,
-        ...inUseVehicles,
-      ];
+      const response = await mechanicApi.getAllVehicles();
 
       set({
-        pendingVehicles,
-        deliveryVehicles,
-        inUseVehicles,
-        allMechanicVehicles,
+        allMechanicVehicles: response.data.vehicles,
         isLoadingAllMechanic: false,
       });
     } catch (error) {

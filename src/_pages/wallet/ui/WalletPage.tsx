@@ -8,12 +8,77 @@ import { useTranslations } from "next-intl";
 import { userApi } from "@/shared/api/routes/user";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { useSearchParams } from "next/navigation";
+import { useModal } from "@/shared/ui/modal/ModalContext";
+
+const PromoCodeModal = ({
+  onSubmit,
+  isLoading,
+}: {
+  onSubmit: (code: string) => void;
+  isLoading: boolean;
+}) => {
+  const [code, setCode] = useState("");
+  const t = useTranslations("wallet");
+
+  return (
+    <div className="rounded-2xl rounded-b-none overflow-hidden">
+      <div className="bg-white p-6 ">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="text-2xl">🎁</div>
+          <h2 className="text-xl font-bold text-gray-900">{t("promocodes")}</h2>
+        </div>
+
+        <div className="space-y-4">
+          <div className="relative">
+            <input
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Введите промокод"
+              className="w-full text-base bg-gray-50 text-gray-900 outline-none border-2 border-transparent
+                     focus:border-gray-800 focus:bg-white placeholder:text-gray-400 p-4 rounded-2xl
+                     transition-all duration-300 shadow-inner focus:shadow-lg"
+              disabled={isLoading}
+              autoFocus
+            />
+            {code && (
+              <button
+                onClick={() => setCode("")}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <Button
+            variant="secondary"
+            className={`font-semibold text-lg text-white w-full
+                    ${
+                      code ? "" : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    }
+                    disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]`}
+            onClick={() => code.trim() && onSubmit(code)}
+            disabled={!code.trim() || isLoading}
+          >
+            <div className="flex items-center justify-center gap-2">
+              {isLoading && (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              )}
+              <span>{isLoading ? "Активируем..." : t("activate")}</span>
+            </div>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const WalletPage = () => {
   const t = useTranslations("wallet");
-  const { showModal } = useResponseModal();
+  const { showModal: showResponseModal } = useResponseModal();
+  const { showModal } = useModal();
   const [balance, setBalance] = useState(0);
-  const [promoCode, setPromoCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isTopUpLoading, setIsTopUpLoading] = useState(false);
   const searchParams = useSearchParams();
@@ -32,8 +97,7 @@ const WalletPage = () => {
       const response = await userApi.addMoney(100000);
       if (response.status === 200) {
         await getBalance();
-        setPromoCode("");
-        showModal({
+        showResponseModal({
           type: "success",
           description: `Баланс успешно пополнен на 100000 ₸`,
           buttonText: "Хорошо",
@@ -46,15 +110,14 @@ const WalletPage = () => {
     }
   };
 
-  const handleApplyPromoCode = async () => {
+  const handleApplyPromoCode = async (promoCode: string) => {
     if (!promoCode.trim()) return;
     setIsLoading(true);
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("Applying promo code:", promoCode);
-      setPromoCode("");
-      showModal({
+      showResponseModal({
         type: "success",
         description: `Промокод "${promoCode}" успешно активирован!`,
         buttonText: "Отлично",
@@ -83,8 +146,16 @@ const WalletPage = () => {
     return new Intl.NumberFormat("ru-RU").format(amount);
   };
 
+  const openPromoCodeModal = () => {
+    showModal({
+      children: (
+        <PromoCodeModal onSubmit={handleApplyPromoCode} isLoading={isLoading} />
+      ),
+    });
+  };
+
   return (
-    <article className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10">
+    <article className="flex overflow-y-auto flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10">
       <CustomAppBar backHref={redirectRoute} title={t("title")} />
 
       {/* Balance Section */}
@@ -111,8 +182,8 @@ const WalletPage = () => {
         </div>
       </section>
 
-      {/* Top Up Button */}
-      <section className="px-6 mt-8">
+      {/* Actions Section */}
+      <section className="px-6 mt-8 space-y-4">
         <Button
           variant="secondary"
           onClick={handleTopUp}
@@ -135,64 +206,17 @@ const WalletPage = () => {
             </span>
           </div>
         </Button>
-      </section>
 
-      {/* Spacer to push promocodes to bottom */}
-      <div className="flex-grow min-h-8" />
-
-      {/* Promocodes Section */}
-      <section className="px-6 pb-8 pt-4">
-        <div className="bg-white rounded-3xl p-6 shadow-xl shadow-gray-200/50 border border-gray-200">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="text-2xl">🎁</div>
-            <h2 className="text-xl font-bold text-gray-900">
-              {t("promocodes")}
-            </h2>
+        <Button
+          variant="outline"
+          onClick={openPromoCodeModal}
+          className="w-full"
+        >
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-2xl">🎁</span>
+            <span className="font-semibold">{t("promocodes")}</span>
           </div>
-
-          <div className="space-y-4">
-            <div className="relative">
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                placeholder="Введите промокод"
-                className="w-full text-base bg-gray-50 text-gray-900 outline-none border-2 border-transparent
-                         focus:border-gray-800 focus:bg-white placeholder:text-gray-400 p-4 rounded-2xl
-                         transition-all duration-300 shadow-inner focus:shadow-lg"
-                disabled={isLoading}
-              />
-              {promoCode && (
-                <button
-                  onClick={() => setPromoCode("")}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-
-            <Button
-              variant="secondary"
-              className={`font-semibold text-lg text-white
-                        ${
-                          promoCode
-                            ? ""
-                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                        }
-                        disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]`}
-              onClick={handleApplyPromoCode}
-              disabled={!promoCode.trim() || isLoading}
-            >
-              <div className="flex items-center justify-center gap-2">
-                {isLoading && (
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                )}
-                <span>{isLoading ? "Активируем..." : t("activate")}</span>
-              </div>
-            </Button>
-          </div>
-        </div>
+        </Button>
       </section>
     </article>
   );

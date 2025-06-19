@@ -25,7 +25,7 @@ export const ResponseBottomModal = ({
   buttonText,
   onButtonClick,
   type = "success",
-  closeOnScroll = false,
+  closeOnScroll = true,
 }: BottomModalProps) => {
   const [isBrowser, setIsBrowser] = useState(false);
 
@@ -33,74 +33,191 @@ export const ResponseBottomModal = ({
     setIsBrowser(true);
   }, []);
 
+  // Добавляем touch события для закрытия на свайп
   useEffect(() => {
-    if (!closeOnScroll || !onClose || !isOpen) return;
+    if (closeOnScroll !== true || !onClose || !isOpen) return;
 
     let startY = 0;
-    let currentY = 0;
-    let isSwipeStarted = false;
-    let startScrollTop = 0;
+    let startTime = 0;
+    let hasMoved = false;
 
     const handleTouchStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-      isSwipeStarted = true;
-
-      // Запоминаем начальную позицию скролла
-      const scrollableElement = document.querySelector(
-        ".overflow-y-auto, .overflow-scroll"
-      );
-      startScrollTop = scrollableElement?.scrollTop || window.scrollY || 0;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isSwipeStarted) return;
-      currentY = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = () => {
-      if (!isSwipeStarted) return;
-
-      const deltaY = currentY - startY;
-
-      // Проверяем, был ли скролл во время свайпа
-      const scrollableElement = document.querySelector(
-        ".overflow-y-auto, .overflow-scroll"
-      );
-      const currentScrollTop =
-        scrollableElement?.scrollTop || window.scrollY || 0;
-      const scrolledDuringSwipe =
-        Math.abs(currentScrollTop - startScrollTop) > 10;
-
-      // Закрываем только если:
-      // 1. Свайп вниз больше 100px
-      // 2. Не было скролла во время свайпа
-      // 3. Скролл находится в самом верху (scrollTop близко к 0)
-      if (deltaY > 100 && !scrolledDuringSwipe && startScrollTop < 50) {
-        onClose();
+      // Проверяем, что PushScreen не закрывается
+      if (document.body.hasAttribute("data-push-screen-closing")) {
+        console.log(
+          "ResponseBottomModal: ignoring touch - PushScreen is closing"
+        );
+        return;
       }
 
-      isSwipeStarted = false;
-      startY = 0;
-      currentY = 0;
+      // Проверяем, что touch начался внутри нашего модала
+      const target = e.target as Element;
+      const responseModal = target.closest('[data-response-modal="true"]');
+      if (!responseModal) return;
+
+      // Проверяем PushScreen - игнорируем только если touch ВНУТРИ PushScreen
+      const pushScreen = target.closest('[data-push-screen="true"]');
+      if (pushScreen && responseModal.contains(pushScreen)) {
+        console.log(
+          "ResponseBottomModal: ignoring touch - touch is inside nested PushScreen"
+        );
+        return;
+      }
+
+      startY = e.touches[0].clientY;
+      startTime = Date.now();
+      hasMoved = false;
+
+      console.log("ResponseBottomModal: touch start", {
+        startY,
+      });
     };
 
-    // Добавляем слушатели на body, чтобы ловить touch события везде
-    document.body.addEventListener("touchstart", handleTouchStart, {
+    const handleTouchMove = () => {
+      // Проверяем, что PushScreen не закрывается
+      if (document.body.hasAttribute("data-push-screen-closing")) return;
+
+      hasMoved = true;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      // Проверяем, что PushScreen не закрывается
+      if (document.body.hasAttribute("data-push-screen-closing")) {
+        console.log(
+          "ResponseBottomModal: ignoring touch end - PushScreen is closing"
+        );
+        return;
+      }
+
+      // Проверяем, что touch закончился внутри нашего модала
+      const target = e.changedTouches[0].target as Element;
+      const responseModal = target.closest('[data-response-modal="true"]');
+      if (!responseModal) return;
+
+      // Проверяем, что нет PushScreen с более высоким приоритетом
+      const pushScreen = target.closest('[data-push-screen="true"]');
+      if (pushScreen) {
+        console.log(
+          "ResponseBottomModal: ignoring touch end - PushScreen has higher priority"
+        );
+        return;
+      }
+
+      const endY = e.changedTouches[0].clientY;
+      const deltaY = endY - startY;
+      const deltaTime = Date.now() - startTime;
+
+      // Проверяем условия для закрытия:
+      // 1. Был ли реальный свайп (движение)
+      // 2. Свайп вниз больше 120px (для success/error модалей больше порог)
+      // 3. Свайп достаточно быстрый (меньше 600мс)
+      const isValidSwipe = hasMoved && deltaY > 120 && deltaTime < 600;
+
+      console.log("ResponseBottomModal: touch end", {
+        deltaY,
+        deltaTime,
+        hasMoved,
+        isValidSwipe,
+      });
+
+      if (isValidSwipe) {
+        console.log("ResponseBottomModal: closing due to valid swipe down");
+        onClose();
+      }
+    };
+
+    document.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
-    document.body.addEventListener("touchmove", handleTouchMove, {
-      passive: true,
-    });
-    document.body.addEventListener("touchend", handleTouchEnd, {
-      passive: true,
-    });
+    document.addEventListener("touchmove", handleTouchMove, { passive: true });
+    document.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     return () => {
-      document.body.removeEventListener("touchstart", handleTouchStart);
-      document.body.removeEventListener("touchmove", handleTouchMove);
-      document.body.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [closeOnScroll, onClose, isOpen]);
+
+  // useEffect(() => {
+  //   if ((false && closeOnScroll !== true) || !onClose || !isOpen) return;
+
+  //   let startY = 0;
+  //   let currentY = 0;
+  //   let isSwipeStarted = false;
+  //   let startScrollTop = 0;
+
+  //   const handleTouchStart = (e: TouchEvent) => {
+  //     console.log("ResponseBottomModal touchStart", closeOnScroll, isOpen);
+  //     startY = e.touches[0].clientY;
+  //     isSwipeStarted = true;
+
+  //     // Запоминаем начальную позицию скролла
+  //     const scrollableElement = document.querySelector(
+  //       ".overflow-y-auto, .overflow-scroll"
+  //     );
+  //     startScrollTop = scrollableElement?.scrollTop || window.scrollY || 0;
+  //   };
+
+  //   const handleTouchMove = (e: TouchEvent) => {
+  //     if (!isSwipeStarted) return;
+  //     currentY = e.touches[0].clientY;
+  //   };
+
+  //   const handleTouchEnd = () => {
+  //     if (!isSwipeStarted) return;
+
+  //     const deltaY = currentY - startY;
+
+  //     // Проверяем, был ли скролл во время свайпа
+  //     const scrollableElement = document.querySelector(
+  //       ".overflow-y-auto, .overflow-scroll"
+  //     );
+  //     const currentScrollTop =
+  //       scrollableElement?.scrollTop || window.scrollY || 0;
+  //     const scrolledDuringSwipe =
+  //       Math.abs(currentScrollTop - startScrollTop) > 10;
+
+  //     // Закрываем только если:
+  //     // 1. Свайп вниз больше 100px
+  //     // 2. Не было скролла во время свайпа
+  //     // 3. Скролл находится в самом верху (scrollTop близко к 0)
+  //     console.log("ResponseBottomModal touchEnd:", {
+  //       deltaY,
+  //       scrolledDuringSwipe,
+  //       startScrollTop,
+  //       closeOnScroll,
+  //       isOpen,
+  //     });
+
+  //     if (deltaY > 100 && !scrolledDuringSwipe && startScrollTop < 50) {
+  //       console.log("ResponseBottomModal closing due to swipe");
+  //       console.trace("ResponseBottomModal close called from:");
+  //       onClose();
+  //     }
+
+  //     isSwipeStarted = false;
+  //     startY = 0;
+  //     currentY = 0;
+  //   };
+
+  //   // Добавляем слушатели на body, чтобы ловить touch события везде
+  //   document.body.addEventListener("touchstart", handleTouchStart, {
+  //     passive: true,
+  //   });
+  //   document.body.addEventListener("touchmove", handleTouchMove, {
+  //     passive: true,
+  //   });
+  //   document.body.addEventListener("touchend", handleTouchEnd, {
+  //     passive: true,
+  //   });
+
+  //   return () => {
+  //     document.body.removeEventListener("touchstart", handleTouchStart);
+  //     document.body.removeEventListener("touchmove", handleTouchMove);
+  //     document.body.removeEventListener("touchend", handleTouchEnd);
+  //   };
+  // }, [closeOnScroll, onClose, isOpen]);
 
   const modalContent = (
     <AnimatePresence>
@@ -112,7 +229,7 @@ export const ResponseBottomModal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-[999]"
+            className="fixed inset-0 bg-black/50 z-10"
             onClick={onClose}
           />
 
@@ -126,7 +243,8 @@ export const ResponseBottomModal = ({
               damping: 25,
               stiffness: 200,
             }}
-            className="fixed left-0 right-0 bottom-0 bg-white rounded-t-[40px] p-8 z-[1000]"
+            className="fixed left-0 right-0 bottom-0 bg-white rounded-t-[40px] p-8 z-20"
+            data-response-modal="true"
           >
             <div className="flex flex-col items-center text-center">
               {/* Icon with animation */}

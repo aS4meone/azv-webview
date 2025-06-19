@@ -8,23 +8,23 @@ const TermsPage = () => {
   const docs = [
     {
       title: t("faqs"),
-      url: "/docs/freq_ques.pdf",
+      contentKey: "faqs",
     },
     {
       title: t("aboutApp"),
-      url: "/docs/about.pdf",
+      contentKey: "about",
     },
     {
       title: t("userOffer"),
-      url: "/docs/offer.pdf",
+      contentKey: "offer",
     },
     {
       title: t("personalData"),
-      url: "/docs/personal.pdf",
+      contentKey: "personal",
     },
     {
       title: t("onlinePayment"),
-      url: "/docs/online_payment.pdf",
+      contentKey: "payment",
     },
   ];
   return (
@@ -32,11 +32,11 @@ const TermsPage = () => {
       <CustomAppBar backHref={ROUTES.MAIN} />
       <section className="px-8 pt-5">
         <h2 className="text-[24px] font-semibold text-[#191919] mb-6">
-          {t("terms")}
+          Условия и Политика
         </h2>
         <div className="flex flex-col gap-4">
           {docs.map((doc) => (
-            <TermsViewCard key={doc.title} {...doc} />
+            <TermsViewCard key={doc.contentKey} {...doc} />
           ))}
         </div>
       </section>

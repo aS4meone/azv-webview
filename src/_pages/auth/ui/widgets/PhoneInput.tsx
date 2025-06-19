@@ -42,11 +42,11 @@ const PhoneInput = ({
   };
 
   return (
-    <div className="flex items-center gap-2 w-full bg-[#292929] rounded-[20px] h-[60px]">
+    <div className="flex items-center gap-2 w-full bg-[#292929] rounded-[20px] h-[60px] text-white">
       <div className="p-4 pl-6 text-[16px]">+7</div>
       <div className="h-full w-[1px] bg-[#191919]"></div>
       <input
-        className="w-full outline-none bg-transparent p-4 text-[16px]"
+        className="w-full outline-none bg-transparent p-4 text-[16px] text-white placeholder:text-white/30"
         placeholder={t("auth.phoneNumber.placeholder")}
         value={formatPhone(phone)}
         onChange={handleChange}

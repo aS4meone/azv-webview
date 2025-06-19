@@ -1,6 +1,27 @@
 {
   "error": "Error",
-  "terms": "Terms and Policy",
+  "terms": {
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "content": "Here you can find answers to common questions about our service..."
+    },
+    "about": {
+      "title": "About the App",
+      "content": "Our app provides a convenient way to rent cars..."
+    },
+    "offer": {
+      "title": "User Agreement",
+      "content": "This agreement outlines the terms and conditions of using our service..."
+    },
+    "personal": {
+      "title": "Personal Data Policy",
+      "content": "We take your privacy seriously. This policy explains how we handle your personal data..."
+    },
+    "payment": {
+      "title": "Online Payment Terms",
+      "content": "Learn about our secure payment methods and processing..."
+    }
+  },
   "faqs": "FAQs",
   "aboutApp": "About App",
   "userOffer": "User Agreement",

@@ -52,14 +52,14 @@ const CarStatusBadge = ({ status }: { status: CarStatus }) => {
   };
 
   const color = {
-    [CarStatus.free]: "#BAF2AF",
-    [CarStatus.inUse]: "#EF7C7C",
+    [CarStatus.free]: "#EF7C7C",
+    [CarStatus.inUse]: "#BAF2AF",
     [CarStatus.service]: "#FFE494",
     [CarStatus.owner]: "#AEC9F1",
     [CarStatus.pending]: "#FFE494",
     [CarStatus.failure]: "#EF7C7C",
     [CarStatus.reserved]: "#EF7C7C",
-    [CarStatus.delivering]: "#EF7C7C",
+    [CarStatus.delivering]: "#FFE494",
     [CarStatus.tracking]: "#EF7C7C",
   };
 

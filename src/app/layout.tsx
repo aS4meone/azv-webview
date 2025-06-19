@@ -5,9 +5,14 @@ import { AuthProvider } from "@/features/auth/provider/AuthContext";
 
 import { getLocale } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
-import { ModalProvider, ResponseModalProvider } from "@/shared/ui/modal";
+import {
+  ModalProvider,
+  ResponseModalProvider,
+  ModalPortal,
+} from "@/shared/ui/modal";
 import { BrowserProtectionProvider } from "@/shared/contexts/BrowserProtectionProvider";
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
+import { PageTransitionProvider } from "@/shared/contexts/PageTransitionContext";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -40,12 +45,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   const locale = await getLocale();
   return (
-    <html lang={locale}>
+    <html lang={locale} className="loading">
       <head>
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
@@ -79,6 +84,7 @@ export default async function RootLayout({
               /* Отключаем pull-to-refresh но разрешаем горизонтальный скролл */
               overscroll-behavior-y: none !important;
               overscroll-behavior-x: auto !important;
+
             }
             
             input, textarea, [contenteditable="true"] {
@@ -98,18 +104,30 @@ export default async function RootLayout({
           `,
           }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            document.documentElement.classList.add('loading');
+          `,
+          }}
+        />
       </head>
       <body className={`${montserrat.variable} antialiased`}>
         <ResponseModalProvider>
-          <PhotoUploadProvider>
-            <ModalProvider>
+          <ModalProvider>
+            <PhotoUploadProvider>
               <BrowserProtectionProvider>
                 <NextIntlClientProvider>
-                  <AuthProvider>{children}</AuthProvider>
+                  <AuthProvider>
+                    <PageTransitionProvider>
+                      {children}
+                      <ModalPortal />
+                    </PageTransitionProvider>
+                  </AuthProvider>
                 </NextIntlClientProvider>
               </BrowserProtectionProvider>
-            </ModalProvider>
-          </PhotoUploadProvider>
+            </PhotoUploadProvider>
+          </ModalProvider>
         </ResponseModalProvider>
       </body>
     </html>

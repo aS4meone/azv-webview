@@ -30,17 +30,17 @@ export const userRoleInteraction = ({
     );
   }
 
-  if (user.current_rental.rental_details.status === RentalStatus.DELIVERING) {
-    const deliveryStatus = user.current_rental.rental_details
-      .delivery_in_progress
-      ? "in_progress"
-      : "searching_driver";
-
+  if (
+    user.current_rental.rental_details.status === RentalStatus.DELIVERING ||
+    user.current_rental.rental_details.status ===
+      RentalStatus.DELIVERY_RESERVED ||
+    user.current_rental.rental_details.status ===
+      RentalStatus.DELIVERY_IN_PROGRESS
+  ) {
     return (
       <UserDeliveryModal
         car={user.current_rental.car_details}
         onClose={hideModal}
-        deliveryStatus={deliveryStatus}
       />
     );
   }

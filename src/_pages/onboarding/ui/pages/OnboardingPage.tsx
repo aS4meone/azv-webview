@@ -15,7 +15,7 @@ const OnboardingPage = () => {
   const slides = t.raw("onboarding.slides");
 
   return (
-    <article className="h-screen overflow-hidden">
+    <article className="h-screen overflow-hidden bg-[#191919]">
       <section className="overflow-hidden rounded-[40px] flex-2">
         <Swiper
           className="h-full"
@@ -39,7 +39,7 @@ const OnboardingPage = () => {
         </Swiper>
       </section>
       <section className="px-10 py-4 pb-10 flex flex-col gap-4 justify-end">
-        <div className="flex flex-col gap-2 h-[165px] justify-center">
+        <div className="flex flex-col gap-2 h-[165px] justify-center text-white">
           <h2 className="text-[24px] leading-[30px]">
             {slides[activeSlide].title}
           </h2>
@@ -52,7 +52,9 @@ const OnboardingPage = () => {
         <Button link={ROUTES.AUTH} variant="primary">
           {t("onboarding.login")}
         </Button>
-        <p className="text-[12px]">{t("onboarding.termsAgreement")}</p>
+        <p className="text-[12px] text-white">
+          {t("onboarding.termsAgreement")}
+        </p>
       </section>
     </article>
   );

@@ -17,6 +17,7 @@ import PushScreen from "@/shared/ui/push-screen";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 import Loader from "@/shared/ui/loader";
+import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
 
 interface MechanicInUseModalProps {
   user: IUser;
@@ -39,7 +40,7 @@ export const MechanicInUseModal = ({
   const [comment, setComment] = useState("");
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [isEndLoading, setIsEndLoading] = useState(false);
-
+  const [showDataScreen, setShowDataScreen] = useState(false);
   const car: ICar = user.current_rental?.car_details || ({} as ICar);
 
   const handleUploadAfterInspection = async (files: {
@@ -210,6 +211,10 @@ export const MechanicInUseModal = ({
     }
   };
 
+  const handleViewData = () => {
+    setShowDataScreen(true);
+  };
+
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
       <div className="p-6 pt-4 space-y-6">
@@ -247,6 +252,14 @@ export const MechanicInUseModal = ({
         />
       )}
 
+      {car.status === CarStatus.inUse && (
+        <div className="flex justify-center px-6">
+          <Button variant="outline" onClick={handleViewData}>
+            Посмотреть данные
+          </Button>
+        </div>
+      )}
+
       <div className="p-6 pt-4 space-y-6">
         <div className="flex justify-between gap-2">
           <Button
@@ -272,6 +285,10 @@ export const MechanicInUseModal = ({
           Завершить осмотр
         </Button>
       </div>
+
+      {showDataScreen && (
+        <DescriptionScreen car={car} onClose={() => setShowDataScreen(false)} />
+      )}
     </div>
   );
 };

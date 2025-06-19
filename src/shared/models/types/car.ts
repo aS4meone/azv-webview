@@ -1,11 +1,3 @@
-export enum RentStatus {
-  RESERVED = "reserved",
-  IN_USE = "in_use",
-  COMPLETED = "completed",
-  DELIVERING = "delivering",
-  CANCELLED = "CANCELLED",
-}
-
 export enum CarStatus {
   free = "FREE",
   inUse = "IN_USE",
@@ -16,6 +8,8 @@ export enum CarStatus {
   reserved = "RESERVED",
   delivering = "DELIVERING",
   tracking = "TRACKING",
+  deliveryReserved = "delivery_reserved",
+  deliveryInProgress = "delivering_in_progress",
 }
 
 import { UniqueIdentifier } from "./unique-identifier";
@@ -41,4 +35,14 @@ export interface ICar extends UniqueIdentifier {
   open_price: number;
   owned_car: boolean;
   rental_id: number;
+  reservation_time?: string;
+  description?: string;
+  current_renter_details?: ICurrentRenterDetails;
+}
+
+export interface ICurrentRenterDetails {
+  full_name: string;
+  phone_number: string;
+  selfie_url: string;
+  rent_selfie_url: string;
 }

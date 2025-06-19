@@ -2,15 +2,19 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { BaseMap, ZOOM_CONSTRAINTS } from "@/shared/ui/map";
 import { useUserStore } from "@/shared/stores/userStore";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { MapWithMarkers } from "./MapWithMarkers";
 import { ServiceZonePolygon } from "./ServiceZonePolygon";
 import { MapCameraProps } from "@vis.gl/react-google-maps";
 import { ICar } from "@/shared/models/types/car";
+import { UserRole } from "@/shared/models/types/user";
 
 export const MapComponent = () => {
   const { user } = useUserStore();
+  const { currentDeliveryVehicle } = useVehiclesStore();
 
   const initialCenter = useMemo(() => {
+    // Приоритет 1: Если есть аренда у пользователя
     if (user?.current_rental?.car_details) {
       const rentalCar = user.current_rental.car_details;
       return {
@@ -18,14 +22,35 @@ export const MapComponent = () => {
         lng: rentalCar.longitude,
       };
     }
+
+    // Приоритет 2: Если механик с текущей доставкой
+    if (
+      user?.role === UserRole.MECHANIC &&
+      currentDeliveryVehicle &&
+      currentDeliveryVehicle.id !== 0 &&
+      currentDeliveryVehicle.latitude &&
+      currentDeliveryVehicle.longitude
+    ) {
+      return {
+        lat: currentDeliveryVehicle.latitude,
+        lng: currentDeliveryVehicle.longitude,
+      };
+    }
+
+    // Приоритет 3: Стандартное местоположение
     return { lat: 43.222, lng: 76.8512 };
-  }, [user?.current_rental?.car_details]);
+  }, [user?.current_rental?.car_details, user?.role, currentDeliveryVehicle]);
 
   const initialZoom = useMemo(() => {
-    return user?.current_rental?.car_details
-      ? ZOOM_CONSTRAINTS.CAR_FOCUS
-      : ZOOM_CONSTRAINTS.DEFAULT;
-  }, [user?.current_rental?.car_details]);
+    // Если есть машина для фокуса (аренда или доставка), используем CAR_FOCUS зум
+    const hasFocusCar =
+      user?.current_rental?.car_details ||
+      (user?.role === UserRole.MECHANIC &&
+        currentDeliveryVehicle &&
+        currentDeliveryVehicle.id !== 0);
+
+    return hasFocusCar ? ZOOM_CONSTRAINTS.CAR_FOCUS : ZOOM_CONSTRAINTS.DEFAULT;
+  }, [user?.current_rental?.car_details, user?.role, currentDeliveryVehicle]);
 
   // Состояние камеры карты
   const [cameraProps, setCameraProps] = useState<MapCameraProps>({
@@ -35,7 +60,6 @@ export const MapComponent = () => {
 
   // Функция для центрирования карты на машине
   const centerOnCar = useCallback((car: ICar) => {
-    console.log("Centering map on car:", car.latitude, car.longitude);
     setCameraProps({
       center: {
         lat: car.latitude,

@@ -5,9 +5,15 @@ import { useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
-import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
+import {
+  baseConfig,
+  SERVICE_UPLOAD,
+  usePhotoUpload,
+} from "@/shared/contexts/PhotoUploadContext";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { MechanicWaitingTimer } from "../../timers/MechanicTimer";
+import { CarStatus } from "@/shared/models/types/car";
+import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
 
 interface MechanicCarInWaitingModalProps {
   user: IUser;
@@ -21,6 +27,9 @@ export const MechanicCarInWaitingModal = ({
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
+  const { setUploadRequired } = usePhotoUpload();
+  const [showDataScreen, setShowDataScreen] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
 
@@ -28,6 +37,7 @@ export const MechanicCarInWaitingModal = ({
     try {
       const res = await mechanicApi.startCheckCar();
       if (res.status === 200) {
+        setUploadRequired(SERVICE_UPLOAD, true);
         showModal({
           type: "success",
           title: "Осмотр успешно начат",
@@ -99,6 +109,10 @@ export const MechanicCarInWaitingModal = ({
     }
   };
 
+  const handleViewData = () => {
+    setShowDataScreen(true);
+  };
+
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
       <UploadPhoto
@@ -142,6 +156,12 @@ export const MechanicCarInWaitingModal = ({
 
         {/* Action Buttons */}
         <div className="space-y-3">
+          {car.status === CarStatus.service && (
+            <Button variant="outline" onClick={handleViewData}>
+              Посмотреть данные
+            </Button>
+          )}
+
           <Button variant="outline" onClick={handleCancelInspection}>
             Отменить осмотр
           </Button>
@@ -150,6 +170,10 @@ export const MechanicCarInWaitingModal = ({
           </Button>
         </div>
       </div>
+
+      {showDataScreen && (
+        <DescriptionScreen car={car} onClose={() => setShowDataScreen(false)} />
+      )}
     </div>
   );
 };

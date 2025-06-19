@@ -38,6 +38,8 @@ export const MapWithMarkers = ({
     allVehicles,
     fetchAllMechanicVehicles,
     allMechanicVehicles,
+    fetchCurrentDeliveryVehicle,
+    currentDeliveryVehicle,
   } = useVehiclesStore();
   const { user } = useUserStore();
 
@@ -96,20 +98,65 @@ export const MapWithMarkers = ({
   const markerLibraryLoadedRef = useRef(false);
   const processedCarIdRef = useRef<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const trackingModalShownRef = useRef<boolean>(false);
 
   // Функция для загрузки автомобилей в зависимости от роли
   const fetchVehiclesByRole = useCallback(() => {
     if (user?.role === UserRole.MECHANIC) {
       fetchAllMechanicVehicles();
+      fetchCurrentDeliveryVehicle();
     } else {
       fetchAllVehicles();
     }
-  }, [fetchAllVehicles, fetchAllMechanicVehicles, user?.role]);
+  }, [
+    fetchAllVehicles,
+    fetchAllMechanicVehicles,
+    fetchCurrentDeliveryVehicle,
+    user?.role,
+  ]);
 
   // Fetch vehicles based on user role - первоначальная загрузка
   useEffect(() => {
     fetchVehiclesByRole();
   }, [fetchVehiclesByRole, user]);
+
+  // Автоматическое центрирование на current delivery vehicle для механика
+  useEffect(() => {
+    if (
+      map &&
+      user?.role === UserRole.MECHANIC &&
+      currentDeliveryVehicle &&
+      currentDeliveryVehicle.id !== 0 &&
+      currentDeliveryVehicle.latitude &&
+      currentDeliveryVehicle.longitude &&
+      currentDeliveryVehicle.status !== CarStatus.free
+    ) {
+      // Центрируем карту на текущей доставке
+      map.setCenter({
+        lat: currentDeliveryVehicle.latitude,
+        lng: currentDeliveryVehicle.longitude,
+      });
+      map.setZoom(16); // Устанавливаем удобный зум для просмотра машины
+    }
+  }, [map, user, currentDeliveryVehicle]);
+
+  // Автоматическое центрирование на машину из текущей аренды
+  useEffect(() => {
+    if (
+      map &&
+      user?.current_rental &&
+      user.current_rental.car_details &&
+      user.current_rental.car_details.latitude &&
+      user.current_rental.car_details.longitude
+    ) {
+      // Центрируем карту на арендованной машине
+      map.setCenter({
+        lat: user.current_rental.car_details.latitude,
+        lng: user.current_rental.car_details.longitude,
+      });
+      map.setZoom(16); // Устанавливаем удобный зум для просмотра машины
+    }
+  }, [map, user?.current_rental]);
 
   // Интервал для обновления списка автомобилей с адаптивной частотой
   useEffect(() => {
@@ -140,7 +187,12 @@ export const MapWithMarkers = ({
       let vehiclesList: ICar[] = [];
 
       if (user.role === UserRole.MECHANIC) {
-        vehiclesList = allMechanicVehicles;
+        // Для механика проверяем сначала current delivery, потом все машины
+        if (currentDeliveryVehicle && currentDeliveryVehicle.id !== 0) {
+          vehiclesList = [currentDeliveryVehicle];
+        } else {
+          vehiclesList = allMechanicVehicles;
+        }
       } else {
         vehiclesList = allVehicles;
       }
@@ -182,6 +234,7 @@ export const MapWithMarkers = ({
     user,
     allVehicles,
     allMechanicVehicles,
+    currentDeliveryVehicle,
     onCarFound,
     showModal,
     hideModal,
@@ -240,11 +293,18 @@ export const MapWithMarkers = ({
             textColor = "#92400e";
             break;
           case CarStatus.delivering:
-            backgroundColor = "rgba(34, 197, 94, 0.95)"; // Зеленый
+            backgroundColor = "rgba(255, 228, 148, 0.95)"; // Зеленый
+            borderColor = "#f59e0b";
+            textColor = "#92400e";
+            break;
+          case CarStatus.inUse:
+            backgroundColor = "rgba(34, 197, 94, 0.95)"; // Красный
+            // borderColor = "#dc2626";
+            // textColor = "#991b1b";
             borderColor = "#16a34a";
             textColor = "#15803d";
             break;
-          case CarStatus.inUse:
+          case CarStatus.free:
             backgroundColor = "rgba(239, 124, 124, 0.95)"; // Красный
             borderColor = "#dc2626";
             textColor = "#991b1b";
@@ -280,15 +340,43 @@ export const MapWithMarkers = ({
       markerDiv.appendChild(nameDiv);
     }
 
-    // Add car icon
+    // Add car icon with status-based coloring for mechanic
     const iconImg = document.createElement("img");
     iconImg.src = "/images/carmarker.png";
     iconImg.alt = "Car marker";
     iconImg.loading = "lazy";
+
+    // Определяем цвет маркера в зависимости от роли пользователя и статуса машины
+    let filter = "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))";
+
+    if (user?.role === UserRole.MECHANIC) {
+      switch (vehicle.status) {
+        case CarStatus.free:
+          // Свободные - красные
+          filter =
+            "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(0deg) saturate(1.5) brightness(1) contrast(1.2)";
+          break;
+        case CarStatus.inUse:
+          // В аренде - зеленые
+          filter =
+            "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(120deg) saturate(1.3) brightness(1.1)";
+          break;
+        case CarStatus.pending:
+        case CarStatus.delivering:
+          // Доставка/проверка - желтые
+          filter =
+            "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(60deg) saturate(1.4) brightness(1.2)";
+          break;
+        default:
+          // Стандартный цвет для других статусов
+          break;
+      }
+    }
+
     iconImg.style.cssText = `
           width: ${markerWidth}px;
           height: ${markerHeight}px;
-          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+          filter: ${filter};
           transition: all 0.2s ease;
         `;
 
@@ -359,13 +447,36 @@ export const MapWithMarkers = ({
     if (user?.current_rental) {
       const rentalVehicle = user.current_rental.car_details;
       vehicles = [rentalVehicle];
-    } else {
-      // Показываем все машины в зависимости от роли пользователя
-      if (user?.role === UserRole.MECHANIC) {
-        vehicles = allMechanicVehicles;
+    } else if (user?.role === UserRole.MECHANIC) {
+      // Проверяем, есть ли активная слежка
+      const trackingCarId = localStorage.getItem("tracking_car_id");
+
+      if (trackingCarId && allMechanicVehicles.length > 0) {
+        // Если есть активная слежка, показываем только отслеживаемую машину
+        const trackingCar = allMechanicVehicles.find(
+          (car) => car.id === parseInt(trackingCarId)
+        );
+        if (trackingCar) {
+          vehicles = [trackingCar];
+        } else {
+          // Если машина не найдена, удаляем ID из localStorage и показываем все машины
+          localStorage.removeItem("tracking_car_id");
+          vehicles = allMechanicVehicles;
+        }
+      } else if (
+        currentDeliveryVehicle &&
+        currentDeliveryVehicle.id !== 0 &&
+        currentDeliveryVehicle.status !== CarStatus.free
+      ) {
+        // Для механика: если есть current delivery и он не завершен, показываем только его
+        vehicles = [currentDeliveryVehicle];
       } else {
-        vehicles = allVehicles;
+        // Иначе показываем все машины механика
+        vehicles = allMechanicVehicles;
       }
+    } else {
+      // Для обычных пользователей показываем все доступные машины
+      vehicles = allVehicles;
     }
 
     if (!vehicles.length) {
@@ -412,14 +523,6 @@ export const MapWithMarkers = ({
 
         // Логика кластеризации: показываем индивидуальные маркеры только на зуме 16+
         const shouldCluster = currentZoomLevel < 16;
-
-        // Отладочная информация
-        console.log("Clustering debug:", {
-          currentZoomLevel,
-          showIndividualMarkers: currentZoomLevel >= 16,
-          markersCount: newMarkers.length,
-          shouldCluster,
-        });
 
         if (shouldCluster) {
           // Всегда пересоздаем кластеризатор для корректного переключения
@@ -519,7 +622,16 @@ export const MapWithMarkers = ({
     };
 
     initializeMarkers();
-  }, [map, zoom, allVehicles, allMechanicVehicles, user, showModal, hideModal]);
+  }, [
+    map,
+    zoom,
+    allVehicles,
+    allMechanicVehicles,
+    currentDeliveryVehicle,
+    user,
+    showModal,
+    hideModal,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -549,6 +661,9 @@ export const MapWithMarkers = ({
       if (zoomUpdateTimeoutRef.current) {
         clearTimeout(zoomUpdateTimeoutRef.current);
       }
+
+      // Сбрасываем ref для модального окна слежки
+      trackingModalShownRef.current = false;
     };
   }, []);
 
