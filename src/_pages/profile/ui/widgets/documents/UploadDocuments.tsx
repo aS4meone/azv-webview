@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { Button } from "@/shared/ui";
-import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
+import {
+  Button,
+  ResponseBottomModalContent,
+  ResponseBottomModalContentProps,
+} from "@/shared/ui";
+
 import { PhotoConfig, UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { userApi } from "@/shared/api/routes/user";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { DocumentDetailsModal } from "./DocumentDetailsModal";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
 interface DocumentFiles {
   id_front?: File;
@@ -14,11 +19,12 @@ interface DocumentFiles {
 }
 
 export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
-  const { showModal } = useResponseModal();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [files, setFiles] = useState<DocumentFiles>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalContentProps | null>(null);
   const [data, setData] = useState<
     Omit<
       UploadDocumentsDto,
@@ -58,11 +64,14 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         error instanceof Error
           ? error.message
           : "Не удалось загрузить документы. Попробуйте еще раз";
-      showModal({
+      setResponseModal({
         type: "error",
         title: "Ошибка",
         description: errorMessage,
         buttonText: "Понятно",
+        onButtonClick: () => {
+          handleCloseResponseModal();
+        },
       });
     } finally {
       setIsLoading(false);
@@ -89,52 +98,52 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       setIsDetailsOpen(false);
 
       if (response.status === 200) {
-        showModal({
+        setResponseModal({
           type: "success",
           title: "Успешно",
           description: "Документы успешно загружены",
           buttonText: "Хорошо",
           onButtonClick: () => {
-            getUser();
-            setFiles({});
-            setData({
-              full_name: "",
-              birth_date: "",
-              iin: "",
-              id_card_expiry: "",
-              drivers_license_expiry: "",
-            });
-          },
-          onClose: () => {
-            getUser();
-            setFiles({});
-            setData({
-              full_name: "",
-              birth_date: "",
-              iin: "",
-              id_card_expiry: "",
-              drivers_license_expiry: "",
-            });
+            handleCloseResponseModal();
           },
         });
       } else {
-        showModal({
+        setResponseModal({
           type: "error",
           title: "Ошибка",
           description: "Не удалось загрузить документы. Попробуйте еще раз",
           buttonText: "Понятно",
+          onButtonClick: () => {
+            handleCloseResponseModal();
+          },
         });
       }
     } catch (error) {
-      showModal({
+      setResponseModal({
         type: "error",
         title: "Ошибка",
         description: error.response.data.detail,
         buttonText: "Понятно",
+        onButtonClick: () => {
+          handleCloseResponseModal();
+        },
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCloseResponseModal = () => {
+    getUser();
+    setFiles({});
+    setData({
+      full_name: "",
+      birth_date: "",
+      iin: "",
+      id_card_expiry: "",
+      drivers_license_expiry: "",
+    });
+    setResponseModal(null);
   };
 
   const uploadConfig: PhotoConfig[] = [
@@ -195,6 +204,26 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         initialData={data}
         isLoading={isLoading}
       />
+      <CustomPushScreen
+        isOpen={!!responseModal}
+        onClose={() => {
+          handleCloseResponseModal();
+        }}
+        withHeader={false}
+        fullScreen={false}
+        direction="bottom"
+        height="auto"
+      >
+        <ResponseBottomModalContent
+          type={responseModal?.type || "success"}
+          title={responseModal?.title || ""}
+          description={responseModal?.description || ""}
+          buttonText={responseModal?.buttonText || ""}
+          onButtonClick={() => {
+            handleCloseResponseModal();
+          }}
+        />
+      </CustomPushScreen>
     </>
   );
 };

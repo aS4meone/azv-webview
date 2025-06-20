@@ -100,8 +100,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       set({ isCurrentDeliveryVehicle: true, error: null });
       const response = await mechanicApi.getCurrentDelivery();
 
-      // Если есть данные и это не пустой объект
-      if (response.data && Object.keys(response.data).length > 0) {
+      if (response?.data) {
         const car: ICar = {
           ...response.data,
           name: response.data.car_name,
@@ -112,13 +111,11 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           isCurrentDeliveryVehicle: false,
         });
 
-        // Если есть координаты доставки и статус соответствует, обновляем контекст
+        // Update delivery point if coordinates exist and status is correct
         if (
           car.delivery_coordinates &&
           car.status === CarStatus.deliveryInProgress
         ) {
-          // Здесь мы не можем напрямую использовать хук useDeliveryPoint,
-          // поэтому нам нужно обновить состояние через событие
           const event = new CustomEvent("updateDeliveryPoint", {
             detail: {
               coordinates: car.delivery_coordinates,
@@ -128,7 +125,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           window.dispatchEvent(event);
         }
       } else {
-        // Если нет текущей доставки, устанавливаем пустой объект с id: 0
+        // Reset current delivery vehicle to default state
         set({
           currentDeliveryVehicle: {
             id: 0,
@@ -154,19 +151,33 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           },
           isCurrentDeliveryVehicle: false,
         });
-
-        // Очищаем точку доставки через событие
-        const event = new CustomEvent("updateDeliveryPoint", {
-          detail: {
-            coordinates: null,
-            visible: false,
-          },
-        });
-        window.dispatchEvent(event);
       }
     } catch (error) {
+      // Handle 404 or other errors gracefully
       console.error("Failed to fetch current delivery vehicle:", error);
       set({
+        currentDeliveryVehicle: {
+          id: 0,
+          name: "",
+          plate_number: "",
+          latitude: 0,
+          longitude: 0,
+          course: 0,
+          fuel_level: 0,
+          price_per_minute: 0,
+          price_per_hour: 0,
+          price_per_day: 0,
+          engine_volume: 0,
+          year: 0,
+          drive_type: 0,
+          photos: [],
+          owner_id: 0,
+          current_renter_id: null,
+          status: CarStatus.free,
+          open_price: 0,
+          owned_car: false,
+          rental_id: 0,
+        },
         error:
           error instanceof Error
             ? error.message

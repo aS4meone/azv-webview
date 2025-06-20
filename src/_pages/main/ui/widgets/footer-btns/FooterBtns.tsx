@@ -11,13 +11,18 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { Button } from "@/shared/ui";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import FooterHaveCar from "./FooterHaveCar";
-import { ROUTES } from "@/shared/constants/routes";
 import FooterDeliveryCar from "./FooterDeliveryCar";
 import { ICar } from "@/shared/models/types/car";
 import FooterTrackingCar from "./FooterTracking";
 import { CarStatus } from "@/shared/models/types/car";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import FreeCarsPage from "@/app/(main)/cars/free/page";
+import FreqUsedCarsPage from "@/app/(main)/cars/freq-used/page";
+import MyCarsPage from "@/app/(main)/cars/my/page";
+import MechanicPendingPage from "@/app/(main)/mechanic/pending/page";
+import MechanicDeliveryPage from "@/app/(main)/mechanic/delivery/page";
+import MechanicInRentPage from "@/app/(main)/mechanic/in-rent/page";
 
 enum ServiceButtonType {
   CHECK = "check",
@@ -28,12 +33,50 @@ enum ServiceButtonType {
 const FooterBtns = () => {
   const { user } = useUserStore();
   const { currentDeliveryVehicle, allMechanicVehicles } = useVehiclesStore();
-  const router = useRouter();
   const [activeServiceButton, setActiveServiceButton] =
     useState<ServiceButtonType>(ServiceButtonType.CHECK);
+  const [currentComponent, setCurrentComponent] = useState<string | null>(null);
   const trackingCarId = localStorage.getItem("tracking_car_id");
 
-  console.log(currentDeliveryVehicle);
+  const components = [
+    {
+      key: "my_cars",
+      component: <MyCarsPage onClose={() => setCurrentComponent(null)} />,
+      title: "Мои машины",
+    },
+    {
+      key: "free_cars",
+      component: <FreeCarsPage onClose={() => setCurrentComponent(null)} />,
+      title: "Свободно",
+    },
+    {
+      key: "freq_used_cars",
+      component: <FreqUsedCarsPage onClose={() => setCurrentComponent(null)} />,
+      title: "Часто используемые",
+    },
+    {
+      key: "mechanic_pending",
+      component: (
+        <MechanicPendingPage onClose={() => setCurrentComponent(null)} />
+      ),
+      title: "Проверка",
+    },
+    {
+      key: "mechanic_delivery",
+      component: (
+        <MechanicDeliveryPage onClose={() => setCurrentComponent(null)} />
+      ),
+      title: "Доставка",
+    },
+    {
+      key: "mechanic_in_rent",
+      component: (
+        <MechanicInRentPage onClose={() => setCurrentComponent(null)} />
+      ),
+      title: "В аренде",
+    },
+  ];
+
   let trackingCar: ICar | undefined = undefined;
   if (trackingCarId) {
     trackingCar = allMechanicVehicles.find(
@@ -65,16 +108,16 @@ const FooterBtns = () => {
 
   const handleServiceButtonClick = (buttonType: ServiceButtonType) => {
     if (activeServiceButton === buttonType) {
-      // Already active, navigate
+      // Already active, show component
       switch (buttonType) {
         case ServiceButtonType.CHECK:
-          router.push(ROUTES.MECHANIC_PENDING);
+          setCurrentComponent("mechanic_pending");
           break;
         case ServiceButtonType.DELIVERING:
-          router.push(ROUTES.MECHANIC_DELIVERY);
+          setCurrentComponent("mechanic_delivery");
           break;
         case ServiceButtonType.RENT:
-          router.push(ROUTES.MECHANIC_IN_RENT);
+          setCurrentComponent("mechanic_in_rent");
           break;
       }
     } else {
@@ -135,14 +178,14 @@ const FooterBtns = () => {
       return (
         <div className="flex flex-col gap-2">
           <Button
-            link={ROUTES.CARS_MY}
+            onClick={() => setCurrentComponent("my_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <UserIcon />
             <span>Мои машины</span>
           </Button>
           <Button
-            link={ROUTES.CARS_FREE}
+            onClick={() => setCurrentComponent("free_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <RoadIcon />
@@ -182,14 +225,14 @@ const FooterBtns = () => {
       return (
         <div className="flex flex-col gap-2">
           <Button
-            link={ROUTES.CARS_FREQ_USED}
+            onClick={() => setCurrentComponent("freq_used_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <UserIcon />
             <span>Часто используемые</span>
           </Button>
           <Button
-            link={ROUTES.CARS_FREE}
+            onClick={() => setCurrentComponent("free_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <RoadIcon />
@@ -201,9 +244,23 @@ const FooterBtns = () => {
   };
 
   return (
-    <footer className="absolute bottom-4 left-4 right-4">
-      {getFooterBtns()}
-    </footer>
+    <>
+      <footer className="absolute bottom-4 left-4 right-4">
+        {getFooterBtns()}
+      </footer>
+
+      <CustomPushScreen
+        isOpen={!!currentComponent}
+        onClose={() => {
+          setCurrentComponent(null);
+        }}
+        direction="right"
+        height="auto"
+        title={components.find((c) => c.key === currentComponent)?.title}
+      >
+        {components.find((c) => c.key === currentComponent)?.component}
+      </CustomPushScreen>
+    </>
   );
 };
 

@@ -6,6 +6,7 @@ import {
   useResponseModal,
   VehicleActionSuccessModal,
   VehicleActionType,
+  ResponseBottomModalProps,
 } from "@/shared/ui/modal";
 import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { useUserStore } from "@/shared/stores/userStore";
@@ -16,6 +17,7 @@ import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 import { useDeliveryPoint } from "@/shared/contexts/DeliveryPointContext";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface MechanicDeliveryInUseModalProps {
   user: IUser;
@@ -38,8 +40,18 @@ export const MechanicDeliveryInUseModal = ({
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [actionType, setActionType] = useState<VehicleActionType | null>(null);
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
 
   const car: ICar = notRentedCar || ({} as ICar);
+
+  const handleClose = async () => {
+    setResponseModal(null);
+    onClose();
+    await refreshUser();
+    await fetchAllMechanicVehicles();
+    await fetchCurrentDeliveryVehicle();
+  };
 
   useEffect(() => {
     // Устанавливаем точку доставки при монтировании компонента
@@ -77,17 +89,14 @@ export const MechanicDeliveryInUseModal = ({
           // Очищаем точку доставки
           setDeliveryPoint(null);
           setIsVisible(false);
-          onClose();
-
-          showModal({
+          setResponseModal({
             type: "success",
+            isOpen: true,
+            title: "Доставка завершена",
             description: "Доставка успешно завершена",
             buttonText: "Отлично",
-            onClose: async () => {
-              await refreshUser();
-              await fetchAllMechanicVehicles();
-              await fetchCurrentDeliveryVehicle();
-            },
+            onButtonClick: handleClose,
+            onClose: handleClose,
           });
         }
       }
@@ -221,6 +230,15 @@ export const MechanicDeliveryInUseModal = ({
       <div className="p-6 pt-4 space-y-6">
         <CarInfoHeader car={car} />
       </div>
+
+      <CustomResponseModal
+        isOpen={responseModal?.isOpen || false}
+        onClose={responseModal?.onClose || (() => {})}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+        onButtonClick={responseModal?.onButtonClick || (() => {})}
+      />
 
       <VehicleActionSuccessModal
         isOpen={isSuccessOpen}

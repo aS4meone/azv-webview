@@ -2,10 +2,11 @@ import { CarStatus, ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
-import { useResponseModal } from "@/shared/ui/modal";
+import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { useUserStore } from "@/shared/stores/userStore";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface MechanicStartCheckModalProps {
   car: ICar;
@@ -20,20 +21,29 @@ export const MechanicStartCheckModal = ({
   const { refreshUser } = useUserStore();
   const delivering = car.status === CarStatus.delivering;
   const tracking = car.status === CarStatus.inUse;
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
 
   const [showDataScreen, setShowDataScreen] = useState(false);
+
+  const handleClose = async () => {
+    setResponseModal(null);
+    onClose();
+    await refreshUser();
+  };
+
   const handleStartInspection = async () => {
     try {
       const res = await mechanicApi.reserveCheckCar(car.id);
       if (res.status === 200) {
-        showModal({
+        setResponseModal({
           type: "success",
+          isOpen: true,
+          title: "Осмотр успешно принят в работу",
+          onButtonClick: handleClose,
           description: "Осмотр успешно принят в работу",
           buttonText: "Отлично",
-          onClose: async () => {
-            onClose();
-            await refreshUser();
-          },
+          onClose: handleClose,
         });
       }
     } catch (error) {
@@ -50,14 +60,14 @@ export const MechanicStartCheckModal = ({
     try {
       const res = await mechanicApi.acceptDelivery(car.rental_id!);
       if (res.status === 200) {
-        showModal({
+        setResponseModal({
           type: "success",
+          isOpen: true,
+          title: "Доставка успешно принята в работу",
+          onButtonClick: handleClose,
           description: "Доставка успешно принята в работу",
           buttonText: "Отлично",
-          onClose: async () => {
-            onClose();
-            await refreshUser();
-          },
+          onClose: handleClose,
         });
       }
     } catch (error) {
@@ -75,22 +85,25 @@ export const MechanicStartCheckModal = ({
       // Сохраняем ID машины в localStorage для слежки
       localStorage.setItem("tracking_car_id", car.id.toString());
 
-      showModal({
+      setResponseModal({
         type: "success",
+        isOpen: true,
+        title: "Слежка начата",
+        onButtonClick: handleClose,
         description: "Слежка начата",
         buttonText: "Отлично",
-        onClose: async () => {
-          onClose();
-          await refreshUser();
-        },
+        onClose: handleClose,
       });
     } catch (error) {
       console.log(error);
-      showModal({
+      setResponseModal({
         type: "error",
+        isOpen: true,
+        title: "Ошибка при начале слежки",
         description: "Ошибка при начале слежки",
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: handleClose,
+        onClose: handleClose,
       });
     }
   };
@@ -103,6 +116,16 @@ export const MechanicStartCheckModal = ({
     <>
       <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
         {/* Car Image Carousel */}
+
+        <CustomResponseModal
+          isOpen={responseModal?.isOpen || false}
+          onClose={responseModal?.onClose || (() => {})}
+          title={responseModal?.title || ""}
+          description={responseModal?.description || ""}
+          buttonText={responseModal?.buttonText || ""}
+          onButtonClick={responseModal?.onButtonClick || (() => {})}
+        />
+
         <CarImageCarousel
           car={car}
           height="h-64"

@@ -1,7 +1,9 @@
 import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
-import React from "react";
+import React, { useState } from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
+import { ResponseBottomModalProps } from "@/shared/ui/modal";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface MechanicCarIsFreeModalProps {
   car: ICar;
@@ -12,6 +14,14 @@ export const MechanicCarIsFreeModal = ({
   car,
   onClose,
 }: MechanicCarIsFreeModalProps) => {
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
+
+  const handleClose = () => {
+    setResponseModal(null);
+    onClose();
+  };
+
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
       <CarImageCarousel
@@ -19,6 +29,15 @@ export const MechanicCarIsFreeModal = ({
         height="h-64"
         showProgressIndicator
         rounded={true}
+      />
+
+      <CustomResponseModal
+        isOpen={responseModal?.isOpen || false}
+        onClose={responseModal?.onClose || (() => {})}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+        onButtonClick={responseModal?.onButtonClick || (() => {})}
       />
 
       {/* Content */}
@@ -33,12 +52,7 @@ export const MechanicCarIsFreeModal = ({
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <Button
-            variant="secondary"
-            onClick={() => {
-              onClose();
-            }}
-          >
+          <Button variant="secondary" onClick={handleClose}>
             Закрыть
           </Button>
         </div>

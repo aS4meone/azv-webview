@@ -6,6 +6,7 @@ import {
   useResponseModal,
   VehicleActionSuccessModal,
   VehicleActionType,
+  ResponseBottomModalProps,
 } from "@/shared/ui/modal";
 import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { useUserStore } from "@/shared/stores/userStore";
@@ -18,6 +19,7 @@ import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 import Loader from "@/shared/ui/loader";
 import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface MechanicInUseModalProps {
   user: IUser;
@@ -41,7 +43,16 @@ export const MechanicInUseModal = ({
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [isEndLoading, setIsEndLoading] = useState(false);
   const [showDataScreen, setShowDataScreen] = useState(false);
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
   const car: ICar = user.current_rental?.car_details || ({} as ICar);
+
+  const handleClose = async () => {
+    setResponseModal(null);
+    onClose();
+    await refreshUser();
+    await fetchAllMechanicVehicles();
+  };
 
   const handleUploadAfterInspection = async (files: {
     [key: string]: File[];
@@ -53,11 +64,22 @@ export const MechanicInUseModal = ({
         formData.append(key, file);
       }
     }
-    const res = await mechanicApi.uploadAfterCheckCar(formData);
-    if (res.status === 200) {
+    try {
+      const res = await mechanicApi.uploadAfterCheckCar(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhoto(false);
+        setShowRatingModal(true);
+      }
+    } catch (error) {
       setIsLoading(false);
-      setShowUploadPhoto(false);
-      setShowRatingModal(true);
+      showModal({
+        type: "error",
+        description:
+          error.response?.data?.detail || "Ошибка при загрузке фотографий",
+        buttonText: "Попробовать снова",
+        onClose: () => {},
+      });
     }
   };
 
@@ -133,15 +155,14 @@ export const MechanicInUseModal = ({
       if (res.status === 200) {
         setIsEndLoading(false);
         setShowRatingModal(false);
-        onClose();
-        showModal({
+        setResponseModal({
           type: "success",
+          isOpen: true,
+          title: "Осмотр завершен",
           description: "Осмотр успешно завершен",
           buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-            await fetchAllMechanicVehicles();
-          },
+          onButtonClick: handleClose,
+          onClose: handleClose,
         });
       }
     } catch (error: unknown) {
@@ -220,6 +241,15 @@ export const MechanicInUseModal = ({
       <div className="p-6 pt-4 space-y-6">
         <CarInfoHeader car={car} />
       </div>
+
+      <CustomResponseModal
+        isOpen={responseModal?.isOpen || false}
+        onClose={responseModal?.onClose || (() => {})}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+        onButtonClick={responseModal?.onButtonClick || (() => {})}
+      />
 
       <VehicleActionSuccessModal
         isOpen={isSuccessOpen}

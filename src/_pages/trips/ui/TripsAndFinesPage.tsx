@@ -7,12 +7,14 @@ import { useTranslations } from "next-intl";
 import { historyApi } from "@/shared/api/routes/history";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui";
 import { IHistory } from "@/shared/models/types/history";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import RentalHistoryDetailPage from "./RentalHistoryDetailPage";
 
 const TripsAndFinesPage = () => {
   const [activeTab] = useState<"trips" | "fines">("trips");
   const t = useTranslations();
   const [trips, setTrips] = useState<IHistory[]>([]);
-
+  const [activePush, setActivePush] = useState<number | null>(null);
   const fetchTrips = async () => {
     try {
       const response = await historyApi.getHistories();
@@ -28,50 +30,50 @@ const TripsAndFinesPage = () => {
   }, []);
 
   return (
-    <article
-      className="flex flex-col min-h-screen bg-white py-10 overflow-y-auto"
-      style={{
-        WebkitOverflowScrolling: "touch",
-        touchAction: "pan-y",
-        overscrollBehaviorY: "auto",
-      }}
-    >
-      <CustomAppBar backHref={ROUTES.MAIN} title={t("trips.title")} />
-      <div className="px-4 mt-6 flex-1">
-        <Tabs defaultValue="trips" className="w-full h-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="trips">Поездки</TabsTrigger>
-            <TabsTrigger value="fines">Штрафы</TabsTrigger>
-          </TabsList>
+    <>
+      <CustomPushScreen
+        direction="bottom"
+        isOpen={!!activePush}
+        onClose={() => setActivePush(null)}
+        height="auto"
+        className="pt-20"
+      >
+        <RentalHistoryDetailPage historyId={activePush ?? 0} />
+      </CustomPushScreen>
+      <Tabs defaultValue="trips" className="w-full h-full overflow-y-auto">
+        <TabsList className="mb-6">
+          <TabsTrigger value="trips">Поездки</TabsTrigger>
+          <TabsTrigger value="fines">Штрафы</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="trips" className="h-full">
-            <div
-              className="flex flex-col gap-4 max-h-[calc(100vh-200px)] pb-[100px] overflow-y-auto"
-              style={{
-                WebkitOverflowScrolling: "touch",
-                touchAction: "pan-y",
-                overscrollBehaviorY: "auto",
-              }}
-            >
-              {trips.map((item, index) => (
-                <HistoryItem
-                  key={index}
-                  date={item.date}
-                  amount={item.final_total_price}
-                  carModel={item.car_name}
-                  isFine={activeTab === "fines"}
-                  historyId={item.history_id}
-                />
-              ))}
-            </div>
-          </TabsContent>
+        <TabsContent value="trips">
+          <div
+            className="flex flex-col gap-4 max-h-[calc(100vh-200px)] pb-[100px] overflow-y-auto"
+            style={{
+              WebkitOverflowScrolling: "touch",
+              touchAction: "pan-y",
+              overscrollBehaviorY: "auto",
+            }}
+          >
+            {trips.map((item, index) => (
+              <HistoryItem
+                key={index}
+                setActivePush={setActivePush}
+                date={item.date}
+                amount={item.final_total_price}
+                carModel={item.car_name}
+                isFine={activeTab === "fines"}
+                historyId={item.history_id}
+              />
+            ))}
+          </div>
+        </TabsContent>
 
-          <TabsContent value="fines">
-            <div></div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </article>
+        <TabsContent value="fines">
+          <div></div>
+        </TabsContent>
+      </Tabs>
+    </>
   );
 };
 

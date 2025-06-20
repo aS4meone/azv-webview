@@ -43,18 +43,14 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+html,
 body {
-  font-family: var(--font-montserrat);
+  touch-action: pan-y;
+  overscroll-behavior-x: contain;
 }
 
-body,
-html {
-  overscroll-behavior-y: contain;
-  position: fixed;
-  width: 100vw;
-  overflow: hidden;
-  touch-action: none;
-  scroll-padding-top: 100px;
+body {
+  font-family: var(--font-montserrat);
 }
 
 :root {

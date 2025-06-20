@@ -2,7 +2,7 @@ import { ArrowRightIcon } from "@/shared/icons";
 import { RentalType } from "@/shared/models/dto/rent.dto";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
-import PushScreen from "@/shared/ui/push-screen";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { TermsContent } from "@/_pages/terms/ui/widgets/TermsContent";
 import { ICar } from "@/shared/models/types/car";
 
@@ -34,17 +34,25 @@ export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
         <ArrowRightIcon />
       </Button>
 
-      {showTariff && (
-        <PushScreen onClose={() => setShowTariff(false)} withCloseButton>
-          <TermsContent contentKey="tariff" rentalType={rentalType} car={car} />
-        </PushScreen>
-      )}
+      <CustomPushScreen
+        isOpen={showTariff}
+        onClose={() => setShowTariff(false)}
+        direction="bottom"
+        title="О тарифе"
+        className="pt-20"
+      >
+        <TermsContent contentKey="tariff" rentalType={rentalType} car={car} />
+      </CustomPushScreen>
 
-      {showAgreement && (
-        <PushScreen onClose={() => setShowAgreement(false)} withCloseButton>
-          <TermsContent contentKey="agreement" />
-        </PushScreen>
-      )}
+      <CustomPushScreen
+        isOpen={showAgreement}
+        onClose={() => setShowAgreement(false)}
+        direction="bottom"
+        title="Договор аренды"
+        className="pt-20"
+      >
+        <TermsContent contentKey="agreement" />
+      </CustomPushScreen>
     </div>
   );
 };

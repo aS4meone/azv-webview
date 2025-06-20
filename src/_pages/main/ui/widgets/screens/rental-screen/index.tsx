@@ -7,7 +7,6 @@ import { RentalTabContent } from "./components";
 
 interface RentalPageProps {
   car: ICar;
-  onBack: () => void;
   onRent: (rentalData: RentalData) => void;
   isDelivery: boolean;
   deliveryAddress?: string;
@@ -15,7 +14,7 @@ interface RentalPageProps {
 
 export const RentalPage = ({
   car,
-  onBack,
+
   onRent,
   isDelivery,
   deliveryAddress,
@@ -41,7 +40,7 @@ export const RentalPage = ({
       data-scrollable="true"
     >
       {/* Header with car image */}
-      <CarImageCarousel car={car} height="h-80" onBack={onBack} />
+      <CarImageCarousel car={car} height="h-80" />
 
       {/* Content - добавляем больше контента чтобы был скролл */}
       <div className="px-4 py-6 space-y-6 pb-20">

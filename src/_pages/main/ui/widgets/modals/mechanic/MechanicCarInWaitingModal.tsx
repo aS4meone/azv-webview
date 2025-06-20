@@ -1,7 +1,7 @@
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
-import { useResponseModal } from "@/shared/ui/modal";
+import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
@@ -14,6 +14,7 @@ import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { MechanicWaitingTimer } from "../../timers/MechanicTimer";
 import { CarStatus } from "@/shared/models/types/car";
 import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface MechanicCarInWaitingModalProps {
   user: IUser;
@@ -29,24 +30,34 @@ export const MechanicCarInWaitingModal = ({
   const { refreshUser } = useUserStore();
   const { setUploadRequired } = usePhotoUpload();
   const [showDataScreen, setShowDataScreen] = useState(false);
-
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
+
+  const handleClose = async () => {
+    setResponseModal(null);
+    onClose();
+    await refreshUser();
+  };
 
   async function handleStartInspection() {
     try {
       const res = await mechanicApi.startCheckCar();
       if (res.status === 200) {
         setUploadRequired(SERVICE_UPLOAD, true);
-        showModal({
+        setResponseModal({
           type: "success",
+          isOpen: true,
           title: "Осмотр успешно начат",
           description: "Загрузите фотографии автомобиля перед началом осмотра",
           buttonText: "Отлично",
-          onClose: async () => {
+          onButtonClick: async () => {
             await refreshUser();
             setShowUploadPhoto(true);
+            handleClose();
           },
+          onClose: handleClose,
         });
       }
     } catch (error) {
@@ -60,17 +71,17 @@ export const MechanicCarInWaitingModal = ({
   }
 
   const handleCancelInspection = async () => {
-    onClose();
     try {
       const res = await mechanicApi.cancelCheckCar();
       if (res.status === 200) {
-        showModal({
+        setResponseModal({
           type: "success",
+          isOpen: true,
+          title: "Осмотр отменен",
           description: "Осмотр успешно отменен",
           buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-          },
+          onButtonClick: handleClose,
+          onClose: handleClose,
         });
       }
     } catch (error) {
@@ -93,18 +104,29 @@ export const MechanicCarInWaitingModal = ({
         formData.append(key, file);
       }
     }
-    const res = await mechanicApi.uploadBeforeCheckCar(formData);
-    if (res.status === 200) {
+    try {
+      const res = await mechanicApi.uploadBeforeCheckCar(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhoto(false);
+        setResponseModal({
+          type: "success",
+          isOpen: true,
+          title: "Фотографии загружены",
+          description: "Фотографии успешно загружены, можно начинать осмотр",
+          buttonText: "Отлично",
+          onButtonClick: handleClose,
+          onClose: handleClose,
+        });
+      }
+    } catch (error) {
       setIsLoading(false);
-      setShowUploadPhoto(false);
       showModal({
-        type: "success",
-        description: "Фотографии успешно загружены, можно начинать осмотр",
-        buttonText: "Отлично",
-        onClose: async () => {
-          onClose();
-          await refreshUser();
-        },
+        type: "error",
+        description:
+          error.response?.data?.detail || "Ошибка при загрузке фотографий",
+        buttonText: "Попробовать снова",
+        onClose: () => {},
       });
     }
   };
@@ -121,6 +143,15 @@ export const MechanicCarInWaitingModal = ({
         isLoading={isLoading}
         isOpen={showUploadPhoto}
         onClose={() => setShowUploadPhoto(false)}
+      />
+
+      <CustomResponseModal
+        isOpen={responseModal?.isOpen || false}
+        onClose={responseModal?.onClose || (() => {})}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+        onButtonClick={responseModal?.onButtonClick || (() => {})}
       />
 
       {/* Таймер ожидания */}

@@ -3,8 +3,8 @@ import { Button } from "@/shared/ui";
 import React, { useState } from "react";
 
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
-import PushScreen from "@/shared/ui/push-screen";
-import { useResponseModal } from "@/shared/ui/modal";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { ResponseBottomModalProps } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
@@ -13,6 +13,7 @@ import { RentalPage } from "../../screens/rental-screen";
 import { ROUTES } from "@/shared/constants/routes";
 import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
 import { DeliveryAddressScreen } from "../../screens/delivery-screen/DeliveryAddressScreen";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -20,11 +21,12 @@ interface UserStartCarModalProps {
 }
 
 export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
-  const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [showRentalPage, setShowRentalPage] = useState(false);
   const [showAddressScreen, setShowAddressScreen] = useState(false);
   const [isDelivery, setIsDelivery] = useState(false);
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
 
   const { redirectToCar } = useFormatCarInUrl({
     car: {
@@ -40,8 +42,13 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
     address: string;
   } | null>(null);
 
-  const handleRent = async (rentalData: RentalData) => {
+  const handleClose = async () => {
+    setResponseModal(null);
+    await refreshUser();
     onClose();
+  };
+
+  const handleRent = async (rentalData: RentalData) => {
     try {
       const data: RentCarDto = {
         carId: rentalData.carId,
@@ -51,14 +58,14 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
 
       const res = await rentApi.reserveCar(data);
       if (res.status === 200) {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "success",
+          title: "Успешно забронированно",
           description: "Успешно забронированно",
           buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-            setShowRentalPage(false);
-          },
+          onButtonClick: handleClose,
         });
       }
     } catch (error: unknown) {
@@ -68,21 +75,26 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       if (
         apiError.response.data.detail.includes("Пожалуйста, пополните счёт")
       ) {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "error",
+          title: "Ошибка",
           description: apiError.response.data.detail,
           buttonText: "Пополнить баланс",
           onButtonClick: () => {
             redirectToCar();
           },
-          onClose: () => {},
         });
       } else {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "error",
+          title: "Ошибка",
           description: apiError.response.data.detail,
           buttonText: "Повторить попытку",
-          onClose: () => {},
+          onButtonClick: handleClose,
         });
       }
     }
@@ -91,7 +103,6 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const handleDelivery = async (rentalData: RentalData) => {
     if (!deliveryAddress) return;
 
-    onClose();
     try {
       const data: RentCarDto = {
         carId: rentalData.carId,
@@ -107,25 +118,26 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       );
 
       if (res.status === 200) {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "success",
+          title: "Успешно забронированно",
           description: "Доставка успешно заказана",
           buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-            setShowRentalPage(false);
-            setShowAddressScreen(false);
-            setDeliveryAddress(null);
-          },
+          onButtonClick: handleClose,
         });
       }
     } catch (error: unknown) {
       const apiError = error as { response: { data: { detail: string } } };
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: handleClose,
         type: "error",
+        title: "Ошибка",
         description: apiError.response.data.detail,
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: handleClose,
       });
     }
   };
@@ -141,13 +153,15 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
 
       const res = await rentApi.reserveCar(data);
       if (res.status === 200) {
-        showModal({
+        handleClose();
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "success",
+          title: "Успешно забронированно",
           description: "Успешно забронированно",
           buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-          },
+          onButtonClick: handleClose,
         });
       }
     } catch (error: unknown) {
@@ -158,18 +172,28 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         apiError.response.data.detail.startsWith("Для")
       );
       if (apiError.response.data.detail.startsWith("Для")) {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "error",
+          title: "Ошибка",
           description: apiError.response.data.detail,
           buttonText: "Пополнить",
-          onClose: () => {},
+          onButtonClick: () => {
+            redirectToCar();
+          },
         });
       } else {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "error",
+          title: "Ошибка",
           description: apiError.response.data.detail,
           buttonText: "Попробовать снова",
-          onClose: () => {},
+          onButtonClick: () => {
+            setShowRentalPage(true);
+          },
         });
       }
     }
@@ -188,14 +212,24 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
+      <CustomResponseModal
+        onButtonClick={handleClose}
+        isOpen={!!responseModal}
+        onClose={handleClose}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+      />
       {showAddressScreen && (
-        <PushScreen
-          withOutStyles={true}
-          closeOnScroll={true}
+        <CustomPushScreen
+          direction="bottom"
+          isOpen={showAddressScreen}
           onClose={() => {
             setShowAddressScreen(false);
             setIsDelivery(false);
           }}
+          isCloseable={false}
+          className="p-0"
         >
           <DeliveryAddressScreen
             onBack={() => {
@@ -204,14 +238,15 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
             }}
             onAddressSelected={handleAddressSelected}
           />
-        </PushScreen>
+        </CustomPushScreen>
       )}
 
       {/* Rental Page */}
       {showRentalPage && (
-        <PushScreen
-          withOutStyles={true}
-          closeOnScroll={true}
+        <CustomPushScreen
+          direction="bottom"
+          className="p-0"
+          isOpen={showRentalPage}
           onClose={() => {
             setShowRentalPage(false);
             if (isDelivery) {
@@ -222,16 +257,10 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           <RentalPage
             isDelivery={isDelivery}
             car={car}
-            onBack={() => {
-              setShowRentalPage(false);
-              if (isDelivery) {
-                setShowAddressScreen(true);
-              }
-            }}
             onRent={isDelivery ? handleDelivery : handleRent}
             deliveryAddress={deliveryAddress?.address}
           />
-        </PushScreen>
+        </CustomPushScreen>
       )}
 
       {/* Car Image Carousel */}

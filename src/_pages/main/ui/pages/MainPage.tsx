@@ -11,6 +11,10 @@ import { useEffect, useRef, useState } from "react";
 import { useModal } from "@/shared/ui/modal";
 import { RentalStatus } from "@/shared/models/types/current-rental";
 import { handleCarInteraction } from "../../utils/car-interaction";
+import { preventEdgeSwipeNavigation } from "@/shared/utils/preventEdgeSwipe";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { SearchPage } from "@/_pages/search";
+import { SupportPage } from "@/_pages/support";
 
 export default function GoogleMapsPage() {
   const { refreshUser, user } = useUserStore();
@@ -18,6 +22,21 @@ export default function GoogleMapsPage() {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const previousStatusRef = useRef<RentalStatus | null>(null);
   const [isModalCurrentlyOpen, setIsModalCurrentlyOpen] = useState(false);
+
+  const [currentComponent, setCurrentComponent] = useState<string | null>(null);
+  const components = [
+    {
+      key: "search",
+      component: <SearchPage onClose={() => setCurrentComponent(null)} />,
+    },
+    {
+      key: "support",
+      component: <SupportPage />,
+    },
+  ];
+  useEffect(() => {
+    preventEdgeSwipeNavigation();
+  }, []);
 
   useEffect(() => {
     refreshUser();
@@ -118,7 +137,9 @@ export default function GoogleMapsPage() {
         <Button
           variant="icon"
           className="absolute top-10 right-20 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
-          link={ROUTES.SEARCH}
+          onClick={() => {
+            setCurrentComponent("search");
+          }}
         >
           <SearchIcon />
         </Button>
@@ -126,10 +147,23 @@ export default function GoogleMapsPage() {
       <Button
         variant="icon"
         className="absolute top-10 right-4 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
-        link={ROUTES.SUPPORT}
+        onClick={() => {
+          setCurrentComponent("support");
+        }}
       >
         <ChatIcon />
       </Button>
+
+      <CustomPushScreen
+        isOpen={!!currentComponent}
+        onClose={() => {
+          setCurrentComponent(null);
+        }}
+        direction="right"
+        height="auto"
+      >
+        {components.find((c) => c.key === currentComponent)?.component}
+      </CustomPushScreen>
       <FooterBtns />
     </div>
   );

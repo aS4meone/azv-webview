@@ -1,7 +1,7 @@
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
-import { useResponseModal } from "@/shared/ui/modal";
+import { ResponseBottomModalProps } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
 import { IUser } from "@/shared/models/types/user";
@@ -16,6 +16,7 @@ import {
   USER_UPLOAD,
 } from "@/shared/contexts/PhotoUploadContext";
 import { useRouter } from "next/navigation";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface UserCarInWaitingModalProps {
   user: IUser;
@@ -27,61 +28,75 @@ export const UserCarInWaitingModal = ({
   onClose,
 }: UserCarInWaitingModalProps) => {
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
-  const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
   const router = useRouter();
   const { setUploadRequired } = usePhotoUpload();
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
 
-  // onClose();
+  const handleClose = async () => {
+    setResponseModal(null);
+    await refreshUser();
+    onClose();
+  };
+
   async function handleRent() {
     try {
       const res = await rentApi.startRent();
       if (res.status === 200) {
+        handleClose();
         setUploadRequired(car.owned_car ? OWNER_UPLOAD : USER_UPLOAD, true);
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "success",
           title: "Аренда успешно начата",
           description: "Загрузите фотографии перед началом аренды",
           buttonText: "Отлично",
-          onClose: async () => {
+          onButtonClick: async () => {
             await refreshUser();
             setShowUploadPhoto(true);
-            setUploadRequired(USER_UPLOAD, true);
           },
         });
       }
     } catch (error) {
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: handleClose,
         type: "error",
+        title: "Ошибка",
         description: error.response.data.detail,
         buttonText: "Попробвать сново",
-        onClose: () => {},
+        onButtonClick: handleClose,
       });
     }
   }
 
   const handleCancelRental = async () => {
-    onClose();
     try {
       const res = await rentApi.cancelReservation();
       if (res.status === 200) {
-        showModal({
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
           type: "success",
+          title: "Аренда успешно отменена",
           description: "Аренда успешно отменена",
           buttonText: "Отлично",
-          onClose: async () => {
-            await refreshUser();
-          },
+          onButtonClick: handleClose,
         });
       }
     } catch (error) {
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: handleClose,
         type: "error",
+        title: "Ошибка",
         description: error.response.data.detail,
         buttonText: "Попробвать сново",
-        onClose: () => {},
+        onButtonClick: handleClose,
       });
     }
   };
@@ -98,15 +113,14 @@ export const UserCarInWaitingModal = ({
     if (res.status === 200) {
       setIsLoading(false);
       setShowUploadPhoto(false);
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: handleClose,
         type: "success",
+        title: "Фотографии успешно загружены",
         description: "Фотографии успешно загружены",
         buttonText: "Отлично",
-        onClose: async () => {
-          onClose();
-          await refreshUser();
-          router.refresh();
-        },
+        onButtonClick: handleClose,
       });
     }
   };
@@ -123,20 +137,28 @@ export const UserCarInWaitingModal = ({
     if (res.status === 200) {
       setIsLoading(false);
       setShowUploadPhoto(false);
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: handleClose,
         type: "success",
+        title: "Фотографии успешно загружены",
         description: "Фотографии успешно загружены",
         buttonText: "Отлично",
-        onClose: async () => {
-          onClose();
-          await refreshUser();
-        },
+        onButtonClick: handleClose,
       });
     }
   };
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
+      <CustomResponseModal
+        onButtonClick={responseModal?.onButtonClick || handleClose}
+        isOpen={!!responseModal}
+        onClose={handleClose}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+      />
       <UploadPhoto
         config={car.owned_car ? ownerConfig : baseConfig}
         onPhotoUpload={

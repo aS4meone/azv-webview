@@ -18,11 +18,7 @@ export const ModalPortal = () => {
   }
 
   return (
-    <BottomModal
-      isOpen={isModalOpen}
-      onClose={handleClose}
-      closeOnScroll={true}
-    >
+    <BottomModal isOpen={isModalOpen} onClose={handleClose}>
       {modalConfig.children}
     </BottomModal>
   );

@@ -69,7 +69,7 @@ export const FAQContent = () => {
   const categories = Array.from(new Set(faqs.map((faq) => faq.category)));
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-black">
           Часто задаваемые вопросы

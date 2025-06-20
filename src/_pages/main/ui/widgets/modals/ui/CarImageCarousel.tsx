@@ -32,6 +32,7 @@ export const CarImageCarousel = ({
   const [imageLoading, setImageLoading] = useState<{ [key: number]: boolean }>(
     {}
   );
+  console.log("CarImageCarousel", car);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [initialImageSlide, setInitialImageSlide] = useState(0);

@@ -2,20 +2,28 @@ import { userApi } from "@/shared/api/routes/user";
 import { ROUTES } from "@/shared/constants/routes";
 
 import { Button } from "@/shared/ui/button";
-import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { clearTokens } from "@/shared/utils/tokenStorage";
 import { callFlutterLogout } from "@/shared/utils/flutterLogout";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import React from "react";
+import React, { useState } from "react";
 import { TrashIcon } from "@/shared/icons";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { ResponseBottomModalContent } from "@/shared/ui/modal/ResponseBottomModal";
 
 const DeleteAccount = () => {
   const router = useRouter();
   const t = useTranslations();
   const t2 = useTranslations("profile");
-  const { showModal } = useResponseModal();
+  const [responseModal, setResponseModal] = useState<{
+    isOpen: boolean;
+    type: "success" | "error";
+    title: string;
+    description: string;
+    buttonText: string;
+    onButtonClick: () => void;
+  } | null>(null);
 
   const handleLogoutAndRedirect = async () => {
     try {
@@ -36,52 +44,67 @@ const DeleteAccount = () => {
   const handleDelete = async () => {
     const res = await userApi.deleteUser();
     if (res.status === 200) {
-      showModal({
+      setResponseModal({
         type: "success",
         title: "Действие выполнено",
         description: "Аккаунт удален",
         buttonText: t("modal.success.button"),
+        isOpen: true,
         onButtonClick: handleLogoutAndRedirect,
-        onClose: handleLogoutAndRedirect,
       });
     } else {
-      showModal({
+      setResponseModal({
         type: "error",
         title: t("error"),
         description: res.data.detail,
         buttonText: t("modal.error.button"),
+        isOpen: true,
+        onButtonClick: handleLogoutAndRedirect,
       });
     }
   };
   return (
-    <Button
-      variant="danger"
-      onClick={() => {
-        console.log("Delete button clicked");
-        showModal({
-          type: "error",
-          title: "Вы уверены?",
-          description: "Вы уверены, что хотите удалить аккаунт?",
-          buttonText: "Да, удалить",
-          onButtonClick: () => {
-            showModal({
-              type: "error",
-              title: "Вы точно уверены?",
-              description:
-                "Это действие необратимо. Все ваши данные будут удалены.",
-              buttonText: "Да, удалить",
-              onButtonClick: handleDelete,
-            });
-          },
-        });
-      }}
-      className="w-full flex items-center justify-center gap-2 py-6 bg-transparent"
-    >
-      <TrashIcon />
-      <span className="ml-2 text-[18px] text-[#E56D6D]">
-        {t2("deleteAccount")}
-      </span>
-    </Button>
+    <>
+      <CustomPushScreen
+        isOpen={!!responseModal}
+        onClose={() => {
+          setResponseModal(null);
+        }}
+        withHeader={false}
+        fullScreen={false}
+        direction="bottom"
+        height="auto"
+      >
+        <ResponseBottomModalContent
+          type={responseModal?.type || "success"}
+          title={responseModal?.title || ""}
+          description={responseModal?.description || ""}
+          buttonText={responseModal?.buttonText || ""}
+          onButtonClick={() => {
+            setResponseModal(null);
+          }}
+        />
+      </CustomPushScreen>
+      <Button
+        variant="danger"
+        onClick={() => {
+          setResponseModal({
+            type: "error",
+            title: "Вы уверены?",
+            description: "Вы уверены, что хотите удалить аккаунт?",
+            buttonText: "Да, удалить",
+            isOpen: true,
+            onButtonClick: handleDelete,
+          });
+        }}
+        className="w-full flex items-center justify-center gap-2 py-6 bg-transparent"
+      >
+        <TrashIcon />
+        <span className="ml-2 text-[18px] text-[#E56D6D]">
+          {t2("deleteAccount")}
+        </span>
+      </Button>
+    </>
   );
 };
 

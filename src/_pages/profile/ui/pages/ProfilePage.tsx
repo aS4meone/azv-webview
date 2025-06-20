@@ -5,10 +5,9 @@ import { useTranslations } from "next-intl";
 import DeleteAccount from "../widgets/DeleteAccount";
 import Logout from "../widgets/Logout";
 import GetUserData from "../widgets/GetUserData";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useUserStore } from "@/shared/stores/userStore";
-import { DrawerDemo } from "@/shared/test";
 
 export default function ProfilePage() {
   const t = useTranslations("profile");
@@ -27,14 +26,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <article className="flex flex-col min-h-screen bg-white py-10 pb-14">
-      <CustomAppBar backHref={ROUTES.MAIN} title={t("title")} />
+    <>
       <GetUserData user={user} getUser={refreshUser} isLoading={isLoading} />
-      <DrawerDemo />
-      <div className="px-4 py-6 space-y-4 ">
+
+      <div className=" py-6 space-y-4 ">
         <DeleteAccount />
         <Logout />
       </div>
-    </article>
+    </>
   );
 }

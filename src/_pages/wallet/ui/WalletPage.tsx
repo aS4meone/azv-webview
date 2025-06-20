@@ -1,14 +1,11 @@
 "use client";
-import { ROUTES } from "@/shared/constants/routes";
-import { CustomAppBar } from "@/widgets/appbars";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/shared/ui";
 import { PlusIcon } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { userApi } from "@/shared/api/routes/user";
-import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
-import { useSearchParams } from "next/navigation";
-import { useModal } from "@/shared/ui/modal/ModalContext";
+import { ResponseBottomModalContent } from "@/shared/ui/modal/ResponseBottomModal";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
 const PromoCodeModal = ({
   onSubmit,
@@ -22,7 +19,7 @@ const PromoCodeModal = ({
 
   return (
     <div className="rounded-2xl rounded-b-none overflow-hidden">
-      <div className="bg-white p-6 ">
+      <div className="bg-white p-6 rounded-2xl overflow-hidden">
         <div className="flex items-center gap-2 mb-6">
           <div className="text-2xl">🎁</div>
           <h2 className="text-xl font-bold text-gray-900">{t("promocodes")}</h2>
@@ -39,7 +36,6 @@ const PromoCodeModal = ({
                      focus:border-gray-800 focus:bg-white placeholder:text-gray-400 p-4 rounded-2xl
                      transition-all duration-300 shadow-inner focus:shadow-lg"
               disabled={isLoading}
-              autoFocus
             />
             {code && (
               <button
@@ -76,20 +72,18 @@ const PromoCodeModal = ({
 
 const WalletPage = () => {
   const t = useTranslations("wallet");
-  const { showModal: showResponseModal } = useResponseModal();
-  const { showModal } = useModal();
+
   const [balance, setBalance] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isTopUpLoading, setIsTopUpLoading] = useState(false);
-  const searchParams = useSearchParams();
-  const carId = Number(searchParams?.get("carId")) || 0;
-  const lat = Number(searchParams?.get("lat")) || 0;
-  const lng = Number(searchParams?.get("lng")) || 0;
-
-  const redirectRoute =
-    carId !== 0
-      ? `${ROUTES.MAIN}?carId=${carId}&lat=${lat}&lng=${lng}`
-      : ROUTES.MAIN;
+  const [isPromoCodeModalOpen, setIsPromoCodeModalOpen] = useState(false);
+  const [responseModal, setResponseModal] = useState<{
+    isOpen: boolean;
+    type: "success" | "error";
+    title: string;
+    description: string;
+    buttonText: string;
+  } | null>(null);
 
   const handleTopUp = async () => {
     setIsTopUpLoading(true);
@@ -97,14 +91,22 @@ const WalletPage = () => {
       const response = await userApi.addMoney(100000);
       if (response.status === 200) {
         await getBalance();
-        showResponseModal({
+        setResponseModal({
+          isOpen: true,
+          title: "Баланс успешно пополнен",
           type: "success",
           description: `Баланс успешно пополнен на 100000 ₸`,
           buttonText: "Хорошо",
         });
       }
     } catch (error) {
-      console.error("Error topping up:", error);
+      setResponseModal({
+        isOpen: true,
+        title: "Ошибка",
+        type: "error",
+        description: "Не удалось пополнить баланс",
+        buttonText: "Понятно",
+      });
     } finally {
       setIsTopUpLoading(false);
     }
@@ -116,14 +118,23 @@ const WalletPage = () => {
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Applying promo code:", promoCode);
-      showResponseModal({
+
+      setResponseModal({
+        isOpen: true,
         type: "success",
+        title: "Промокод успешно активирован!",
         description: `Промокод "${promoCode}" успешно активирован!`,
         buttonText: "Отлично",
       });
     } catch (error) {
       console.error("Error applying promo code:", error);
+      setResponseModal({
+        isOpen: true,
+        type: "error",
+        title: "Ошибка",
+        description: "Не удалось активировать промокод",
+        buttonText: "Понятно",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -147,20 +158,13 @@ const WalletPage = () => {
   };
 
   const openPromoCodeModal = () => {
-    showModal({
-      children: (
-        <PromoCodeModal onSubmit={handleApplyPromoCode} isLoading={isLoading} />
-      ),
-    });
+    setIsPromoCodeModalOpen(true);
   };
 
   return (
-    <article className="flex overflow-y-auto flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10">
-      <CustomAppBar backHref={redirectRoute} title={t("title")} />
-
-      <section className="px-6 mt-8">
+    <article className="space-y-4">
+      <section>
         <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-[40px] p-8 text-white shadow-2xl shadow-gray-900/25">
-          {/* Background pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full transform translate-x-16 -translate-y-16"></div>
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/30 rounded-full transform -translate-x-8 translate-y-8"></div>
@@ -173,7 +177,7 @@ const WalletPage = () => {
               </p>
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
             </div>
-            <h1 className="t  ext-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               {formatBalance(balance)} ₸
             </h1>
             <p className="text-xs text-white/50">Доступно для использования</p>
@@ -181,8 +185,7 @@ const WalletPage = () => {
         </div>
       </section>
 
-      {/* Actions Section */}
-      <section className="px-6 mt-8 space-y-4">
+      <section className="space-y-4">
         <Button
           variant="secondary"
           onClick={handleTopUp}
@@ -217,6 +220,40 @@ const WalletPage = () => {
           </div>
         </Button>
       </section>
+
+      <CustomPushScreen
+        isOpen={isPromoCodeModalOpen}
+        onClose={() => setIsPromoCodeModalOpen(false)}
+        withHeader={false}
+        fullScreen={false}
+        direction="bottom"
+        height="auto"
+      >
+        <PromoCodeModal onSubmit={handleApplyPromoCode} isLoading={isLoading} />
+      </CustomPushScreen>
+
+      <CustomPushScreen
+        isOpen={!!responseModal}
+        onClose={() => {
+          setResponseModal(null);
+          setIsPromoCodeModalOpen(false);
+        }}
+        withHeader={false}
+        fullScreen={false}
+        direction="bottom"
+        height="auto"
+      >
+        <ResponseBottomModalContent
+          type={responseModal?.type || "success"}
+          title={responseModal?.title || ""}
+          description={responseModal?.description || ""}
+          buttonText={responseModal?.buttonText || ""}
+          onButtonClick={() => {
+            setResponseModal(null);
+            setIsPromoCodeModalOpen(false);
+          }}
+        />
+      </CustomPushScreen>
     </article>
   );
 };

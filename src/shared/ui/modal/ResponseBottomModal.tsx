@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { Button } from "../button";
 import { AnimatePresence, motion } from "framer-motion";
 
-interface BottomModalProps {
+export interface ResponseBottomModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -14,7 +14,14 @@ interface BottomModalProps {
   buttonText: string;
   onButtonClick: () => void;
   type?: "success" | "error";
-  closeOnScroll?: boolean;
+}
+
+export interface ResponseBottomModalContentProps {
+  type: "success" | "error";
+  title: string;
+  description: string;
+  buttonText: string;
+  onButtonClick: () => void;
 }
 
 export const ResponseBottomModal = ({
@@ -25,342 +32,33 @@ export const ResponseBottomModal = ({
   buttonText,
   onButtonClick,
   type = "success",
-  closeOnScroll = true,
-}: BottomModalProps) => {
+}: ResponseBottomModalProps) => {
   const [isBrowser, setIsBrowser] = useState(false);
 
   useEffect(() => {
     setIsBrowser(true);
   }, []);
 
-  // Добавляем touch события для закрытия на свайп
-  useEffect(() => {
-    if (closeOnScroll !== true || !onClose || !isOpen) return;
-
-    let startY = 0;
-    let startTime = 0;
-    let hasMoved = false;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      // Проверяем, что PushScreen не закрывается
-      if (document.body.hasAttribute("data-push-screen-closing")) {
-        console.log(
-          "ResponseBottomModal: ignoring touch - PushScreen is closing"
-        );
-        return;
-      }
-
-      // Проверяем, что touch начался внутри нашего модала
-      const target = e.target as Element;
-      const responseModal = target.closest('[data-response-modal="true"]');
-      if (!responseModal) return;
-
-      // Проверяем PushScreen - игнорируем только если touch ВНУТРИ PushScreen
-      const pushScreen = target.closest('[data-push-screen="true"]');
-      if (pushScreen && responseModal.contains(pushScreen)) {
-        console.log(
-          "ResponseBottomModal: ignoring touch - touch is inside nested PushScreen"
-        );
-        return;
-      }
-
-      startY = e.touches[0].clientY;
-      startTime = Date.now();
-      hasMoved = false;
-
-      console.log("ResponseBottomModal: touch start", {
-        startY,
-      });
-    };
-
-    const handleTouchMove = () => {
-      // Проверяем, что PushScreen не закрывается
-      if (document.body.hasAttribute("data-push-screen-closing")) return;
-
-      hasMoved = true;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      // Проверяем, что PushScreen не закрывается
-      if (document.body.hasAttribute("data-push-screen-closing")) {
-        console.log(
-          "ResponseBottomModal: ignoring touch end - PushScreen is closing"
-        );
-        return;
-      }
-
-      // Проверяем, что touch закончился внутри нашего модала
-      const target = e.changedTouches[0].target as Element;
-      const responseModal = target.closest('[data-response-modal="true"]');
-      if (!responseModal) return;
-
-      // Проверяем, что нет PushScreen с более высоким приоритетом
-      const pushScreen = target.closest('[data-push-screen="true"]');
-      if (pushScreen) {
-        console.log(
-          "ResponseBottomModal: ignoring touch end - PushScreen has higher priority"
-        );
-        return;
-      }
-
-      const endY = e.changedTouches[0].clientY;
-      const deltaY = endY - startY;
-      const deltaTime = Date.now() - startTime;
-
-      // Проверяем условия для закрытия:
-      // 1. Был ли реальный свайп (движение)
-      // 2. Свайп вниз больше 120px (для success/error модалей больше порог)
-      // 3. Свайп достаточно быстрый (меньше 600мс)
-      const isValidSwipe = hasMoved && deltaY > 120 && deltaTime < 600;
-
-      console.log("ResponseBottomModal: touch end", {
-        deltaY,
-        deltaTime,
-        hasMoved,
-        isValidSwipe,
-      });
-
-      if (isValidSwipe) {
-        console.log("ResponseBottomModal: closing due to valid swipe down");
-        onClose();
-      }
-    };
-
-    document.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    document.addEventListener("touchmove", handleTouchMove, { passive: true });
-    document.addEventListener("touchend", handleTouchEnd, { passive: true });
-
-    return () => {
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [closeOnScroll, onClose, isOpen]);
-
-  // useEffect(() => {
-  //   if ((false && closeOnScroll !== true) || !onClose || !isOpen) return;
-
-  //   let startY = 0;
-  //   let currentY = 0;
-  //   let isSwipeStarted = false;
-  //   let startScrollTop = 0;
-
-  //   const handleTouchStart = (e: TouchEvent) => {
-  //     console.log("ResponseBottomModal touchStart", closeOnScroll, isOpen);
-  //     startY = e.touches[0].clientY;
-  //     isSwipeStarted = true;
-
-  //     // Запоминаем начальную позицию скролла
-  //     const scrollableElement = document.querySelector(
-  //       ".overflow-y-auto, .overflow-scroll"
-  //     );
-  //     startScrollTop = scrollableElement?.scrollTop || window.scrollY || 0;
-  //   };
-
-  //   const handleTouchMove = (e: TouchEvent) => {
-  //     if (!isSwipeStarted) return;
-  //     currentY = e.touches[0].clientY;
-  //   };
-
-  //   const handleTouchEnd = () => {
-  //     if (!isSwipeStarted) return;
-
-  //     const deltaY = currentY - startY;
-
-  //     // Проверяем, был ли скролл во время свайпа
-  //     const scrollableElement = document.querySelector(
-  //       ".overflow-y-auto, .overflow-scroll"
-  //     );
-  //     const currentScrollTop =
-  //       scrollableElement?.scrollTop || window.scrollY || 0;
-  //     const scrolledDuringSwipe =
-  //       Math.abs(currentScrollTop - startScrollTop) > 10;
-
-  //     // Закрываем только если:
-  //     // 1. Свайп вниз больше 100px
-  //     // 2. Не было скролла во время свайпа
-  //     // 3. Скролл находится в самом верху (scrollTop близко к 0)
-  //     console.log("ResponseBottomModal touchEnd:", {
-  //       deltaY,
-  //       scrolledDuringSwipe,
-  //       startScrollTop,
-  //       closeOnScroll,
-  //       isOpen,
-  //     });
-
-  //     if (deltaY > 100 && !scrolledDuringSwipe && startScrollTop < 50) {
-  //       console.log("ResponseBottomModal closing due to swipe");
-  //       console.trace("ResponseBottomModal close called from:");
-  //       onClose();
-  //     }
-
-  //     isSwipeStarted = false;
-  //     startY = 0;
-  //     currentY = 0;
-  //   };
-
-  //   // Добавляем слушатели на body, чтобы ловить touch события везде
-  //   document.body.addEventListener("touchstart", handleTouchStart, {
-  //     passive: true,
-  //   });
-  //   document.body.addEventListener("touchmove", handleTouchMove, {
-  //     passive: true,
-  //   });
-  //   document.body.addEventListener("touchend", handleTouchEnd, {
-  //     passive: true,
-  //   });
-
-  //   return () => {
-  //     document.body.removeEventListener("touchstart", handleTouchStart);
-  //     document.body.removeEventListener("touchmove", handleTouchMove);
-  //     document.body.removeEventListener("touchend", handleTouchEnd);
-  //   };
-  // }, [closeOnScroll, onClose, isOpen]);
-
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/50 z-10"
+            className="fixed inset-0 bg-black/50 z-[9998]"
             onClick={onClose}
           />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{
-              type: "spring",
-              damping: 25,
-              stiffness: 200,
-            }}
-            className="fixed left-0 right-0 bottom-0 bg-white rounded-t-[40px] p-8 z-20"
-            data-response-modal="true"
-          >
-            <div className="flex flex-col items-center text-center">
-              {/* Icon with animation */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{
-                  type: "spring",
-                  damping: 10,
-                  stiffness: 100,
-                  delay: 0.2,
-                }}
-                className={cn(
-                  "w-16 h-16 rounded-full flex items-center justify-center mb-6",
-                  type === "success" ? "bg-[#34C759]" : "bg-[#FF3B30]"
-                )}
-              >
-                {type === "success" ? (
-                  <motion.svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                  >
-                    <motion.path
-                      d="M20 6L9 17L4 12"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
-                    />
-                  </motion.svg>
-                ) : (
-                  <motion.svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="50"
-                    height="50"
-                    viewBox="0 0 50 50"
-                    fill="none"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.3, delay: 0.3 }}
-                  >
-                    <motion.path
-                      d="M25 50C38.8071 50 50 38.8071 50 25C50 11.1929 38.8071 0 25 0C11.1929 0 0 11.1929 0 25C0 38.8071 11.1929 50 25 50Z"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
-                    />
-                    <motion.path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M28.219 12.4297L27.2727 31.6401C27.2097 32.9196 26.2499 33.9719 24.9999 33.9719C23.7499 33.9719 22.7901 32.921 22.7271 31.6401L21.7808 12.4297C21.6084 8.91088 28.3916 8.91201 28.219 12.4297Z"
-                      fill="white"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
-                    />
-                    <motion.path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M25.0002 35.6641C26.255 35.6641 27.2727 36.6818 27.2727 37.9368C27.2727 39.1919 26.255 40.2096 25.0002 40.2096C23.7451 40.2096 22.7274 39.1919 22.7274 37.9368C22.7274 36.6818 23.7451 35.6641 25.0002 35.6641Z"
-                      fill="white"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ duration: 0.5, delay: 0.3 }}
-                    />
-                  </motion.svg>
-                )}
-              </motion.div>
-
-              {/* Content with animation */}
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.4 }}
-                className="text-[18px] font-medium mb-2 text-[#191919]"
-              >
-                {title}
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.5 }}
-                className="text-[18px] mb-8 text-[#191919] whitespace-pre-line"
-              >
-                {description}
-              </motion.p>
-
-              {/* Button with animation */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.6 }}
-                className="w-full"
-              >
-                <Button
-                  variant="secondary"
-                  className="w-full"
-                  onClick={() => {
-                    onButtonClick();
-                    onClose();
-                  }}
-                >
-                  {buttonText}
-                </Button>
-              </motion.div>
-            </div>
-          </motion.div>
+          <ResponseBottomModalContent
+            type={type}
+            title={title}
+            description={description}
+            buttonText={buttonText}
+            onButtonClick={onButtonClick}
+          />
         </>
       )}
     </AnimatePresence>
@@ -372,3 +70,141 @@ export const ResponseBottomModal = ({
 
   return createPortal(modalContent, document.body);
 };
+
+export const ResponseBottomModalContent = ({
+  type,
+  title,
+  description,
+  buttonText,
+  onButtonClick,
+}: ResponseBottomModalContentProps) => {
+  return (
+    <motion.div
+      initial={{ y: "100%" }}
+      animate={{ y: 0 }}
+      exit={{ y: "100%" }}
+      transition={{
+        type: "spring",
+        damping: 25,
+        stiffness: 200,
+      }}
+      className="fixed left-0 right-0 bottom-0 bg-white rounded-t-[40px] p-8 z-[9999]"
+      data-response-modal="true"
+    >
+      <div className="flex flex-col items-center text-center">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{
+            type: "spring",
+            damping: 10,
+            stiffness: 100,
+            delay: 0.2,
+          }}
+          className={cn(
+            "w-16 h-16 rounded-full flex items-center justify-center mb-6",
+            type === "success" ? "bg-[#34C759]" : "bg-[#FF3B30]"
+          )}
+        >
+          {type === "success" ? (
+            <motion.svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <motion.path
+                d="M20 6L9 17L4 12"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              />
+            </motion.svg>
+          ) : (
+            <motion.svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="50"
+              viewBox="0 0 50 50"
+              fill="none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+            >
+              <motion.path
+                d="M25 50C38.8071 50 50 38.8071 50 25C50 11.1929 38.8071 0 25 0C11.1929 0 0 11.1929 0 25C0 38.8071 11.1929 50 25 50Z"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              />
+              <motion.path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M28.219 12.4297L27.2727 31.6401C27.2097 32.9196 26.2499 33.9719 24.9999 33.9719C23.7499 33.9719 22.7901 32.921 22.7271 31.6401L21.7808 12.4297C21.6084 8.91088 28.3916 8.91201 28.219 12.4297Z"
+                fill="white"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              />
+              <motion.path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M25.0002 35.6641C26.255 35.6641 27.2727 36.6818 27.2727 37.9368C27.2727 39.1919 26.255 40.2096 25.0002 40.2096C23.7451 40.2096 22.7274 39.1919 22.7274 37.9368C22.7274 36.6818 23.7451 35.6641 25.0002 35.6641Z"
+                fill="white"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              />
+            </motion.svg>
+          )}
+        </motion.div>
+
+        {/* Content with animation */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          className="text-[18px] font-medium mb-2 text-[#191919]"
+        >
+          {title}
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
+          className="text-[18px] mb-8 text-[#191919] whitespace-pre-line"
+        >
+          {description}
+        </motion.p>
+
+        {/* Button with animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+          className="w-full"
+        >
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => {
+              onButtonClick();
+            }}
+          >
+            {buttonText}
+          </Button>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default ResponseBottomModal;

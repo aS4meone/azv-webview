@@ -2,7 +2,7 @@ import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
 import { CarInfoHeader, CarControlsSlider } from "../../ui";
 import {
-  useResponseModal,
+  ResponseBottomModalProps,
   VehicleActionSuccessModal,
   VehicleActionType,
 } from "@/shared/ui/modal";
@@ -22,6 +22,7 @@ import { MinutesRentalContent } from "./components/MinutesRentalContent";
 import { HoursRentalContent } from "./components/HoursRentalContent";
 import { DaysRentalContent } from "./components/DaysRentalContent";
 import Loader from "@/shared/ui/loader";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface UserInUseModalProps {
   user: IUser;
@@ -29,7 +30,6 @@ interface UserInUseModalProps {
 }
 
 export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
-  const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,6 +41,15 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   const [comment, setComment] = useState("");
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [isEndLoading, setIsEndLoading] = useState(false);
+
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
+
+  const handleClose = async () => {
+    setResponseModal(null);
+    await refreshUser();
+    onClose();
+  };
 
   const handlePhotoUpload = async (files: { [key: string]: File[] }) => {
     setIsLoading(true);
@@ -85,7 +94,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         setIsSuccessOpen(false);
       }, 1000);
     }
-  }, [isSuccessOpen]);
+  }, [isSuccessOpen, responseModal]);
 
   const car = user.current_rental!.car_details;
   const rentalDetails = user.current_rental!.rental_details;
@@ -103,11 +112,20 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
               ?.data?.detail
           : "Ошибка при попытке поставить на паузу";
 
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: async () => {
+          setResponseModal(null);
+          await refreshUser();
+        },
         type: "error",
+        title: "Ошибка",
         description: errorMessage || "Ошибка при попытке поставить на паузу",
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: async () => {
+          setResponseModal(null);
+          await refreshUser();
+        },
       });
     }
   };
@@ -123,11 +141,19 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
               ?.data?.detail
           : "Ошибка при попытке начать поездку";
 
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: async () => {
+          setResponseModal(null);
+          await refreshUser();
+        },
         type: "error",
+        title: "Ошибка",
         description: errorMessage || "Ошибка при попытке начать поездку",
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: async () => {
+          setResponseModal(null);
+        },
       });
     }
   };
@@ -142,13 +168,22 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       if (res.status === 200) {
         setIsEndLoading(false);
         setShowRatingModal(false);
-        onClose();
-        showModal({
+
+        setResponseModal({
+          isOpen: true,
+          onClose: async () => {
+            setResponseModal(null);
+            await refreshUser();
+            onClose();
+          },
           type: "success",
+          title: "Успешно",
           description: "Аренда успешно завершена",
           buttonText: "Отлично",
-          onClose: async () => {
+          onButtonClick: async () => {
+            setResponseModal(null);
             await refreshUser();
+            onClose();
           },
         });
       }
@@ -160,11 +195,14 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
               ?.data?.detail
           : "Произошла ошибка при завершении аренды";
 
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: () => {},
         type: "error",
+        title: "Ошибка",
         description: errorMessage || "Произошла ошибка при завершении аренды",
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: () => {},
       });
     }
   };
@@ -180,12 +218,15 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
               ?.data?.detail
           : "Ошибка при попытке заблокировать автомобиль";
 
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: () => {},
         type: "error",
+        title: "Ошибка",
         description:
           errorMessage || "Ошибка при попытке заблокировать автомобиль",
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: () => {},
       });
     }
   };
@@ -201,12 +242,15 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
               ?.data?.detail
           : "Ошибка при попытке разблокировать автомобиль";
 
-      showModal({
+      setResponseModal({
+        isOpen: true,
+        onClose: () => {},
         type: "error",
+        title: "Ошибка",
         description:
           errorMessage || "Ошибка при попытке разблокировать автомобиль",
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onButtonClick: () => {},
       });
     }
   };
@@ -235,6 +279,14 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       <div className="p-6 pt-4 space-y-6">
         <CarInfoHeader car={car} />
       </div>
+      <CustomResponseModal
+        onButtonClick={handleClose}
+        isOpen={!!responseModal}
+        onClose={handleClose}
+        title={responseModal?.title || ""}
+        description={responseModal?.description || ""}
+        buttonText={responseModal?.buttonText || ""}
+      />
       <VehicleActionSuccessModal
         isOpen={isSuccessOpen}
         onClose={() => {

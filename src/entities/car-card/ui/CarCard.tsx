@@ -12,12 +12,11 @@ const CarCard = ({ car, onCarClick }: CarCardProps) => {
   const router = useRouter();
 
   const handleClick = () => {
+    router.push(
+      `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
+    );
     if (onCarClick) {
       onCarClick(car);
-    } else {
-      router.push(
-        `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
-      );
     }
   };
 

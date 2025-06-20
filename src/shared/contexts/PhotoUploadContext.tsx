@@ -267,6 +267,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           isOpen={true}
           onClose={() => setUploadRequired(USER_UPLOAD, false)}
           isLoading={isLoading}
+          isCloseable={false}
         />
       )}
 
@@ -278,6 +279,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           isOpen={true}
           onClose={() => setUploadRequired(OWNER_UPLOAD, false)}
           isLoading={isLoading}
+          isCloseable={false}
         />
       )}
 
@@ -289,6 +291,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           isOpen={true}
           onClose={() => setUploadRequired(SERVICE_UPLOAD, false)}
           isLoading={isLoading}
+          isCloseable={false}
         />
       )}
 
@@ -300,6 +303,7 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
           isOpen={true}
           onClose={() => setUploadRequired(DELIVERY_UPLOAD, false)}
           isLoading={isLoading}
+          isCloseable={false}
         />
       )}
     </PhotoUploadMgrContext.Provider>

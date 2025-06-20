@@ -2,8 +2,8 @@
 
 import { ArrowRightIcon } from "@/shared/icons";
 import { useState } from "react";
-import PushScreen from "@/shared/ui/push-screen";
 import { TermsContent } from "./TermsContent";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
 interface ITermsViewCard {
   title: string;
@@ -23,11 +23,14 @@ const TermsViewCard = ({ title, contentKey }: ITermsViewCard) => {
         <ArrowRightIcon />
       </button>
 
-      {isOpen && (
-        <PushScreen onClose={() => setIsOpen(false)} withCloseButton>
-          <TermsContent contentKey={contentKey} />
-        </PushScreen>
-      )}
+      <CustomPushScreen
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        direction="bottom"
+        height="auto"
+      >
+        <TermsContent contentKey={contentKey} />
+      </CustomPushScreen>
     </>
   );
 };

@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { CameraIcon, GoodIcon, BadIcon } from "@/shared/icons";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { Button } from "@/shared/ui";
-import PushScreen from "@/shared/ui/push-screen";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import Loader from "@/shared/ui/loader";
 import { FlutterCamera } from "@/shared/utils/flutter-camera";
 
@@ -25,6 +25,7 @@ interface UploadPhotoProps {
   onClose?: () => void;
   withCloseButton?: boolean;
   isLoading?: boolean;
+  isCloseable?: boolean;
 }
 
 export const UploadPhoto: React.FC<UploadPhotoProps> = ({
@@ -34,6 +35,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   onClose,
   withCloseButton = false,
   isLoading = false,
+  isCloseable = true,
 }) => {
   const { showModal } = useResponseModal();
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
@@ -200,7 +202,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     });
   };
 
-  // Обработка выбора фото через HTML input (fallback)
   const handlePhotoSelect = async (
     photoId: string,
     event: React.ChangeEvent<HTMLInputElement>
@@ -294,7 +295,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const isFlutterAvailable = FlutterCamera.isAvailable();
 
   const content = (
-    <div className="flex flex-col gap-8 pb-[100px]">
+    <div className="flex flex-col gap-8 pb-[100px] pt-12">
       {config.map((photo) => (
         <div key={photo.id} className="flex flex-col gap-2">
           <div className="flex items-start gap-2">
@@ -400,13 +401,15 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   }
 
   const modalContent = (
-    <PushScreen
-      closeOnScroll={false}
-      onClose={onClose}
-      withCloseButton={withCloseButton}
+    <CustomPushScreen
+      isOpen={true}
+      onClose={onClose || (() => {})}
+      direction="bottom"
+      withHeader={withCloseButton}
+      isCloseable={isCloseable}
     >
-      <div className="flex flex-col min-h-full bg-white py-10">
-        <div className="flex-1 pt-4">{content}</div>
+      <div className="flex flex-col min-h-full bg-white">
+        <div className="flex-1">{content}</div>
         {allPhotosUploaded && (
           <div className="sticky bottom-0  pt-4 pb-8">
             <Button
@@ -420,7 +423,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
           </div>
         )}
       </div>
-    </PushScreen>
+    </CustomPushScreen>
   );
 
   // Рендерим через Portal в корень DOM

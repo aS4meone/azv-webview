@@ -100,15 +100,16 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
   const statusInfo = getStatusInfo();
 
   return (
-    <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
-      {/* Status Bar */}
-      <div className="bg-blue-500 text-white px-6 py-4 flex items-center space-x-3 rounded-[40px] -top-[70px] absolute left-4 right-4">
-        <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-        <span className="text-lg font-medium">{statusInfo.title}</span>
+    <div className="rounded-t-[24px] w-full mb-0 relative bg-transparent flex flex-col gap-4">
+      <div className="px-4">
+        <div className="bg-blue-500 text-white px-6 py-4 flex items-center space-x-3 rounded-[40px] w-[100%]">
+          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+          <span className="text-lg font-medium">{statusInfo.title}</span>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="p-6 pt-4 space-y-6">
+      <div className="p-6 pt-4 space-y-6 bg-white overflow-hidden rounded-t-[24px]">
         {/* Status Description */}
         <div className="text-center">
           <p className="text-gray-600 text-lg mb-4">{statusInfo.description}</p>

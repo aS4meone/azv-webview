@@ -17,7 +17,7 @@ const GetUserData = ({
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
   ) : (
-    <div className="flex-1 px-8 py-6 space-y-6 overflow-y-auto">
+    <div className="flex-1 space-y-6 overflow-y-auto">
       <UserData user={user} />
 
       {user.role === UserRole.USER ||

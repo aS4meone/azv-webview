@@ -5,7 +5,7 @@ import { CustomAppBar } from "@/widgets/appbars";
 import React, { useEffect } from "react";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 
-const MyCarsPage = () => {
+const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
   const { fetchAllVehicles, allVehicles, isLoadingAll } = useVehiclesStore();
 
   useEffect(() => {
@@ -24,7 +24,9 @@ const MyCarsPage = () => {
           ) : allVehicles.filter((car) => car.owned_car).length > 0 ? (
             allVehicles
               .filter((car) => car.owned_car)
-              .map((car) => <CarCard key={car.id} car={car} />)
+              .map((car) => (
+                <CarCard onCarClick={onClose} key={car.id} car={car} />
+              ))
           ) : (
             <div className="text-center py-4 text-[#191919] text-[16px]">
               Ничего не найдено

@@ -2,9 +2,10 @@ import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
-import { useResponseModal } from "@/shared/ui/modal";
+import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { useUserStore } from "@/shared/stores/userStore";
 import { TrackingDataScreen } from "../../screens/tracking-screen/TrackingDataScreen";
+import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface MechanicTrackingCarModalProps {
   car: ICar;
@@ -18,20 +19,28 @@ export const MechanicTrackingCarModal = ({
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const [showDataScreen, setShowDataScreen] = useState(false);
+  const [responseModal, setResponseModal] =
+    useState<ResponseBottomModalProps | null>(null);
+
+  const handleClose = async () => {
+    setResponseModal(null);
+    onClose();
+    await refreshUser();
+  };
 
   const handleCompleteTracking = async () => {
     try {
       // Удаляем ID машины из localStorage
       localStorage.removeItem("tracking_car_id");
 
-      showModal({
+      setResponseModal({
         type: "success",
-        description: "Слежка завершена",
+        isOpen: true,
+        title: "Слежка завершена",
+        description: "Слежка успешно завершена",
         buttonText: "Отлично",
-        onClose: async () => {
-          onClose();
-          await refreshUser();
-        },
+        onButtonClick: handleClose,
+        onClose: handleClose,
       });
     } catch (error) {
       console.log(error);
@@ -57,6 +66,15 @@ export const MechanicTrackingCarModal = ({
           height="h-64"
           showProgressIndicator
           rounded={true}
+        />
+
+        <CustomResponseModal
+          isOpen={responseModal?.isOpen || false}
+          onClose={responseModal?.onClose || (() => {})}
+          title={responseModal?.title || ""}
+          description={responseModal?.description || ""}
+          buttonText={responseModal?.buttonText || ""}
+          onButtonClick={responseModal?.onButtonClick || (() => {})}
         />
 
         {/* Content */}

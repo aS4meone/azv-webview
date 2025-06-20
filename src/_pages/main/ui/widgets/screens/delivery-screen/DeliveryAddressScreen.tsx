@@ -234,18 +234,7 @@ export const DeliveryAddressScreen = ({
   );
 
   return (
-    <div className="bg-white h-full flex flex-col py-10">
-      {/* Header */}
-      <div className="flex items-center p-4 border-b border-gray-200">
-        <button
-          onClick={onBack}
-          className="mr-4 p-1 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeftIcon />
-        </button>
-        <h1 className=" text-[#191919]">Выберите адрес доставки</h1>
-      </div>
-
+    <div className="bg-white h-full flex flex-col ">
       {/* Map */}
       <div className="flex-1 relative">
         <BaseMap
@@ -264,17 +253,6 @@ export const DeliveryAddressScreen = ({
 
         {/* Center Marker (Fixed in center) */}
         <CenterMarker size="medium" color="#ef4444" />
-
-        {/* Instructions */}
-        <div className="absolute top-4 left-4 right-4 bg-white rounded-lg shadow-lg p-3 border border-gray-100">
-          <p className="text-sm text-gray-600 flex items-center gap-2">
-            <InfoIcon />
-            <span>
-              Перемещайте карту, чтобы выбрать адрес доставки в синей зоне
-              обслуживания
-            </span>
-          </p>
-        </div>
 
         {/* My Location Button */}
         <div className="absolute bottom-4 right-4">

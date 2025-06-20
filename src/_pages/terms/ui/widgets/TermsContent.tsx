@@ -44,5 +44,5 @@ export const TermsContent = ({
     }
   };
 
-  return renderContent();
+  return <div className="pt-12">{renderContent()}</div>;
 };
