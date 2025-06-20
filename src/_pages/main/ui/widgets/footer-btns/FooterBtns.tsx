@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import {
   RoadIcon,
   UserIcon,
@@ -10,7 +11,6 @@ import { UserRole } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { Button } from "@/shared/ui";
-import { useState } from "react";
 import FooterHaveCar from "./FooterHaveCar";
 import FooterDeliveryCar from "./FooterDeliveryCar";
 import { ICar } from "@/shared/models/types/car";
@@ -32,10 +32,17 @@ enum ServiceButtonType {
 
 const FooterBtns = () => {
   const { user } = useUserStore();
-  const { currentDeliveryVehicle, allMechanicVehicles } = useVehiclesStore();
+  const {
+    allMechanicVehicles,
+
+    currentDeliveryVehicle,
+  } = useVehiclesStore();
+
   const [activeServiceButton, setActiveServiceButton] =
-    useState<ServiceButtonType>(ServiceButtonType.CHECK);
+    useState<ServiceButtonType | null>(null);
   const [currentComponent, setCurrentComponent] = useState<string | null>(null);
+  const [lastClickTime, setLastClickTime] = useState(0);
+
   const trackingCarId = localStorage.getItem("tracking_car_id");
 
   const components = [
@@ -86,6 +93,37 @@ const FooterBtns = () => {
 
   if (!user) return null;
 
+  // ИСПРАВЛЕНИЕ: Дебаунсинг для предотвращения двойных кликов
+  const clickDebounceTime = 300;
+
+  const handleServiceButtonClick = (buttonType: ServiceButtonType) => {
+    const currentTime = Date.now();
+
+    // Дебаунсинг для предотвращения двойных кликов
+    if (currentTime - lastClickTime < clickDebounceTime) {
+      return;
+    }
+    setLastClickTime(currentTime);
+
+    if (activeServiceButton === buttonType) {
+      // Already active, show component
+      switch (buttonType) {
+        case ServiceButtonType.CHECK:
+          setCurrentComponent("mechanic_pending");
+          break;
+        case ServiceButtonType.DELIVERING:
+          setCurrentComponent("mechanic_delivery");
+          break;
+        case ServiceButtonType.RENT:
+          setCurrentComponent("mechanic_in_rent");
+          break;
+      }
+    } else {
+      // Not active yet, just activate
+      setActiveServiceButton(buttonType);
+    }
+  };
+
   if (trackingCarId && trackingCar) {
     return <FooterTrackingCar user={user} car={trackingCar} />;
   }
@@ -106,26 +144,6 @@ const FooterBtns = () => {
     return <FooterDeliveryCar car={currentDeliveryVehicle} user={user} />;
   }
 
-  const handleServiceButtonClick = (buttonType: ServiceButtonType) => {
-    if (activeServiceButton === buttonType) {
-      // Already active, show component
-      switch (buttonType) {
-        case ServiceButtonType.CHECK:
-          setCurrentComponent("mechanic_pending");
-          break;
-        case ServiceButtonType.DELIVERING:
-          setCurrentComponent("mechanic_delivery");
-          break;
-        case ServiceButtonType.RENT:
-          setCurrentComponent("mechanic_in_rent");
-          break;
-      }
-    } else {
-      // Not active yet, just activate
-      setActiveServiceButton(buttonType);
-    }
-  };
-
   const renderServiceButton = (
     buttonType: ServiceButtonType,
     icon: React.ReactNode,
@@ -143,9 +161,15 @@ const FooterBtns = () => {
           font-medium text-base text-[#191919]
           min-w-[55px] h-12 cursor-pointer overflow-hidden
           transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]
-          hover:shadow-lg active:scale-95
+          hover:shadow-lg active:scale-95 service-button
           ${isActive ? "w-[170px] px-4" : "w-[55px] px-2"}
         `}
+        style={{
+          touchAction: "manipulation",
+          WebkitTouchCallout: "none",
+          WebkitTapHighlightColor: "transparent",
+          pointerEvents: "auto",
+        }}
       >
         <div
           className={`

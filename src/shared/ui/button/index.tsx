@@ -2,7 +2,7 @@
 
 import { cn } from "@/shared/utils/cn";
 import Link from "next/link";
-import { ButtonHTMLAttributes, ReactNode, useRef } from "react";
+import { ButtonHTMLAttributes, ReactNode, useRef, useCallback } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -20,8 +20,43 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const lastClickTime = useRef<number>(0);
+  const CLICK_DEBOUNCE_TIME = 300;
 
   const disabled = props.disabled || false;
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      const currentTime = Date.now();
+      if (currentTime - lastClickTime.current < CLICK_DEBOUNCE_TIME) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
+      lastClickTime.current = currentTime;
+
+      if (buttonRef.current) {
+        buttonRef.current.style.pointerEvents = "none";
+        setTimeout(() => {
+          if (buttonRef.current) {
+            buttonRef.current.style.pointerEvents = "auto";
+          }
+        }, 300);
+      }
+
+      if (props.onClick) {
+        props.onClick(e);
+      }
+    },
+    [disabled, props.onClick]
+  );
 
   const buttonClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
     primary: "bg-white text-black",
@@ -39,6 +74,11 @@ const Button = ({
           disabled && "opacity-50 cursor-not-allowed active:scale-100",
           className
         )}
+        style={{
+          touchAction: "manipulation",
+          WebkitTouchCallout: "none",
+          WebkitTapHighlightColor: "transparent",
+        }}
       >
         {children}
       </div>
@@ -56,7 +96,14 @@ const Button = ({
             buttonClasses[variant],
             className
           )}
+          style={{
+            touchAction: "manipulation",
+            WebkitTouchCallout: "none",
+            WebkitTapHighlightColor: "transparent",
+            pointerEvents: disabled ? "none" : "auto",
+          }}
           {...props}
+          onClick={handleClick}
         >
           {children}
         </button>
@@ -72,7 +119,14 @@ const Button = ({
         disabled && "opacity-50 cursor-not-allowed active:scale-100",
         className
       )}
+      style={{
+        touchAction: "manipulation",
+        WebkitTouchCallout: "none",
+        WebkitTapHighlightColor: "transparent",
+        pointerEvents: disabled ? "none" : "auto",
+      }}
       {...props}
+      onClick={handleClick}
     >
       {children}
     </button>
