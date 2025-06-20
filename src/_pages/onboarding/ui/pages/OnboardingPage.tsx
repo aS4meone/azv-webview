@@ -7,8 +7,10 @@ import "swiper/css";
 import { Button, ProgressIndicator } from "@/shared/ui";
 import { ROUTES } from "@/shared/constants/routes";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 const OnboardingPage = () => {
+  const router = useRouter();
   const [activeSlide, setActiveSlide] = useState(0);
   const t = useTranslations();
 
@@ -49,7 +51,7 @@ const OnboardingPage = () => {
         </div>
         <ProgressIndicator current={activeSlide} total={slides.length} />
 
-        <Button link={ROUTES.AUTH} variant="primary">
+        <Button onClick={() => router.push(ROUTES.AUTH)} variant="primary">
           {t("onboarding.login")}
         </Button>
         <p className="text-[12px] text-white">

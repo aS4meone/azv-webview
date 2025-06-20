@@ -39,6 +39,13 @@ const AuthPage = () => {
       description: `${t("auth.otp.description")} +7 ${formatPhone(phone)}`,
     },
   ];
+  const handleBack = () => {
+    if (activeStep === 0) {
+      router.push(ROUTES.ONBOARDING);
+    } else {
+      setActiveStep(0);
+    }
+  };
 
   const handleNext = async () => {
     if (activeStep === 0) {
@@ -82,10 +89,7 @@ const AuthPage = () => {
 
   return (
     <article className="h-screen flex flex-col py-10 bg-[#191919]">
-      <DefaultAppBar
-        link={activeStep === 0 ? ROUTES.ONBOARDING : undefined}
-        onClick={activeStep === 1 ? () => setActiveStep(0) : undefined}
-      />
+      <DefaultAppBar onClick={handleBack} />
       <div className="px-10 flex flex-col justify-between h-full mt-[20%] text-white">
         <section>
           <h2 className="text-[24px] font-medium mt-2">

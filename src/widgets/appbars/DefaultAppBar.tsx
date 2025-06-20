@@ -4,16 +4,10 @@ import { Button } from "@/shared/ui";
 
 import React from "react";
 
-const DefaultAppBar = ({
-  link,
-  onClick,
-}: {
-  link?: string;
-  onClick?: () => void;
-}) => {
+const DefaultAppBar = ({ onClick }: { onClick?: () => void }) => {
   return (
     <header className="flex items-center justify-between px-10 py-4">
-      <Button variant="icon" link={link} onClick={onClick}>
+      <Button variant="icon" onClick={onClick}>
         <ArrowLeftIcon />
       </Button>
       <LogoIcon />
