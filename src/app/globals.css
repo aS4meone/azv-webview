@@ -45,12 +45,8 @@
 
 html,
 body {
-  touch-action: manipulation;
+  touch-action: pan-y;
   overscroll-behavior-x: contain;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 body {
@@ -132,83 +128,5 @@ body {
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-/* ИСПРАВЛЕНИЯ ДЛЯ WEBVIEW КАСАНИЙ И КЛИКОВ */
-@layer utilities {
-  /* Исправляем кнопки и интерактивные элементы */
-  button,
-  [role="button"],
-  .cursor-pointer {
-    touch-action: manipulation !important;
-    -webkit-touch-callout: none !important;
-    -webkit-tap-highlight-color: transparent !important;
-    -webkit-user-select: none !important;
-    user-select: none !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-  }
-
-  /* Исправляем активные состояния */
-  .active\:scale-95:active,
-  .active\:scale-\[0\.98\]:active,
-  .active\:scale-\[0\.95\]:active,
-  .hover\:scale-\[1\.02\]:active {
-    transform: scale(0.95) !important;
-    transition: transform 0.1s ease !important;
-  }
-
-  /* Исправляем модальные окна и push screens */
-  .push-screen,
-  .push-screen-container,
-  [data-push-screen="true"] {
-    touch-action: manipulation !important;
-    pointer-events: auto !important;
-  }
-
-  /* Исправляем z-index проблемы */
-  .z-\[9998\],
-  .z-\[9999\] {
-    z-index: 9998 !important;
-  }
-
-  .z-30 {
-    z-index: 9999 !important;
-  }
-
-  /* Улучшаем обработку касаний для карт */
-  .map-zoom-controls button {
-    touch-action: manipulation !important;
-    -webkit-tap-highlight-color: transparent !important;
-  }
-
-  /* Исправляем проблемы с input элементами */
-  input[type="number"],
-  input[type="text"],
-  input[type="tel"] {
-    touch-action: manipulation !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-  }
-
-  /* Исправляем drag элементы */
-  [draggable="true"] {
-    -webkit-user-drag: element !important;
-    user-drag: element !important;
-  }
-
-  /* Исправляем swiper элементы */
-  .swiper,
-  .swiper-slide {
-    touch-action: pan-y pinch-zoom !important;
-  }
-
-  /* Исправляем footer кнопки */
-  .footer-button,
-  .service-button {
-    touch-action: manipulation !important;
-    pointer-events: auto !important;
-    -webkit-tap-highlight-color: transparent !important;
   }
 }

@@ -32,16 +32,11 @@ enum ServiceButtonType {
 
 const FooterBtns = () => {
   const { user } = useUserStore();
-  const {
-    allMechanicVehicles,
-
-    currentDeliveryVehicle,
-  } = useVehiclesStore();
+  const { allMechanicVehicles, currentDeliveryVehicle } = useVehiclesStore();
 
   const [activeServiceButton, setActiveServiceButton] =
     useState<ServiceButtonType | null>(null);
   const [currentComponent, setCurrentComponent] = useState<string | null>(null);
-  const [lastClickTime, setLastClickTime] = useState(0);
 
   const trackingCarId = localStorage.getItem("tracking_car_id");
 
@@ -93,18 +88,7 @@ const FooterBtns = () => {
 
   if (!user) return null;
 
-  // ИСПРАВЛЕНИЕ: Дебаунсинг для предотвращения двойных кликов
-  const clickDebounceTime = 300;
-
   const handleServiceButtonClick = (buttonType: ServiceButtonType) => {
-    const currentTime = Date.now();
-
-    // Дебаунсинг для предотвращения двойных кликов
-    if (currentTime - lastClickTime < clickDebounceTime) {
-      return;
-    }
-    setLastClickTime(currentTime);
-
     if (activeServiceButton === buttonType) {
       // Already active, show component
       switch (buttonType) {

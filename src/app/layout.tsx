@@ -12,7 +12,6 @@ import {
 } from "@/shared/ui/modal";
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 import { DeliveryPointProvider } from "@/shared/contexts/DeliveryPointContext";
-import "@/shared/utils/webviewOptimization";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
