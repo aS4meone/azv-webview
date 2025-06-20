@@ -13,6 +13,9 @@ import {
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 import { DeliveryPointProvider } from "@/shared/contexts/DeliveryPointContext";
 
+// Импортируем click fixer для автоматического исправления кликов в WebView
+import "@/shared/utils/clickFix";
+
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],

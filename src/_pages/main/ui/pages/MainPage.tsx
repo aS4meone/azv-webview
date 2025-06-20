@@ -12,6 +12,7 @@ import { RentalStatus } from "@/shared/models/types/current-rental";
 import { handleCarInteraction } from "../../utils/car-interaction";
 import { preventEdgeSwipeNavigation } from "@/shared/utils/preventEdgeSwipe";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { refreshClickFixer } from "@/shared/utils/clickFix";
 
 import { SupportPage } from "@/_pages/support";
 import SearchPage from "@/_pages/search";
@@ -36,6 +37,20 @@ export default function GoogleMapsPage() {
   ];
   useEffect(() => {
     preventEdgeSwipeNavigation();
+
+    // Устанавливаем периодическую проверку и восстановление кликов для WebView
+    const clickCheckInterval = setInterval(() => {
+      if (
+        typeof (window as { flutter_inappwebview?: unknown })
+          .flutter_inappwebview !== "undefined"
+      ) {
+        refreshClickFixer();
+      }
+    }, 10000); // Каждые 10 секунд
+
+    return () => {
+      clearInterval(clickCheckInterval);
+    };
   }, []);
 
   useEffect(() => {
