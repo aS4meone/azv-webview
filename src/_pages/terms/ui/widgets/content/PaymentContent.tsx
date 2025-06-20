@@ -81,8 +81,8 @@ export const PaymentContent = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900">Оплата и тарифы</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-black">Оплата и тарифы</h1>
+        <p className="text-black/60">
           Удобные способы оплаты и гибкие тарифы для любых задач
         </p>
       </div>
@@ -91,10 +91,10 @@ export const PaymentContent = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
+            <CreditCard className="w-5 h-5 text-[#1D77FF]" />
             Способы оплаты
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-black/60">
             Выберите удобный способ оплаты из доступных вариантов
           </CardDescription>
         </CardHeader>
@@ -106,19 +106,17 @@ export const PaymentContent = () => {
                 className="relative p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer group"
               >
                 {method.popular && (
-                  <Badge className="absolute -top-2 -right-2 bg-blue-500">
+                  <Badge className="absolute -top-2 -right-2 bg-[#1D77FF]">
                     Популярно
                   </Badge>
                 )}
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gray-100 rounded-lg group-hover:bg-blue-50 transition-colors">
+                  <div className="p-2 bg-[#1D77FF]/10 rounded-lg group-hover:bg-[#1D77FF]/20 transition-colors text-[#1D77FF]">
                     {method.icon}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
-                      {method.name}
-                    </h4>
-                    <p className="text-sm text-gray-600">
+                    <h4 className="font-semibold text-black">{method.name}</h4>
+                    <p className="text-sm text-black/60">
                       {method.description}
                     </p>
                   </div>
@@ -133,10 +131,10 @@ export const PaymentContent = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Timer className="w-5 h-5" />
+            <Timer className="w-5 h-5 text-[#1D77FF]" />
             Тарифы
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-black/60">
             Выберите подходящий тариф в зависимости от продолжительности поездки
           </CardDescription>
         </CardHeader>
@@ -147,28 +145,26 @@ export const PaymentContent = () => {
                 key={index}
                 className={`relative p-6 border rounded-lg transition-all hover:shadow-lg ${
                   item.recommended
-                    ? "border-blue-500 bg-blue-50/50"
-                    : "hover:border-gray-300"
+                    ? "border-[#1D77FF] bg-[#1D77FF]/5"
+                    : "hover:border-black/30"
                 }`}
               >
                 {item.recommended && (
-                  <Badge className="absolute -top-2 -right-2 bg-green-500">
+                  <Badge className="absolute -top-2 -right-2 bg-[#1D77FF]">
                     Рекомендуем
                   </Badge>
                 )}
                 <div className="text-center space-y-3">
-                  <div className="p-3 bg-white rounded-lg w-fit mx-auto">
+                  <div className="p-3 bg-white rounded-lg w-fit mx-auto text-[#1D77FF]">
                     {item.icon}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
-                      {item.service}
-                    </h4>
-                    <p className="text-2xl font-bold text-blue-600 mt-1">
+                    <h4 className="font-semibold text-black">{item.service}</h4>
+                    <p className="text-2xl font-bold text-[#1D77FF] mt-1">
                       {item.price}
                     </p>
                     {item.note && (
-                      <p className="text-sm text-gray-500 mt-1">{item.note}</p>
+                      <p className="text-sm text-black/50 mt-1">{item.note}</p>
                     )}
                   </div>
                 </div>
@@ -179,40 +175,40 @@ export const PaymentContent = () => {
       </Card>
 
       {/* Important Info */}
-      <Card className="border-blue-200 bg-blue-50/50">
+      <Card className="border-[#1D77FF] bg-[#1D77FF]/5">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-900">
-            <Info className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-black">
+            <Info className="w-5 h-5 text-[#1D77FF]" />
             Важная информация
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#1D77FF] mt-0.5" />
               <div>
-                <h4 className="font-medium text-blue-900">
+                <h4 className="font-medium text-black">
                   Автоматическая оплата
                 </h4>
-                <p className="text-sm text-blue-700">
+                <p className="text-sm text-black/70">
                   Оплата списывается после завершения аренды
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#1D77FF] mt-0.5" />
               <div>
-                <h4 className="font-medium text-blue-900">Депозит</h4>
-                <p className="text-sm text-blue-700">
+                <h4 className="font-medium text-black">Депозит</h4>
+                <p className="text-sm text-black/70">
                   При бронировании замораживается сумма депозита
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Shield className="w-5 h-5 text-[#1D77FF] mt-0.5" />
               <div>
-                <h4 className="font-medium text-blue-900">Возврат средств</h4>
-                <p className="text-sm text-blue-700">
+                <h4 className="font-medium text-black">Возврат средств</h4>
+                <p className="text-sm text-black/70">
                   Возврат на карту в течение 3-5 рабочих дней
                 </p>
               </div>

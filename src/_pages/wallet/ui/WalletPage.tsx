@@ -158,7 +158,6 @@ const WalletPage = () => {
     <article className="flex overflow-y-auto flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10">
       <CustomAppBar backHref={redirectRoute} title={t("title")} />
 
-      {/* Balance Section */}
       <section className="px-6 mt-8">
         <div className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-[40px] p-8 text-white shadow-2xl shadow-gray-900/25">
           {/* Background pattern */}
@@ -174,7 +173,7 @@ const WalletPage = () => {
               </p>
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
             </div>
-            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+            <h1 className="t  ext-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               {formatBalance(balance)} ₸
             </h1>
             <p className="text-xs text-white/50">Доступно для использования</p>

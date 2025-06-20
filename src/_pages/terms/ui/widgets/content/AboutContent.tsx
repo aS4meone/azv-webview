@@ -19,7 +19,6 @@ interface FeatureCard {
   title: string;
   description: string;
   icon: React.ReactNode;
-  color: string;
 }
 
 interface StatCard {
@@ -35,26 +34,22 @@ export const AboutContent = () => {
       description:
         "Оформление аренды занимает всего несколько минут через приложение",
       icon: <Zap className="w-6 h-6" />,
-      color: "yellow",
     },
     {
       title: "Гибкие тарифы",
       description:
         "Выбирайте удобный тариф: поминутный, почасовой или посуточный",
       icon: <DollarSign className="w-6 h-6" />,
-      color: "green",
     },
     {
       title: "Страховка включена",
       description: "Все автомобили застрахованы по КАСКО и ОСАГО",
       icon: <Shield className="w-6 h-6" />,
-      color: "blue",
     },
     {
       title: "Поддержка 24/7",
       description: "Наша служба поддержки всегда готова помочь",
       icon: <Phone className="w-6 h-6" />,
-      color: "purple",
     },
   ];
 
@@ -81,14 +76,14 @@ export const AboutContent = () => {
       {/* Hero Section */}
       <div className="text-center space-y-6">
         <div className="flex justify-center">
-          <Badge className="text-sm px-4 py-2 bg-blue-100 text-blue-800">
+          <Badge className="text-sm px-4 py-2 bg-[#1D77FF] text-white">
             О компании AZV Motors
           </Badge>
         </div>
-        <h1 className="text-4xl font-bold text-gray-900">
+        <h1 className="text-4xl font-bold text-black">
           Современный сервис аренды автомобилей
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-xl text-black/60 max-w-3xl mx-auto leading-relaxed">
           AZV Motors - это современный сервис аренды автомобилей, который делает
           процесс аренды максимально простым и удобным. Мы предлагаем широкий
           выбор автомобилей и гибкие условия аренды.
@@ -101,12 +96,14 @@ export const AboutContent = () => {
           <Card key={index} className="text-center">
             <CardContent className="pt-6">
               <div className="flex justify-center mb-4">
-                <div className="p-3 bg-blue-100 rounded-full">{stat.icon}</div>
+                <div className="p-3 bg-[#1D77FF]/10 rounded-full text-[#1D77FF]">
+                  {stat.icon}
+                </div>
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="text-3xl font-bold text-black mb-2">
                 {stat.value}
               </div>
-              <div className="text-gray-600">{stat.label}</div>
+              <div className="text-black/60">{stat.label}</div>
             </CardContent>
           </Card>
         ))}
@@ -115,10 +112,10 @@ export const AboutContent = () => {
       {/* Features */}
       <div>
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-black mb-4">
             Почему выбирают нас
           </h2>
-          <p className="text-gray-600">
+          <p className="text-black/60">
             Мы предлагаем лучшие условия аренды и высокое качество сервиса
           </p>
         </div>
@@ -130,13 +127,13 @@ export const AboutContent = () => {
               className="h-full hover:shadow-lg transition-shadow"
             >
               <CardHeader>
-                <div className={`p-3 w-fit rounded-lg bg-${feature.color}-100`}>
+                <div className="p-3 w-fit rounded-lg bg-[#1D77FF]/10 text-[#1D77FF]">
                   {feature.icon}
                 </div>
                 <CardTitle className="text-lg">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-black/60">{feature.description}</p>
               </CardContent>
             </Card>
           ))}
@@ -144,15 +141,15 @@ export const AboutContent = () => {
       </div>
 
       {/* Mission */}
-      <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="border-[#1D77FF] bg-[#1D77FF]/5">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Target className="w-6 h-6 text-blue-600" />
-            <CardTitle className="text-blue-900">Наша миссия</CardTitle>
+            <Target className="w-6 h-6 text-[#1D77FF]" />
+            <CardTitle className="text-black">Наша миссия</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-blue-800 text-lg leading-relaxed">
+          <p className="text-black text-lg leading-relaxed">
             Сделать аренду автомобилей доступной и удобной для каждого,
             предоставляя качественный сервис и современные технологические
             решения. Мы стремимся к тому, чтобы каждая поездка с нами была
@@ -165,11 +162,11 @@ export const AboutContent = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="text-center">
           <CardContent className="pt-6">
-            <div className="p-3 bg-green-100 rounded-full w-fit mx-auto mb-4">
-              <Shield className="w-6 h-6 text-green-600" />
+            <div className="p-3 bg-[#1D77FF]/10 rounded-full w-fit mx-auto mb-4">
+              <Shield className="w-6 h-6 text-[#1D77FF]" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Безопасность</h3>
-            <p className="text-gray-600 text-sm">
+            <h3 className="font-semibold text-black mb-2">Безопасность</h3>
+            <p className="text-black/60 text-sm">
               Все автомобили проходят регулярное техническое обслуживание
             </p>
           </CardContent>
@@ -177,13 +174,13 @@ export const AboutContent = () => {
 
         <Card className="text-center">
           <CardContent className="pt-6">
-            <div className="p-3 bg-purple-100 rounded-full w-fit mx-auto mb-4">
-              <Users className="w-6 h-6 text-purple-600" />
+            <div className="p-3 bg-[#1D77FF]/10 rounded-full w-fit mx-auto mb-4">
+              <Users className="w-6 h-6 text-[#1D77FF]" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">
+            <h3 className="font-semibold text-black mb-2">
               Клиентоориентированность
             </h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-black/60 text-sm">
               Мы всегда готовы помочь и решить любые вопросы
             </p>
           </CardContent>
@@ -191,11 +188,11 @@ export const AboutContent = () => {
 
         <Card className="text-center">
           <CardContent className="pt-6">
-            <div className="p-3 bg-orange-100 rounded-full w-fit mx-auto mb-4">
-              <Award className="w-6 h-6 text-orange-600" />
+            <div className="p-3 bg-[#1D77FF]/10 rounded-full w-fit mx-auto mb-4">
+              <Award className="w-6 h-6 text-[#1D77FF]" />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Качество</h3>
-            <p className="text-gray-600 text-sm">
+            <h3 className="font-semibold text-black mb-2">Качество</h3>
+            <p className="text-black/60 text-sm">
               Высокие стандарты обслуживания и современный автопарк
             </p>
           </CardContent>

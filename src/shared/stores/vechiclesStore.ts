@@ -111,6 +111,22 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           currentDeliveryVehicle: car,
           isCurrentDeliveryVehicle: false,
         });
+
+        // Если есть координаты доставки и статус соответствует, обновляем контекст
+        if (
+          car.delivery_coordinates &&
+          car.status === CarStatus.deliveryInProgress
+        ) {
+          // Здесь мы не можем напрямую использовать хук useDeliveryPoint,
+          // поэтому нам нужно обновить состояние через событие
+          const event = new CustomEvent("updateDeliveryPoint", {
+            detail: {
+              coordinates: car.delivery_coordinates,
+              visible: true,
+            },
+          });
+          window.dispatchEvent(event);
+        }
       } else {
         // Если нет текущей доставки, устанавливаем пустой объект с id: 0
         set({
@@ -138,6 +154,15 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           },
           isCurrentDeliveryVehicle: false,
         });
+
+        // Очищаем точку доставки через событие
+        const event = new CustomEvent("updateDeliveryPoint", {
+          detail: {
+            coordinates: null,
+            visible: false,
+          },
+        });
+        window.dispatchEvent(event);
       }
     } catch (error) {
       console.error("Failed to fetch current delivery vehicle:", error);

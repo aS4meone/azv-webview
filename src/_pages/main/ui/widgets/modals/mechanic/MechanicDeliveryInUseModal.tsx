@@ -15,6 +15,7 @@ import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
+import { useDeliveryPoint } from "@/shared/contexts/DeliveryPointContext";
 
 interface MechanicDeliveryInUseModalProps {
   user: IUser;
@@ -31,6 +32,7 @@ export const MechanicDeliveryInUseModal = ({
   const { refreshUser } = useUserStore();
   const { fetchAllMechanicVehicles, fetchCurrentDeliveryVehicle } =
     useVehiclesStore();
+  const { setDeliveryPoint, setIsVisible } = useDeliveryPoint();
   const [isLoading, setIsLoading] = useState(false);
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -38,6 +40,20 @@ export const MechanicDeliveryInUseModal = ({
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
 
   const car: ICar = notRentedCar || ({} as ICar);
+
+  useEffect(() => {
+    // Устанавливаем точку доставки при монтировании компонента
+    if (notRentedCar.delivery_coordinates) {
+      setDeliveryPoint(notRentedCar.delivery_coordinates);
+      setIsVisible(true);
+    }
+
+    return () => {
+      // Очищаем точку доставки при размонтировании
+      setDeliveryPoint(null);
+      setIsVisible(false);
+    };
+  }, [notRentedCar.delivery_coordinates, setDeliveryPoint, setIsVisible]);
 
   const handleUploadAfterDelivery = async (files: {
     [key: string]: File[];
@@ -58,6 +74,9 @@ export const MechanicDeliveryInUseModal = ({
         if (completeRes.status === 200) {
           setIsLoading(false);
           setShowUploadPhoto(false);
+          // Очищаем точку доставки
+          setDeliveryPoint(null);
+          setIsVisible(false);
           onClose();
 
           showModal({

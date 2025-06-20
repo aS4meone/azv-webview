@@ -71,15 +71,15 @@ export const FAQContent = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-black">
           Часто задаваемые вопросы
         </h1>
-        <p className="text-gray-600">
+        <p className="text-black/60">
           Найдите ответы на популярные вопросы о нашем сервисе
         </p>
 
         <div className="relative max-w-md mx-auto">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/40 w-4 h-4" />
           <Input
             placeholder="Поиск по вопросам..."
             value={searchTerm}
@@ -91,7 +91,11 @@ export const FAQContent = () => {
 
       <div className="flex flex-wrap gap-2 justify-center">
         {categories.map((category) => (
-          <Badge key={category} variant="secondary" className="text-sm">
+          <Badge
+            key={category}
+            variant="secondary"
+            className="text-sm bg-[#1D77FF]/10 text-[#1D77FF]"
+          >
             {category}
           </Badge>
         ))}
@@ -101,23 +105,29 @@ export const FAQContent = () => {
         {filteredFaqs.map((faq, index) => (
           <Card key={index} className="overflow-hidden">
             <button
-              className="w-full p-6 text-left hover:bg-gray-50 transition-colors"
+              className="w-full p-6 text-left hover:bg-[#1D77FF]/5 transition-colors"
               onClick={() => setOpenIndex(openIndex === index ? null : index)}
             >
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <HelpCircle className="w-4 h-4 text-blue-600" />
+                    <HelpCircle className="w-4 h-4 text-[#1D77FF]" />
                     {faq.popular && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-[#1D77FF] text-white"
+                      >
                         Популярный
                       </Badge>
                     )}
-                    <Badge variant="outline" className="text-xs">
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-[#1D77FF] text-[#1D77FF]"
+                    >
                       {faq.category}
                     </Badge>
                   </div>
-                  <h3 className="font-semibold text-gray-900 text-lg">
+                  <h3 className="font-semibold text-black text-lg">
                     {faq.question}
                   </h3>
                 </div>
@@ -125,7 +135,7 @@ export const FAQContent = () => {
                   animate={{ rotate: openIndex === index ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                  <ChevronDown className="w-5 h-5 text-black/50" />
                 </motion.div>
               </div>
             </button>
@@ -140,8 +150,8 @@ export const FAQContent = () => {
                   className="overflow-hidden"
                 >
                   <CardContent className="pt-0 pb-6">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <p className="text-gray-700 leading-relaxed">
+                    <div className="bg-[#1D77FF]/5 p-4 rounded-lg">
+                      <p className="text-black/80 leading-relaxed">
                         {faq.answer}
                       </p>
                     </div>
@@ -155,11 +165,11 @@ export const FAQContent = () => {
 
       {filteredFaqs.length === 0 && (
         <div className="text-center py-12">
-          <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <HelpCircle className="w-12 h-12 text-black/40 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-black mb-2">
             Вопросы не найдены
           </h3>
-          <p className="text-gray-600">
+          <p className="text-black/60">
             Попробуйте изменить поисковый запрос или обратитесь в поддержку
           </p>
         </div>

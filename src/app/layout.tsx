@@ -10,13 +10,14 @@ import {
   ResponseModalProvider,
   ModalPortal,
 } from "@/shared/ui/modal";
-import { BrowserProtectionProvider } from "@/shared/contexts/BrowserProtectionProvider";
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
-import { PageTransitionProvider } from "@/shared/contexts/PageTransitionContext";
+import { DeliveryPointProvider } from "@/shared/contexts/DeliveryPointContext";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -50,7 +51,7 @@ export default async function RootLayout({
 }) {
   const locale = await getLocale();
   return (
-    <html lang={locale} className="loading">
+    <html lang={locale}>
       <head>
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />
@@ -60,6 +61,8 @@ export default async function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
+        <link rel="preconnect" href="https://api.azvmotors.kz" />
+        <link rel="dns-prefetch" href="https://api.azvmotors.kz" />
 
         {/* 🔒 Inline CSS для немедленной защиты */}
         <style
@@ -84,7 +87,6 @@ export default async function RootLayout({
               /* Отключаем pull-to-refresh но разрешаем горизонтальный скролл */
               overscroll-behavior-y: none !important;
               overscroll-behavior-x: auto !important;
-
             }
             
             input, textarea, [contenteditable="true"] {
@@ -104,28 +106,19 @@ export default async function RootLayout({
           `,
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-            document.documentElement.classList.add('loading');
-          `,
-          }}
-        />
       </head>
       <body className={`${montserrat.variable} antialiased`}>
         <ResponseModalProvider>
           <ModalProvider>
             <PhotoUploadProvider>
-              <BrowserProtectionProvider>
-                <NextIntlClientProvider>
-                  <AuthProvider>
-                    <PageTransitionProvider>
-                      {children}
-                      <ModalPortal />
-                    </PageTransitionProvider>
-                  </AuthProvider>
-                </NextIntlClientProvider>
-              </BrowserProtectionProvider>
+              <NextIntlClientProvider>
+                <AuthProvider>
+                  <DeliveryPointProvider>
+                    {children}
+                    <ModalPortal />
+                  </DeliveryPointProvider>
+                </AuthProvider>
+              </NextIntlClientProvider>
             </PhotoUploadProvider>
           </ModalProvider>
         </ResponseModalProvider>

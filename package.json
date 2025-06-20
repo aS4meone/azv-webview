@@ -12,6 +12,7 @@
   "dependencies": {
     "@googlemaps/markerclusterer": "^2.5.3",
     "@pdf-viewer/react": "^1.6.1",
+    "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-separator": "^1.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@react-pdf-viewer/core": "^3.12.0",
@@ -38,6 +39,7 @@
     "react-pdf": "^9.2.1",
     "swiper": "^11.2.8",
     "tailwind-merge": "^3.3.0",
+    "vaul": "^1.1.2",
     "zustand": "^5.0.5"
   },
   "devDependencies": {

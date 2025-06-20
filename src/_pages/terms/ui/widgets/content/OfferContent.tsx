@@ -54,22 +54,27 @@ export const OfferContent = () => {
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <div className="p-3 bg-blue-100 rounded-full">
-            <FileText className="w-8 h-8 text-blue-600" />
+          <div className="p-3 bg-[#1D77FF]/10 rounded-full">
+            <FileText className="w-8 h-8 text-[#1D77FF]" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">Публичная оферта</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold text-black">Публичная оферта</h1>
+        <p className="text-black/60 max-w-2xl mx-auto">
           Договор аренды автомобилей AZV Motors. Ознакомьтесь с условиями
           предоставления услуг.
         </p>
 
         <div className="flex flex-wrap justify-center gap-2">
-          <Badge variant="secondary" className="flex items-center gap-1">
+          <Badge
+            variant="secondary"
+            className="flex items-center gap-1 bg-[#1D77FF]/10 text-[#1D77FF]"
+          >
             <Calendar className="w-3 h-3" />
             Действует с {new Date().toLocaleDateString("ru-RU")}
           </Badge>
-          <Badge variant="outline">Версия 2.1</Badge>
+          <Badge variant="outline" className="border-[#1D77FF] text-[#1D77FF]">
+            Версия 2.1
+          </Badge>
         </div>
       </div>
 
@@ -79,7 +84,9 @@ export const OfferContent = () => {
           <Card key={index}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">{section.icon}</div>
+                <div className="p-2 bg-[#1D77FF]/10 rounded-lg text-[#1D77FF]">
+                  {section.icon}
+                </div>
                 {section.title}
               </CardTitle>
             </CardHeader>
@@ -89,8 +96,8 @@ export const OfferContent = () => {
                   <div key={pIndex}>
                     {paragraph.startsWith("-") ? (
                       <div className="flex items-start gap-2 ml-4">
-                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
-                        <p className="text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-[#1D77FF] rounded-full mt-2 flex-shrink-0" />
+                        <p className="text-black/60">
                           {paragraph.substring(2)}
                         </p>
                       </div>
@@ -98,8 +105,8 @@ export const OfferContent = () => {
                       <p
                         className={`${
                           paragraph.match(/^\d+\.\d+\./)
-                            ? "font-medium text-gray-900"
-                            : "text-gray-700"
+                            ? "font-medium text-black"
+                            : "text-black/70"
                         }`}
                       >
                         {paragraph}
@@ -114,25 +121,25 @@ export const OfferContent = () => {
       </div>
 
       {/* Additional Terms */}
-      <Card className="border-amber-200 bg-amber-50/50">
+      <Card className="border-[#1D77FF] bg-[#1D77FF]/5">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-amber-900">
-            <Shield className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-black">
+            <Shield className="w-5 h-5 text-[#1D77FF]" />
             Дополнительные условия
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-amber-900 mb-2">Страхование</h4>
-              <p className="text-sm text-amber-800">
+              <h4 className="font-medium text-black mb-2">Страхование</h4>
+              <p className="text-sm text-black/80">
                 Все автомобили застрахованы по КАСКО и ОСАГО. Франшиза
                 составляет 50,000 ₸.
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-amber-900 mb-2">Техподдержка</h4>
-              <p className="text-sm text-amber-800">
+              <h4 className="font-medium text-black mb-2">Техподдержка</h4>
+              <p className="text-sm text-black/80">
                 Круглосуточная поддержка доступна через приложение или по
                 телефону.
               </p>
@@ -142,17 +149,17 @@ export const OfferContent = () => {
       </Card>
 
       {/* Footer */}
-      <Card className="bg-gray-50">
+      <Card className="bg-[#1D77FF]/5">
         <CardContent className="pt-6">
           <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-black/60">
               Полный текст договора доступен для скачивания в формате PDF.
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-black/60">
               При возникновении вопросов обратитесь в службу поддержки.
             </p>
             <Separator className="my-4" />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-black/50">
               © 2024 AZV Motors. Все права защищены.
             </p>
           </div>

@@ -9,6 +9,7 @@ interface PushScreenProps {
   withOutStyles?: boolean;
   withCloseButton?: boolean;
   closeOnScroll?: boolean;
+  direction?: "left" | "bottom";
 }
 
 const PushScreen = ({
@@ -17,6 +18,7 @@ const PushScreen = ({
   withOutStyles = false,
   withCloseButton = false,
   closeOnScroll = true,
+  direction = "bottom",
 }: PushScreenProps) => {
   const [, setIsClosing] = useState(false);
 
@@ -45,6 +47,7 @@ const PushScreen = ({
 
     console.log("PushScreen: setting up touch events for closeOnScroll");
 
+    let startX = 0;
     let startY = 0;
     let startTime = 0;
     let initialScrollTop = 0;
@@ -73,6 +76,7 @@ const PushScreen = ({
         ) as HTMLElement) ||
         (pushScreen.scrollHeight > pushScreen.clientHeight ? pushScreen : null);
 
+      startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       startTime = Date.now();
       hasMoved = false;
@@ -87,6 +91,7 @@ const PushScreen = ({
       }
 
       console.log("PushScreen: touch start", {
+        startX,
         startY,
         scrollTop: initialScrollTop,
         hasScrollableElement: !!scrollableElement,
@@ -134,7 +139,9 @@ const PushScreen = ({
 
       if (!pushScreen) return;
 
+      const endX = e.changedTouches[0].clientX;
       const endY = e.changedTouches[0].clientY;
+      const deltaX = endX - startX;
       const deltaY = endY - startY;
       const deltaTime = Date.now() - startTime;
 
@@ -154,14 +161,18 @@ const PushScreen = ({
 
       const isValidSwipe =
         hasMoved &&
-        deltaY > 80 &&
         deltaTime < 700 &&
         scrollDelta < 30 &&
-        (currentScrollTop < 20 || !scrollableElement);
+        (currentScrollTop < 20 || !scrollableElement) &&
+        ((direction === "bottom" && deltaY > 80) ||
+          (direction === "left" && deltaX < -80));
 
       console.log("PushScreen: touch end", {
+        startX,
         startY,
+        endX,
         endY,
+        deltaX,
         deltaY,
         deltaTime,
         scrollDelta,
@@ -173,7 +184,11 @@ const PushScreen = ({
       });
 
       if (isValidSwipe) {
-        console.log("PushScreen: CLOSING due to valid swipe down");
+        console.log(
+          `PushScreen: CLOSING due to valid swipe ${
+            direction === "bottom" ? "down" : "left"
+          }`
+        );
         wrappedOnClose();
       }
     };
@@ -187,24 +202,41 @@ const PushScreen = ({
     return () => {
       console.log("PushScreen: cleaning up touch events");
       document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
       document.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [closeOnScroll, onClose, wrappedOnClose]);
+  }, [closeOnScroll, onClose, wrappedOnClose, direction]);
 
   const handleTouchEvents = {};
+
+  const getInitialAnimation = () => {
+    return direction === "bottom"
+      ? { opacity: 0, y: "100%" }
+      : { opacity: 0, x: "100%" };
+  };
+
+  const getExitAnimation = () => {
+    return direction === "bottom"
+      ? { opacity: 0, y: "100%" }
+      : { opacity: 0, x: "100%" };
+  };
 
   if (withOutStyles != null && withOutStyles) {
     return (
       <AnimatePresence>
         <motion.div
-          initial={{ opacity: 0, y: "100%" }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: "100%" }}
+          initial={getInitialAnimation()}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          exit={getExitAnimation()}
           transition={{
             duration: 0.4,
             ease: [0.4, 0.0, 0.2, 1],
           }}
-          className="fixed inset-0 z-30 bg-white push-screen-container"
+          className={`fixed inset-0 z-30 bg-white push-screen-container ${
+            direction === "left"
+              ? "border-l border-gray-200"
+              : "rounded-t-[24px]"
+          }`}
           data-push-screen="true"
           {...handleTouchEvents}
         >
@@ -218,14 +250,16 @@ const PushScreen = ({
     <AnimatePresence>
       {/* Основной контент */}
       <motion.div
-        initial={{ opacity: 0, y: "100%" }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: "100%" }}
+        initial={getInitialAnimation()}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        exit={getExitAnimation()}
         transition={{
           duration: 0.4,
           ease: [0.4, 0.0, 0.2, 1],
         }}
-        className="fixed inset-0 z-30 bg-white px-8 py-10 overflow-y-auto push-screen-container"
+        className={`fixed inset-0 z-30 bg-white px-8 py-10 overflow-y-auto push-screen-container ${
+          direction === "left" ? "border-l border-gray-200" : "rounded-t-[24px]"
+        }`}
         style={{ pointerEvents: "auto" }}
         data-push-screen="true"
         {...handleTouchEvents}

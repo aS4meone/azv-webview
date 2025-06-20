@@ -57,39 +57,6 @@ html {
   scroll-padding-top: 100px;
 }
 
-html.loading {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease-in, visibility 0.2s ease-in;
-}
-
-html.ready {
-  opacity: 1;
-  visibility: visible;
-}
-
-.page-transition-ready {
-  animation: none !important;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-  will-change: transform, opacity;
-}
-
-/* Prevent content flash during transitions */
-.page-transition-ready > * {
-  opacity: 0;
-  animation: fadeIn 0.2s ease-in forwards;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

@@ -14,6 +14,11 @@ export enum CarStatus {
 
 import { UniqueIdentifier } from "./unique-identifier";
 
+export interface IDeliveryCoordinates {
+  latitude: number;
+  longitude: number;
+}
+
 export interface ICar extends UniqueIdentifier {
   id: number;
   name: string;
@@ -38,6 +43,7 @@ export interface ICar extends UniqueIdentifier {
   reservation_time?: string;
   description?: string;
   current_renter_details?: ICurrentRenterDetails;
+  delivery_coordinates?: IDeliveryCoordinates;
 }
 
 export interface ICurrentRenterDetails {

@@ -13,6 +13,7 @@ import {
   logPerformance,
   preloadMarkerImages,
 } from "@/shared/utils/mapOptimization";
+import { useDeliveryPoint } from "@/shared/contexts/DeliveryPointContext";
 
 const ZOOM_LEVELS = {
   CLUSTER_ONLY: 8,
@@ -32,6 +33,7 @@ export const MapWithMarkers = ({
   onCarFound?: (car: ICar) => void;
 }) => {
   const { showModal, hideModal } = useModal();
+  const { deliveryPoint, isVisible } = useDeliveryPoint();
 
   const {
     fetchAllVehicles,
@@ -52,6 +54,9 @@ export const MapWithMarkers = ({
   const [zoom, setZoom] = useState(15);
   const zoomUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastZoomRef = useRef(15);
+  const deliveryMarkerRef =
+    useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
+  const deliveryPolylineRef = useRef<google.maps.Polyline | null>(null);
 
   useEffect(() => {
     if (!map) return;
@@ -93,8 +98,6 @@ export const MapWithMarkers = ({
 
   const clustererRef = useRef<MarkerClusterer | null>(null);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
-  const deliveryMarkerRef =
-    useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
   const markerLibraryLoadedRef = useRef(false);
   const processedCarIdRef = useRef<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -434,6 +437,73 @@ export const MapWithMarkers = ({
     return marker;
   };
 
+  // Функция создания маркера точки доставки
+  const createDeliveryMarker = (coordinates: {
+    latitude: number;
+    longitude: number;
+  }) => {
+    if (!window.google?.maps?.marker?.AdvancedMarkerElement) {
+      return null;
+    }
+
+    const markerDiv = document.createElement("div");
+    markerDiv.style.cssText = `
+      width: 24px;
+      height: 24px;
+      background-color: #f59e0b;
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      position: relative;
+      animation: pulse 2s infinite;
+    `;
+
+    // Добавляем стили для пульсации
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Добавляем лейбл
+    const labelDiv = document.createElement("div");
+    labelDiv.style.cssText = `
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #92400e;
+      white-space: nowrap;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      pointer-events: none;
+    `;
+    labelDiv.textContent = "Точка доставки";
+    markerDiv.appendChild(labelDiv);
+
+    return new window.google.maps.marker.AdvancedMarkerElement({
+      position: { lat: coordinates.latitude, lng: coordinates.longitude },
+      content: markerDiv,
+      title: "Точка доставки",
+      zIndex: 1000, // Поверх других маркеров
+    });
+  };
+
   // Эффект для управления маркерами - обновляем всегда
   useEffect(() => {
     if (!map || !user) {
@@ -633,6 +703,52 @@ export const MapWithMarkers = ({
     hideModal,
   ]);
 
+  // Эффект для управления маркером точки доставки
+  useEffect(() => {
+    if (!map || !user || user.role !== UserRole.MECHANIC) {
+      // Очищаем маркер если есть
+      if (deliveryMarkerRef.current) {
+        deliveryMarkerRef.current.map = null;
+        deliveryMarkerRef.current = null;
+      }
+      return;
+    }
+
+    // Проверяем наличие координат доставки
+    if (
+      isVisible &&
+      deliveryPoint &&
+      deliveryPoint.latitude &&
+      deliveryPoint.longitude
+    ) {
+      console.log("Creating delivery marker with coordinates:", deliveryPoint);
+      // Создаем маркер точки доставки
+      const deliveryMarker = createDeliveryMarker(deliveryPoint);
+      if (deliveryMarker) {
+        // Удаляем старый маркер если есть
+        if (deliveryMarkerRef.current) {
+          deliveryMarkerRef.current.map = null;
+        }
+        deliveryMarker.map = map;
+        deliveryMarkerRef.current = deliveryMarker;
+
+        // Центрируем карту на точке доставки
+        map.setCenter({
+          lat: deliveryPoint.latitude,
+          lng: deliveryPoint.longitude,
+        });
+        map.setZoom(16);
+      }
+    } else {
+      console.log("No delivery point or not visible");
+      // Если нет координат или точка не должна быть видима, удаляем маркер
+      if (deliveryMarkerRef.current) {
+        deliveryMarkerRef.current.map = null;
+        deliveryMarkerRef.current = null;
+      }
+    }
+  }, [map, user, deliveryPoint, isVisible]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -662,7 +778,6 @@ export const MapWithMarkers = ({
         clearTimeout(zoomUpdateTimeoutRef.current);
       }
 
-      // Сбрасываем ref для модального окна слежки
       trackingModalShownRef.current = false;
     };
   }, []);
