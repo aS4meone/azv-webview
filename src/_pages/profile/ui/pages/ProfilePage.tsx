@@ -1,16 +1,13 @@
 "use client";
-import { ROUTES } from "@/shared/constants/routes";
-import { CustomAppBar } from "@/widgets/appbars";
-import { useTranslations } from "next-intl";
+
 import DeleteAccount from "../widgets/DeleteAccount";
 import Logout from "../widgets/Logout";
 import GetUserData from "../widgets/GetUserData";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { useUserStore } from "@/shared/stores/userStore";
 
 export default function ProfilePage() {
-  const t = useTranslations("profile");
   const { user, isLoading, refreshUser } = useUserStore();
 
   useEffect(() => {

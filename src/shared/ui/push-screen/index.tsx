@@ -1,7 +1,6 @@
 "use client";
 import { ArrowLeftIcon } from "@/shared/icons";
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
 
 interface PushScreenProps {
   onClose?: () => void;
@@ -11,7 +10,6 @@ interface PushScreenProps {
 }
 
 const PushScreen = ({
-  onClose,
   children,
   withOutStyles = false,
   withCloseButton = false,

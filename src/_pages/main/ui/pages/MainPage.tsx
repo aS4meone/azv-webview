@@ -2,7 +2,6 @@
 import { Button } from "@/shared/ui";
 import { ChatIcon } from "@/shared/icons";
 import { Drawer } from "../widgets/drawer";
-import { ROUTES } from "@/shared/constants/routes";
 import { MapComponent } from "../widgets/map/Map";
 import { FooterBtns } from "../widgets/footer-btns";
 import SearchIcon from "@/shared/icons/ui/SearchIcon";

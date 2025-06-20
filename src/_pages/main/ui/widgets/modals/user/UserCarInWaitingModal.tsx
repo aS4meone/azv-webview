@@ -15,7 +15,6 @@ import {
   usePhotoUpload,
   USER_UPLOAD,
 } from "@/shared/contexts/PhotoUploadContext";
-import { useRouter } from "next/navigation";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 
 interface UserCarInWaitingModalProps {
@@ -31,7 +30,6 @@ export const UserCarInWaitingModal = ({
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
-  const router = useRouter();
   const { setUploadRequired } = usePhotoUpload();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);

@@ -1,9 +1,7 @@
 "use client";
-import { ROUTES } from "@/shared/constants/routes";
-import { CustomAppBar } from "@/widgets/appbars";
+
 import React, { useEffect, useState } from "react";
 import { HistoryItem } from "./components/HistoryItem";
-import { useTranslations } from "next-intl";
 import { historyApi } from "@/shared/api/routes/history";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui";
 import { IHistory } from "@/shared/models/types/history";
@@ -12,7 +10,6 @@ import RentalHistoryDetailPage from "./RentalHistoryDetailPage";
 
 const TripsAndFinesPage = () => {
   const [activeTab] = useState<"trips" | "fines">("trips");
-  const t = useTranslations();
   const [trips, setTrips] = useState<IHistory[]>([]);
   const [activePush, setActivePush] = useState<number | null>(null);
   const fetchTrips = async () => {

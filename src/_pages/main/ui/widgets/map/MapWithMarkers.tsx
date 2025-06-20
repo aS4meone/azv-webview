@@ -56,7 +56,6 @@ export const MapWithMarkers = ({
   const lastZoomRef = useRef(15);
   const deliveryMarkerRef =
     useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
-  const deliveryPolylineRef = useRef<google.maps.Polyline | null>(null);
 
   useEffect(() => {
     if (!map) return;

@@ -1,6 +1,4 @@
-import { ROUTES } from "@/shared/constants/routes";
 import { PhoneIcon, TelegramIcon } from "@/shared/icons";
-import { CustomAppBar } from "@/widgets/appbars";
 import { useTranslations } from "next-intl";
 import React from "react";
 

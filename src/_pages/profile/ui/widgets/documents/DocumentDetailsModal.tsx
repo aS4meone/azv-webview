@@ -123,7 +123,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     e.target.focus({ preventScroll: false });
     const { name, value } = e.target;
 
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
     delete newErrors[name];
 
     // Validate full name

@@ -100,6 +100,7 @@ const WalletPage = () => {
         });
       }
     } catch (error) {
+      console.log(error);
       setResponseModal({
         isOpen: true,
         title: "Ошибка",

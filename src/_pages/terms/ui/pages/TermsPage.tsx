@@ -1,5 +1,3 @@
-import { ROUTES } from "@/shared/constants/routes";
-import { CustomAppBar } from "@/widgets/appbars";
 import TermsViewCard from "../widgets/TermsViewCard";
 import { useTranslations } from "next-intl";
 

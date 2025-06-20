@@ -1,9 +1,6 @@
 import { useTranslations } from "next-intl";
-import React, { useState } from "react";
 
 import { formatDate } from "@/shared/utils/formate-date";
-import { CustomPushScreen } from "@/components/ui/custom-push-screen";
-import RentalHistoryDetailPage from "../RentalHistoryDetailPage";
 
 interface HistoryItemProps {
   date: string;

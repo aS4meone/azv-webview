@@ -1,10 +1,8 @@
 "use client";
-import { ROUTES } from "@/shared/constants/routes";
-import { CustomAppBar } from "@/widgets/appbars";
+
 import React, { useEffect, useState } from "react";
 import { historyApi } from "@/shared/api/routes/history";
 import { IHistoryItem } from "@/shared/models/types/history";
-import { useParams } from "next/navigation";
 import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { TripInfoCard } from "./components/TripInfoCard";
 import { LocationInfoCard } from "./components/LocationInfoCard";

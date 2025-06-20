@@ -6,7 +6,6 @@ import React, {
   useMemo,
 } from "react";
 import { Button } from "@/shared/ui";
-import { ArrowLeftIcon } from "@/shared/icons";
 import { BaseMap, CenterMarker, ZOOM_CONSTRAINTS } from "@/shared/ui/map";
 import { useMap } from "@vis.gl/react-google-maps";
 import { getAddressFromCoordinates } from "@/shared/utils/googleMaps";
@@ -15,7 +14,6 @@ import {
   logPerformance,
 } from "@/shared/utils/mapOptimization";
 import { MapCameraProps } from "@vis.gl/react-google-maps";
-import InfoIcon from "@/shared/icons/ui/InfoIcon";
 import { ServiceZonePolygon } from "../../map/ServiceZonePolygon";
 import { checkDeliveryAvailability } from "@/shared/utils/polygon";
 
@@ -85,7 +83,6 @@ const MapWithCenterListener = ({
 };
 
 export const DeliveryAddressScreen = ({
-  onBack,
   onAddressSelected,
 }: DeliveryAddressScreenProps) => {
   // Состояние камеры карты
