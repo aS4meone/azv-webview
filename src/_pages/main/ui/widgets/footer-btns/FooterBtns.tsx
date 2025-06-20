@@ -17,12 +17,12 @@ import { ICar } from "@/shared/models/types/car";
 import FooterTrackingCar from "./FooterTracking";
 import { CarStatus } from "@/shared/models/types/car";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
-import FreeCarsPage from "@/app/(main)/cars/free/page";
-import FreqUsedCarsPage from "@/app/(main)/cars/freq-used/page";
-import MyCarsPage from "@/app/(main)/cars/my/page";
-import MechanicPendingPage from "@/app/(main)/mechanic/pending/page";
-import MechanicDeliveryPage from "@/app/(main)/mechanic/delivery/page";
-import MechanicInRentPage from "@/app/(main)/mechanic/in-rent/page";
+import FreeCarsPage from "@/_pages/cars/free/page";
+import FreqUsedCarsPage from "@/_pages/cars/freq-used/page";
+import MyCarsPage from "@/_pages/cars/my/page";
+import MechanicPendingPage from "@/_pages/mechanic/pending/page";
+import MechanicDeliveryPage from "@/_pages/mechanic/delivery/page";
+import MechanicInRentPage from "@/_pages/mechanic/in-rent/page";
 
 enum ServiceButtonType {
   CHECK = "check",

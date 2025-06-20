@@ -10,7 +10,7 @@ interface DescriptionScreenProps {
 
 export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
   return (
-    <PushScreen onClose={onClose} withCloseButton={true} closeOnScroll>
+    <PushScreen onClose={onClose} withCloseButton={true}>
       <div className="space-y-6">
         {/* Заголовок */}
         <div className="space-y-2">

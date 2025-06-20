@@ -23,6 +23,12 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "AZV Motors",
   description: "AZV Motors - Мобильное приложение",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default async function RootLayout({
@@ -33,6 +39,12 @@ export default async function RootLayout({
   const locale = await getLocale();
   return (
     <html lang={locale}>
+      <head>
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-touch-fullscreen" content="yes" />
+      </head>
       <body className={`${montserrat.variable} antialiased`}>
         <ResponseModalProvider>
           <ModalProvider>
