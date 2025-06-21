@@ -14,6 +14,7 @@ export interface UploadDocumentsDto {
    */
   drivers_license: string;
 
+  selfie_with_license: string;
   /**
    * Selfie image in binary format
    */

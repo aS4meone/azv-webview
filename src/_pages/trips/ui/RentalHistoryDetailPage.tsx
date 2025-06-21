@@ -12,6 +12,7 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
   const [historyDetail, setHistoryDetail] = useState<IHistoryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isActionHistoryOpen, setIsActionHistoryOpen] = useState(false);
 
   useEffect(() => {
     const fetchHistoryDetail = async () => {
@@ -31,6 +32,27 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
       fetchHistoryDetail();
     }
   }, [historyId]);
+
+  const formatActionType = (actionType: string) => {
+    const actionTypes: { [key: string]: string } = {
+      take_key: "Ключ забран",
+      give_key: "Ключ выдан",
+      close_vehicle: "Автомобиль закрыт",
+      open_vehicle: "Автомобиль открыт",
+    };
+    return actionTypes[actionType] || actionType;
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString("ru-RU", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   if (loading) {
     return (
@@ -102,6 +124,60 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
         totalPrice={detail.total_price}
         alreadyPayed={detail.already_payed}
       />
+
+      {detail.action_history && detail.action_history.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <button
+            onClick={() => setIsActionHistoryOpen(!isActionHistoryOpen)}
+            className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+          >
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                История действий
+              </h3>
+              <p className="text-sm text-gray-500">
+                {detail.action_history.length}{" "}
+                {detail.action_history.length === 1 ? "действие" : "действий"}
+              </p>
+            </div>
+            <svg
+              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                isActionHistoryOpen ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+
+          {isActionHistoryOpen && (
+            <div className="border-t border-gray-200">
+              <div className="p-4 space-y-3">
+                {detail.action_history.map((action, index) => (
+                  <div key={index} className="flex items-start space-x-3">
+                    <div className="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900">
+                        {formatActionType(action.action_type)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {formatTimestamp(action.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Bottom spacing for better scroll experience */}
       <div className="h-8" />

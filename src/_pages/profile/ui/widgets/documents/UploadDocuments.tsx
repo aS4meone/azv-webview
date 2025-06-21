@@ -16,6 +16,7 @@ interface DocumentFiles {
   id_back?: File;
   drivers_license?: File;
   selfie?: File;
+  selfie_with_license?: File;
 }
 
 export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
@@ -28,7 +29,11 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
   const [data, setData] = useState<
     Omit<
       UploadDocumentsDto,
-      "id_front" | "id_back" | "drivers_license" | "selfie"
+      | "id_front"
+      | "id_back"
+      | "drivers_license"
+      | "selfie"
+      | "selfie_with_license"
     >
   >({
     full_name: "",
@@ -88,6 +93,8 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       if (files.drivers_license)
         form.append("drivers_license", files.drivers_license);
       if (files.selfie) form.append("selfie", files.selfie);
+      if (files.selfie_with_license)
+        form.append("selfie_with_license", files.selfie_with_license);
 
       Object.entries(formData).forEach(([key, value]) => {
         if (value) form.append(key, value);
@@ -164,7 +171,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       },
     },
     {
-      id: "selfie",
+      id: "selfie_with_license",
       title: "Сделайте селфи, держа водительское удостоверение рядом с лицом",
       isSelfy: true, // Только это селфи!
       multiple: {
@@ -172,9 +179,19 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         max: 1,
       },
     },
+
     {
       id: "drivers_license",
       title: "Сфотографируйте лицевую сторону водительского удостоверения",
+      multiple: {
+        min: 1,
+        max: 1,
+      },
+    },
+    {
+      id: "selfie",
+      title: "Сделайте селфи",
+      isSelfy: true, // Только это селфи!
       multiple: {
         min: 1,
         max: 1,

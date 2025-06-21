@@ -7,7 +7,7 @@ import Loader from "@/shared/ui/loader";
 
 type DocumentDetailsData = Omit<
   UploadDocumentsDto,
-  "id_front" | "id_back" | "drivers_license" | "selfie"
+  "id_front" | "id_back" | "drivers_license" | "selfie" | "selfie_with_license"
 >;
 
 interface DocumentDetailsModalProps {

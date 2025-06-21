@@ -2,13 +2,15 @@ import { ICar } from "@/shared/models/types/car";
 import { Button, ProgressIndicator } from "@/shared/ui";
 import Loader from "@/shared/ui/loader";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import { formatImage } from "@/shared/utils/formatImage";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
 import { ArrowLeftIcon } from "@/shared/icons";
 import { ImageViewerPage } from "./ImageViewerPage";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
 interface CarImageCarouselProps {
   car: ICar;
@@ -32,12 +34,26 @@ export const CarImageCarousel = ({
   const [imageLoading, setImageLoading] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const swiperRef = useRef<SwiperType | null>(null);
   console.log("CarImageCarousel", car);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [initialImageSlide, setInitialImageSlide] = useState(0);
 
   const photos = car.photos && car.photos.length > 0 ? car.photos : [];
+
+  // Автоскролл
+  useEffect(() => {
+    if (photos.length <= 1 || !swiperRef.current) return;
+
+    const interval = setInterval(() => {
+      if (swiperRef.current) {
+        swiperRef.current.slideNext();
+      }
+    }, 3000); // Смена слайда каждые 3 секунды
+
+    return () => clearInterval(interval);
+  }, [photos.length]);
 
   const handleImageError = (index: number) => {
     setImageErrors((prev) => ({ ...prev, [index]: true }));
@@ -65,17 +81,6 @@ export const CarImageCarousel = ({
           rounded ? "rounded-t-[24px]" : ""
         }`}
       >
-        {/* Back Button */}
-        {onBack && (
-          <Button
-            variant="icon"
-            onClick={onBack}
-            className="absolute left-4 top-10 bg-white z-10"
-          >
-            <ArrowLeftIcon />
-          </Button>
-        )}
-
         <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center">
           <InfoIcon />
           <p className="text-gray-500 text-sm font-medium">Фото недоступно</p>
@@ -86,43 +91,44 @@ export const CarImageCarousel = ({
 
   return (
     <div
-      className={`relative ${height} bg-gray-100 overflow-hidden ${
+      className={`relative ${height} bg-gray-100  ${
         rounded ? "rounded-t-[24px]" : ""
       }`}
     >
-      {showImageViewer && (
+      <CustomPushScreen
+        isOpen={showImageViewer}
+        onClose={() => setShowImageViewer(false)}
+        direction="bottom"
+        isCloseable={true}
+        className="bg-black p-0"
+      >
         <ImageViewerPage
           car={car}
           onBack={() => setShowImageViewer(false)}
           initialSlide={initialImageSlide}
         />
-      )}
-
-      {/* Back Button */}
-      {onBack && (
-        <Button
-          variant="icon"
-          onClick={onBack}
-          className="absolute left-4 top-10 bg-white z-10"
-        >
-          <ArrowLeftIcon />
-        </Button>
-      )}
+      </CustomPushScreen>
 
       <Swiper
         className="h-full"
         slidesPerView={1}
+        onSwiper={(swiper) => {
+          swiperRef.current = swiper;
+        }}
         onActiveIndexChange={(swiper) => {
           setActiveSlide(swiper.realIndex);
         }}
-        onClick={(swiper) => {
-          handleImageClick(swiper.activeIndex);
-        }}
         loop={photos.length > 1}
+        allowTouchMove={false}
       >
         {photos.map((photo, index) => (
           <SwiperSlide key={index} className="h-full relative">
-            <div className="h-full w-full cursor-pointer">
+            <div
+              className="h-full w-full cursor-pointer"
+              onClick={(swiper) => {
+                handleImageClick(index);
+              }}
+            >
               {imageErrors[index] ? (
                 // Показываем заглушку если изображение не загрузилось
                 <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center">
@@ -156,7 +162,7 @@ export const CarImageCarousel = ({
       </Swiper>
 
       {/* Progress Indicator - Bottom */}
-      {showProgressIndicator && photos.length > 1 && (
+      {photos.length > 1 && (
         <div className="my-2 px-4">
           <ProgressIndicator
             current={activeSlide}

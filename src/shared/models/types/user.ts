@@ -18,6 +18,7 @@ interface DriversLicense {
 interface Documents {
   documents_verified: boolean;
   selfie_with_license_url: string | null;
+  selfie_url: string | null;
   drivers_license: DriversLicense;
   id_card: IdCard;
 }

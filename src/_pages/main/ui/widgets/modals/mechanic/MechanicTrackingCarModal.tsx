@@ -61,12 +61,7 @@ export const MechanicTrackingCarModal = ({
     <>
       <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
         {/* Car Image Carousel */}
-        <CarImageCarousel
-          car={car}
-          height="h-64"
-          showProgressIndicator
-          rounded={true}
-        />
+        <CarImageCarousel car={car} rounded={true} />
 
         <CustomResponseModal
           isOpen={responseModal?.isOpen || false}

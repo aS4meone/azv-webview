@@ -96,8 +96,18 @@ export function CustomPushScreen({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             drag={isVertical ? "y" : "x"}
             dragDirectionLock
-            dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-            dragElastic={isCloseable ? 0.3 : 0}
+            dragConstraints={
+              direction === "right"
+                ? { top: 0, bottom: 0, left: 0, right: window.innerWidth }
+                : direction === "left"
+                ? { top: 0, bottom: 0, left: -window.innerWidth, right: 0 }
+                : direction === "bottom"
+                ? { top: 0, bottom: window.innerHeight, left: 0, right: 0 }
+                : direction === "top"
+                ? { top: -window.innerHeight, bottom: 0, left: 0, right: 0 }
+                : { top: 0, bottom: 0, left: 0, right: 0 }
+            }
+            dragElastic={0}
             onDragEnd={(e, info) => {
               const offset = isVertical ? info.offset.y : info.offset.x;
               const threshold =

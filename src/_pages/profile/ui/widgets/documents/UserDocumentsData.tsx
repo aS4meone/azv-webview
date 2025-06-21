@@ -29,6 +29,11 @@ const UserDocumentsData = ({
       expiry: user?.documents.drivers_license.expiry || "-",
       hasExpiry: user?.documents.drivers_license.expiry ? true : false,
     },
+    {
+      id: 4,
+      title: "Селфи",
+      hasExpiry: user?.documents.selfie_url ? true : false,
+    },
   ];
 
   return (
@@ -60,7 +65,7 @@ const UserDocumentsData = ({
             >
               <div className="text-[#191919] text-[14px]">{doc.title}</div>
               {doc.hasExpiry ? (
-                doc.id === 2 ? (
+                doc.id === 2 || doc.id === 4 ? (
                   <div className="text-[10px] text-[#191919]">Загружено</div>
                 ) : (
                   <div className="text-[10px] text-[#191919]">

@@ -160,12 +160,7 @@ export const MechanicCarInWaitingModal = ({
       </div>
 
       {/* Car Image Carousel */}
-      <CarImageCarousel
-        car={car}
-        height="h-64"
-        showProgressIndicator
-        rounded={true}
-      />
+      <CarImageCarousel car={car} rounded={true} />
 
       {/* Content */}
       <div className="p-6 pt-4 space-y-6">

@@ -21,18 +21,26 @@ export function CustomModal({
 }: CustomModalProps) {
   const [zIndex, setZIndex] = useState(zIndexManager.current());
   const [mounted, setMounted] = useState(false);
+  const [hasSwiperContent, setHasSwiperContent] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     if (isOpen) {
       setZIndex(zIndexManager.increment());
+      // Check if children contain Swiper elements
+      setTimeout(() => {
+        const swiperElements = document.querySelectorAll(
+          '.swiper, [class*="swiper"]'
+        );
+        setHasSwiperContent(swiperElements.length > 0);
+      }, 0);
     }
     return () => {
       if (isOpen) {
         zIndexManager.decrement();
       }
     };
-  }, [isOpen]);
+  }, [isOpen, children]);
 
   const content = (
     <AnimatePresence>
@@ -59,7 +67,7 @@ export function CustomModal({
                 "rounded-t-3xl relative flex flex-col overflow-hidden w-full",
                 variant === "center"
                   ? "max-w-md"
-                  : variant === "bottom" && "max-h-[85vh] touch-pan-y"
+                  : variant === "bottom" && "max-h-[85vh]"
               )}
               initial={
                 variant === "center"
@@ -79,24 +87,52 @@ export function CustomModal({
                 damping: 25,
                 stiffness: 200,
               }}
-              drag={variant === "bottom" ? "y" : undefined}
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={0}
+              drag={variant === "bottom" && !hasSwiperContent ? "y" : false}
               dragDirectionLock
+              dragConstraints={
+                variant === "bottom" && !hasSwiperContent
+                  ? { top: 0, bottom: window.innerHeight, left: 0, right: 0 }
+                  : { top: 0, bottom: 0, left: 0, right: 0 }
+              }
+              dragElastic={0}
               dragMomentum={false}
               dragSnapToOrigin={false}
-              whileDrag={{ cursor: "grabbing" }}
-              onDrag={(e, info) => {
-                if (variant === "bottom" && info.offset.y < 0) {
-                  e.preventDefault();
-                }
-              }}
-              onDragEnd={(e, info) => {
-                if (variant === "bottom" && info.offset.y > 100) {
-                  onClose();
-                }
-              }}
+              whileDrag={!hasSwiperContent ? { cursor: "grabbing" } : {}}
+              onDrag={
+                !hasSwiperContent
+                  ? (e, info) => {
+                      if (variant === "bottom") {
+                        // Only prevent if it's a clearly vertical drag with significant movement
+                        const isVerticalDrag =
+                          Math.abs(info.offset.y) >
+                          Math.abs(info.offset.x) * 1.5;
+                        const hasSignificantMovement =
+                          Math.abs(info.offset.y) > 20;
+
+                        if (
+                          !isVerticalDrag ||
+                          !hasSignificantMovement ||
+                          info.offset.y < 0
+                        ) {
+                          e.preventDefault();
+                        }
+                      }
+                    }
+                  : undefined
+              }
+              onDragEnd={
+                !hasSwiperContent
+                  ? (e, info) => {
+                      if (variant === "bottom" && info.offset.y > 100) {
+                        onClose();
+                      }
+                    }
+                  : undefined
+              }
               onClick={(e) => e.stopPropagation()}
+              style={{
+                touchAction: hasSwiperContent ? "pan-x pan-y" : "pan-y",
+              }}
             >
               <div className="flex-1 overflow-y-auto w-full">{children}</div>
             </motion.div>

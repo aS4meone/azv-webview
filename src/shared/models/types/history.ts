@@ -47,8 +47,14 @@ export interface IRentalHistoryDetail {
   overtime_fee: number;
   distance_fee: number;
   car_details: ICarDetails;
+  action_history: IActionHistory[];
 }
 
 export interface IHistoryItem {
   rental_history_detail: IRentalHistoryDetail;
+}
+
+export interface IActionHistory {
+  action_type: string;
+  timestamp: string;
 }

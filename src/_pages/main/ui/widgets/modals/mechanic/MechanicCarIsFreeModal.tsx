@@ -24,12 +24,7 @@ export const MechanicCarIsFreeModal = ({
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
-      <CarImageCarousel
-        car={car}
-        height="h-64"
-        showProgressIndicator
-        rounded={true}
-      />
+      <CarImageCarousel car={car} rounded={true} />
 
       <CustomResponseModal
         isOpen={responseModal?.isOpen || false}

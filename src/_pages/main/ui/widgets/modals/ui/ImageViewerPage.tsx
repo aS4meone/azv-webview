@@ -1,11 +1,13 @@
 import { ICar } from "@/shared/models/types/car";
 import { ProgressIndicator } from "@/shared/ui";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Zoom } from "swiper/modules";
+import { Zoom, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/zoom";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { formatImage } from "@/shared/utils/formatImage";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
 
@@ -27,12 +29,11 @@ export const ImageViewerPage = ({
   const [imageLoading, setImageLoading] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const [isZoomed, setIsZoomed] = useState(false);
+  const swiperRef = useRef<any>(null);
 
   // Prepare photos array
-  const photos =
-    car.photos && car.photos.length > 0
-      ? car.photos
-      : ["/images/car-placeholder.jpg"];
+  const photos = car.photos && car.photos.length > 0 ? car.photos : [];
 
   const handleImageError = (index: number) => {
     setImageErrors((prev) => ({ ...prev, [index]: true }));
@@ -47,31 +48,20 @@ export const ImageViewerPage = ({
     setImageLoading((prev) => ({ ...prev, [index]: true }));
   };
 
+  const handleZoomChange = (swiper: any, scale: number) => {
+    const isCurrentlyZoomed = scale > 1;
+    setIsZoomed(isCurrentlyZoomed);
+
+    // Отключаем allowTouchMove при зуме
+    if (swiperRef.current) {
+      swiperRef.current.allowTouchMove = !isCurrentlyZoomed;
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
-      {/* Header */}
-      <div className="relative z-10 bg-gradient-to-b from-black/50 to-transparent">
+    <div className="h-full bg-black flex flex-col">
+      <div className="relative bg-gradient-to-b from-black/50 to-transparent">
         <div className="flex items-center justify-between p-4 pt-12">
-          {/* Back Button */}
-          <button
-            onClick={onBack}
-            className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M15 18L9 12L15 6"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-
-          {/* Car Name */}
-          <h1 className="text-white text-lg font-medium">{car.name}</h1>
-
-          {/* Progress Indicator */}
           {photos.length > 1 && (
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
               <span className="text-white text-sm font-medium">
@@ -79,24 +69,44 @@ export const ImageViewerPage = ({
               </span>
             </div>
           )}
+
+          {/* Car Name */}
+          <h1 className="text-white text-lg font-medium">{car.name}</h1>
+
+          <div className="w-10"></div>
         </div>
       </div>
 
       {/* Image Viewer */}
       <div className="flex-1 relative">
         <Swiper
+          ref={swiperRef}
           className="h-full w-full"
           slidesPerView={1}
+          spaceBetween={0}
           initialSlide={initialSlide}
           onActiveIndexChange={(swiper) => {
             setActiveSlide(swiper.realIndex);
           }}
+          onZoomChange={handleZoomChange}
           loop={photos.length > 1}
           zoom={{
             maxRatio: 3,
             minRatio: 1,
+            toggle: true,
           }}
-          modules={[Zoom]}
+          modules={[Zoom, Navigation, Pagination]}
+          touchRatio={1}
+          threshold={10}
+          allowTouchMove={!isZoomed}
+          simulateTouch={true}
+          grabCursor={!isZoomed}
+          resistance={true}
+          resistanceRatio={0}
+          preventClicks={isZoomed}
+          preventClicksPropagation={isZoomed}
+          touchStartPreventDefault={false}
+          touchMoveStopPropagation={isZoomed}
         >
           {photos.map((photo, index) => (
             <SwiperSlide key={index} className="h-full relative">
@@ -121,12 +131,15 @@ export const ImageViewerPage = ({
                       src={formatImage(photo)}
                       alt={`${car.name} - фото ${index + 1}`}
                       fill
-                      className="object-contain"
+                      className="object-contain select-none"
                       onError={() => handleImageError(index)}
                       onLoad={() => handleImageLoad(index)}
                       onLoadStart={() => handleImageLoadStart(index)}
                       placeholder="blur"
                       blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                      draggable={false}
+                      priority={index === initialSlide}
+                      style={{ pointerEvents: isZoomed ? "auto" : "none" }}
                     />
                   </>
                 )}
@@ -137,7 +150,7 @@ export const ImageViewerPage = ({
       </div>
 
       {/* Bottom Controls */}
-      {photos.length > 1 && (
+      {photos.length > 1 && !isZoomed && (
         <div className="relative z-10 bg-gradient-to-t from-black/50 to-transparent">
           <div className="p-4 pb-8">
             <ProgressIndicator
@@ -151,11 +164,13 @@ export const ImageViewerPage = ({
       )}
 
       {/* Instruction Text */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10">
-        <p className="text-white/70 text-sm text-center">
-          Нажмите дважды для увеличения
-        </p>
-      </div>
+      {!isZoomed && (
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10">
+          <p className="text-white/70 text-sm text-center">
+            Приближайте пальцами
+          </p>
+        </div>
+      )}
     </div>
   );
 };

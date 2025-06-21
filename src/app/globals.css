@@ -130,3 +130,25 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Webview optimizations for Swiper */
+.swiper-webview-optimized {
+  touch-action: pan-x pan-y !important;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.swiper-webview-optimized .swiper-slide {
+  touch-action: pan-x pan-y !important;
+  pointer-events: auto !important;
+}
+
+.swiper-webview-optimized .swiper-wrapper {
+  touch-action: pan-x pan-y !important;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
