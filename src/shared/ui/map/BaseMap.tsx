@@ -93,7 +93,6 @@ export const BaseMap = ({
   className = "relative h-screen w-full",
   mapId = "e56617123a7fcf1ad2c3782d",
   gestureHandling = "greedy",
-  styles,
   cameraProps: externalCameraProps,
   onCameraPropsChange,
 }: BaseMapProps) => {

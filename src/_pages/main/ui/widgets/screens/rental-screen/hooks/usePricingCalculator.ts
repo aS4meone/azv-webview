@@ -160,7 +160,7 @@ export const usePricingCalculator = (car: ICar) => {
       rentalType: activeTab,
       duration,
     };
-  }, [car.id, activeTab, duration, totalCost]);
+  }, [car.id, activeTab, duration]);
 
   return {
     activeTab,

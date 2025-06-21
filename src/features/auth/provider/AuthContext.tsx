@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  ReactNode,
+  useCallback,
+} from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
 import { getRefreshToken, clearTokens } from "@/shared/utils/tokenStorage";
@@ -32,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const initializationRef = useRef(false);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       // Clear FCM token first
       await callFlutterLogout();
@@ -46,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Navigate to root
     router.push(ROUTES.ROOT);
-  };
+  }, [router]);
 
   useEffect(() => {
     const checkAuth = async () => {

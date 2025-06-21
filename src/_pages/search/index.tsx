@@ -16,36 +16,42 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
   const [cars, setCars] = useState<ICar[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSearch = async (query: string, isInitial: boolean = false) => {
-    if (!query.trim() && !isInitial) {
-      setCars([]);
-      return;
-    }
-
-    try {
-      if (user!.role === UserRole.MECHANIC) {
-        setIsLoading(true);
-        const response = await mechanicApi.searchVehicles(query);
-
-        setCars(response.vehicles || []);
-      } else {
-        setIsLoading(true);
-
-        const response = await vehicleApi.searchVehicles(query);
-
-        setCars(response.vehicles || []);
+  const handleSearch = useCallback(
+    async (query: string, isInitial: boolean = false) => {
+      if (!query.trim() && !isInitial) {
+        setCars([]);
+        return;
       }
-    } catch (error) {
-      console.error("Search failed:", error);
-      setCars([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+      try {
+        if (user!.role === UserRole.MECHANIC) {
+          setIsLoading(true);
+          const response = await mechanicApi.searchVehicles(query);
+
+          setCars(response.vehicles || []);
+        } else {
+          setIsLoading(true);
+
+          const response = await vehicleApi.searchVehicles(query);
+
+          setCars(response.vehicles || []);
+        }
+      } catch (error) {
+        console.error("Search failed:", error);
+        setCars([]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [user]
+  );
 
   // Создаем дебаунсированную версию поиска
   const debouncedSearch = useCallback(
-    debounce((query: string) => handleSearch(query), 500),
+    (query: string) => {
+      const debouncedFn = debounce(() => handleSearch(query), 500);
+      debouncedFn();
+    },
     [handleSearch]
   );
 

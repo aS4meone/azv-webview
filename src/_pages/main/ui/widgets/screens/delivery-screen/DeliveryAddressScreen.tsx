@@ -214,7 +214,7 @@ export const DeliveryAddressScreen = ({
     if (center) {
       updateAddress(center.lat, center.lng);
     }
-  }, [updateAddress]);
+  }, [updateAddress, cameraProps.center]);
 
   // Мемоизированные ограничения для карты доставки
   const deliveryRestriction = useMemo(

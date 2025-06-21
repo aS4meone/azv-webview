@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Input, Button } from "@/shared/ui";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
@@ -70,49 +70,52 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     return "";
   };
 
-  const validateIIN = (iin: string) => {
-    if (!/^\d{12}$/.test(iin)) {
-      return "ИИН должен содержать 12 цифр";
-    }
-
-    // Validate birth date from IIN with form birth date
-    if (formData.birth_date) {
-      const birthDate = new Date(formData.birth_date);
-      const birthYear = birthDate.getFullYear() % 100;
-      const birthMonth = birthDate.getMonth() + 1;
-      const birthDay = birthDate.getDate();
-
-      const iinYear = parseInt(iin.slice(0, 2));
-      const iinMonth = parseInt(iin.slice(2, 4));
-      const iinDay = parseInt(iin.slice(4, 6));
-
-      if (
-        birthYear !== iinYear ||
-        birthMonth !== iinMonth ||
-        birthDay !== iinDay
-      ) {
-        return "ИИН не соответствует указанной дате рождения";
+  const validateIIN = useCallback(
+    (iin: string) => {
+      if (!/^\d{12}$/.test(iin)) {
+        return "ИИН должен содержать 12 цифр";
       }
-    }
 
-    // Validate IIN checksum
-    const weights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    let sum = 0;
-    for (let i = 0; i < 11; i++) {
-      sum += parseInt(iin[i]) * weights[i];
-    }
-    const control = sum % 11;
-    const lastDigit = parseInt(iin[11]);
+      // Validate birth date from IIN with form birth date
+      if (formData.birth_date) {
+        const birthDate = new Date(formData.birth_date);
+        const birthYear = birthDate.getFullYear() % 100;
+        const birthMonth = birthDate.getMonth() + 1;
+        const birthDay = birthDate.getDate();
 
-    if (control === 10) {
-      return "Неверный ИИН";
-    }
-    if (control !== lastDigit) {
-      return "Неверная контрольная сумма ИИН";
-    }
+        const iinYear = parseInt(iin.slice(0, 2));
+        const iinMonth = parseInt(iin.slice(2, 4));
+        const iinDay = parseInt(iin.slice(4, 6));
 
-    return "";
-  };
+        if (
+          birthYear !== iinYear ||
+          birthMonth !== iinMonth ||
+          birthDay !== iinDay
+        ) {
+          return "ИИН не соответствует указанной дате рождения";
+        }
+      }
+
+      // Validate IIN checksum
+      const weights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+      let sum = 0;
+      for (let i = 0; i < 11; i++) {
+        sum += parseInt(iin[i]) * weights[i];
+      }
+      const control = sum % 11;
+      const lastDigit = parseInt(iin[11]);
+
+      if (control === 10) {
+        return "Неверный ИИН";
+      }
+      if (control !== lastDigit) {
+        return "Неверная контрольная сумма ИИН";
+      }
+
+      return "";
+    },
+    [formData.birth_date]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,7 +197,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       validateFutureDate(formData.drivers_license_expiry) &&
       Object.keys(errors).length === 0
     );
-  }, [formData, errors]);
+  }, [formData, errors, validateIIN]);
 
   const getMaxDate = (years: number) => {
     const date = new Date();

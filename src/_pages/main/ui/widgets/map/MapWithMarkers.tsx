@@ -244,26 +244,27 @@ export const MapWithMarkers = ({
   ]);
 
   // Функция создания маркера
-  const createAdvancedMarker = (vehicle: ICar) => {
-    if (!window.google?.maps?.marker?.AdvancedMarkerElement) {
-      return null;
-    }
+  const createAdvancedMarker = useCallback(
+    (vehicle: ICar) => {
+      if (!window.google?.maps?.marker?.AdvancedMarkerElement) {
+        return null;
+      }
 
-    const roundedZoom = Math.round(zoom);
+      const roundedZoom = Math.round(zoom);
 
-    // Расчет размеров маркеров
-    const baseWidth: number = 12;
+      // Расчет размеров маркеров
+      const baseWidth: number = 12;
 
-    const aspectRatio = 29 / 12;
-    const markerWidth = Math.max(6, Math.min(24, baseWidth));
-    const markerHeight = markerWidth * aspectRatio;
-    const textSize = Math.max(8, Math.min(16, roundedZoom - 2));
-    const showNames = roundedZoom >= ZOOM_LEVELS.SHOW_NAMES;
-    const showDetails = roundedZoom >= ZOOM_LEVELS.LARGE_MARKERS;
+      const aspectRatio = 29 / 12;
+      const markerWidth = Math.max(6, Math.min(24, baseWidth));
+      const markerHeight = markerWidth * aspectRatio;
+      const textSize = Math.max(8, Math.min(16, roundedZoom - 2));
+      const showNames = roundedZoom >= ZOOM_LEVELS.SHOW_NAMES;
+      const showDetails = roundedZoom >= ZOOM_LEVELS.LARGE_MARKERS;
 
-    // Create marker content
-    const markerDiv = document.createElement("div");
-    markerDiv.style.cssText = `
+      // Create marker content
+      const markerDiv = document.createElement("div");
+      markerDiv.style.cssText = `
           position: relative;
           display: flex;
           align-items: center;
@@ -277,47 +278,47 @@ export const MapWithMarkers = ({
           min-height: ${markerHeight + 15}px;
         `;
 
-    // Add vehicle name if zoom is sufficient
-    if (showNames) {
-      const nameDiv = document.createElement("div");
-      nameDiv.className = "marker-name";
+      // Add vehicle name if zoom is sufficient
+      if (showNames) {
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "marker-name";
 
-      // Определяем цвет фона в зависимости от роли пользователя и статуса автомобиля
-      let backgroundColor = "rgba(255, 255, 255, 0.95)";
-      let borderColor = "#e5e7eb";
-      let textColor = "#374151";
+        // Определяем цвет фона в зависимости от роли пользователя и статуса автомобиля
+        let backgroundColor = "rgba(255, 255, 255, 0.95)";
+        let borderColor = "#e5e7eb";
+        let textColor = "#374151";
 
-      if (user?.role === UserRole.MECHANIC) {
-        switch (vehicle.status) {
-          case CarStatus.pending:
-            backgroundColor = "rgba(255, 228, 148, 0.95)"; // Желтый
-            borderColor = "#f59e0b";
-            textColor = "#92400e";
-            break;
-          case CarStatus.delivering:
-            backgroundColor = "rgba(255, 228, 148, 0.95)"; // Зеленый
-            borderColor = "#f59e0b";
-            textColor = "#92400e";
-            break;
-          case CarStatus.inUse:
-            backgroundColor = "rgba(34, 197, 94, 0.95)"; // Красный
-            // borderColor = "#dc2626";
-            // textColor = "#991b1b";
-            borderColor = "#16a34a";
-            textColor = "#15803d";
-            break;
-          case CarStatus.free:
-            backgroundColor = "rgba(239, 124, 124, 0.95)"; // Красный
-            borderColor = "#dc2626";
-            textColor = "#991b1b";
-            break;
-          default:
-            // Оставляем стандартные цвета для других статусов
-            break;
+        if (user?.role === UserRole.MECHANIC) {
+          switch (vehicle.status) {
+            case CarStatus.pending:
+              backgroundColor = "rgba(255, 228, 148, 0.95)"; // Желтый
+              borderColor = "#f59e0b";
+              textColor = "#92400e";
+              break;
+            case CarStatus.delivering:
+              backgroundColor = "rgba(255, 228, 148, 0.95)"; // Зеленый
+              borderColor = "#f59e0b";
+              textColor = "#92400e";
+              break;
+            case CarStatus.inUse:
+              backgroundColor = "rgba(34, 197, 94, 0.95)"; // Красный
+              // borderColor = "#dc2626";
+              // textColor = "#991b1b";
+              borderColor = "#16a34a";
+              textColor = "#15803d";
+              break;
+            case CarStatus.free:
+              backgroundColor = "rgba(239, 124, 124, 0.95)"; // Красный
+              borderColor = "#dc2626";
+              textColor = "#991b1b";
+              break;
+            default:
+              // Оставляем стандартные цвета для других статусов
+              break;
+          }
         }
-      }
 
-      nameDiv.style.cssText = `
+        nameDiv.style.cssText = `
             position: absolute;
             top: -${markerHeight + 8}px;
             left: 50%;
@@ -338,103 +339,105 @@ export const MapWithMarkers = ({
             z-index: 10;
             pointer-events: none;
           `;
-      nameDiv.textContent = vehicle.name;
-      markerDiv.appendChild(nameDiv);
-    }
-
-    // Add car icon with status-based coloring for mechanic
-    const iconImg = document.createElement("img");
-    iconImg.src = "/images/carmarker.png";
-    iconImg.alt = "Car marker";
-    iconImg.loading = "lazy";
-
-    // Определяем цвет маркера в зависимости от роли пользователя и статуса машины
-    let filter = "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))";
-
-    if (user?.role === UserRole.MECHANIC) {
-      switch (vehicle.status) {
-        case CarStatus.free:
-          // Свободные - красные
-          filter =
-            "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(0deg) saturate(1.5) brightness(1) contrast(1.2)";
-          break;
-        case CarStatus.inUse:
-          // В аренде - зеленые
-          filter =
-            "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(120deg) saturate(1.3) brightness(1.1)";
-          break;
-        case CarStatus.pending:
-        case CarStatus.delivering:
-          // Доставка/проверка - желтые
-          filter =
-            "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(60deg) saturate(1.4) brightness(1.2)";
-          break;
-        default:
-          // Стандартный цвет для других статусов
-          break;
+        nameDiv.textContent = vehicle.name;
+        markerDiv.appendChild(nameDiv);
       }
-    }
 
-    iconImg.style.cssText = `
+      // Add car icon with status-based coloring for mechanic
+      const iconImg = document.createElement("img");
+      iconImg.src = "/images/carmarker.png";
+      iconImg.alt = "Car marker";
+      iconImg.loading = "lazy";
+
+      // Определяем цвет маркера в зависимости от роли пользователя и статуса машины
+      let filter = "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))";
+
+      if (user?.role === UserRole.MECHANIC) {
+        switch (vehicle.status) {
+          case CarStatus.free:
+            // Свободные - красные
+            filter =
+              "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(0deg) saturate(1.5) brightness(1) contrast(1.2)";
+            break;
+          case CarStatus.inUse:
+            // В аренде - зеленые
+            filter =
+              "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(120deg) saturate(1.3) brightness(1.1)";
+            break;
+          case CarStatus.pending:
+          case CarStatus.delivering:
+            // Доставка/проверка - желтые
+            filter =
+              "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2)) hue-rotate(60deg) saturate(1.4) brightness(1.2)";
+            break;
+          default:
+            // Стандартный цвет для других статусов
+            break;
+        }
+      }
+
+      iconImg.style.cssText = `
           width: ${markerWidth}px;
           height: ${markerHeight}px;
           filter: ${filter};
           transition: all 0.2s ease;
         `;
 
-    // Добавляем hover эффект только для больших зумов
-    if (showDetails) {
-      iconImg.addEventListener("mouseenter", () => {
-        iconImg.style.transform = "scale(1.1)";
-        iconImg.style.filter = "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))";
-      });
+      // Добавляем hover эффект только для больших зумов
+      if (showDetails) {
+        iconImg.addEventListener("mouseenter", () => {
+          iconImg.style.transform = "scale(1.1)";
+          iconImg.style.filter = "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))";
+        });
 
-      iconImg.addEventListener("mouseleave", () => {
-        iconImg.style.transform = "scale(1)";
-        iconImg.style.filter = "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))";
-      });
-    }
-
-    markerDiv.appendChild(iconImg);
-
-    // Create marker
-    const marker = new window.google.maps.marker.AdvancedMarkerElement({
-      position: { lat: vehicle.latitude, lng: vehicle.longitude },
-      content: markerDiv,
-      title: vehicle.name,
-    });
-
-    // Add click handler
-    marker.addListener("click", async () => {
-      if (user === null) {
-        return;
+        iconImg.addEventListener("mouseleave", () => {
+          iconImg.style.transform = "scale(1)";
+          iconImg.style.filter = "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2))";
+        });
       }
 
-      // Автоматический зум до 16 уровня и центрирование на машине
-      if (map) {
-        map.setZoom(16);
-        map.setCenter({ lat: vehicle.latitude, lng: vehicle.longitude });
-      }
+      markerDiv.appendChild(iconImg);
 
-      const content = handleCarInteraction({
-        user,
-        notRentedCar: vehicle,
-        hideModal: () => {
-          hideModal();
-        },
+      // Create marker
+      const marker = new window.google.maps.marker.AdvancedMarkerElement({
+        position: { lat: vehicle.latitude, lng: vehicle.longitude },
+        content: markerDiv,
+        title: vehicle.name,
       });
 
-      if (content === null) {
-        return;
-      }
+      // Add click handler
+      marker.addListener("click", async () => {
+        if (user === null) {
+          return;
+        }
 
-      showModal({
-        children: content,
+        // Автоматический зум до 16 уровня и центрирование на машине
+        if (map) {
+          map.setZoom(16);
+          map.setCenter({ lat: vehicle.latitude, lng: vehicle.longitude });
+        }
+
+        const content = handleCarInteraction({
+          user,
+          notRentedCar: vehicle,
+          hideModal: () => {
+            hideModal();
+          },
+        });
+
+        if (content === null) {
+          return;
+        }
+
+        showModal({
+          children: content,
+        });
       });
-    });
 
-    return marker;
-  };
+      return marker;
+    },
+    [user, showModal, hideModal, map, zoom]
+  );
 
   // Функция создания маркера точки доставки
   const createDeliveryMarker = (coordinates: {
@@ -700,6 +703,7 @@ export const MapWithMarkers = ({
     user,
     showModal,
     hideModal,
+    createAdvancedMarker,
   ]);
 
   // Эффект для управления маркером точки доставки
