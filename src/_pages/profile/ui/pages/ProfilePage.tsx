@@ -12,7 +12,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     refreshUser();
-  }, []);
+  }, [refreshUser]);
 
   if (isLoading) {
     return (

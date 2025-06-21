@@ -226,7 +226,7 @@ export const BaseMap = ({
       tilt: 0,
       heading: 0,
     }),
-    [gestureHandling, minZoom, maxZoom, restriction, styles]
+    [gestureHandling, minZoom, maxZoom, restriction]
   );
 
   // Эффект для вызова onMapReady

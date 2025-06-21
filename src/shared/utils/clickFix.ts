@@ -244,4 +244,11 @@ if (typeof window !== "undefined") {
 
 // Экспортируем для использования в других частях приложения
 export { ClickFixer };
-export default { initClickFixer, destroyClickFixer, refreshClickFixer };
+
+const clickFixExports = {
+  initClickFixer,
+  destroyClickFixer,
+  refreshClickFixer,
+};
+
+export default clickFixExports;

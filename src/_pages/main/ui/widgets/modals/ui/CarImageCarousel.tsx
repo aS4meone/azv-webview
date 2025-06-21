@@ -1,5 +1,5 @@
 import { ICar } from "@/shared/models/types/car";
-import { Button, ProgressIndicator } from "@/shared/ui";
+import { ProgressIndicator } from "@/shared/ui";
 import Loader from "@/shared/ui/loader";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
@@ -8,23 +8,18 @@ import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import { formatImage } from "@/shared/utils/formatImage";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
-import { ArrowLeftIcon } from "@/shared/icons";
 import { ImageViewerPage } from "./ImageViewerPage";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
 interface CarImageCarouselProps {
   car: ICar;
-  showProgressIndicator?: boolean;
   height?: string;
-  onBack?: () => void;
   rounded?: boolean;
 }
 
 export const CarImageCarousel = ({
   car,
-  showProgressIndicator = true,
   height = "h-64",
-  onBack,
   rounded = false,
 }: CarImageCarouselProps) => {
   const [activeSlide, setActiveSlide] = useState(0);
@@ -125,7 +120,7 @@ export const CarImageCarousel = ({
           <SwiperSlide key={index} className="h-full relative">
             <div
               className="h-full w-full cursor-pointer"
-              onClick={(swiper) => {
+              onClick={() => {
                 handleImageClick(index);
               }}
             >

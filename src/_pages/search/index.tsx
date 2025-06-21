@@ -16,10 +16,6 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
   const [cars, setCars] = useState<ICar[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    handleSearch(search, true);
-  }, []);
-
   const handleSearch = async (query: string, isInitial: boolean = false) => {
     if (!query.trim() && !isInitial) {
       setCars([]);
@@ -50,8 +46,12 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
   // Создаем дебаунсированную версию поиска
   const debouncedSearch = useCallback(
     debounce((query: string) => handleSearch(query), 500),
-    []
+    [handleSearch]
   );
+
+  useEffect(() => {
+    handleSearch(search, true);
+  }, [handleSearch, search]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

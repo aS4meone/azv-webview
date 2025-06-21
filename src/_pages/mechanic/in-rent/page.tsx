@@ -10,7 +10,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
 
   useEffect(() => {
     fetchInUseVehicles();
-  }, []);
+  }, [fetchInUseVehicles]);
 
   return (
     <section>

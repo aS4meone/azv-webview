@@ -13,7 +13,7 @@ const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
 
   useEffect(() => {
     fetchFrequentlyUsedVehicles();
-  }, []);
+  }, [fetchFrequentlyUsedVehicles]);
 
   return (
     <section>

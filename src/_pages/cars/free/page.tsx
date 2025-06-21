@@ -8,7 +8,7 @@ const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
 
   useEffect(() => {
     fetchAllVehicles();
-  }, []);
+  }, [fetchAllVehicles]);
 
   return (
     <section>

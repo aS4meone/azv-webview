@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     checkAuth();
-  }, []);
+  }, [fetchUser, logout, pathname, router]);
 
   // Отдельный эффект для редиректа с auth страниц
   useEffect(() => {
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (user && refreshToken && isAuthRoute(pathname)) {
       router.push(ROUTES.MAIN);
     }
-  }, [user, pathname]);
+  }, [user, pathname, router]);
 
   return (
     <AuthContext.Provider value={{ user, loading: isLoading, logout }}>

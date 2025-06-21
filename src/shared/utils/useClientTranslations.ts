@@ -23,21 +23,21 @@ export function useClientTranslations() {
 
     try {
       return t(key);
-    } catch (error) {
+    } catch {
       console.warn(`Translation missing for key: ${key}`);
       return fallback;
     }
   };
 
   // Возвращаем функцию для получения сырых данных переводов
-  const safeRaw = (key: string, fallback: any = []) => {
+  const safeRaw = (key: string, fallback: unknown[] = []) => {
     if (!isClientMounted) {
       return fallback;
     }
 
     try {
       return t.raw(key);
-    } catch (error) {
+    } catch {
       console.warn(`Raw translation missing for key: ${key}`);
       return fallback;
     }

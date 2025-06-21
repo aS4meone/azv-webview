@@ -11,7 +11,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
   console.log(pendingVehicles);
   useEffect(() => {
     fetchPendingVehicles();
-  }, []);
+  }, [fetchPendingVehicles]);
 
   return (
     <section>

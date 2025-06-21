@@ -100,13 +100,7 @@ export default function GoogleMapsPage() {
       previousStatusRef.current = null;
       setIsModalCurrentlyOpen(false);
     }
-  }, [
-    user?.current_rental?.rental_details.status,
-    user,
-    showModal,
-    hideModal,
-    isModalCurrentlyOpen,
-  ]);
+  }, [user?.current_rental, user, showModal, hideModal, isModalCurrentlyOpen]);
 
   // Интервал для обновления пользователя с разной частотой в зависимости от статуса
   useEffect(() => {

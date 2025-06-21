@@ -19,7 +19,7 @@ const Page = () => {
     } else {
       router.push(ROUTES.ONBOARDING);
     }
-  }, []);
+  }, [fetchUser, router]);
 
   return <article></article>;
 };

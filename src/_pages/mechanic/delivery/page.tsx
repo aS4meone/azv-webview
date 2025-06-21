@@ -9,7 +9,7 @@ const CarsPage = ({ onClose }: { onClose: () => void }) => {
 
   useEffect(() => {
     fetchDeliveryVehicles();
-  }, []);
+  }, [fetchDeliveryVehicles]);
 
   return (
     <section>

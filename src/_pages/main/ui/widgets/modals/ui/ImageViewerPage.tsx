@@ -4,6 +4,8 @@ import Image from "next/image";
 import React, { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Zoom, Navigation, Pagination } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+import type { SwiperRef } from "swiper/react";
 import "swiper/css";
 import "swiper/css/zoom";
 import "swiper/css/navigation";
@@ -19,7 +21,6 @@ interface ImageViewerPageProps {
 
 export const ImageViewerPage = ({
   car,
-  onBack,
   initialSlide = 0,
 }: ImageViewerPageProps) => {
   const [activeSlide, setActiveSlide] = useState(initialSlide);
@@ -30,7 +31,7 @@ export const ImageViewerPage = ({
     {}
   );
   const [isZoomed, setIsZoomed] = useState(false);
-  const swiperRef = useRef<any>(null);
+  const swiperRef = useRef<SwiperRef | null>(null);
 
   // Prepare photos array
   const photos = car.photos && car.photos.length > 0 ? car.photos : [];
@@ -48,13 +49,13 @@ export const ImageViewerPage = ({
     setImageLoading((prev) => ({ ...prev, [index]: true }));
   };
 
-  const handleZoomChange = (swiper: any, scale: number) => {
+  const handleZoomChange = (swiper: SwiperType, scale: number) => {
     const isCurrentlyZoomed = scale > 1;
     setIsZoomed(isCurrentlyZoomed);
 
     // Отключаем allowTouchMove при зуме
-    if (swiperRef.current) {
-      swiperRef.current.allowTouchMove = !isCurrentlyZoomed;
+    if (swiperRef.current?.swiper) {
+      swiperRef.current.swiper.allowTouchMove = !isCurrentlyZoomed;
     }
   };
 

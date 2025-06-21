@@ -10,7 +10,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
 
   useEffect(() => {
     fetchAllVehicles();
-  }, []);
+  }, [fetchAllVehicles]);
 
   return (
     <article className="flex flex-col min-h-screen bg-white pt-10">
