@@ -10,9 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { useModal } from "@/shared/ui/modal";
 import { RentalStatus } from "@/shared/models/types/current-rental";
 import { handleCarInteraction } from "../../utils/car-interaction";
-import { preventEdgeSwipeNavigation } from "@/shared/utils/preventEdgeSwipe";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
-import { refreshClickFixer } from "@/shared/utils/clickFix";
 
 import { SupportPage } from "@/_pages/support";
 import SearchPage from "@/_pages/search";
@@ -40,7 +38,6 @@ export default function GoogleMapsPage() {
     refreshUser();
   }, [refreshUser]);
 
-  // Отслеживание изменений статуса аренды и автоматическое переключение модалок
   useEffect(() => {
     if (user?.current_rental) {
       const currentStatus = user.current_rental.rental_details.status;

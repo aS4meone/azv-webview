@@ -22,17 +22,36 @@ interface FlutterWebViewInterface {
   flutterLocationResult?: (result: GeolocationResult) => void;
 }
 
-// Получаем типизированный window
-const flutterWindow = window as Window & FlutterWebViewInterface;
+// Получаем типизированный window безопасно
+const getFlutterWindow = (): (Window & FlutterWebViewInterface) | null => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+  return window as Window & FlutterWebViewInterface;
+};
 
 // Проверяем, работаем ли мы в Flutter WebView
 const isFlutterWebView = (): boolean => {
-  return typeof flutterWindow.flutter_inappwebview !== "undefined";
+  const flutterWindow = getFlutterWindow();
+  return (
+    flutterWindow !== null &&
+    typeof flutterWindow.flutter_inappwebview !== "undefined"
+  );
 };
 
 // Получение геолокации через Flutter
 const getLocationFromFlutter = (): Promise<GeolocationResult> => {
   return new Promise((resolve) => {
+    const flutterWindow = getFlutterWindow();
+
+    if (!flutterWindow) {
+      resolve({
+        success: false,
+        error: "Window not available (SSR environment)",
+      });
+      return;
+    }
+
     // Устанавливаем callback для результата
     flutterWindow.flutterLocationResult = (result: GeolocationResult) => {
       resolve(result);

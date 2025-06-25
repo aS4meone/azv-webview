@@ -131,13 +131,12 @@ export const MapWithMarkers = ({
   const markerPoolRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
   const visibleMarkersRef = useRef<Set<number>>(new Set());
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const lastViewportRef = useRef<google.maps.LatLngBounds | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
   // Функции для работы с кэшем
   const isCacheValid = useCallback(
-    (
-      cacheEntry: CacheEntry<any> | null,
+    <T,>(
+      cacheEntry: CacheEntry<T> | null,
       hasCurrentRental: boolean
     ): boolean => {
       if (!cacheEntry) return false;
@@ -329,7 +328,7 @@ export const MapWithMarkers = ({
       lastFetchTimeRef.current = now;
 
       if (user?.role === UserRole.MECHANIC) {
-        const [mechanicVehicles, deliveryVehicle] = await Promise.all([
+        await Promise.all([
           fetchAllMechanicVehicles(),
           fetchCurrentDeliveryVehicle(),
         ]);
@@ -524,7 +523,7 @@ export const MapWithMarkers = ({
       const showDetails = roundedZoom >= ZOOM_LEVELS.LARGE_MARKERS;
 
       // Попробуем переиспользовать существующий маркер
-      let reuseMarker = existingMarker || getMarkerFromPool();
+      const reuseMarker = existingMarker || getMarkerFromPool();
 
       // Create marker content
       const markerDiv = document.createElement("div");

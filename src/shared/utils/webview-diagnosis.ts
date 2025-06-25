@@ -140,7 +140,11 @@ export class WebViewDiagnosis {
       }
 
       // Проверка tap-highlight
-      const tapHighlight = (computedStyle as any).webkitTapHighlightColor;
+      const tapHighlight = (
+        computedStyle as CSSStyleDeclaration & {
+          webkitTapHighlightColor?: string;
+        }
+      ).webkitTapHighlightColor;
       if (
         tapHighlight &&
         tapHighlight !== "transparent" &&
@@ -363,7 +367,11 @@ export class WebViewDiagnosis {
     );
 
     clickableElements.forEach((element) => {
-      const style = (element as HTMLElement).style as any;
+      const style = (element as HTMLElement).style as CSSStyleDeclaration & {
+        touchAction?: string;
+        webkitTouchCallout?: string;
+        webkitTapHighlightColor?: string;
+      };
       style.touchAction = "manipulation";
       style.webkitTouchCallout = "none";
       style.webkitTapHighlightColor = "transparent";

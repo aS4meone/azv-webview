@@ -38,7 +38,11 @@ const FooterBtns = () => {
     useState<ServiceButtonType | null>(null);
   const [currentComponent, setCurrentComponent] = useState<string | null>(null);
 
-  const trackingCarId = localStorage.getItem("tracking_car_id");
+  // Безопасное получение trackingCarId для SSR
+  const trackingCarId =
+    typeof window !== "undefined"
+      ? localStorage.getItem("tracking_car_id")
+      : null;
 
   const components = [
     {

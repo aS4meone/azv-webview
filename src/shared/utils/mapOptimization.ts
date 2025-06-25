@@ -125,6 +125,12 @@ export const getOptimizedMarkerSettings = (zoom: number) => {
 
 // Функция для предзагрузки изображений маркеров
 export const preloadMarkerImages = (imagePaths: string[]): Promise<void[]> => {
+  // Проверяем, доступен ли Image конструктор (только в браузере)
+  if (typeof Image === "undefined") {
+    // В SSR возвращаем resolved промисы
+    return Promise.all(imagePaths.map(() => Promise.resolve()));
+  }
+
   const promises = imagePaths.map((path) => {
     return new Promise<void>((resolve, reject) => {
       const img = new Image();
