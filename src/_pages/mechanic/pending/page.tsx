@@ -8,7 +8,6 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
   const { fetchPendingVehicles, pendingVehicles, isLoadingPending } =
     useVehiclesStore();
 
-  console.log(pendingVehicles);
   useEffect(() => {
     fetchPendingVehicles();
   }, [fetchPendingVehicles]);

@@ -35,23 +35,6 @@ export default function GoogleMapsPage() {
       component: <SupportPage />,
     },
   ];
-  useEffect(() => {
-    preventEdgeSwipeNavigation();
-
-    // Устанавливаем периодическую проверку и восстановление кликов для WebView
-    const clickCheckInterval = setInterval(() => {
-      if (
-        typeof (window as { flutter_inappwebview?: unknown })
-          .flutter_inappwebview !== "undefined"
-      ) {
-        refreshClickFixer();
-      }
-    }, 10000); // Каждые 10 секунд
-
-    return () => {
-      clearInterval(clickCheckInterval);
-    };
-  }, []);
 
   useEffect(() => {
     refreshUser();
@@ -135,7 +118,7 @@ export default function GoogleMapsPage() {
         intervalRef.current = null;
       }
     };
-  }, [user?.current_rental?.rental_details.status, refreshUser]);
+  }, [, refreshUser]);
 
   return (
     <div className="relative h-screen w-full overflow-hidden">

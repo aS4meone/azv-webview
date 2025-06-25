@@ -33,7 +33,6 @@ export const DeliveryPointProvider: React.FC<{ children: ReactNode }> = ({
         visible: boolean;
       }>
     ) => {
-      console.log("Received updateDeliveryPoint event:", event.detail);
       setDeliveryPoint(event.detail.coordinates);
       setIsVisible(event.detail.visible);
     };

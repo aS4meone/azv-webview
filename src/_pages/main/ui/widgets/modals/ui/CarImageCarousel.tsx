@@ -30,7 +30,6 @@ export const CarImageCarousel = ({
     {}
   );
   const swiperRef = useRef<SwiperType | null>(null);
-  console.log("CarImageCarousel", car);
 
   const [showImageViewer, setShowImageViewer] = useState(false);
   const [initialImageSlide, setInitialImageSlide] = useState(0);

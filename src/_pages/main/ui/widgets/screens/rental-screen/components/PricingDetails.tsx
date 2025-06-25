@@ -1,5 +1,6 @@
 import React from "react";
 import { ICar } from "@/shared/models/types/car";
+import { CostCalculation } from "../hooks/usePricingCalculator";
 
 interface RentalConfig {
   hasOpeningFee: boolean;
@@ -12,13 +13,18 @@ interface PricingDetailsProps {
   car: ICar;
   pricePerUnit: number;
   totalCost: number;
+  costCalculation?: CostCalculation;
 }
 
 export const PricingDetails = ({
   config,
   pricePerUnit,
   totalCost,
+  costCalculation,
 }: PricingDetailsProps) => {
+  const hasDiscount =
+    costCalculation?.discountPercent && costCalculation.discountPercent > 0;
+
   return (
     <div className="space-y-3">
       <h3 className="text-[18px] font-medium text-[#191919]">Стоимость</h3>
@@ -31,13 +37,20 @@ export const PricingDetails = ({
         </div>
       </div>
 
-      {!config.hasOpeningFee && (
-        <div className=" pt-3">
-          <div className="text-3xl font-bold text-[#191919] transition-all duration-300">
-            Итог: {totalCost.toLocaleString()} ₸
+      {!config.hasOpeningFee &&
+        costCalculation?.totalCost &&
+        costCalculation?.totalCost > 0 && (
+          <div className="pt-3">
+            <div className="text-3xl font-bold text-[#191919] transition-all duration-300">
+              Итог: {totalCost.toLocaleString()} ₸
+              {hasDiscount === true && (
+                <div className="text-sm font-normal text-green-600 mt-1">
+                  Экономия {costCalculation?.discountAmount?.toLocaleString()} ₸
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 };

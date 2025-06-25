@@ -70,7 +70,7 @@ export function CustomPushScreen({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             style={{ zIndex: zIndex - 1 }}
-            onClick={onClose}
+            onClick={isCloseable ? onClose : undefined}
           />
           <motion.div
             className={cn(
@@ -94,73 +94,83 @@ export function CustomPushScreen({
             animate={{ x: 0, y: 0 }}
             exit={exitPosition}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            drag={isVertical ? "y" : "x"}
+            drag={isCloseable ? (isVertical ? "y" : "x") : false}
             dragDirectionLock
             dragConstraints={
-              direction === "right"
-                ? { top: 0, bottom: 0, left: 0, right: window.innerWidth }
-                : direction === "left"
-                ? { top: 0, bottom: 0, left: -window.innerWidth, right: 0 }
-                : direction === "bottom"
-                ? { top: 0, bottom: window.innerHeight, left: 0, right: 0 }
-                : direction === "top"
-                ? { top: -window.innerHeight, bottom: 0, left: 0, right: 0 }
+              isCloseable
+                ? direction === "right"
+                  ? { top: 0, bottom: 0, left: 0, right: window.innerWidth }
+                  : direction === "left"
+                  ? { top: 0, bottom: 0, left: -window.innerWidth, right: 0 }
+                  : direction === "bottom"
+                  ? { top: 0, bottom: window.innerHeight, left: 0, right: 0 }
+                  : direction === "top"
+                  ? { top: -window.innerHeight, bottom: 0, left: 0, right: 0 }
+                  : { top: 0, bottom: 0, left: 0, right: 0 }
                 : { top: 0, bottom: 0, left: 0, right: 0 }
             }
             dragElastic={0}
-            onDragEnd={(e, info) => {
-              const offset = isVertical ? info.offset.y : info.offset.x;
-              const threshold =
-                dragThreshold *
-                (direction === "left" || direction === "top" ? -1 : 1);
-              if (
-                (isCloseable && direction === "right" && offset > threshold) ||
-                (isCloseable && direction === "left" && offset < threshold) ||
-                (isCloseable && direction === "bottom" && offset > threshold) ||
-                (isCloseable && direction === "top" && offset < threshold)
-              ) {
-                onClose();
-              }
-            }}
+            onDragEnd={
+              isCloseable
+                ? (e, info) => {
+                    const offset = isVertical ? info.offset.y : info.offset.x;
+                    const threshold =
+                      dragThreshold *
+                      (direction === "left" || direction === "top" ? -1 : 1);
+                    if (
+                      (direction === "right" && offset > threshold) ||
+                      (direction === "left" && offset < threshold) ||
+                      (direction === "bottom" && offset > threshold) ||
+                      (direction === "top" && offset < threshold)
+                    ) {
+                      onClose();
+                    }
+                  }
+                : undefined
+            }
           >
             {withHeader &&
               (direction === "bottom" ? (
                 <>
-                  <Button
-                    onClick={onClose}
-                    variant="icon"
-                    className="ml-auto absolute right-4 top-10 z-10"
-                  >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
+                  {isCloseable && (
+                    <Button
+                      onClick={onClose}
+                      variant="icon"
+                      className="ml-auto absolute right-4 top-10 z-10"
                     >
-                      <path
-                        d="M18 6L6 18"
-                        stroke="black"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M6 6L18 18"
-                        stroke="black"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </Button>
+                      <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M18 6L6 18"
+                          stroke="black"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M6 6L18 18"
+                          stroke="black"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Button>
+                  )}
                 </>
               ) : (
                 <header className="flex items-center justify-between px-6 pt-12 pb-4 transition-shadow duration-200">
                   <div className="flex items-center">
-                    <Button onClick={onClose} variant="icon" className="mr-2">
-                      <ArrowLeftIcon color="black" />
-                    </Button>
+                    {isCloseable && (
+                      <Button onClick={onClose} variant="icon" className="mr-2">
+                        <ArrowLeftIcon color="black" />
+                      </Button>
+                    )}
                   </div>
 
                   {title && <h1 className="text-xl mr-4">{title}</h1>}

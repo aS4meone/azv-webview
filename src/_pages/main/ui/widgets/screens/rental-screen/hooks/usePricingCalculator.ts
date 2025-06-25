@@ -35,13 +35,40 @@ const getRussianPlural = (
   return many;
 };
 
+// Функция для расчета скидки для дневного тарифа
+const calculateDaysDiscount = (
+  duration: number
+): {
+  discountPercent: number;
+  discountAmount: number;
+  baseCost: number;
+  finalCost: number;
+} => {
+  let discountPercent = 0;
+
+  if (duration >= 30) {
+    discountPercent = 15;
+  } else if (duration >= 7) {
+    discountPercent = 10;
+  } else if (duration >= 3) {
+    discountPercent = 5;
+  }
+
+  return {
+    discountPercent,
+    discountAmount: 0, // будет рассчитан позже
+    baseCost: 0, // будет рассчитан позже
+    finalCost: 0, // будет рассчитан позже
+  };
+};
+
 export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
   minutes: {
     title: "Поминутная аренда",
-    description: "При поминутной аренде взимается доплата за открытие.",
+    description: "При поминутной аренде взимается плата за открытие.",
     getDescription: (car: ICar) => {
       const openingFee = car.open_price as number;
-      return `При поминутной аренде взимается доплата ${openingFee.toLocaleString()} ₸ за открытие.`;
+      return `При поминутной аренде взимается плата ${openingFee.toLocaleString()} ₸ за открытие.`;
     },
     unit: "в минуту",
     maxDuration: 120,
@@ -56,7 +83,7 @@ export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
     description: "",
     getDescription: (car: ICar) => {
       const openingFee = car.open_price as number;
-      return `Удобный тариф для коротких поездок и дел в городе. За открытие двери автомобиля взимается доплата ${openingFee.toLocaleString()} ₸ за открытие.`;
+      return `Удобный тариф для коротких поездок и дел в городе. За открытие двери автомобиля взимается плата ${openingFee.toLocaleString()} ₸ за открытие.`;
     },
     unit: "в час",
     maxDuration: 24,
@@ -68,6 +95,7 @@ export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
   days: {
     title: "Суточная аренда",
     description: "Выгодный тариф для длительного использования автомобиля.",
+
     unit: "в день",
     maxDuration: 365,
     priceKey: "price_per_day",
@@ -83,6 +111,14 @@ export interface RentalData {
   duration: number;
 }
 
+export interface CostCalculation {
+  baseCost: number;
+  totalCost: number;
+  discountPercent?: number;
+  discountAmount?: number;
+  originalCost?: number;
+}
+
 export const usePricingCalculator = (car: ICar) => {
   const [activeTab, setActiveTab] = useState<RentalType>("minutes");
   const [duration, setDuration] = useState(1);
@@ -90,7 +126,10 @@ export const usePricingCalculator = (car: ICar) => {
   const currentConfig = RENTAL_CONFIG[activeTab];
 
   const calculateCost = useCallback(
-    (rentalType: RentalType, currentDuration: number = duration) => {
+    (
+      rentalType: RentalType,
+      currentDuration: number = duration
+    ): CostCalculation => {
       const config = RENTAL_CONFIG[rentalType];
       const pricePerUnit = car[config.priceKey] as number;
 
@@ -106,23 +145,50 @@ export const usePricingCalculator = (car: ICar) => {
         };
       }
 
-      // Для часов и дней обычный расчет
-      const baseCost = pricePerUnit * currentDuration;
-      const openingFee =
-        config.hasOpeningFee && config.openingFeeKey
-          ? (car[config.openingFeeKey] as number)
-          : 0;
+      // Для часов обычный расчет
+      if (rentalType === "hours") {
+        const baseCost = pricePerUnit * currentDuration;
+        const openingFee =
+          config.hasOpeningFee && config.openingFeeKey
+            ? (car[config.openingFeeKey] as number)
+            : 0;
 
+        return {
+          baseCost,
+          totalCost: baseCost + openingFee,
+        };
+      }
+
+      // Для дней расчет со скидками
+      if (rentalType === "days") {
+        const originalCost = pricePerUnit * currentDuration;
+        const discountInfo = calculateDaysDiscount(currentDuration);
+
+        const discountAmount =
+          (originalCost * discountInfo.discountPercent) / 100;
+        const finalCost = originalCost - discountAmount;
+
+        return {
+          baseCost: originalCost,
+          totalCost: finalCost,
+          discountPercent: discountInfo.discountPercent,
+          discountAmount: discountAmount,
+          originalCost: originalCost,
+        };
+      }
+
+      // Fallback
+      const baseCost = pricePerUnit * currentDuration;
       return {
         baseCost,
-        totalCost: baseCost + openingFee,
+        totalCost: baseCost,
       };
     },
     [car, duration]
   );
 
   // Расчет стоимости для текущего активного таба
-  const { totalCost, baseCost } = useMemo(() => {
+  const costCalculation = useMemo(() => {
     return calculateCost(activeTab, duration);
   }, [activeTab, duration, calculateCost]);
 
@@ -138,17 +204,14 @@ export const usePricingCalculator = (car: ICar) => {
   }, [duration, currentConfig.maxDuration]);
 
   const decrementDuration = useCallback(() => {
-    if (duration > 1) {
+    if (duration > 0) {
       setDuration((prev) => prev - 1);
     }
   }, [duration]);
 
   const setDurationDirect = useCallback(
     (newDuration: number) => {
-      const clampedDuration = Math.max(
-        1,
-        Math.min(currentConfig.maxDuration, newDuration)
-      );
+      const clampedDuration = Math.min(currentConfig.maxDuration, newDuration);
       setDuration(clampedDuration);
     },
     [currentConfig.maxDuration]
@@ -166,8 +229,9 @@ export const usePricingCalculator = (car: ICar) => {
     activeTab,
     duration,
     currentConfig,
-    totalCost,
-    baseCost,
+    totalCost: costCalculation.totalCost,
+    baseCost: costCalculation.baseCost,
+    costCalculation,
     calculateCost,
     handleTabChange,
     incrementDuration,

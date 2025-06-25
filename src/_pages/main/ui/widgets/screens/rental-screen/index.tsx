@@ -14,7 +14,6 @@ interface RentalPageProps {
 
 export const RentalPage = ({
   car,
-
   onRent,
   isDelivery,
   deliveryAddress,
@@ -75,6 +74,7 @@ export const RentalPage = ({
                 car={car}
                 duration={duration}
                 totalCost={calculateCost(rentalType).totalCost}
+                costCalculation={calculateCost(rentalType)}
                 onIncrement={incrementDuration}
                 onDecrement={decrementDuration}
                 onDurationChange={setDurationDirect}
@@ -85,7 +85,12 @@ export const RentalPage = ({
 
         {/* Rent Button */}
         <div className="pt-4">
-          <Button variant="secondary" onClick={handleRent} className="w-full">
+          <Button
+            variant="secondary"
+            onClick={handleRent}
+            className="w-full"
+            disabled={duration <= 0}
+          >
             {isDelivery ? "Заказать доставку" : "Забронировать"}
           </Button>
         </div>

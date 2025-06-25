@@ -10,10 +10,9 @@ import { RentCarDto } from "@/shared/models/dto/rent.dto";
 import { useUserStore } from "@/shared/stores/userStore";
 import { RentalData } from "../../screens/rental-screen/hooks/usePricingCalculator";
 import { RentalPage } from "../../screens/rental-screen";
-import { ROUTES } from "@/shared/constants/routes";
-import { useFormatCarInUrl } from "@/shared/utils/formatCarInUrl";
 import { DeliveryAddressScreen } from "../../screens/delivery-screen/DeliveryAddressScreen";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
+import { WalletPage } from "@/_pages/wallet";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -28,14 +27,8 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
 
-  const { redirectToCar } = useFormatCarInUrl({
-    car: {
-      id: car.id,
-      lat: car.latitude,
-      lng: car.longitude,
-    },
-    route: ROUTES.WALLET,
-  });
+  const [showWalletPage, setShowWalletPage] = useState(false);
+
   const [deliveryAddress, setDeliveryAddress] = useState<{
     lat: number;
     lng: number;
@@ -45,7 +38,6 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const handleClose = async () => {
     setResponseModal(null);
     await refreshUser();
-    onClose();
   };
 
   const handleRent = async (rentalData: RentalData) => {
@@ -60,12 +52,20 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       if (res.status === 200) {
         setResponseModal({
           isOpen: true,
-          onClose: handleClose,
+          onClose: async () => {
+            onClose();
+            setResponseModal(null);
+            await refreshUser();
+          },
           type: "success",
           title: "Успешно забронированно",
           description: "Успешно забронированно",
           buttonText: "Отлично",
-          onButtonClick: handleClose,
+          onButtonClick: async () => {
+            onClose();
+            setResponseModal(null);
+            await refreshUser();
+          },
         });
       }
     } catch (error: unknown) {
@@ -83,7 +83,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           description: apiError.response.data.detail,
           buttonText: "Пополнить баланс",
           onButtonClick: () => {
-            redirectToCar();
+            setShowWalletPage(true);
           },
         });
       } else {
@@ -120,25 +120,51 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       if (res.status === 200) {
         setResponseModal({
           isOpen: true,
-          onClose: handleClose,
+          onClose: async () => {
+            onClose();
+            setResponseModal(null);
+            await refreshUser();
+          },
           type: "success",
           title: "Успешно забронированно",
           description: "Доставка успешно заказана",
           buttonText: "Отлично",
-          onButtonClick: handleClose,
+          onButtonClick: async () => {
+            onClose();
+            setResponseModal(null);
+            await refreshUser();
+          },
         });
       }
     } catch (error: unknown) {
       const apiError = error as { response: { data: { detail: string } } };
-      setResponseModal({
-        isOpen: true,
-        onClose: handleClose,
-        type: "error",
-        title: "Ошибка",
-        description: apiError.response.data.detail,
-        buttonText: "Попробовать снова",
-        onButtonClick: handleClose,
-      });
+      console.log(apiError.response.data.detail);
+
+      if (
+        apiError.response.data.detail.includes("Пожалуйста, пополните счёт")
+      ) {
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
+          type: "error",
+          title: "Ошибка",
+          description: apiError.response.data.detail,
+          buttonText: "Пополнить баланс",
+          onButtonClick: () => {
+            setShowWalletPage(true);
+          },
+        });
+      } else {
+        setResponseModal({
+          isOpen: true,
+          onClose: handleClose,
+          type: "error",
+          title: "Ошибка",
+          description: apiError.response.data.detail,
+          buttonText: "Повторить попытку",
+          onButtonClick: handleClose,
+        });
+      }
     }
   };
 
@@ -156,46 +182,34 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         handleClose();
         setResponseModal({
           isOpen: true,
-          onClose: handleClose,
+          onClose: async () => {
+            onClose();
+            setResponseModal(null);
+            await refreshUser();
+          },
           type: "success",
           title: "Успешно забронированно",
           description: "Успешно забронированно",
           buttonText: "Отлично",
-          onButtonClick: handleClose,
+          onButtonClick: async () => {
+            onClose();
+            setResponseModal(null);
+            await refreshUser();
+          },
         });
       }
     } catch (error: unknown) {
       const apiError = error as { response: { data: { detail: string } } };
-      console.log(
-        apiError,
-        apiError.response.data.detail,
-        apiError.response.data.detail.startsWith("Для")
-      );
-      if (apiError.response.data.detail.startsWith("Для")) {
-        setResponseModal({
-          isOpen: true,
-          onClose: handleClose,
-          type: "error",
-          title: "Ошибка",
-          description: apiError.response.data.detail,
-          buttonText: "Пополнить",
-          onButtonClick: () => {
-            redirectToCar();
-          },
-        });
-      } else {
-        setResponseModal({
-          isOpen: true,
-          onClose: handleClose,
-          type: "error",
-          title: "Ошибка",
-          description: apiError.response.data.detail,
-          buttonText: "Попробовать снова",
-          onButtonClick: () => {
-            setShowRentalPage(true);
-          },
-        });
-      }
+
+      setResponseModal({
+        isOpen: true,
+        onClose: handleClose,
+        type: "error",
+        title: "Ошибка",
+        description: apiError.response.data.detail,
+        buttonText: "Попробовать снова",
+        onButtonClick: handleClose,
+      });
     }
   };
 
@@ -213,13 +227,24 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
       <CustomResponseModal
-        onButtonClick={handleClose}
+        onButtonClick={responseModal?.onButtonClick || handleClose}
         isOpen={!!responseModal}
-        onClose={handleClose}
+        onClose={responseModal?.onClose || handleClose}
+        type={responseModal?.type || "success"}
         title={responseModal?.title || ""}
         description={responseModal?.description || ""}
         buttonText={responseModal?.buttonText || ""}
       />
+
+      <CustomPushScreen
+        direction="bottom"
+        isOpen={showWalletPage}
+        onClose={() => setShowWalletPage(false)}
+        className="pt-12"
+      >
+        <WalletPage />
+      </CustomPushScreen>
+
       {showAddressScreen && (
         <CustomPushScreen
           direction="bottom"

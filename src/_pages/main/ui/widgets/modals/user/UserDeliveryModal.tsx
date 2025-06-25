@@ -23,7 +23,6 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
   useEffect(() => {
     // Запускаем интервал каждые 10 секунд
     intervalRef.current = setInterval(() => {
-      console.log("Polling delivery status...");
       refreshUser();
     }, 10000);
 

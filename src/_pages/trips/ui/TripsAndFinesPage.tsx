@@ -15,7 +15,7 @@ const TripsAndFinesPage = () => {
   const fetchTrips = async () => {
     try {
       const response = await historyApi.getHistories();
-      console.log(response.data.trip_history);
+
       setTrips(response.data.trip_history);
     } catch (error) {
       console.error("Failed to fetch trips:", error);

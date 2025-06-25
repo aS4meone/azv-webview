@@ -1,6 +1,6 @@
 import React from "react";
 import { ICar } from "@/shared/models/types/car";
-import { RENTAL_CONFIG } from "../hooks/usePricingCalculator";
+import { RENTAL_CONFIG, CostCalculation } from "../hooks/usePricingCalculator";
 import { DurationSelector } from "./DurationSelector";
 import { PricingDetails } from "./PricingDetails";
 import { AdditionalInfo } from "./AdditionalInfo";
@@ -11,6 +11,7 @@ interface RentalTabContentProps {
   car: ICar;
   duration: number;
   totalCost: number;
+  costCalculation?: CostCalculation;
   onIncrement: () => void;
   onDecrement: () => void;
   onDurationChange?: (duration: number) => void;
@@ -21,6 +22,7 @@ export const RentalTabContent = ({
   car,
   duration,
   totalCost,
+  costCalculation,
   onIncrement,
   onDecrement,
   onDurationChange,
@@ -56,6 +58,7 @@ export const RentalTabContent = ({
         car={car}
         pricePerUnit={pricePerUnit}
         totalCost={totalCost}
+        costCalculation={costCalculation}
       />
 
       {/* Additional Info */}
