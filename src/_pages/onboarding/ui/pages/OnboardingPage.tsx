@@ -64,7 +64,7 @@ const OnboardingPage = () => {
                   alt={slide.title || `Car ${index + 1}`}
                   width={1000}
                   height={1000}
-                  className="object-contain h-full"
+                  className="object-contain h-full sm:object-cover sm:h-[650px]"
                 />
               </SwiperSlide>
             )
