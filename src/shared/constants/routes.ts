@@ -16,4 +16,6 @@ export const ROUTES = {
   MECHANIC_PENDING: "/mechanic/pending",
   MECHANIC_DELIVERY: "/mechanic/delivery",
   MECHANIC_IN_RENT: "/mechanic/in-rent",
+  DELETE_TUTORIAL: "/delete-tutorial",
+  CONTACT: "/contact",
 } as const;

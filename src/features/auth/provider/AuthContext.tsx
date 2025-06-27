@@ -27,7 +27,13 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
 });
 
-const AUTH_ROUTES = [ROUTES.ROOT, ROUTES.AUTH, ROUTES.ONBOARDING] as const;
+const AUTH_ROUTES = [
+  ROUTES.ROOT,
+  ROUTES.AUTH,
+  ROUTES.ONBOARDING,
+  ROUTES.DELETE_TUTORIAL,
+  ROUTES.CONTACT,
+] as const;
 
 const isAuthRoute = (path: string): path is (typeof AUTH_ROUTES)[number] => {
   return AUTH_ROUTES.includes(path as (typeof AUTH_ROUTES)[number]);
