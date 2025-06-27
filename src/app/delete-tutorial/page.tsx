@@ -4,54 +4,10 @@ import { useState } from "react";
 
 export default function DeleteTutorialPage() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showProfileMenu] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [pulseAnimation, setPulseAnimation] = useState(false);
-
-  const steps = ["step1", "step2", "step3"];
-
-  const highlightStep = (stepIndex: number) => {
-    setCurrentStep(stepIndex);
-  };
-
-  const startDemo = () => {
-    setCurrentStep(0);
-    setShowProfileMenu(false);
-    setShowSuccess(false);
-    setPulseAnimation(false);
-    highlightStep(0);
-
-    setTimeout(() => {
-      alert("Demo started! Click on 'John Doe' to begin.");
-    }, 100);
-  };
-
-  const handleProfileClick = () => {
-    if (showProfileMenu) {
-      setShowProfileMenu(false);
-    } else {
-      setShowProfileMenu(true);
-      highlightStep(1);
-
-      setTimeout(() => {
-        const deleteSection = document.querySelector(".delete-section");
-        deleteSection?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-
-        setTimeout(() => {
-          setPulseAnimation(true);
-        }, 1000);
-      }, 500);
-    }
-  };
-
-  const handleDeleteClick = () => {
-    highlightStep(2);
-    setShowDeleteModal(true);
-  };
+  const [pulseAnimation] = useState(false);
 
   const closeModal = () => {
     setShowDeleteModal(false);
