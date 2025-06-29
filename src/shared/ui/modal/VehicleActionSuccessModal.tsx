@@ -23,12 +23,12 @@ const successConfig = {
     description: "Можете начинать поездку",
   },
   lock: {
-    title: "Автомобиль заблокирован",
-    description: "Автомобиль заблокирован",
+    title: "Замки закрыты",
+    description: "Замки закрыты",
   },
   unlock: {
-    title: "Автомобиль разблокирован",
-    description: "Автомобиль разблокирован",
+    title: "замки открыты",
+    description: "замки открыты",
   },
 };
 

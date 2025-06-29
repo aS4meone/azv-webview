@@ -188,8 +188,17 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   },
 
   fetchAllVehicles: async () => {
+    const state = get();
+    if (state.isLoadingAll) {
+      console.log(
+        "[vehiclesStore] fetchAllVehicles: уже загружается, пропускаем"
+      );
+      return;
+    }
+
     try {
       set({ isLoadingAll: true, error: null });
+      console.log("[vehiclesStore] fetchAllVehicles: начинаем запрос");
       const response = await vehicleApi.getVehicles();
       set({ allVehicles: response?.vehicles || [], isLoadingAll: false });
     } catch (error) {
@@ -225,8 +234,17 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   },
 
   fetchPendingVehicles: async () => {
+    const state = get();
+    if (state.isLoadingPending) {
+      console.log(
+        "[vehiclesStore] fetchPendingVehicles: уже загружается, пропускаем"
+      );
+      return;
+    }
+
     try {
       set({ isLoadingPending: true, error: null });
+      console.log("[vehiclesStore] fetchPendingVehicles: начинаем запрос");
       const response = await mechanicApi.getPendingVehicles();
       set({
         pendingVehicles: response.data.vehicles || [],
@@ -270,8 +288,19 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   },
 
   fetchFrequentlyUsedVehicles: async () => {
+    const state = get();
+    if (state.isLoadingFrequent) {
+      console.log(
+        "[vehiclesStore] fetchFrequentlyUsedVehicles: уже загружается, пропускаем"
+      );
+      return;
+    }
+
     try {
       set({ isLoadingFrequent: true, error: null });
+      console.log(
+        "[vehiclesStore] fetchFrequentlyUsedVehicles: начинаем запрос"
+      );
       const response = await vehicleApi.frequentlyUsedVehicles();
       set({
         frequentlyUsedVehicles: response?.vehicles || [],

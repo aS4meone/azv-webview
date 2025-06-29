@@ -18,6 +18,7 @@ export const CustomResponseModal = ({
       onClose={onClose}
       withHeader={false}
       fullScreen={false}
+      isCloseable={true}
       direction="bottom"
       height="auto"
     >

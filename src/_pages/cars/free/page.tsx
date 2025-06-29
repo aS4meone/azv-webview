@@ -2,11 +2,13 @@
 import { CarCard } from "@/entities/car-card";
 import React, { useEffect } from "react";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
+import { webviewDebugger } from "@/shared/utils/webview-debug";
 
 const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
   const { fetchAllVehicles, allVehicles, isLoadingAll } = useVehiclesStore();
 
   useEffect(() => {
+    webviewDebugger.logRequest("FreeCarsPage", "fetchAllVehicles");
     fetchAllVehicles();
   }, [fetchAllVehicles]);
 

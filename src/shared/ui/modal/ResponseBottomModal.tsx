@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 export interface ResponseBottomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   description: string;
   buttonText: string;
   onButtonClick: () => void;
@@ -18,7 +18,7 @@ export interface ResponseBottomModalProps {
 
 export interface ResponseBottomModalContentProps {
   type: "success" | "error";
-  title: string;
+  title?: string;
   description: string;
   buttonText: string;
   onButtonClick: () => void;
@@ -174,7 +174,7 @@ export const ResponseBottomModalContent = ({
           transition={{ duration: 0.3, delay: 0.4 }}
           className="text-[18px] font-medium mb-2 text-[#191919]"
         >
-          {title}
+          {title ?? ""}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}

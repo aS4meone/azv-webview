@@ -42,11 +42,6 @@ export const AboutContent = () => {
       icon: <DollarSign className="w-6 h-6" />,
     },
     {
-      title: "Страховка включена",
-      description: "Все автомобили застрахованы по КАСКО и ОСАГО",
-      icon: <Shield className="w-6 h-6" />,
-    },
-    {
       title: "Поддержка 24/7",
       description: "Наша служба поддержки всегда готова помочь",
       icon: <Phone className="w-6 h-6" />,
@@ -63,11 +58,6 @@ export const AboutContent = () => {
       value: "500+",
       label: "Автомобилей в парке",
       icon: <MapPin className="w-5 h-5" />,
-    },
-    {
-      value: "99.9%",
-      label: "Время работы сервиса",
-      icon: <Award className="w-5 h-5" />,
     },
   ];
 

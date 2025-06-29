@@ -225,9 +225,9 @@ const WalletPage = () => {
       <CustomPushScreen
         isOpen={isPromoCodeModalOpen}
         onClose={() => setIsPromoCodeModalOpen(false)}
-        withHeader={false}
         fullScreen={false}
         direction="bottom"
+        withCloseButton={false}
         height="auto"
       >
         <PromoCodeModal onSubmit={handleApplyPromoCode} isLoading={isLoading} />

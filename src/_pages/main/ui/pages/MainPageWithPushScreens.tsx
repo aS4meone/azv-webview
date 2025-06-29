@@ -7,20 +7,21 @@ import { FooterBtns } from "../widgets/footer-btns";
 import SearchIcon from "@/shared/icons/ui/SearchIcon";
 import { useUserStore } from "@/shared/stores/userStore";
 import { useEffect, useRef, useState } from "react";
-import { useModal } from "@/shared/ui/modal";
 import { RentalStatus } from "@/shared/models/types/current-rental";
 import { handleCarInteraction } from "../../utils/car-interaction";
-import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { usePushScreenActions } from "@/shared/hooks/usePushScreenActions";
 import { webviewDebugger } from "@/shared/utils/webview-debug";
 
 import { SupportPage } from "@/_pages/support";
 import SearchPage from "@/_pages/search";
 
-export default function GoogleMapsPage() {
+export default function MainPageWithPushScreens() {
   const { refreshUser, user } = useUserStore();
-  const { showModal, hideModal, isModalOpen } = useModal();
+  const { openBottomSheet, closePushScreen, closeAllPushScreens } =
+    usePushScreenActions();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const previousStatusRef = useRef<RentalStatus | null>(null);
+  const [currentModalId, setCurrentModalId] = useState<string | null>(null);
 
   const [currentComponent, setCurrentComponent] = useState<string | null>(null);
   const components = [
@@ -39,6 +40,22 @@ export default function GoogleMapsPage() {
     refreshUser();
   }, [refreshUser]);
 
+  // Function to show modal using push screen system
+  const showCarModal = (content: React.ReactNode) => {
+    // Close any existing modal first
+    if (currentModalId) {
+      closePushScreen(currentModalId);
+    }
+
+    // Open new modal
+    const id = openBottomSheet(content, {
+      onClose: () => {
+        setCurrentModalId(null);
+      },
+    });
+    setCurrentModalId(id);
+  };
+
   useEffect(() => {
     if (user?.current_rental) {
       const currentStatus = user.current_rental.rental_details.status;
@@ -47,14 +64,13 @@ export default function GoogleMapsPage() {
       if (
         previousStatusRef.current !== null &&
         previousStatusRef.current !== currentStatus &&
-        isModalOpen
+        currentModalId
       ) {
-        console.log(
-          `[MainPage] Status changed from ${previousStatusRef.current} to ${currentStatus}, switching modal`
-        );
-
         // Закрываем текущую модалку
-        hideModal();
+        if (currentModalId) {
+          closePushScreen(currentModalId);
+          setCurrentModalId(null);
+        }
 
         // Небольшая задержка для плавного перехода
         setTimeout(() => {
@@ -63,21 +79,15 @@ export default function GoogleMapsPage() {
             user,
             notRentedCar: user.current_rental!.car_details,
             hideModal: () => {
-              hideModal();
+              if (currentModalId) {
+                closePushScreen(currentModalId);
+                setCurrentModalId(null);
+              }
             },
           });
 
           if (content) {
-            console.log(
-              `[MainPage] Showing new modal for status: ${currentStatus}`
-            );
-            showModal({
-              children: content,
-            });
-          } else {
-            console.log(
-              `[MainPage] No modal needed for status: ${currentStatus}`
-            );
+            showCarModal(content);
           }
         }, 100);
       }
@@ -85,10 +95,14 @@ export default function GoogleMapsPage() {
       // Обновляем предыдущий статус
       previousStatusRef.current = currentStatus;
     } else {
-      // Если аренды нет, сбрасываем предыдущий статус
+      // Если аренды нет, сбрасываем предыдущий статус и закрываем модалку
       previousStatusRef.current = null;
+      if (currentModalId) {
+        closePushScreen(currentModalId);
+        setCurrentModalId(null);
+      }
     }
-  }, [user?.current_rental, user, showModal, hideModal, isModalOpen]);
+  }, [user?.current_rental, user, currentModalId, closePushScreen]);
 
   // Интервал для обновления пользователя с разной частотой в зависимости от статуса
   useEffect(() => {
@@ -129,6 +143,11 @@ export default function GoogleMapsPage() {
     };
   }, [user?.current_rental, refreshUser]);
 
+  // Function to open push screens for components
+  const openPushScreenComponent = (key: string) => {
+    setCurrentComponent(key);
+  };
+
   return (
     <div className="relative h-screen w-full overflow-hidden">
       <MapComponent />
@@ -139,7 +158,7 @@ export default function GoogleMapsPage() {
           variant="icon"
           className="absolute top-10 right-20 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
           onClick={() => {
-            setCurrentComponent("search");
+            openPushScreenComponent("search");
           }}
         >
           <SearchIcon />
@@ -149,22 +168,29 @@ export default function GoogleMapsPage() {
         variant="icon"
         className="absolute top-10 right-4 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
         onClick={() => {
-          setCurrentComponent("support");
+          openPushScreenComponent("support");
         }}
       >
         <ChatIcon />
       </Button>
 
-      <CustomPushScreen
-        isOpen={!!currentComponent}
-        onClose={() => {
-          setCurrentComponent(null);
-        }}
-        direction="right"
-        height="auto"
-      >
-        {components.find((c) => c.key === currentComponent)?.component}
-      </CustomPushScreen>
+      {/* Using push screen system for components */}
+      {currentComponent &&
+        (() => {
+          const component = components.find((c) => c.key === currentComponent);
+          if (component) {
+            const id = openBottomSheet(component.component, {
+              direction: "right",
+              height: "auto",
+              onClose: () => {
+                setCurrentComponent(null);
+              },
+            });
+            return null; // The component is rendered by the push screen system
+          }
+          return null;
+        })()}
+
       <FooterBtns />
     </div>
   );

@@ -49,7 +49,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     setLoadingStates((prev) => ({ ...prev, [photoId]: loading }));
   };
 
-  // Универсальная обработка выбора фото через Flutter
   const handleFlutterPhotoSelect = async (
     photoId: string,
     photoConfig: PhotoConfig
@@ -57,9 +56,14 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     try {
       setPhotoLoading(photoId, true);
 
+      // Очищаем старые фотографии сразу при входе в камеру
+      setSelectedFiles((prev) => ({
+        ...prev,
+        [photoId]: [],
+      }));
+
       let files: File[] = [];
 
-      // Определяем тип камеры
       let cameraType: "front" | "back" =
         photoConfig.cameraType || (photoConfig.isSelfy ? "front" : "back");
 
@@ -70,7 +74,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
         photoConfig: photoConfig,
       });
 
-      // Дополнительная проверка типа
       if (cameraType !== "front" && cameraType !== "back") {
         console.warn(
           `⚠️ Некорректный cameraType: ${cameraType}, используем 'back'`
@@ -81,7 +84,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       console.log(`📱 Финальный cameraType для съемки: ${cameraType}`);
 
       if (photoConfig.multiple) {
-        // Множественные фото только с камеры
         console.log(
           `📷 Множественные фото с камеры: ${photoConfig.multiple.min}-${photoConfig.multiple.max}, камера: ${cameraType}`
         );
@@ -104,7 +106,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
 
         files = FlutterCamera.base64ArrayToFiles(base64Images, photoId);
       } else {
-        // Одиночное фото с камеры (включая селфи)
         console.log(
           `📸 ${
             photoConfig.isSelfy ? "Селфи" : "Фото"
@@ -137,6 +138,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       }));
     } catch (error) {
       console.error("Flutter camera error:", error);
+
+      // При ошибке или отмене оставляем фотографии очищенными
+      // (они уже были очищены в начале функции)
+
       showModal({
         type: "error",
         title: "Ошибка",
@@ -149,7 +154,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     }
   };
 
-  // Функция для исправления реверса изображения
   const flipImageHorizontally = (file: File): Promise<File> => {
     return new Promise((resolve) => {
       const canvas = document.createElement("canvas");
@@ -158,7 +162,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
 
       if (!ctx) {
         console.error("Canvas context не поддерживается");
-        resolve(file); // Fallback если Canvas не поддерживается
+        resolve(file);
         return;
       }
 
@@ -181,7 +185,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                 resolve(flippedFile);
               } else {
                 console.error("Не удалось создать blob из canvas");
-                resolve(file); // Fallback
+                resolve(file);
               }
             },
             file.type,
@@ -189,13 +193,13 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
           );
         } catch (error) {
           console.error("Ошибка при обработке изображения:", error);
-          resolve(file); // Fallback
+          resolve(file);
         }
       };
 
       img.onerror = () => {
         console.error("Ошибка загрузки изображения");
-        resolve(file); // Fallback
+        resolve(file);
       };
 
       img.src = URL.createObjectURL(file);
@@ -238,8 +242,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       return;
     }
 
-    // Проверка размера файлов (например, максимум 10MB на файл)
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 10 * 1024 * 1024;
     const oversizedFiles = files.filter((file) => file.size > maxSize);
     if (oversizedFiles.length > 0) {
       showModal({
@@ -295,104 +298,108 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const isFlutterAvailable = FlutterCamera.isAvailable();
 
   const content = (
-    <div className="flex flex-col gap-8 pb-[100px] pt-12">
-      {config.map((photo) => (
-        <div key={photo.id} className="flex flex-col gap-2">
-          <div className="flex items-start gap-2">
-            <div>
-              {selectedFiles[photo.id] ? (
-                <GoodIcon className="w-6 h-6" width={32} height={32} />
-              ) : (
-                <BadIcon className="w-6 h-6" width={32} height={32} />
-              )}
-            </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="text-[17px] leading-[22px] font-normal text-[#000000]">
-                {photo.title}
-              </h3>
-              {photo.multiple && (
-                <p className="text-[17px] leading-[22px] font-normal text-[#000000]">
-                  Минимум {photo.multiple.min}, максимум {photo.multiple.max}.
-                </p>
-              )}
-            </div>
-          </div>
+    <div className="flex flex-col gap-20 pb-[100px] pt-12 h-full">
+      <div className="pt-24"></div>
 
-          {isFlutterAvailable ? (
-            // Flutter камера доступна - используем везде
-            <button
-              onClick={() => handleFlutterPhotoSelect(photo.id, photo)}
-              disabled={loadingStates[photo.id] || isLoading}
-              className="block w-full"
-            >
-              <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
-                <div className="flex items-center gap-2">
-                  {loadingStates[photo.id] ? (
-                    <Loader color="#191919" />
-                  ) : (
+      <div className="flex flex-col gap-8 ">
+        {config.map((photo) => (
+          <div key={photo.id} className="flex flex-col gap-2">
+            <div className="flex items-start gap-2">
+              <div>
+                {selectedFiles[photo.id]?.length > 0 ? (
+                  <GoodIcon className="w-6 h-6" width={32} height={32} />
+                ) : (
+                  <BadIcon className="w-6 h-6" width={32} height={32} />
+                )}
+              </div>
+              <div className="flex flex-col gap-1">
+                <h3 className="text-[17px] leading-[22px] font-normal text-[#000000]">
+                  {photo.title}
+                </h3>
+                {photo.multiple && (
+                  <p className="text-[17px] leading-[22px] font-normal text-[#000000]">
+                    Минимум {photo.multiple.min}, максимум {photo.multiple.max}.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {isFlutterAvailable ? (
+              // Flutter камера доступна - используем везде
+              <button
+                onClick={() => handleFlutterPhotoSelect(photo.id, photo)}
+                disabled={loadingStates[photo.id] || isLoading}
+                className="block w-full"
+              >
+                <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
+                  <div className="flex items-center gap-2">
+                    {loadingStates[photo.id] ? (
+                      <Loader color="#191919" />
+                    ) : (
+                      <CameraIcon
+                        className="w-5 h-5"
+                        width={24}
+                        height={24}
+                        color="#191919"
+                      />
+                    )}
+                    <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
+                      {loadingStates[photo.id]
+                        ? "Обработка..."
+                        : selectedFiles[photo.id]?.length > 0
+                        ? `${selectedFiles[photo.id].length} фото готово`
+                        : photo.multiple
+                        ? "Сделать фото"
+                        : photo.isSelfy
+                        ? "Сделать селфи"
+                        : "Сделать фото"}
+                    </span>
+                  </div>
+                </div>
+              </button>
+            ) : (
+              // Fallback на HTML input (только если Flutter недоступен)
+              <label className="block w-full">
+                <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
+                  <div className="flex items-center gap-2">
                     <CameraIcon
                       className="w-5 h-5"
                       width={24}
                       height={24}
                       color="#191919"
                     />
-                  )}
-                  <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
-                    {loadingStates[photo.id]
-                      ? "Обработка..."
-                      : selectedFiles[photo.id]
-                      ? `${selectedFiles[photo.id].length} фото готово`
-                      : photo.multiple
-                      ? "Сделать фото"
-                      : photo.isSelfy
-                      ? "Сделать селфи"
-                      : "Сделать фото"}
-                  </span>
+                    <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
+                      {selectedFiles[photo.id]
+                        ? `${selectedFiles[photo.id].length} фото сделано`
+                        : photo.multiple
+                        ? "Сделать фото"
+                        : photo.isSelfy
+                        ? "Сделать селфи"
+                        : "Сделать фото"}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </button>
-          ) : (
-            // Fallback на HTML input (только если Flutter недоступен)
-            <label className="block w-full">
-              <div className="w-full h-[56px] flex items-center justify-center bg-[#F5F5F5] rounded-[20px]">
-                <div className="flex items-center gap-2">
-                  <CameraIcon
-                    className="w-5 h-5"
-                    width={24}
-                    height={24}
-                    color="#191919"
-                  />
-                  <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
-                    {selectedFiles[photo.id]
-                      ? `${selectedFiles[photo.id].length} фото сделано`
-                      : photo.multiple
-                      ? "Сделать фото"
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple={!!photo.multiple}
+                  className="hidden"
+                  onChange={(e) => handlePhotoSelect(photo.id, e)}
+                  capture={
+                    photo.cameraType === "front"
+                      ? "user"
+                      : photo.cameraType === "back"
+                      ? "environment"
                       : photo.isSelfy
-                      ? "Сделать селфи"
-                      : "Сделать фото"}
-                  </span>
-                </div>
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                multiple={!!photo.multiple}
-                className="hidden"
-                onChange={(e) => handlePhotoSelect(photo.id, e)}
-                capture={
-                  photo.cameraType === "front"
-                    ? "user"
-                    : photo.cameraType === "back"
-                    ? "environment"
-                    : photo.isSelfy
-                    ? "user"
-                    : undefined
-                }
-              />
-            </label>
-          )}
-        </div>
-      ))}
+                      ? "user"
+                      : undefined
+                  }
+                />
+              </label>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 
@@ -405,11 +412,11 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       isOpen={true}
       onClose={onClose || (() => {})}
       direction="bottom"
-      withHeader={withCloseButton}
-      isCloseable={isCloseable}
+      withHeader={true}
+      isCloseable={false}
     >
-      <div className="flex flex-col min-h-full bg-white">
-        <div className="flex-1">{content}</div>
+      <div className="flex flex-col bg-white h-full">
+        {content}
         {allPhotosUploaded && (
           <div className="sticky bottom-0  pt-4 pb-8">
             <Button

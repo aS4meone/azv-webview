@@ -18,12 +18,19 @@ export const useUserStore = create<UserStore>((set, get) => ({
   error: null,
 
   fetchUser: async () => {
-    if (get().isLoading || get().user) {
+    const state = get();
+    if (state.isLoading) {
+      console.log("[userStore] fetchUser: уже загружается, пропускаем");
+      return;
+    }
+    if (state.user) {
+      console.log("[userStore] fetchUser: пользователь уже загружен");
       return;
     }
 
     try {
       set({ isLoading: true, error: null });
+      console.log("[userStore] fetchUser: начинаем запрос");
       const response = await userApi.getUser();
 
       if (!response?.data) {
@@ -44,8 +51,15 @@ export const useUserStore = create<UserStore>((set, get) => ({
   },
 
   refreshUser: async () => {
+    const state = get();
+    if (state.isLoading) {
+      console.log("[userStore] refreshUser: уже загружается, пропускаем");
+      return;
+    }
+
     try {
       set({ isLoading: true, error: null });
+      console.log("[userStore] refreshUser: начинаем запрос");
       const response = await userApi.getUser();
 
       if (!response?.data) {

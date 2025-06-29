@@ -17,6 +17,9 @@ import { DeliveryPointProvider } from "@/shared/contexts/DeliveryPointContext";
 import "@/shared/utils/clickFix";
 // Импортируем диагностический инструмент для WebView
 import "@/shared/utils/webview-diagnosis";
+// Импортируем отладчик WebView для отслеживания дублирующихся запросов
+import "@/shared/utils/webview-debug";
+import { PushScreenProvider } from "@/shared/contexts";
 // Импортируем click tracker для отправки данных на backend
 
 const montserrat = Montserrat({
@@ -60,7 +63,7 @@ export default async function RootLayout({
               <NextIntlClientProvider>
                 <AuthProvider>
                   <DeliveryPointProvider>
-                    {children}
+                    <PushScreenProvider>{children}</PushScreenProvider>
                     <ModalPortal />
                   </DeliveryPointProvider>
                 </AuthProvider>

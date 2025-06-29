@@ -240,4 +240,144 @@ function StatusChecker() {
     </div>
   );
 }
+```
+
+# Contexts
+
+This directory contains React contexts for managing global state across the application.
+
+## Available Contexts
+
+### DeliveryPointContext
+Manages delivery point coordinates and visibility state.
+
+### PhotoUploadContext  
+Manages photo upload requirements and states for different upload types.
+
+### PushScreenContext
+Manages global push screen/modal state across the application.
+
+## PushScreen Context Usage
+
+### Setup
+
+First, wrap your app with the `PushScreenProvider`:
+
+```tsx
+import { PushScreenProvider } from '@/shared/contexts';
+
+function App() {
+  return (
+    <PushScreenProvider>
+      {/* Your app content */}
+    </PushScreenProvider>
+  );
+}
+```
+
+### Basic Usage
+
+```tsx
+import { usePushScreen } from '@/shared/contexts';
+
+function MyComponent() {
+  const { openPushScreen, closePushScreen } = usePushScreen();
+
+  const handleOpenModal = () => {
+    const id = openPushScreen({
+      children: <div>Modal content here</div>,
+      direction: 'bottom',
+      title: 'My Modal',
+      withHeader: true,
+      isCloseable: true,
+    });
+  };
+
+  return (
+    <button onClick={handleOpenModal}>
+      Open Modal
+    </button>
+  );
+}
+```
+
+### Using Convenience Methods
+
+```tsx
+import { usePushScreenActions } from '@/shared/hooks/usePushScreenActions';
+
+function MyComponent() {
+  const { openModal, openFullScreen, openBottomSheet, openSidebar } = usePushScreenActions();
+
+  return (
+    <div>
+      <button onClick={() => openModal(<div>Modal content</div>)}>
+        Open Modal
+      </button>
+      
+      <button onClick={() => openFullScreen(<div>Full screen content</div>, { title: 'Full Screen' })}>
+        Open Full Screen
+      </button>
+      
+      <button onClick={() => openBottomSheet(<div>Bottom sheet content</div>)}>
+        Open Bottom Sheet
+      </button>
+      
+      <button onClick={() => openSidebar(<div>Sidebar content</div>, { title: 'Sidebar' })}>
+        Open Sidebar
+      </button>
+    </div>
+  );
+}
+```
+
+### API Reference
+
+#### `usePushScreen()`
+
+Returns an object with the following methods:
+
+- `openPushScreen(data)` - Opens a new push screen, returns screen ID
+- `closePushScreen(id)` - Closes a specific push screen by ID
+- `closeAllPushScreens()` - Closes all open push screens
+- `updatePushScreen(id, updates)` - Updates a specific push screen
+
+#### `usePushScreenActions()`
+
+Returns convenience methods for common use cases:
+
+- `openModal(children, options)` - Opens a bottom modal
+- `openFullScreen(children, options)` - Opens a full screen push screen
+- `openBottomSheet(children, options)` - Opens a bottom sheet
+- `openSidebar(children, options)` - Opens a sidebar
+
+#### Push Screen Options
+
+```tsx
+interface PushScreenOptions {
+  direction?: "bottom" | "top" | "left" | "right";
+  withHeader?: boolean;
+  fullScreen?: boolean;
+  height?: string;
+  title?: string;
+  className?: string;
+  isCloseable?: boolean;
+  onClose?: () => void;
+}
+```
+
+### Multiple Push Screens
+
+The system supports multiple push screens being open simultaneously. They will stack on top of each other with proper z-index management.
+
+```tsx
+const id1 = openPushScreen({ children: <div>First screen</div> });
+const id2 = openPushScreen({ children: <div>Second screen</div> });
+
+// Close specific screens
+closePushScreen(id1);
+closePushScreen(id2);
+
+// Or close all at once
+closeAllPushScreens();
 ``` 

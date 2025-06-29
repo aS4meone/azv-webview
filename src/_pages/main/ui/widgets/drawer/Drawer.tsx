@@ -15,6 +15,7 @@ import { WalletPage } from "@/_pages/wallet";
 import { SupportPage } from "@/_pages/support";
 import { TermsPage } from "@/_pages/terms";
 import { ProfilePage } from "@/_pages/profile";
+import { UserRole } from "@/shared/models/types/user";
 
 type ComponentKeys = "trips" | "wallet" | "support" | "terms" | "profile";
 
@@ -38,10 +39,12 @@ const Drawer = () => {
       translationKey: "main.drawer.menu.tripsAndPayments",
       key: "trips" as ComponentKeys,
     },
+
     {
       translationKey: "main.drawer.menu.wallet",
       key: "wallet" as ComponentKeys,
     },
+
     {
       translationKey: "main.drawer.menu.support",
       key: "support" as ComponentKeys,
@@ -55,6 +58,42 @@ const Drawer = () => {
       key: "profile" as ComponentKeys,
     },
   ];
+
+  const itemsToShow =
+    user?.role !== UserRole.MECHANIC
+      ? [
+          {
+            translationKey: "main.drawer.menu.tripsAndPayments",
+            key: "trips" as ComponentKeys,
+          },
+
+          {
+            translationKey: "main.drawer.menu.support",
+            key: "support" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.termsAndPolicy",
+            key: "terms" as ComponentKeys,
+          },
+        ]
+      : [
+          {
+            translationKey: "main.drawer.menu.tripsAndPayments",
+            key: "trips" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.wallet",
+            key: "wallet" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.support",
+            key: "support" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.termsAndPolicy",
+            key: "terms" as ComponentKeys,
+          },
+        ];
 
   const handleItemClick = (key: ComponentKeys) => {
     if (components?.[key]) {
@@ -99,7 +138,7 @@ const Drawer = () => {
             <div className="flex items-center space-x-3">
               <div>
                 <h2 className="text-lg font-semibold text-white">
-                  {user?.full_name || "Пользователь"}
+                  {t("main.drawer.menu.profile")}
                 </h2>
               </div>
             </div>
@@ -110,7 +149,7 @@ const Drawer = () => {
 
           <div className="flex flex-col">
             <nav className="py-6 space-y-1">
-              {items.slice(0, 4).map((item) => (
+              {itemsToShow.map((item) => (
                 <button
                   key={item.translationKey}
                   className="flex items-center space-x-3 w-full text-left py-4 px-8 text-white active:bg-gray-800 transition-colors"

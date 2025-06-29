@@ -39,6 +39,7 @@ export const DurationSelector = ({
             <input
               type="number"
               placeholder="0"
+              inputMode="numeric"
               value={duration === 0 ? "" : duration}
               onChange={(e) => {
                 const inputValue = e.target.value;

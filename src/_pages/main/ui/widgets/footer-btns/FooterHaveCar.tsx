@@ -11,6 +11,7 @@ const FooterHaveCar = ({ user }: { user: IUser }) => {
   const { showModal, hideModal, isModalOpen } = useModal();
 
   const handleOpenModal = () => {
+    console.log("[FooterHaveCar] Opening modal manually");
     showModal({
       children: handleCarInteraction({
         user,

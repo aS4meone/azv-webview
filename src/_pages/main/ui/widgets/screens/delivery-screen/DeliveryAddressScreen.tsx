@@ -84,6 +84,7 @@ const MapWithCenterListener = ({
 
 export const DeliveryAddressScreen = ({
   onAddressSelected,
+  onBack,
 }: DeliveryAddressScreenProps) => {
   // Состояние камеры карты
   const [cameraProps, setCameraProps] = useState<MapCameraProps>({
@@ -231,8 +232,7 @@ export const DeliveryAddressScreen = ({
   );
 
   return (
-    <div className="bg-white h-full flex flex-col ">
-      {/* Map */}
+    <div className="bg-white h-full flex flex-col relative">
       <div className="flex-1 relative">
         <BaseMap
           cameraProps={cameraProps}

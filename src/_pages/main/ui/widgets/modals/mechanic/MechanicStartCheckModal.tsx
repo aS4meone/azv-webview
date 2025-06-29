@@ -7,6 +7,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 
 interface MechanicStartCheckModalProps {
   car: ICar;
@@ -21,6 +22,8 @@ export const MechanicStartCheckModal = ({
   const { refreshUser } = useUserStore();
   const delivering = car.status === CarStatus.delivering;
   const tracking = car.status === CarStatus.inUse;
+  const { fetchCurrentDeliveryVehicle } = useVehiclesStore();
+
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
 
@@ -39,7 +42,7 @@ export const MechanicStartCheckModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Осмотр успешно принят в работу",
+
           onButtonClick: handleClose,
           description: "Осмотр успешно принят в работу",
           buttonText: "Отлично",
@@ -63,11 +66,16 @@ export const MechanicStartCheckModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Доставка успешно принята в работу",
-          onButtonClick: handleClose,
+          onButtonClick: () => {
+            handleClose();
+            fetchCurrentDeliveryVehicle();
+          },
           description: "Доставка успешно принята в работу",
           buttonText: "Отлично",
-          onClose: handleClose,
+          onClose: () => {
+            handleClose();
+            fetchCurrentDeliveryVehicle();
+          },
         });
       }
     } catch (error) {
@@ -88,7 +96,7 @@ export const MechanicStartCheckModal = ({
       setResponseModal({
         type: "success",
         isOpen: true,
-        title: "Слежка начата",
+
         onButtonClick: handleClose,
         description: "Слежка начата",
         buttonText: "Отлично",
@@ -99,7 +107,7 @@ export const MechanicStartCheckModal = ({
       setResponseModal({
         type: "error",
         isOpen: true,
-        title: "Ошибка при начале слежки",
+
         description: "Ошибка при начале слежки",
         buttonText: "Попробовать снова",
         onButtonClick: handleClose,

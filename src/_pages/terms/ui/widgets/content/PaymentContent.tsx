@@ -44,16 +44,6 @@ export const PaymentContent = () => {
       icon: <CreditCard className="w-6 h-6" />,
       popular: true,
     },
-    {
-      name: "Apple Pay",
-      description: "Быстрая оплата с iPhone",
-      icon: <Apple className="w-6 h-6" />,
-    },
-    {
-      name: "Google Pay",
-      description: "Быстрая оплата с Android",
-      icon: <Smartphone className="w-6 h-6" />,
-    },
   ];
 
   const prices: PriceItem[] = [
@@ -191,7 +181,9 @@ export const PaymentContent = () => {
                   Автоматическая оплата
                 </h4>
                 <p className="text-sm text-black/70">
-                  Оплата списывается после завершения аренды
+                  Оплата списывается до началы аренды. Пост оплата только в
+                  поминутном тарифе,при условии что баланс приложения позволяет
+                  вам начать поминутную поездку
                 </p>
               </div>
             </div>
@@ -201,15 +193,6 @@ export const PaymentContent = () => {
                 <h4 className="font-medium text-black">Депозит</h4>
                 <p className="text-sm text-black/70">
                   При бронировании замораживается сумма депозита
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Shield className="w-5 h-5 text-[#1D77FF] mt-0.5" />
-              <div>
-                <h4 className="font-medium text-black">Возврат средств</h4>
-                <p className="text-sm text-black/70">
-                  Возврат на карту в течение 3-5 рабочих дней
                 </p>
               </div>
             </div>

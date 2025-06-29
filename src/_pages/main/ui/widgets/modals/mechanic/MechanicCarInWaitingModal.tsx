@@ -77,7 +77,6 @@ export const MechanicCarInWaitingModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Осмотр отменен",
           description: "Осмотр успешно отменен",
           buttonText: "Отлично",
           onButtonClick: handleClose,

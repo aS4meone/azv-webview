@@ -38,6 +38,9 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   const handleClose = async () => {
     setResponseModal(null);
     await refreshUser();
+    setShowWalletPage(false);
+    setShowAddressScreen(false);
+    setShowRentalPage(false);
   };
 
   const handleRent = async (rentalData: RentalData) => {
@@ -47,24 +50,25 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         duration: rentalData.duration,
         rentalType: rentalData.rentalType,
       };
+      // await testRequest("handleRent");
 
       const res = await rentApi.reserveCar(data);
       if (res.status === 200) {
         setResponseModal({
           isOpen: true,
           onClose: async () => {
+            await refreshUser();
             onClose();
             setResponseModal(null);
-            await refreshUser();
           },
           type: "success",
-          title: "Успешно забронированно",
+
           description: "Успешно забронированно",
           buttonText: "Отлично",
           onButtonClick: async () => {
+            await refreshUser();
             onClose();
             setResponseModal(null);
-            await refreshUser();
           },
         });
       }
@@ -75,9 +79,15 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       if (
         apiError.response.data.detail.includes("Пожалуйста, пополните счёт")
       ) {
+        setShowRentalPage(false);
+        if (isDelivery) {
+          setShowAddressScreen(true);
+        }
         setResponseModal({
           isOpen: true,
-          onClose: handleClose,
+          onClose: () => {
+            setShowWalletPage(false);
+          },
           type: "error",
           title: "Ошибка",
           description: apiError.response.data.detail,
@@ -121,18 +131,17 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         setResponseModal({
           isOpen: true,
           onClose: async () => {
+            await refreshUser();
             onClose();
             setResponseModal(null);
-            await refreshUser();
           },
           type: "success",
-          title: "Успешно забронированно",
-          description: "Доставка успешно заказана",
+          description: "Доставка успешно закзана",
           buttonText: "Отлично",
           onButtonClick: async () => {
+            await refreshUser();
             onClose();
             setResponseModal(null);
-            await refreshUser();
           },
         });
       }
@@ -183,18 +192,17 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         setResponseModal({
           isOpen: true,
           onClose: async () => {
+            await refreshUser();
             onClose();
             setResponseModal(null);
-            await refreshUser();
           },
           type: "success",
-          title: "Успешно забронированно",
           description: "Успешно забронированно",
           buttonText: "Отлично",
           onButtonClick: async () => {
+            await refreshUser();
             onClose();
             setResponseModal(null);
-            await refreshUser();
           },
         });
       }
@@ -229,7 +237,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       <CustomResponseModal
         onButtonClick={responseModal?.onButtonClick || handleClose}
         isOpen={!!responseModal}
-        onClose={responseModal?.onClose || handleClose}
+        onClose={handleClose}
         type={responseModal?.type || "success"}
         title={responseModal?.title || ""}
         description={responseModal?.description || ""}
@@ -239,7 +247,10 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
       <CustomPushScreen
         direction="bottom"
         isOpen={showWalletPage}
-        onClose={() => setShowWalletPage(false)}
+        onClose={() => {
+          setShowWalletPage(false);
+          console.log("close wallet page");
+        }}
         className="pt-12"
       >
         <WalletPage />

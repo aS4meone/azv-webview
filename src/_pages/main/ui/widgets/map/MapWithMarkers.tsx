@@ -997,7 +997,7 @@ export const MapWithMarkers = ({
 
   // Эффект для управления маркером точки доставки
   useEffect(() => {
-    if (!map || !user || user.role !== UserRole.MECHANIC) {
+    if (!map || !user) {
       // Очищаем маркер если есть
       if (deliveryMarkerRef.current) {
         deliveryMarkerRef.current.map = null;
@@ -1006,13 +1006,7 @@ export const MapWithMarkers = ({
       return;
     }
 
-    // Проверяем наличие координат доставки
-    if (
-      isVisible &&
-      deliveryPoint &&
-      deliveryPoint.latitude &&
-      deliveryPoint.longitude
-    ) {
+    if (deliveryPoint && deliveryPoint.latitude && deliveryPoint.longitude) {
       const deliveryMarker = createDeliveryMarker(deliveryPoint);
       if (deliveryMarker) {
         // Удаляем старый маркер если есть
@@ -1022,12 +1016,14 @@ export const MapWithMarkers = ({
         deliveryMarker.map = map;
         deliveryMarkerRef.current = deliveryMarker;
 
-        // Центрируем карту на точке доставки
-        map.setCenter({
-          lat: deliveryPoint.latitude,
-          lng: deliveryPoint.longitude,
-        });
-        map.setZoom(16);
+        // Центрируем карту на точке доставки только если isVisible = true (при клике на кнопку)
+        if (isVisible) {
+          map.setCenter({
+            lat: deliveryPoint.latitude,
+            lng: deliveryPoint.longitude,
+          });
+          map.setZoom(16);
+        }
       }
     } else {
       if (deliveryMarkerRef.current) {

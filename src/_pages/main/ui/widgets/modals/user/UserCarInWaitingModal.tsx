@@ -35,8 +35,8 @@ export const UserCarInWaitingModal = ({
     useState<ResponseBottomModalProps | null>(null);
 
   const handleClose = async () => {
-    setResponseModal(null);
     await refreshUser();
+    setResponseModal(null);
     onClose();
   };
 
@@ -50,7 +50,6 @@ export const UserCarInWaitingModal = ({
           isOpen: true,
           onClose: handleClose,
           type: "success",
-          title: "Аренда успешно начата",
           description: "Загрузите фотографии перед началом аренды",
           buttonText: "Отлично",
           onButtonClick: async () => {
@@ -78,23 +77,38 @@ export const UserCarInWaitingModal = ({
       if (res.status === 200) {
         setResponseModal({
           isOpen: true,
-          onClose: handleClose,
+          onClose: async () => {
+            await refreshUser();
+            onClose();
+            setResponseModal(null);
+          },
           type: "success",
-          title: "Аренда успешно отменена",
           description: "Аренда успешно отменена",
           buttonText: "Отлично",
-          onButtonClick: handleClose,
+          onButtonClick: async () => {
+            await refreshUser();
+            onClose();
+            setResponseModal(null);
+          },
         });
       }
     } catch (error) {
       setResponseModal({
         isOpen: true,
-        onClose: handleClose,
+        onClose: async () => {
+          await refreshUser();
+          onClose();
+          setResponseModal(null);
+        },
         type: "error",
         title: "Ошибка",
         description: error.response.data.detail,
         buttonText: "Попробвать сново",
-        onButtonClick: handleClose,
+        onButtonClick: async () => {
+          await refreshUser();
+          onClose();
+          setResponseModal(null);
+        },
       });
     }
   };
@@ -115,7 +129,6 @@ export const UserCarInWaitingModal = ({
         isOpen: true,
         onClose: handleClose,
         type: "success",
-        title: "Фотографии успешно загружены",
         description: "Фотографии успешно загружены",
         buttonText: "Отлично",
         onButtonClick: handleClose,
@@ -137,12 +150,19 @@ export const UserCarInWaitingModal = ({
       setShowUploadPhoto(false);
       setResponseModal({
         isOpen: true,
-        onClose: handleClose,
+        onClose: async () => {
+          await refreshUser();
+          onClose();
+          setResponseModal(null);
+        },
         type: "success",
-        title: "Фотографии успешно загружены",
         description: "Фотографии успешно загружены",
         buttonText: "Отлично",
-        onButtonClick: handleClose,
+        onButtonClick: async () => {
+          await refreshUser();
+          onClose();
+          setResponseModal(null);
+        },
       });
     }
   };

@@ -45,23 +45,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
           basePrice: `${car.price_per_minute} ₸/минута`,
           description: "Идеально для коротких поездок по городу",
           icon: <Timer className="w-6 h-6" />,
-          popular: false,
+          popular: true,
           features: [
             {
-              text: "Минимальное время аренды: 15 минут",
+              text: "Минимальное время аренды: от 1 минуты",
               icon: <Clock className="w-4 h-4" />,
-            },
-            {
-              text: "Включена базовая страховка",
-              icon: <Shield className="w-4 h-4" />,
-            },
-            {
-              text: "Бензин включен в стоимость",
-              icon: <Fuel className="w-4 h-4" />,
-            },
-            {
-              text: "Парковка в разрешенных зонах",
-              icon: <MapPin className="w-4 h-4" />,
             },
           ],
         };
@@ -71,23 +59,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
           basePrice: `${car.price_per_hour} ₸/час`,
           description: "Оптимально для длительных поездок",
           icon: <Clock className="w-6 h-6" />,
-          popular: true,
+          popular: false,
           features: [
             {
               text: "Минимальное время аренды: 1 час",
               icon: <Clock className="w-4 h-4" />,
-            },
-            {
-              text: "Расширенная страховка",
-              icon: <Shield className="w-4 h-4" />,
-            },
-            {
-              text: "Бензин включен в стоимость",
-              icon: <Fuel className="w-4 h-4" />,
-            },
-            {
-              text: "Бесплатная парковка в специальных зонах",
-              icon: <MapPin className="w-4 h-4" />,
             },
           ],
         };
@@ -102,19 +78,6 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
             {
               text: "Минимальное время аренды: 1 день",
               icon: <Calendar className="w-4 h-4" />,
-            },
-            { text: "Полная страховка", icon: <Shield className="w-4 h-4" /> },
-            {
-              text: "Бензин включен в стоимость",
-              icon: <Fuel className="w-4 h-4" />,
-            },
-            {
-              text: "Неограниченный пробег",
-              icon: <MapPin className="w-4 h-4" />,
-            },
-            {
-              text: "Приоритетная поддержка",
-              icon: <Phone className="w-4 h-4" />,
             },
           ],
         };
@@ -137,8 +100,6 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
       text: "Действующий паспорт и водительское удостоверение",
       icon: <FileText className="w-4 h-4" />,
     },
-    { text: "Стаж вождения от 2 лет", icon: <User className="w-4 h-4" /> },
-    { text: "Возраст от 21 года", icon: <User className="w-4 h-4" /> },
     {
       text: "Депозит зависит от класса автомобиля",
       icon: <CreditCard className="w-4 h-4" />,
@@ -249,6 +210,9 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
               }`}
             >
               <div className="text-center space-y-2">
+                <Badge className="absolute -top-2 -right-2 bg-[#1D77FF]">
+                  Популярный
+                </Badge>
                 <Timer className="w-6 h-6 mx-auto text-[#1D77FF]" />
                 <h3 className="font-semibold">Поминутный</h3>
                 <p className="text-2xl font-bold text-[#1D77FF]">
@@ -263,9 +227,6 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                 rentalType === "hours" ? "border-[#1D77FF] bg-[#1D77FF]/5" : ""
               }`}
             >
-              <Badge className="absolute -top-2 -right-2 bg-[#1D77FF]">
-                Популярный
-              </Badge>
               <div className="text-center space-y-2">
                 <Clock className="w-6 h-6 mx-auto text-[#1D77FF]" />
                 <h3 className="font-semibold">Почасовой</h3>
@@ -309,12 +270,9 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
               <ul className="space-y-2">
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <CheckCircle className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>КАСКО и ОСАГО включены</span>
+                  <span>ОГПО включены</span>
                 </li>
-                <li className="flex items-start gap-2 text-sm text-black/70">
-                  <CheckCircle className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>Франшиза от 50,000 ₸</span>
-                </li>
+
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <CheckCircle className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
                   <span>Помощь на дороге 24/7</span>

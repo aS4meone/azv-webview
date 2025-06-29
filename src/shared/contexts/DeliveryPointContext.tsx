@@ -24,7 +24,7 @@ export const DeliveryPointProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [deliveryPoint, setDeliveryPoint] =
     useState<IDeliveryCoordinates | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const handleUpdateDeliveryPoint = (
@@ -34,7 +34,6 @@ export const DeliveryPointProvider: React.FC<{ children: ReactNode }> = ({
       }>
     ) => {
       setDeliveryPoint(event.detail.coordinates);
-      setIsVisible(event.detail.visible);
     };
 
     // Приводим тип события к CustomEvent

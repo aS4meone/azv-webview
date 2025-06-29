@@ -14,6 +14,7 @@ import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { MechanicWaitingTimer } from "../../timers/MechanicTimer";
 import { ICar } from "@/shared/models/types/car";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 
 interface MechaniCarInWaitingDeliverModalProps {
   user: IUser;
@@ -30,6 +31,7 @@ export const MechaniCarInWaitingDeliverModal = ({
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const { setUploadRequired } = usePhotoUpload();
+  const { fetchCurrentDeliveryVehicle } = useVehiclesStore();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +41,7 @@ export const MechaniCarInWaitingDeliverModal = ({
     setResponseModal(null);
     onClose();
     await refreshUser();
+    await fetchCurrentDeliveryVehicle();
   };
 
   async function handleStartDelivery() {
@@ -57,7 +60,11 @@ export const MechaniCarInWaitingDeliverModal = ({
             setShowUploadPhoto(true);
             handleClose();
           },
-          onClose: handleClose,
+          onClose: async () => {
+            await refreshUser();
+            setShowUploadPhoto(true);
+            handleClose();
+          },
         });
       }
     } catch (error) {

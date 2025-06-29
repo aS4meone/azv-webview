@@ -177,7 +177,6 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
             onClose();
           },
           type: "success",
-          title: "Успешно",
           description: "Аренда успешно завершена",
           buttonText: "Отлично",
           onButtonClick: async () => {

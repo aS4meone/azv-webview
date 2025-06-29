@@ -47,39 +47,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = useCallback(async () => {
     try {
-      // Clear FCM token first
       await callFlutterLogout();
       console.log("FCM token cleared successfully");
     } catch (error) {
       console.error("Error clearing FCM token:", error);
     }
 
-    // Clear local tokens
     clearTokens();
 
-    // Navigate to root
     router.push(ROUTES.ROOT);
   }, [router]);
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Пропускаем повторную инициализацию
-      if (initializationRef.current) return;
+      if (initializationRef.current) {
+        console.log("[AuthContext] checkAuth: уже инициализирован, пропускаем");
+        return;
+      }
       initializationRef.current = true;
 
+      console.log("[AuthContext] checkAuth: начинаем проверку авторизации");
       const refreshToken = getRefreshToken();
 
       if (!refreshToken) {
+        console.log("[AuthContext] checkAuth: refresh token отсутствует");
         if (!isAuthRoute(pathname)) {
           router.push(ROUTES.ROOT);
         }
         return;
       }
 
-      // Если есть токены - за  гружаем пользователя
       try {
+        console.log("[AuthContext] checkAuth: вызываем fetchUser");
         await fetchUser();
       } catch (error) {
+        console.log("[AuthContext] checkAuth: ошибка при fetchUser:", error);
         if (error?.response?.status !== 403) {
           logout().catch(console.error);
         }
@@ -89,7 +91,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, [fetchUser, logout, pathname, router]);
 
-  // Отдельный эффект для редиректа с auth страниц
   useEffect(() => {
     const refreshToken = getRefreshToken();
     if (user && refreshToken && isAuthRoute(pathname)) {

@@ -18,6 +18,9 @@ interface QueueItem {
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
 
+// Защита от дублирования запросов
+const pendingRequests = new Map<string, Promise<any>>();
+
 const processQueue = (error: unknown = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -37,6 +40,32 @@ axiosInstance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Защита от дублирования запросов
+    const shouldProtectFromDuplication =
+      config.method === "get" || config.method === "post";
+
+    if (shouldProtectFromDuplication) {
+      const requestKey = `${config.method}:${config.url}:${JSON.stringify(
+        config.params || {}
+      )}:${config.method === "post" ? JSON.stringify(config.data || {}) : ""}`;
+
+      if (pendingRequests.has(requestKey)) {
+        console.log(`[axios] Предотвращен дублирующийся запрос: ${requestKey}`);
+        // Возвращаем Promise который отклоняется для предотвращения дублирования
+        return Promise.reject(new Error("DUPLICATE_REQUEST_PREVENTED"));
+      }
+
+      // Добавляем запрос в pending
+      pendingRequests.set(requestKey, Promise.resolve());
+
+      // Автоматически очищаем через 5 секунд (для POST запросов)
+      if (config.method === "post") {
+        setTimeout(() => {
+          pendingRequests.delete(requestKey);
+        }, 5000);
+      }
+    }
+
     return config;
   },
   (error) => {
@@ -45,8 +74,48 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Очищаем завершенный запрос из pending
+    const shouldClearFromCache =
+      response.config.method === "get" ||
+      (response.config.method === "post" &&
+        response.config.url?.includes("/rent/"));
+
+    if (shouldClearFromCache) {
+      const requestKey = `${response.config.method}:${
+        response.config.url
+      }:${JSON.stringify(response.config.params || {})}:${
+        response.config.method === "post"
+          ? JSON.stringify(response.config.data || {})
+          : ""
+      }`;
+      pendingRequests.delete(requestKey);
+    }
+    return response;
+  },
   async (error) => {
+    // Пропускаем обработку для предотвращенных дубликатов
+    if (error.message === "DUPLICATE_REQUEST_PREVENTED") {
+      console.log("[axios] Дублирующийся запрос предотвращен");
+      return Promise.resolve({ status: 200, data: "DUPLICATE_PREVENTED" });
+    }
+
+    // Очищаем неудачный запрос из pending
+    const shouldClearFromCache =
+      error.config?.method === "get" ||
+      (error.config?.method === "post" &&
+        error.config?.url?.includes("/rent/"));
+
+    if (shouldClearFromCache) {
+      const requestKey = `${error.config.method}:${
+        error.config.url
+      }:${JSON.stringify(error.config.params || {})}:${
+        error.config.method === "post"
+          ? JSON.stringify(error.config.data || {})
+          : ""
+      }`;
+      pendingRequests.delete(requestKey);
+    }
     const originalRequest = error.config;
 
     if (error.response?.status === 403 && !originalRequest._retry) {

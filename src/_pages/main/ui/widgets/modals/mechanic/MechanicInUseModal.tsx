@@ -158,7 +158,6 @@ export const MechanicInUseModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Осмотр завершен",
           description: "Осмотр успешно завершен",
           buttonText: "Отлично",
           onButtonClick: handleClose,

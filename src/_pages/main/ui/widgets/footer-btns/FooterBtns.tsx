@@ -58,7 +58,7 @@ const FooterBtns = () => {
     {
       key: "freq_used_cars",
       component: <FreqUsedCarsPage onClose={() => setCurrentComponent(null)} />,
-      title: "Часто используемые",
+      title: "Свободные машины",
     },
     {
       key: "mechanic_pending",
@@ -201,7 +201,7 @@ const FooterBtns = () => {
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <RoadIcon />
-            <span>Свободно</span>
+            <span>Свободные машины</span>
           </Button>
         </div>
       );
@@ -241,14 +241,14 @@ const FooterBtns = () => {
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <UserIcon />
-            <span>Часто используемые</span>
+            <span>Недавние поездки</span>
           </Button>
           <Button
             onClick={() => setCurrentComponent("free_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <RoadIcon />
-            <span>Свободно</span>
+            <span>Свободные машины</span>
           </Button>
         </div>
       );

@@ -46,11 +46,11 @@ export const MechanicDeliveryInUseModal = ({
   const car: ICar = notRentedCar || ({} as ICar);
 
   const handleClose = async () => {
-    setResponseModal(null);
-    onClose();
+    await fetchCurrentDeliveryVehicle();
     await refreshUser();
     await fetchAllMechanicVehicles();
-    await fetchCurrentDeliveryVehicle();
+    setResponseModal(null);
+    onClose();
   };
 
   useEffect(() => {
@@ -86,13 +86,12 @@ export const MechanicDeliveryInUseModal = ({
         if (completeRes.status === 200) {
           setIsLoading(false);
           setShowUploadPhoto(false);
-          // Очищаем точку доставки
+
           setDeliveryPoint(null);
           setIsVisible(false);
           setResponseModal({
             type: "success",
             isOpen: true,
-            title: "Доставка завершена",
             description: "Доставка успешно завершена",
             buttonText: "Отлично",
             onButtonClick: handleClose,

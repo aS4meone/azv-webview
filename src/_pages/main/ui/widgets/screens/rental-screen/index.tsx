@@ -34,14 +34,10 @@ export const RentalPage = ({
   };
 
   return (
-    <article
-      className="bg-white h-screen overflow-y-auto overflow-x-hidden scrollable"
-      data-scrollable="true"
-    >
+    <article className="bg-white h-screen overflow-y-auto overflow-x-hidden scrollable">
       {/* Header with car image */}
       <CarImageCarousel car={car} height="h-80" />
 
-      {/* Content - добавляем больше контента чтобы был скролл */}
       <div className="px-4 py-6 space-y-6 pb-20">
         {/* Car Info */}
         <CarInfoHeader car={car} />
@@ -87,7 +83,10 @@ export const RentalPage = ({
         <div className="pt-4">
           <Button
             variant="secondary"
-            onClick={handleRent}
+            onClick={() => {
+              console.log("handleRent");
+              handleRent();
+            }}
             className="w-full"
             disabled={duration <= 0}
           >
