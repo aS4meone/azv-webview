@@ -103,7 +103,7 @@ const OnboardingPage = () => {
           </Button>
 
           {/* Terms Text */}
-          <p className="text-xs text-gray-400 text-center leading-relaxed px-4">
+          <p className="text-xs text-white text-center leading-relaxed px-4">
             {t(
               "onboarding.termsAgreement",
               "Нажимая 'Войти', вы соглашаетесь с Условиями использования и Политикой конфиденциальности."
