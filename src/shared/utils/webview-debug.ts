@@ -16,6 +16,7 @@ class WebViewDebugger {
   constructor() {
     this.isWebView =
       typeof window !== "undefined" &&
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       typeof (window as any).flutter_inappwebview !== "undefined";
 
     if (this.isWebView) {
@@ -93,7 +94,7 @@ class WebViewDebugger {
     });
 
     return Object.fromEntries(
-      Object.entries(duplicates).filter(([_, count]) => count > 1)
+      Object.entries(duplicates).filter(([, count]) => count > 1)
     );
   }
 

@@ -1,5 +1,4 @@
 "use client";
-import { ArrowLeftIcon } from "@/shared/icons";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "../button";
 

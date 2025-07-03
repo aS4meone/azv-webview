@@ -10,16 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  CreditCard,
-  Smartphone,
-  Apple,
-  Clock,
-  Calendar,
-  Timer,
-  Info,
-  Shield,
-} from "lucide-react";
+import { CreditCard, Clock, Calendar, Timer, Info, Shield } from "lucide-react";
 
 interface PaymentMethod {
   name: string;

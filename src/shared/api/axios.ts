@@ -18,7 +18,7 @@ interface QueueItem {
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
 
-// Защита от дублирования запросов
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const pendingRequests = new Map<string, Promise<any>>();
 
 const processQueue = (error: unknown = null) => {

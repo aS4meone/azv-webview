@@ -1,7 +1,5 @@
 "use client";
 import { CarCard } from "@/entities/car-card";
-import { ROUTES } from "@/shared/constants/routes";
-import { CustomAppBar } from "@/widgets/appbars";
 import React, { useEffect } from "react";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 

@@ -33,9 +33,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   onPhotoUpload,
   isOpen = false,
   onClose,
-  withCloseButton = false,
   isLoading = false,
-  isCloseable = true,
 }) => {
   const { showModal } = useResponseModal();
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
