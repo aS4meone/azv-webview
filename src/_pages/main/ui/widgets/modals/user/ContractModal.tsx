@@ -18,7 +18,6 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   onClose,
   onAccept,
   onReject,
-  title,
 }) => {
   const [agreed, setAgreed] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
