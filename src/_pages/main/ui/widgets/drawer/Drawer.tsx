@@ -15,9 +15,16 @@ import { WalletPage } from "@/_pages/wallet";
 import { SupportPage } from "@/_pages/support";
 import { TermsPage } from "@/_pages/terms";
 import { ProfilePage } from "@/_pages/profile";
+import { MessagesPage } from "@/_pages/messages";
 import { UserRole } from "@/shared/models/types/user";
 
-type ComponentKeys = "trips" | "wallet" | "support" | "terms" | "profile";
+type ComponentKeys =
+  | "trips"
+  | "wallet"
+  | "messages"
+  | "support"
+  | "terms"
+  | "profile";
 
 const Drawer = () => {
   const { user } = useUserStore();
@@ -28,6 +35,7 @@ const Drawer = () => {
   const components = {
     trips: <TripsAndFinesPage />,
     wallet: <WalletPage />,
+    messages: <MessagesPage />,
     support: <SupportPage />,
     terms: <TermsPage />,
     profile: <ProfilePage />,
@@ -46,6 +54,11 @@ const Drawer = () => {
     },
 
     {
+      translationKey: "main.drawer.menu.messages",
+      key: "messages" as ComponentKeys,
+    },
+
+    {
       translationKey: "main.drawer.menu.support",
       key: "support" as ComponentKeys,
     },
@@ -60,13 +73,16 @@ const Drawer = () => {
   ];
 
   const itemsToShow =
-    user?.role !== UserRole.MECHANIC
+    user?.role === UserRole.MECHANIC
       ? [
           {
             translationKey: "main.drawer.menu.tripsAndPayments",
             key: "trips" as ComponentKeys,
           },
-
+          {
+            translationKey: "main.drawer.menu.messages",
+            key: "messages" as ComponentKeys,
+          },
           {
             translationKey: "main.drawer.menu.support",
             key: "support" as ComponentKeys,
@@ -84,6 +100,10 @@ const Drawer = () => {
           {
             translationKey: "main.drawer.menu.wallet",
             key: "wallet" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.messages",
+            key: "messages" as ComponentKeys,
           },
           {
             translationKey: "main.drawer.menu.support",

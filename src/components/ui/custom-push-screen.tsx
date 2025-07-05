@@ -105,7 +105,7 @@ export function CustomPushScreen({
           >
             {withCloseButton && (
               <div className="absolute right-4 top-10 z-10 pt-6">
-                <Button onClick={onClose} variant="icon">
+                <Button onClick={onClose} variant="icon" className="shadow-sm">
                   <svg
                     width="24"
                     height="24"
@@ -165,7 +165,7 @@ export function CustomPushScreen({
                   )}
                 </>
               ) : (
-                <header className="flex items-center justify-between px-6 pt-12 pb-4 transition-shadow duration-200">
+                <header className="flex items-center gap-6 px-6 pt-12 pb-4 mt-4 transition-shadow duration-200">
                   <LogoIcon isBlack />
 
                   <div className="flex items-center">
@@ -176,7 +176,7 @@ export function CustomPushScreen({
                     )}
                   </div>
 
-                  {title && <h1 className="text-xl mr-4">{title}</h1>}
+                  {title && <h1 className="text-xl">{title}</h1>}
                 </header>
               ))}
 

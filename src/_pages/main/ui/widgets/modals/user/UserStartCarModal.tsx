@@ -13,6 +13,7 @@ import { RentalPage } from "../../screens/rental-screen";
 import { DeliveryAddressScreen } from "../../screens/delivery-screen/DeliveryAddressScreen";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 import { WalletPage } from "@/_pages/wallet";
+import { ContractModal } from "./ContractModal";
 
 interface UserStartCarModalProps {
   car: ICar;
@@ -28,6 +29,11 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
     useState<ResponseBottomModalProps | null>(null);
 
   const [showWalletPage, setShowWalletPage] = useState(false);
+  const [showContractModal, setShowContractModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<{
+    type: "rent" | "delivery";
+    data: RentalData;
+  } | null>(null);
 
   const [deliveryAddress, setDeliveryAddress] = useState<{
     lat: number;
@@ -43,7 +49,40 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
     setShowRentalPage(false);
   };
 
+  const handleContractAccept = async () => {
+    setShowContractModal(false);
+
+    if (pendingAction) {
+      if (pendingAction.type === "rent") {
+        await executeRent(pendingAction.data);
+      } else if (pendingAction.type === "delivery") {
+        await executeDelivery(pendingAction.data);
+      }
+      setPendingAction(null);
+    }
+  };
+
+  const handleContractReject = () => {
+    setShowContractModal(false);
+    setPendingAction(null);
+    // Возвращаемся на страницу аренды
+    setShowRentalPage(true);
+  };
+
+  const handleContractClose = () => {
+    setShowContractModal(false);
+    setPendingAction(null);
+    // Возвращаемся на страницу аренды
+    setShowRentalPage(true);
+  };
+
   const handleRent = async (rentalData: RentalData) => {
+    // Показываем контракт перед арендой
+    setPendingAction({ type: "rent", data: rentalData });
+    setShowContractModal(true);
+  };
+
+  const executeRent = async (rentalData: RentalData) => {
     try {
       const data: RentCarDto = {
         carId: rentalData.carId,
@@ -111,6 +150,14 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   };
 
   const handleDelivery = async (rentalData: RentalData) => {
+    if (!deliveryAddress) return;
+
+    // Показываем контракт перед доставкой
+    setPendingAction({ type: "delivery", data: rentalData });
+    setShowContractModal(true);
+  };
+
+  const executeDelivery = async (rentalData: RentalData) => {
     if (!deliveryAddress) return;
 
     try {
@@ -330,6 +377,15 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           </Button>
         </div>
       </div>
+
+      {/* Contract Modal */}
+      <ContractModal
+        isOpen={showContractModal}
+        onClose={handleContractClose}
+        onAccept={handleContractAccept}
+        onReject={handleContractReject}
+        title={"Договор аренды"}
+      />
     </div>
   );
 };

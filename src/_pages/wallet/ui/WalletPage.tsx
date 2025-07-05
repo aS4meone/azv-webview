@@ -120,6 +120,9 @@ const WalletPage = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
+      // Закрываем промокод модал перед открытием response модала
+      setIsPromoCodeModalOpen(false);
+
       setResponseModal({
         isOpen: true,
         type: "success",
@@ -129,6 +132,10 @@ const WalletPage = () => {
       });
     } catch (error) {
       console.error("Error applying promo code:", error);
+
+      // Закрываем промокод модал перед открытием response модала
+      setIsPromoCodeModalOpen(false);
+
       setResponseModal({
         isOpen: true,
         type: "error",
@@ -228,6 +235,7 @@ const WalletPage = () => {
         fullScreen={false}
         direction="bottom"
         withCloseButton={false}
+        isCloseable={true}
         height="auto"
       >
         <PromoCodeModal onSubmit={handleApplyPromoCode} isLoading={isLoading} />
@@ -235,13 +243,11 @@ const WalletPage = () => {
 
       <CustomPushScreen
         isOpen={!!responseModal}
-        onClose={() => {
-          setResponseModal(null);
-          setIsPromoCodeModalOpen(false);
-        }}
+        onClose={() => setResponseModal(null)}
         withHeader={false}
         fullScreen={false}
         direction="bottom"
+        isCloseable={true}
         height="auto"
       >
         <ResponseBottomModalContent
@@ -249,10 +255,7 @@ const WalletPage = () => {
           title={responseModal?.title || ""}
           description={responseModal?.description || ""}
           buttonText={responseModal?.buttonText || ""}
-          onButtonClick={() => {
-            setResponseModal(null);
-            setIsPromoCodeModalOpen(false);
-          }}
+          onButtonClick={() => setResponseModal(null)}
         />
       </CustomPushScreen>
     </article>

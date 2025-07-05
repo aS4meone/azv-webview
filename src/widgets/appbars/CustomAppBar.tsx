@@ -11,7 +11,7 @@ interface ICustomAppBar {
 const CustomAppBar = ({ title, backHref }: ICustomAppBar) => {
   return (
     <header className="flex items-center justify-between px-8 py-3">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
         <Link href={backHref}>
           <Button variant="icon" className="mr-2">
             <ArrowLeftIcon color="black" />

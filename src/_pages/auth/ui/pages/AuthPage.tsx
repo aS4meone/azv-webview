@@ -13,6 +13,7 @@ import { authApi } from "@/shared/api/routes/auth";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { useUserStore } from "@/shared/stores/userStore";
 import Loader from "@/shared/ui/loader";
+import { ContractModal } from "@/_pages/main/ui/widgets/modals/user/ContractModal";
 
 const AuthPage = () => {
   const { fetchUser, refreshUser } = useUserStore();
@@ -23,6 +24,7 @@ const AuthPage = () => {
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 
   const isDisabled =
     activeStep === 0
@@ -49,20 +51,8 @@ const AuthPage = () => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      setIsLoading(true);
-      const res = await authApi.sendSms("7" + phone);
-      if (res.statusCode === 200) {
-        setActiveStep(1);
-        setIsLoading(false);
-      } else {
-        showModal({
-          type: "error",
-          title: t("error"),
-          description: res.error,
-          buttonText: t("modal.error.button"),
-        });
-        setIsLoading(false);
-      }
+      // Показываем контрактный модал перед отправкой SMS
+      setIsContractModalOpen(true);
     } else {
       setIsLoading(true);
       const res = await authApi.verifySms("7" + phone, code);
@@ -85,6 +75,30 @@ const AuthPage = () => {
         setIsLoading(false);
       }
     }
+  };
+
+  const handleContractAccept = async () => {
+    setIsContractModalOpen(false);
+    setIsLoading(true);
+
+    const res = await authApi.sendSms("7" + phone);
+    if (res.statusCode === 200) {
+      setActiveStep(1);
+      setIsLoading(false);
+    } else {
+      showModal({
+        type: "error",
+        title: t("error"),
+        description: res.error,
+        buttonText: t("modal.error.button"),
+      });
+      setIsLoading(false);
+    }
+  };
+
+  const handleContractReject = () => {
+    setIsContractModalOpen(false);
+    // Остаемся на том же экране - пользователь может попробовать снова
   };
 
   return (
@@ -135,6 +149,15 @@ const AuthPage = () => {
           </Button>
         </section>
       </div>
+
+      {/* Контрактный модал */}
+      <ContractModal
+        isOpen={isContractModalOpen}
+        onClose={() => setIsContractModalOpen(false)}
+        onAccept={handleContractAccept}
+        onReject={handleContractReject}
+        title={"Договор аренды"}
+      />
     </article>
   );
 };

@@ -98,11 +98,27 @@
       "menu": {
         "tripsAndPayments": "Trips and Fines",
         "wallet": "Wallet",
+        "messages": "Messages",
         "support": "Support",
         "termsAndPolicy": "Terms and Policy"
       },
       "logout": "Logout"
     }
+  },
+  "messages": {
+    "title": "Messages",
+    "noMessages": "No messages yet",
+    "noMessagesDescription": "You will receive notifications about trips, payments, and other important updates here.",
+    "markAsRead": "Mark as read",
+    "new": "New"
+  },
+  "contract": {
+    "title": "Vehicle Rental Agreement",
+    "deliveryTitle": "Delivery and Rental Agreement",
+    "agreeText": "I have read and agree to the terms of the vehicle rental agreement. I confirm that I understand all the rights and obligations provided by the agreement.",
+    "scrollToEndText": "Scroll to the end of the document to read",
+    "accept": "Accept Terms",
+    "reject": "Reject"
   },
   "trips": {
     "title": "History",
