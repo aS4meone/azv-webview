@@ -77,7 +77,6 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
   };
 
   const handleRent = async (rentalData: RentalData) => {
-    // Показываем контракт перед арендой
     setPendingAction({ type: "rent", data: rentalData });
     setShowContractModal(true);
   };
@@ -89,7 +88,6 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         duration: rentalData.duration,
         rentalType: rentalData.rentalType,
       };
-      // await testRequest("handleRent");
 
       const res = await rentApi.reserveCar(data);
       if (res.status === 200) {

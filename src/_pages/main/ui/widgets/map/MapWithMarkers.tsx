@@ -857,7 +857,7 @@ export const MapWithMarkers = ({
       // Проверяем, есть ли активная слежка
       const trackingCarId = localStorage.getItem("tracking_car_id");
 
-      if (trackingCarId && mechanicVehicles.length > 0) {
+      if (trackingCarId && mechanicVehicles && mechanicVehicles.length > 0) {
         // Если есть активная слежка, показываем только отслеживаемую машину
         const trackingCar = mechanicVehicles.find(
           (car) => car.id === parseInt(trackingCarId)
@@ -867,7 +867,7 @@ export const MapWithMarkers = ({
         } else {
           // Если машина не найдена, удаляем ID из localStorage и показываем все машины
           localStorage.removeItem("tracking_car_id");
-          vehicles = mechanicVehicles;
+          vehicles = mechanicVehicles || [];
         }
       } else if (
         deliveryVehicle &&
@@ -878,17 +878,17 @@ export const MapWithMarkers = ({
         vehicles = [deliveryVehicle];
       } else {
         // Иначе показываем все машины механика
-        vehicles = mechanicVehicles;
+        vehicles = mechanicVehicles || [];
       }
     } else {
       // Для обычных пользователей используем кэшированные данные
       const { allVehicles: cachedVehicles } = cachedData as {
         allVehicles: ICar[];
       };
-      vehicles = cachedVehicles;
+      vehicles = cachedVehicles || [];
     }
 
-    if (!vehicles.length) {
+    if (!vehicles || !vehicles.length) {
       return;
     }
 

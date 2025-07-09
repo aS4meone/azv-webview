@@ -59,11 +59,6 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   }, [isOpen]);
 
   const contractText = `
-Утвержден приказом Директора
-«19» июня 2025 года
-
-ДОГОВОР АРЕНДЫ  АВТОТРАНСПОРТНОГО СРЕДСТВА (КАРШЕРИНГ)
-Товарищество с ограниченной ответственностью «Объединение Азаева», именуемое в дальнейшем «Арендодатель», с одной стороны, и Клиент, с другой стороны, при совместном упоминании в дальнейшем именуемые «Стороны», а по отдельности «Сторона», или как указано выше, заключили настоящий Договор о нижеследующем.
 ПРЕАМБУЛА
 Стороны настоящим понимают и подтверждают друг другу, что:
 (1) Настоящий Договор не является договором проката по смыслу статьи 595 Гражданского кодекса Республики Казахстан, при этом содержит определенные элементы, которые могут предусматриваться в договорах проката и (или) договорах аренды транспортного средства без экипажа;
@@ -848,33 +843,12 @@ _______________________
       isCloseable={false}
     >
       <div className="flex flex-col h-full">
-        {/* Индикатор прогресса чтения */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-600">
-              {hasScrolledToEnd ? "✓ Документ прочитан" : "Прогресс прочтения"}
-            </span>
-            <span className="text-sm text-gray-500">
-              {Math.round(scrollProgress)}%
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={cn(
-                "h-2 rounded-full transition-all duration-300",
-                hasScrolledToEnd ? "bg-green-500" : "bg-blue-500"
-              )}
-              style={{ width: `${scrollProgress}%` }}
-            />
-          </div>
-        </div>
-
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
           className="flex-1 overflow-y-auto overflow-x-auto p-3 "
         >
-          <pre className="whitespace-pre text-base sm:text-sm leading-6 sm:leading-relaxed text-gray-700 font-sans">
+          <pre className="whitespace-pre text-[10px] leading-6 sm:leading-relaxed text-gray-700 font-sans">
             {contractText}
           </pre>
         </div>
