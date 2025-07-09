@@ -21,7 +21,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 }) => {
   const [agreed, setAgreed] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [, setScrollProgress] = useState(0);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   const handleAccept = () => {
