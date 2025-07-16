@@ -135,8 +135,9 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       console.log(`🔍 Отладка для ${photoId}:`, {
         "photoConfig.cameraType": photoConfig.cameraType,
         "photoConfig.isSelfy": photoConfig.isSelfy,
+        "photoConfig.multiple": photoConfig.multiple,
         "итоговый cameraType": cameraType,
-        photoConfig: photoConfig,
+        "полная конфигурация": photoConfig,
       });
 
       if (cameraType !== "front" && cameraType !== "back") {
@@ -148,6 +149,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
 
       console.log(`📱 Финальный cameraType для съемки: ${cameraType}`);
 
+      // Всегда используем кастомный экран камеры для множественных фото
       if (photoConfig.multiple) {
         console.log(
           `📷 Множественные фото с камеры: ${photoConfig.multiple.min}-${photoConfig.multiple.max}, камера: ${cameraType}`
@@ -157,6 +159,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
           photoConfig.multiple.min,
           photoConfig.multiple.max,
           cameraType
+        );
+
+        console.log(
+          `✅ Получено ${base64Images.length} фото от кастомной камеры`
         );
 
         if (base64Images.length < photoConfig.multiple.min) {
@@ -183,7 +189,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
         console.log(
           `📸 ${
             photoConfig.isSelfy ? "Селфи" : "Фото"
-          } с камеры ${cameraType} для ${photoId}`
+          } с камеры ${cameraType} для ${photoId} - используем обычную камеру`
         );
 
         const base64Image = await FlutterCamera.capturePhoto(cameraType);
@@ -400,6 +406,20 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   );
 
   const isFlutterAvailable = FlutterCamera.isAvailable();
+
+  // Добавляем отладочную информацию
+  console.log("🔍 Flutter Camera Debug Info:", {
+    isFlutterAvailable,
+    hasFlutterInAppWebView: !!(
+      typeof window !== "undefined" && window.flutter_inappwebview
+    ),
+    userAgent:
+      typeof window !== "undefined" ? window.navigator.userAgent : "unknown",
+    windowObject:
+      typeof window !== "undefined"
+        ? Object.keys(window).filter((k) => k.includes("flutter"))
+        : [],
+  });
 
   const content = (
     <div className="flex flex-col gap-20 pb-[100px] pt-12 h-full">

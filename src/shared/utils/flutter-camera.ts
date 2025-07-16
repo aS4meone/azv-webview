@@ -14,6 +14,18 @@ declare global {
         ...args: unknown[]
       ) => Promise<unknown>;
     };
+    flutter_channels?: {
+      capturePhoto: (cameraType: string) => void;
+      pickSinglePhoto: () => void;
+      pickMultiplePhotos: (maxImages: number) => void;
+      captureMultiplePhotos: (
+        minPhotos: number,
+        maxPhotos: number,
+        cameraType: string
+      ) => void;
+      getCurrentPosition: () => void;
+      logout: () => void;
+    };
     flutterCameraResult?: (result: FlutterCameraResult) => void;
   }
 }
@@ -27,7 +39,48 @@ export class FlutterCamera {
    * Проверяет, доступна ли Flutter камера
    */
   static isAvailable(): boolean {
-    return typeof window !== "undefined" && !!window.flutter_inappwebview;
+    return (
+      typeof window !== "undefined" &&
+      (!!window.flutter_inappwebview ||
+        !!window.flutter_channels ||
+        // Проверяем прямой доступ к JavaScript channels
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        typeof (window as any).capturePhoto !== "undefined")
+    );
+  }
+
+  /**
+   * Вызывает JavaScript channel напрямую
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static callChannel(channelName: string, ...args: any[]): boolean {
+    try {
+      if (typeof window !== "undefined") {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const windowWithChannels = window as any;
+        const channel = windowWithChannels[channelName];
+
+        if (channel && typeof channel.postMessage === "function") {
+          if (args.length === 1) {
+            // Если это объект, преобразуем в JSON для Flutter
+            if (typeof args[0] === "object" && args[0] !== null) {
+              channel.postMessage(JSON.stringify(args[0]));
+            } else {
+              channel.postMessage(String(args[0]));
+            }
+          } else if (args.length > 1) {
+            channel.postMessage(JSON.stringify(args));
+          } else {
+            channel.postMessage("");
+          }
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      console.error(`Error calling channel ${channelName}:`, e);
+      return false;
+    }
   }
 
   /**
@@ -53,10 +106,33 @@ export class FlutterCamera {
       // Устанавливаем глобальный callback
       window.flutterCameraResult = this.resultCallback;
 
-      // Вызываем Flutter handler с параметром типа камеры
-      window.flutter_inappwebview
-        ?.callHandler("capturePhoto", cameraType)
-        .catch(reject);
+      // Пробуем разные способы вызова
+      let success = false;
+
+      // 1. Прямой вызов JavaScript channel
+      if (this.callChannel("capturePhoto", cameraType)) {
+        console.log("📱 Используем прямой JavaScript channel для capturePhoto");
+        success = true;
+      }
+      // 2. Через flutter_channels
+      else if (window.flutter_channels) {
+        console.log("📱 Используем flutter_channels для capturePhoto");
+        window.flutter_channels.capturePhoto(cameraType);
+        success = true;
+      }
+      // 3. Через flutter_inappwebview
+      else if (window.flutter_inappwebview) {
+        console.log("📱 Используем flutter_inappwebview для capturePhoto");
+        window.flutter_inappwebview
+          .callHandler("capturePhoto", cameraType)
+          .catch(reject);
+        success = true;
+      }
+
+      if (!success) {
+        reject(new Error("No Flutter communication method available"));
+        return;
+      }
 
       // Таймаут на случай если результат не придет
       setTimeout(() => {
@@ -88,7 +164,29 @@ export class FlutterCamera {
 
       window.flutterCameraResult = this.resultCallback;
 
-      window.flutter_inappwebview?.callHandler("pickSinglePhoto").catch(reject);
+      let success = false;
+
+      if (this.callChannel("pickSinglePhoto")) {
+        console.log(
+          "📱 Используем прямой JavaScript channel для pickSinglePhoto"
+        );
+        success = true;
+      } else if (window.flutter_channels) {
+        console.log("📱 Используем flutter_channels для pickSinglePhoto");
+        window.flutter_channels.pickSinglePhoto();
+        success = true;
+      } else if (window.flutter_inappwebview) {
+        console.log("📱 Используем flutter_inappwebview для pickSinglePhoto");
+        window.flutter_inappwebview
+          .callHandler("pickSinglePhoto")
+          .catch(reject);
+        success = true;
+      }
+
+      if (!success) {
+        reject(new Error("No Flutter communication method available"));
+        return;
+      }
 
       setTimeout(() => {
         if (this.resultCallback) {
@@ -119,9 +217,31 @@ export class FlutterCamera {
 
       window.flutterCameraResult = this.resultCallback;
 
-      window.flutter_inappwebview
-        ?.callHandler("pickMultiplePhotos", maxImages)
-        .catch(reject);
+      let success = false;
+
+      if (this.callChannel("pickMultiplePhotos", { maxImages })) {
+        console.log(
+          "📱 Используем прямой JavaScript channel для pickMultiplePhotos"
+        );
+        success = true;
+      } else if (window.flutter_channels) {
+        console.log("📱 Используем flutter_channels для pickMultiplePhotos");
+        window.flutter_channels.pickMultiplePhotos(maxImages);
+        success = true;
+      } else if (window.flutter_inappwebview) {
+        console.log(
+          "📱 Используем flutter_inappwebview для pickMultiplePhotos"
+        );
+        window.flutter_inappwebview
+          .callHandler("pickMultiplePhotos", maxImages)
+          .catch(reject);
+        success = true;
+      }
+
+      if (!success) {
+        reject(new Error("No Flutter communication method available"));
+        return;
+      }
 
       setTimeout(() => {
         if (this.resultCallback) {
@@ -158,9 +278,63 @@ export class FlutterCamera {
 
       window.flutterCameraResult = this.resultCallback;
 
-      window.flutter_inappwebview
-        ?.callHandler("captureMultiplePhotos", minPhotos, maxPhotos, cameraType)
-        .catch(reject);
+      let success = false;
+
+      // 1. Прямой вызов JavaScript channel
+      if (
+        this.callChannel("captureMultiplePhotos", {
+          minPhotos,
+          maxPhotos,
+          cameraType,
+        })
+      ) {
+        console.log(
+          "📱 Используем прямой JavaScript channel для captureMultiplePhotos",
+          {
+            minPhotos,
+            maxPhotos,
+            cameraType,
+          }
+        );
+        success = true;
+      }
+      // 2. Через flutter_channels
+      else if (window.flutter_channels) {
+        console.log(
+          "📱 Используем flutter_channels для captureMultiplePhotos",
+          {
+            minPhotos,
+            maxPhotos,
+            cameraType,
+          }
+        );
+        window.flutter_channels.captureMultiplePhotos(
+          minPhotos,
+          maxPhotos,
+          cameraType
+        );
+        success = true;
+      }
+      // 3. Через flutter_inappwebview
+      else if (window.flutter_inappwebview) {
+        console.log(
+          "📱 Используем flutter_inappwebview для captureMultiplePhotos"
+        );
+        window.flutter_inappwebview
+          .callHandler(
+            "captureMultiplePhotos",
+            minPhotos,
+            maxPhotos,
+            cameraType
+          )
+          .catch(reject);
+        success = true;
+      }
+
+      if (!success) {
+        reject(new Error("No Flutter communication method available"));
+        return;
+      }
 
       setTimeout(() => {
         if (this.resultCallback) {
