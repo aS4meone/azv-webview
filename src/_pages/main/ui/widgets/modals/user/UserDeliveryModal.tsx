@@ -23,13 +23,7 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
   const rentalStatus = user?.current_rental?.rental_details.status;
 
   // Логирование изменений статуса
-  useEffect(() => {
-    if (rentalStatus === RentalStatus.RESERVED) {
-      handleModalClose();
-    }
-  }, [rentalStatus]);
 
-  // Функция для закрытия модала
   const handleModalClose = useCallback(async () => {
     console.log("[UserDeliveryModal] handleModalClose called");
     // Останавливаем polling при закрытии
@@ -41,6 +35,14 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
     onClose();
     setResponseModal(null);
   }, [refreshUser, onClose]);
+
+  useEffect(() => {
+    if (rentalStatus === RentalStatus.RESERVED) {
+      handleModalClose();
+    }
+  }, [rentalStatus, handleModalClose]);
+
+  // Функция для закрытия модала
 
   useEffect(() => {
     // Запускаем интервал каждые 10 секунд только для обновления данных
