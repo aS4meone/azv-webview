@@ -21,6 +21,7 @@ export * from "./ui/EngineVolumeIcon";
 export * from "./ui/CheckIcon";
 export * from "./ui/TruckIcon";
 export * from "./ui/ClockIcon";
+export * from "./ui/InfoIcon";
 export * from "./ui/ThumbsUpIcon";
 export * from "./ui/ThumbsDownIcon";
 export { CameraIcon } from "./Camera";
