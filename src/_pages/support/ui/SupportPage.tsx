@@ -1,9 +1,16 @@
 import { PhoneIcon, TelegramIcon } from "@/shared/icons";
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useState } from "react";
 
 const SupportPage = () => {
   const t = useTranslations();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = async () => {
+    await navigator.clipboard.writeText("team@azvmotors.kz");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
   return (
     <section>
       <h2 className="text-[24px] font-semibold text-[#191919] mb-6">
@@ -45,6 +52,20 @@ const SupportPage = () => {
             <p>+7 777 777 77 77</p>
             <div className="w-[70px]"></div>
           </a>
+        </section>
+
+        {/* Email Section */}
+        <section className="mb-12">
+          <h2 className="text-[16px] text-[#191919] mb-6">Email</h2>
+          <button
+            onClick={handleCopyEmail}
+            className="flex items-center h-[66px] justify-between px-7 py-5 border-[#E8E8E8] border gap-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-[#191919] w-full mb-6"
+          >
+            <span>team@azvmotors.kz</span>
+            <span className="text-sm text-[#1D77FF]">
+              {copied ? "Скопировано!" : "Скопировать"}
+            </span>
+          </button>
         </section>
 
         {/* Telegram Section */}
