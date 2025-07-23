@@ -30,7 +30,7 @@ export class FlutterCamera {
   /**
    * Отправляет сообщение в React Native
    */
-  private static sendMessage(action: string, data?: any): boolean {
+  private static sendMessage(action: string, data?: unknown): boolean {
     try {
       if (typeof window !== "undefined" && window.ReactNativeWebView) {
         const message = JSON.stringify({ action, data });

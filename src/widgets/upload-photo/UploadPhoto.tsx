@@ -233,14 +233,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     }
   };
 
-  const flipImageHorizontally = (file: File): Promise<File> => {
-    return new Promise((resolve) => {
-      // Для быстрой обработки - пропускаем flip для селфи, так как камера уже делает это
-      console.log("🚀 Быстрая обработка селфи - пропускаем flip");
-      resolve(file);
-    });
-  };
-
   const handlePhotoSelect = async (
     photoId: string,
     event: React.ChangeEvent<HTMLInputElement>
@@ -290,7 +282,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     }
 
     // Быстрая обработка файлов с индикатором загрузки
-    let processedFiles = files;
+    const processedFiles = files;
     if (photoConfig?.isSelfy) {
       console.log(`🚀 Быстрая обработка селфи для ${photoId}`);
       setPhotoLoading(photoId, true);
