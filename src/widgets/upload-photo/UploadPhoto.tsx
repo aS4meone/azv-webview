@@ -31,7 +31,7 @@ interface UploadPhotoProps {
 // Компонент индикатора прогресса
 const ProgressIndicator: React.FC<{ progress: number }> = ({ progress }) => {
   return (
-    <div className="flex items-center gap-3 min-w-[140px] animate-pulse">
+    <div className="flex items-center gap-3 min-w-[140px]">
       <div className="relative w-14 h-14 drop-shadow-lg">
         {/* Фоновый круг */}
         <svg className="w-14 h-14 transform -rotate-90" viewBox="0 0 56 56">
@@ -162,7 +162,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
         );
 
         console.log(
-          `✅ Получено ${base64Images.length} фото от кастомной камеры`
+          `✅ Получено ${base64Images.length} фото от React Native камеры`
         );
 
         if (base64Images.length < photoConfig.multiple.min) {
@@ -175,16 +175,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
           return;
         }
 
-        // Показываем прогресс обработки фотографий
-        const totalFiles = base64Images.length;
-        for (let i = 0; i < base64Images.length; i++) {
-          const progress = Math.round(((i + 1) / totalFiles) * 100);
-          setPhotoProgress(photoId, progress);
-          // Увеличиваем задержку для лучшей визуализации прогресса
-          await new Promise((resolve) => setTimeout(resolve, 150));
-        }
-
+        // Показываем прогресс обработки
+        setPhotoProgress(photoId, 50);
         files = FlutterCamera.base64ArrayToFiles(base64Images, photoId);
+        setPhotoProgress(photoId, 100);
       } else {
         console.log(
           `📸 ${
@@ -194,10 +188,12 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
 
         const base64Image = await FlutterCamera.capturePhoto(cameraType);
         if (base64Image) {
+          setPhotoProgress(photoId, 50);
           const fileName = photoConfig.isSelfy
             ? `${photoId}_selfie.jpg`
             : `${photoId}.jpg`;
           files = [FlutterCamera.base64ToFile(base64Image, fileName)];
+          setPhotoProgress(photoId, 100);
         }
       }
 
@@ -217,11 +213,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
         [photoId]: files,
       }));
 
-      // Показываем 100% на короткое время перед завершением
+      // Показываем 100% прогресс
       setPhotoProgress(photoId, 100);
-      await new Promise((resolve) => setTimeout(resolve, 500));
     } catch (error) {
-      console.error("Flutter camera error:", error);
+      console.error("React Native camera error:", error);
 
       // При ошибке или отмене оставляем фотографии очищенными
       // (они уже были очищены в начале функции)
@@ -238,63 +233,11 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     }
   };
 
-  const flipImageHorizontally = (
-    file: File,
-    onProgress?: (progress: number) => void
-  ): Promise<File> => {
+  const flipImageHorizontally = (file: File): Promise<File> => {
     return new Promise((resolve) => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
-
-      if (!ctx) {
-        console.error("Canvas context не поддерживается");
-        resolve(file);
-        return;
-      }
-
-      img.onload = () => {
-        try {
-          onProgress?.(50); // 50% - загрузка изображения завершена
-
-          canvas.width = img.width;
-          canvas.height = img.height;
-
-          // Отражаем изображение горизонтально
-          ctx.scale(-1, 1);
-          ctx.drawImage(img, -img.width, 0);
-
-          onProgress?.(80); // 80% - отражение завершено
-
-          canvas.toBlob(
-            (blob) => {
-              if (blob) {
-                const flippedFile = new File([blob], file.name, {
-                  type: file.type,
-                });
-                console.log("✅ Изображение успешно отражено горизонтально");
-                onProgress?.(100); // 100% - завершено
-                resolve(flippedFile);
-              } else {
-                console.error("Не удалось создать blob из canvas");
-                resolve(file);
-              }
-            },
-            file.type,
-            0.9
-          );
-        } catch (error) {
-          console.error("Ошибка при обработке изображения:", error);
-          resolve(file);
-        }
-      };
-
-      img.onerror = () => {
-        console.error("Ошибка загрузки изображения");
-        resolve(file);
-      };
-
-      img.src = URL.createObjectURL(file);
+      // Для быстрой обработки - пропускаем flip для селфи, так как камера уже делает это
+      console.log("🚀 Быстрая обработка селфи - пропускаем flip");
+      resolve(file);
     });
   };
 
@@ -346,49 +289,16 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       return;
     }
 
-    // Исправляем реверс для селфи камеры
+    // Быстрая обработка файлов с индикатором загрузки
     let processedFiles = files;
     if (photoConfig?.isSelfy) {
-      console.log(`🔄 Обнаружено селфи для ${photoId}, применяем flip`);
-      try {
-        setPhotoLoading(photoId, true);
-        const totalFiles = files.length;
-        const resultFiles: File[] = [];
-
-        // Обрабатываем файлы последовательно для корректного отображения прогресса
-        for (let index = 0; index < files.length; index++) {
-          const file = files[index];
-          console.log(
-            `Обрабатываем файл ${index + 1}/${files.length}: ${file.name}`
-          );
-
-          const result = await flipImageHorizontally(file, (fileProgress) => {
-            // Рассчитываем общий прогресс: завершенные файлы + прогресс текущего файла
-            const overallProgress = Math.round(
-              ((index + fileProgress / 100) / totalFiles) * 100
-            );
-            setPhotoProgress(photoId, overallProgress);
-          });
-
-          resultFiles.push(result);
-        }
-
-        processedFiles = resultFiles;
-        console.log(
-          `✅ Успешно обработано ${processedFiles.length} файлов для селфи ${photoId}`
-        );
-
-        // Показываем 100% на короткое время перед завершением
-        setPhotoProgress(photoId, 100);
-        await new Promise((resolve) => setTimeout(resolve, 500));
-      } catch (error) {
-        console.error("❌ Ошибка обработки изображения:", error);
-        // Используем исходные файлы в случае ошибки
-      } finally {
-        setPhotoLoading(photoId, false);
-      }
+      console.log(`🚀 Быстрая обработка селфи для ${photoId}`);
+      setPhotoLoading(photoId, true);
+      // Пропускаем обработку - используем файлы как есть
+      setPhotoProgress(photoId, 100);
+      setPhotoLoading(photoId, false);
     } else {
-      console.log(`📷 Обычное фото для ${photoId}, flip не применяется`);
+      console.log(`📷 Обычное фото для ${photoId}, обработка не требуется`);
     }
 
     setSelectedFiles((prev) => ({
@@ -408,16 +318,16 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const isFlutterAvailable = FlutterCamera.isAvailable();
 
   // Добавляем отладочную информацию
-  console.log("🔍 Flutter Camera Debug Info:", {
+  console.log("🔍 React Native Camera Debug Info:", {
     isFlutterAvailable,
-    hasFlutterInAppWebView: !!(
-      typeof window !== "undefined" && window.flutter_inappwebview
+    hasReactNativeWebView: !!(
+      typeof window !== "undefined" && window.ReactNativeWebView
     ),
     userAgent:
       typeof window !== "undefined" ? window.navigator.userAgent : "unknown",
     windowObject:
       typeof window !== "undefined"
-        ? Object.keys(window).filter((k) => k.includes("flutter"))
+        ? Object.keys(window).filter((k) => k.includes("ReactNative"))
         : [],
   });
 
@@ -449,7 +359,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
             </div>
 
             {isFlutterAvailable ? (
-              // Flutter камера доступна - используем везде
+              // React Native камера доступна - используем везде
               <button
                 onClick={() => handleFlutterPhotoSelect(photo.id, photo)}
                 disabled={loadingStates[photo.id] || isLoading}
@@ -494,7 +404,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                 </div>
               </button>
             ) : (
-              // Fallback на HTML input (только если Flutter недоступен)
+              // Fallback на HTML input (только если React Native недоступен)
               <label className="block w-full">
                 <div
                   className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${

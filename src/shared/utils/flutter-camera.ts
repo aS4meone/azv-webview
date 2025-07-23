@@ -1,4 +1,4 @@
-interface FlutterCameraResult {
+interface ReactNativeCameraResult {
   success: boolean;
   data?: string | string[];
   type?: "single" | "multiple";
@@ -8,77 +8,38 @@ interface FlutterCameraResult {
 
 declare global {
   interface Window {
-    flutter_inappwebview?: {
-      callHandler: (
-        handlerName: string,
-        ...args: unknown[]
-      ) => Promise<unknown>;
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
     };
-    flutter_channels?: {
-      capturePhoto: (cameraType: string) => void;
-      pickSinglePhoto: () => void;
-      pickMultiplePhotos: (maxImages: number) => void;
-      captureMultiplePhotos: (
-        minPhotos: number,
-        maxPhotos: number,
-        cameraType: string
-      ) => void;
-      getCurrentPosition: () => void;
-      logout: () => void;
-    };
-    flutterCameraResult?: (result: FlutterCameraResult) => void;
+    reactNativeCameraResult?: (result: ReactNativeCameraResult) => void;
   }
 }
 
 export class FlutterCamera {
   private static resultCallback:
-    | ((result: FlutterCameraResult) => void)
+    | ((result: ReactNativeCameraResult) => void)
     | null = null;
 
   /**
-   * Проверяет, доступна ли Flutter камера
+   * Проверяет, доступна ли React Native камера
    */
   static isAvailable(): boolean {
-    return (
-      typeof window !== "undefined" &&
-      (!!window.flutter_inappwebview ||
-        !!window.flutter_channels ||
-        // Проверяем прямой доступ к JavaScript channels
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        typeof (window as any).capturePhoto !== "undefined")
-    );
+    return typeof window !== "undefined" && !!window.ReactNativeWebView;
   }
 
   /**
-   * Вызывает JavaScript channel напрямую
+   * Отправляет сообщение в React Native
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private static callChannel(channelName: string, ...args: any[]): boolean {
+  private static sendMessage(action: string, data?: any): boolean {
     try {
-      if (typeof window !== "undefined") {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const windowWithChannels = window as any;
-        const channel = windowWithChannels[channelName];
-
-        if (channel && typeof channel.postMessage === "function") {
-          if (args.length === 1) {
-            // Если это объект, преобразуем в JSON для Flutter
-            if (typeof args[0] === "object" && args[0] !== null) {
-              channel.postMessage(JSON.stringify(args[0]));
-            } else {
-              channel.postMessage(String(args[0]));
-            }
-          } else if (args.length > 1) {
-            channel.postMessage(JSON.stringify(args));
-          } else {
-            channel.postMessage("");
-          }
-          return true;
-        }
+      if (typeof window !== "undefined" && window.ReactNativeWebView) {
+        const message = JSON.stringify({ action, data });
+        window.ReactNativeWebView.postMessage(message);
+        return true;
       }
       return false;
     } catch (e) {
-      console.error(`Error calling channel ${channelName}:`, e);
+      console.error(`Error sending message ${action}:`, e);
       return false;
     }
   }
@@ -90,11 +51,11 @@ export class FlutterCamera {
     cameraType: "front" | "back" = "back"
   ): Promise<string | null> {
     if (!this.isAvailable()) {
-      throw new Error("Flutter camera is not available");
+      throw new Error("React Native camera is not available");
     }
 
     return new Promise((resolve, reject) => {
-      this.resultCallback = (result: FlutterCameraResult) => {
+      this.resultCallback = (result: ReactNativeCameraResult) => {
         if (result.success && typeof result.data === "string") {
           resolve(result.data);
         } else {
@@ -104,43 +65,24 @@ export class FlutterCamera {
       };
 
       // Устанавливаем глобальный callback
-      window.flutterCameraResult = this.resultCallback;
+      window.reactNativeCameraResult = this.resultCallback;
+      console.log("📱 Callback установлен:", !!window.reactNativeCameraResult);
 
-      // Пробуем разные способы вызова
-      let success = false;
-
-      // 1. Прямой вызов JavaScript channel
-      if (this.callChannel("capturePhoto", cameraType)) {
-        console.log("📱 Используем прямой JavaScript channel для capturePhoto");
-        success = true;
-      }
-      // 2. Через flutter_channels
-      else if (window.flutter_channels) {
-        console.log("📱 Используем flutter_channels для capturePhoto");
-        window.flutter_channels.capturePhoto(cameraType);
-        success = true;
-      }
-      // 3. Через flutter_inappwebview
-      else if (window.flutter_inappwebview) {
-        console.log("📱 Используем flutter_inappwebview для capturePhoto");
-        window.flutter_inappwebview
-          .callHandler("capturePhoto", cameraType)
-          .catch(reject);
-        success = true;
-      }
-
-      if (!success) {
-        reject(new Error("No Flutter communication method available"));
+      // Отправляем сообщение в React Native
+      if (this.sendMessage("capturePhoto", cameraType)) {
+        console.log("📱 Отправляем capturePhoto в React Native");
+      } else {
+        reject(new Error("Failed to send message to React Native"));
         return;
       }
 
       // Таймаут на случай если результат не придет
       setTimeout(() => {
         if (this.resultCallback) {
-          reject(new Error("Camera capture timeout"));
+          reject(new Error("Camera capture timeout (30s)"));
           this.resultCallback = null;
         }
-      }, 30000);
+      }, 10000); // Уменьшаем таймаут до 10 секунд
     });
   }
 
@@ -149,11 +91,11 @@ export class FlutterCamera {
    */
   static async pickSinglePhoto(): Promise<string | null> {
     if (!this.isAvailable()) {
-      throw new Error("Flutter camera is not available");
+      throw new Error("React Native camera is not available");
     }
 
     return new Promise((resolve, reject) => {
-      this.resultCallback = (result: FlutterCameraResult) => {
+      this.resultCallback = (result: ReactNativeCameraResult) => {
         if (result.success && typeof result.data === "string") {
           resolve(result.data);
         } else {
@@ -162,38 +104,21 @@ export class FlutterCamera {
         this.resultCallback = null;
       };
 
-      window.flutterCameraResult = this.resultCallback;
+      window.reactNativeCameraResult = this.resultCallback;
 
-      let success = false;
-
-      if (this.callChannel("pickSinglePhoto")) {
-        console.log(
-          "📱 Используем прямой JavaScript channel для pickSinglePhoto"
-        );
-        success = true;
-      } else if (window.flutter_channels) {
-        console.log("📱 Используем flutter_channels для pickSinglePhoto");
-        window.flutter_channels.pickSinglePhoto();
-        success = true;
-      } else if (window.flutter_inappwebview) {
-        console.log("📱 Используем flutter_inappwebview для pickSinglePhoto");
-        window.flutter_inappwebview
-          .callHandler("pickSinglePhoto")
-          .catch(reject);
-        success = true;
-      }
-
-      if (!success) {
-        reject(new Error("No Flutter communication method available"));
+      if (this.sendMessage("pickSinglePhoto")) {
+        console.log("📱 Отправляем pickSinglePhoto в React Native");
+      } else {
+        reject(new Error("Failed to send message to React Native"));
         return;
       }
 
       setTimeout(() => {
         if (this.resultCallback) {
-          reject(new Error("Photo picker timeout"));
+          reject(new Error("Photo picker timeout (10s)"));
           this.resultCallback = null;
         }
-      }, 30000);
+      }, 10000); // Уменьшаем таймаут до 10 секунд
     });
   }
 
@@ -202,11 +127,11 @@ export class FlutterCamera {
    */
   static async pickMultiplePhotos(maxImages: number = 10): Promise<string[]> {
     if (!this.isAvailable()) {
-      throw new Error("Flutter camera is not available");
+      throw new Error("React Native camera is not available");
     }
 
     return new Promise((resolve, reject) => {
-      this.resultCallback = (result: FlutterCameraResult) => {
+      this.resultCallback = (result: ReactNativeCameraResult) => {
         if (result.success && Array.isArray(result.data)) {
           resolve(result.data);
         } else {
@@ -215,40 +140,21 @@ export class FlutterCamera {
         this.resultCallback = null;
       };
 
-      window.flutterCameraResult = this.resultCallback;
+      window.reactNativeCameraResult = this.resultCallback;
 
-      let success = false;
-
-      if (this.callChannel("pickMultiplePhotos", { maxImages })) {
-        console.log(
-          "📱 Используем прямой JavaScript channel для pickMultiplePhotos"
-        );
-        success = true;
-      } else if (window.flutter_channels) {
-        console.log("📱 Используем flutter_channels для pickMultiplePhotos");
-        window.flutter_channels.pickMultiplePhotos(maxImages);
-        success = true;
-      } else if (window.flutter_inappwebview) {
-        console.log(
-          "📱 Используем flutter_inappwebview для pickMultiplePhotos"
-        );
-        window.flutter_inappwebview
-          .callHandler("pickMultiplePhotos", maxImages)
-          .catch(reject);
-        success = true;
-      }
-
-      if (!success) {
-        reject(new Error("No Flutter communication method available"));
+      if (this.sendMessage("pickMultiplePhotos", { maxImages })) {
+        console.log("📱 Отправляем pickMultiplePhotos в React Native");
+      } else {
+        reject(new Error("Failed to send message to React Native"));
         return;
       }
 
       setTimeout(() => {
         if (this.resultCallback) {
-          reject(new Error("Multiple photo picker timeout"));
+          reject(new Error("Multiple photo picker timeout (10s)"));
           this.resultCallback = null;
         }
-      }, 30000);
+      }, 10000); // Уменьшаем таймаут до 10 секунд
     });
   }
 
@@ -261,11 +167,11 @@ export class FlutterCamera {
     cameraType: "front" | "back" = "back"
   ): Promise<string[]> {
     if (!this.isAvailable()) {
-      throw new Error("Flutter camera is not available");
+      throw new Error("React Native camera is not available");
     }
 
     return new Promise((resolve, reject) => {
-      this.resultCallback = (result: FlutterCameraResult) => {
+      this.resultCallback = (result: ReactNativeCameraResult) => {
         if (result.success && Array.isArray(result.data)) {
           resolve(result.data);
         } else {
@@ -276,72 +182,31 @@ export class FlutterCamera {
         this.resultCallback = null;
       };
 
-      window.flutterCameraResult = this.resultCallback;
+      window.reactNativeCameraResult = this.resultCallback;
 
-      let success = false;
-
-      // 1. Прямой вызов JavaScript channel
       if (
-        this.callChannel("captureMultiplePhotos", {
+        this.sendMessage("captureMultiplePhotos", {
           minPhotos,
           maxPhotos,
           cameraType,
         })
       ) {
-        console.log(
-          "📱 Используем прямой JavaScript channel для captureMultiplePhotos",
-          {
-            minPhotos,
-            maxPhotos,
-            cameraType,
-          }
-        );
-        success = true;
-      }
-      // 2. Через flutter_channels
-      else if (window.flutter_channels) {
-        console.log(
-          "📱 Используем flutter_channels для captureMultiplePhotos",
-          {
-            minPhotos,
-            maxPhotos,
-            cameraType,
-          }
-        );
-        window.flutter_channels.captureMultiplePhotos(
+        console.log("📱 Отправляем captureMultiplePhotos в React Native", {
           minPhotos,
           maxPhotos,
-          cameraType
-        );
-        success = true;
-      }
-      // 3. Через flutter_inappwebview
-      else if (window.flutter_inappwebview) {
-        console.log(
-          "📱 Используем flutter_inappwebview для captureMultiplePhotos"
-        );
-        window.flutter_inappwebview
-          .callHandler(
-            "captureMultiplePhotos",
-            minPhotos,
-            maxPhotos,
-            cameraType
-          )
-          .catch(reject);
-        success = true;
-      }
-
-      if (!success) {
-        reject(new Error("No Flutter communication method available"));
+          cameraType,
+        });
+      } else {
+        reject(new Error("Failed to send message to React Native"));
         return;
       }
 
       setTimeout(() => {
         if (this.resultCallback) {
-          reject(new Error("Multiple photo capture timeout"));
+          reject(new Error("Multiple photo capture timeout (20s)"));
           this.resultCallback = null;
         }
-      }, 60000); // Больший таймаут для множественной съемки
+      }, 20000); // Уменьшаем таймаут до 20 секунд для множественной съемки
     });
   }
 
