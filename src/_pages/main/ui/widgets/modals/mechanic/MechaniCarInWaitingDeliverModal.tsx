@@ -31,7 +31,8 @@ export const MechaniCarInWaitingDeliverModal = ({
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const { setUploadRequired } = usePhotoUpload();
-  const { fetchCurrentDeliveryVehicle } = useVehiclesStore();
+  const { fetchCurrentDeliveryVehicle, forceRefreshMechanicData } =
+    useVehiclesStore();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +41,17 @@ export const MechaniCarInWaitingDeliverModal = ({
   const handleClose = async () => {
     setResponseModal(null);
     onClose();
-    await refreshUser();
-    await fetchCurrentDeliveryVehicle();
+    try {
+      await refreshUser();
+      try {
+        await fetchCurrentDeliveryVehicle();
+      } catch {
+        console.log("No current delivery - this is expected");
+      }
+      await forceRefreshMechanicData();
+    } catch (error) {
+      console.warn("Failed to refresh data on modal close:", error);
+    }
   };
 
   async function handleStartDelivery() {

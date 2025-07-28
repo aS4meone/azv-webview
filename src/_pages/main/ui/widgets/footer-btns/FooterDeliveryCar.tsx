@@ -3,16 +3,13 @@ import { CarInfoHeader, CarSpecs } from "../modals/ui";
 import { handleCarInteraction } from "@/_pages/main/utils/car-interaction";
 import { useModal } from "@/shared/ui/modal";
 import { ICar } from "@/shared/models/types/car";
-import { useDeliveryPoint } from "@/shared/contexts/DeliveryPointContext";
-import { ArrowLocationIcon } from "@/shared/icons/ui/ArrowLocationIcon";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import { useMap } from "@vis.gl/react-google-maps";
+
+import { openIn2GIS } from "@/shared/utils/urlUtils";
 
 const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
   const { showModal, hideModal } = useModal();
-  const { setDeliveryPoint, setIsVisible } = useDeliveryPoint();
-  const map = useMap();
 
   const handleOpenModal = () => {
     showModal({
@@ -26,34 +23,9 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
     });
   };
 
-  const handleGoToDeliveryPoint = () => {
-    if (car.delivery_coordinates) {
-      setDeliveryPoint(car.delivery_coordinates);
-      setIsVisible(true);
-      map?.setCenter({
-        lat: car.delivery_coordinates.latitude,
-        lng: car.delivery_coordinates.longitude,
-      });
-      map?.setZoom(16);
-    }
-  };
-
   const hasDeliveryCoordinates = Boolean(
     car.delivery_coordinates?.latitude && car.delivery_coordinates?.longitude
   );
-
-  // Устанавливаем точку доставки один раз при монтировании компонента
-  React.useEffect(() => {
-    if (hasDeliveryCoordinates && car.delivery_coordinates) {
-      setDeliveryPoint(car.delivery_coordinates);
-      setIsVisible(true);
-    }
-  }, [
-    hasDeliveryCoordinates,
-    car.delivery_coordinates,
-    setDeliveryPoint,
-    setIsVisible,
-  ]);
 
   return (
     <div className="absolute bottom-0 w-full flex flex-col gap-4">
@@ -64,8 +36,8 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
         </div>
 
         {hasDeliveryCoordinates && (
-          <div className="flex justify-center pt-2 border-t border-gray-100">
-            <Button
+          <div className="flex justify-center pt-2 border-t border-gray-100 gap-2">
+            {/* <Button
               variant="outline"
               size="sm"
               onClick={handleGoToDeliveryPoint}
@@ -75,6 +47,33 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
               <span className="text-sm font-medium">
                 Перейти к точке доставки
               </span>
+            </Button> */}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                openIn2GIS(
+                  car.delivery_coordinates!.latitude,
+                  car.delivery_coordinates!.longitude
+                )
+              }
+              className="flex items-center gap-2"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              <span className="text-sm font-medium">2GIS</span>
             </Button>
           </div>
         )}

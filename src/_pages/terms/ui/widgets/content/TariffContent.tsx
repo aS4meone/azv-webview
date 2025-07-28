@@ -65,6 +65,10 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
               text: "Минимальное время аренды: 1 час",
               icon: <Clock className="w-4 h-4" />,
             },
+            {
+              text: "Бензин не включен в стоимость",
+              icon: <Fuel className="w-4 h-4" />,
+            },
           ],
         };
       case "days":
@@ -78,6 +82,10 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
             {
               text: "Минимальное время аренды: 1 день",
               icon: <Calendar className="w-4 h-4" />,
+            },
+            {
+              text: "Бензин не включен в стоимость",
+              icon: <Fuel className="w-4 h-4" />,
             },
           ],
         };
@@ -209,7 +217,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                   : ""
               }`}
             >
-              <div className="text-center space-y-2">
+              <div className="text-center space-y-2 relative">
                 <Badge className="absolute -top-2 -right-2 bg-[#1D77FF]">
                   Популярный
                 </Badge>
@@ -291,7 +299,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                 </li>
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <Fuel className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>Заправка за наш счет</span>
+                  <span>Заправка за наш счет (только поминутный тариф)</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <MapPin className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />

@@ -6,9 +6,12 @@ import { MapComponent } from "../widgets/map/Map";
 import { FooterBtns } from "../widgets/footer-btns";
 import SearchIcon from "@/shared/icons/ui/SearchIcon";
 import { useUserStore } from "@/shared/stores/userStore";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { useEffect, useRef, useState } from "react";
 import { useModal } from "@/shared/ui/modal";
 import { RentalStatus } from "@/shared/models/types/current-rental";
+import { UserRole } from "@/shared/models/types/user";
+import { CarStatus } from "@/shared/models/types/car";
 import { handleCarInteraction } from "../../utils/car-interaction";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { webviewDebugger } from "@/shared/utils/webview-debug";
@@ -18,6 +21,7 @@ import SearchPage from "@/_pages/search";
 
 export default function GoogleMapsPage() {
   const { refreshUser, user } = useUserStore();
+  const { currentDeliveryVehicle } = useVehiclesStore();
   const { showModal, hideModal, isModalOpen } = useModal();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const previousStatusRef = useRef<RentalStatus | null>(null);
@@ -134,7 +138,13 @@ export default function GoogleMapsPage() {
       <MapComponent />
 
       <Drawer />
-      {user?.current_rental === null ? (
+      {user?.current_rental === null &&
+      !(
+        user?.role === UserRole.MECHANIC &&
+        currentDeliveryVehicle &&
+        currentDeliveryVehicle.id !== 0 &&
+        currentDeliveryVehicle.status !== CarStatus.free
+      ) ? (
         <Button
           variant="icon"
           className="absolute top-10 right-20 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"

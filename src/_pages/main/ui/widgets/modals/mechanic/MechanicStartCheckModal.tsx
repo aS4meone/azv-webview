@@ -8,6 +8,7 @@ import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
+import { openIn2GIS } from "@/shared/utils/urlUtils";
 
 interface MechanicStartCheckModalProps {
   car: ICar;
@@ -32,7 +33,14 @@ export const MechanicStartCheckModal = ({
   const handleClose = async () => {
     setResponseModal(null);
     onClose();
-    await refreshUser();
+    try {
+      await refreshUser();
+      // Принудительно обновляем данные о доставке для механика
+      await fetchCurrentDeliveryVehicle();
+    } catch (error) {
+      console.warn("Failed to refresh data on modal close:", error);
+      // Continue with close even if refresh fails
+    }
   };
 
   const handleStartInspection = async () => {
@@ -63,18 +71,27 @@ export const MechanicStartCheckModal = ({
     try {
       const res = await mechanicApi.acceptDelivery(car.rental_id!);
       if (res.status === 200) {
+        // Safely update delivery data with error handling
+        try {
+          await fetchCurrentDeliveryVehicle();
+        } catch (error) {
+          console.warn(
+            "Failed to fetch current delivery vehicle after accepting delivery:",
+            error
+          );
+          // Continue with success flow even if fetch fails
+        }
+
         setResponseModal({
           type: "success",
           isOpen: true,
           onButtonClick: () => {
             handleClose();
-            fetchCurrentDeliveryVehicle();
           },
           description: "Доставка успешно принята в работу",
           buttonText: "Отлично",
           onClose: () => {
             handleClose();
-            fetchCurrentDeliveryVehicle();
           },
         });
       }
@@ -151,6 +168,36 @@ export const MechanicStartCheckModal = ({
                 Посмотреть данные
               </Button>
             )}
+
+            {/* Кнопка для просмотра в 2GIS */}
+            {car.delivery_coordinates && (
+              <Button
+                variant="outline"
+                onClick={() =>
+                  openIn2GIS(
+                    car.delivery_coordinates!.latitude,
+                    car.delivery_coordinates!.longitude
+                  )
+                }
+                className="flex items-center justify-center gap-2"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                Открыть в 2GIS
+              </Button>
+            )}
+
             <Button
               variant="secondary"
               onClick={() => {

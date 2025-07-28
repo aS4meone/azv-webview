@@ -12,7 +12,6 @@ import {
   logPerformance,
   preloadMarkerImages,
 } from "@/shared/utils/mapOptimization";
-import { useDeliveryPoint } from "@/shared/contexts/DeliveryPointContext";
 
 const ZOOM_LEVELS = {
   CLUSTER_ONLY: 8,
@@ -52,7 +51,6 @@ export const MapWithMarkers = ({
   onCarFound?: (car: ICar) => void;
 }) => {
   const { showModal, hideModal } = useModal();
-  const { deliveryPoint, isVisible } = useDeliveryPoint();
 
   const {
     fetchAllVehicles,
@@ -305,7 +303,13 @@ export const MapWithMarkers = ({
         hasCurrentRental
       );
 
-      if (mechanicCacheValid && deliveryCacheValid) {
+      // Принудительно обновляем данные если есть активная доставка
+      const hasActiveDelivery =
+        currentDeliveryVehicle &&
+        currentDeliveryVehicle.id !== 0 &&
+        currentDeliveryVehicle.status !== CarStatus.free;
+
+      if (mechanicCacheValid && deliveryCacheValid && !hasActiveDelivery) {
         return;
       }
     } else {
@@ -328,10 +332,28 @@ export const MapWithMarkers = ({
       lastFetchTimeRef.current = now;
 
       if (user?.role === UserRole.MECHANIC) {
-        await Promise.all([
-          fetchAllMechanicVehicles(),
-          fetchCurrentDeliveryVehicle(),
-        ]);
+        // Загружаем все машины механика
+        await fetchAllMechanicVehicles();
+
+        // Пытаемся загрузить текущую доставку, но не падаем при 404
+        try {
+          await fetchCurrentDeliveryVehicle();
+        } catch (error: unknown) {
+          // 404 означает, что нет текущей доставки - это нормально
+          if (
+            error &&
+            typeof error === "object" &&
+            "response" in error &&
+            error.response &&
+            typeof error.response === "object" &&
+            "status" in error.response &&
+            error.response.status === 404
+          ) {
+            console.log("No current delivery found - this is normal");
+          } else {
+            console.warn("Failed to fetch current delivery vehicle:", error);
+          }
+        }
 
         updateCache(
           mechanicVehiclesCacheRef,
@@ -368,6 +390,19 @@ export const MapWithMarkers = ({
   useEffect(() => {
     fetchVehiclesByRole();
   }, [fetchVehiclesByRole, user]);
+
+  // Принудительное обновление при изменении currentDeliveryVehicle для механика
+  useEffect(() => {
+    if (user?.role === UserRole.MECHANIC && currentDeliveryVehicle) {
+      // Если есть активная доставка, принудительно обновляем данные
+      if (
+        currentDeliveryVehicle.id !== 0 &&
+        currentDeliveryVehicle.status !== CarStatus.free
+      ) {
+        fetchVehiclesByRole();
+      }
+    }
+  }, [currentDeliveryVehicle, user?.role, fetchVehiclesByRole]);
 
   // Автоматическое центрирование на current delivery vehicle для механика
   useEffect(() => {
@@ -719,73 +754,6 @@ export const MapWithMarkers = ({
     [user, showModal, hideModal, map, zoom, getMarkerFromPool]
   );
 
-  // Функция создания маркера точки доставки
-  const createDeliveryMarker = (coordinates: {
-    latitude: number;
-    longitude: number;
-  }) => {
-    if (!window.google?.maps?.marker?.AdvancedMarkerElement) {
-      return null;
-    }
-
-    const markerDiv = document.createElement("div");
-    markerDiv.style.cssText = `
-      width: 24px;
-      height: 24px;
-      background-color: #f59e0b;
-      border: 3px solid white;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
-      position: relative;
-      animation: pulse 2s infinite;
-    `;
-
-    // Добавляем стили для пульсации
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes pulse {
-        0% {
-          box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
-        }
-        70% {
-          box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
-        }
-        100% {
-          box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Добавляем лейбл
-    const labelDiv = document.createElement("div");
-    labelDiv.style.cssText = `
-      position: absolute;
-      top: -30px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: rgba(255, 255, 255, 0.95);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #92400e;
-      white-space: nowrap;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      pointer-events: none;
-    `;
-    labelDiv.textContent = "Точка доставки";
-    markerDiv.appendChild(labelDiv);
-
-    return new window.google.maps.marker.AdvancedMarkerElement({
-      position: { lat: coordinates.latitude, lng: coordinates.longitude },
-      content: markerDiv,
-      title: "Точка доставки",
-      zIndex: 1000, // Поверх других маркеров
-    });
-  };
-
   // Функция для получения кэшированных или актуальных данных
   const getCachedOrFreshData = useCallback(() => {
     const hasCurrentRental = Boolean(user?.current_rental);
@@ -872,9 +840,10 @@ export const MapWithMarkers = ({
       } else if (
         deliveryVehicle &&
         deliveryVehicle.id !== 0 &&
-        deliveryVehicle.status !== CarStatus.free
+        deliveryVehicle.status !== CarStatus.free &&
+        deliveryVehicle.status !== CarStatus.deliveryInProgress
       ) {
-        // Для механика: если есть current delivery и он не завершен, показываем только его
+        // Для механика: если есть current delivery и он активен, показываем только его
         vehicles = [deliveryVehicle];
       } else {
         // Иначе показываем все машины механика
@@ -1006,34 +975,10 @@ export const MapWithMarkers = ({
       return;
     }
 
-    if (deliveryPoint && deliveryPoint.latitude && deliveryPoint.longitude) {
-      const deliveryMarker = createDeliveryMarker(deliveryPoint);
-      if (deliveryMarker) {
-        // Удаляем старый маркер если есть
-        if (deliveryMarkerRef.current) {
-          deliveryMarkerRef.current.map = null;
-        }
-        deliveryMarker.map = map;
-        deliveryMarkerRef.current = deliveryMarker;
+    // Показываем точку доставки только если она установлена вручную через контекст
+  }, [map, user]);
 
-        // Центрируем карту на точке доставки только если isVisible = true (при клике на кнопку)
-        if (isVisible) {
-          map.setCenter({
-            lat: deliveryPoint.latitude,
-            lng: deliveryPoint.longitude,
-          });
-          map.setZoom(16);
-        }
-      }
-    } else {
-      if (deliveryMarkerRef.current) {
-        deliveryMarkerRef.current.map = null;
-        deliveryMarkerRef.current = null;
-      }
-    }
-  }, [map, user, deliveryPoint, isVisible]);
-
-  // Эффект для сброса кэша при изменении статуса current rental
+  // Эффект для сброса кэша при изменении статуса current rental или current delivery vehicle
   useEffect(() => {
     const hasCurrentRental = Boolean(user?.current_rental);
 
@@ -1056,7 +1001,39 @@ export const MapWithMarkers = ({
     ) {
       deliveryVehicleCacheRef.current = null;
     }
-  }, [user?.current_rental]);
+
+    // Принудительно сбрасываем кэш при изменении currentDeliveryVehicle для механика
+    if (user?.role === UserRole.MECHANIC && currentDeliveryVehicle) {
+      // Если есть активная доставка, сбрасываем кэш всех машин механика
+      if (
+        currentDeliveryVehicle.id !== 0 &&
+        currentDeliveryVehicle.status !== CarStatus.free
+      ) {
+        mechanicVehiclesCacheRef.current = null;
+        // Также сбрасываем кэш доставки для принудительного обновления
+        deliveryVehicleCacheRef.current = null;
+      }
+    }
+  }, [user?.current_rental, currentDeliveryVehicle, user?.role]);
+
+  // Слушатель события для принудительной очистки кэша после завершения доставки
+  useEffect(() => {
+    const handleDeliveryCompleted = () => {
+      console.log("Delivery completed event received, clearing cache");
+      clearAllCaches();
+      // Принудительно обновляем данные
+      setTimeout(() => {
+        fetchVehiclesByRole();
+      }, 100);
+    };
+
+    // Добавляем слушатель события
+    window.addEventListener("deliveryCompleted", handleDeliveryCompleted);
+
+    return () => {
+      window.removeEventListener("deliveryCompleted", handleDeliveryCompleted);
+    };
+  }, [clearAllCaches, fetchVehiclesByRole]);
 
   // Cleanup on unmount
   useEffect(() => {

@@ -58,7 +58,7 @@ const FooterBtns = () => {
     {
       key: "freq_used_cars",
       component: <FreqUsedCarsPage onClose={() => setCurrentComponent(null)} />,
-      title: "Свободные машины",
+      title: "Часто используемые",
     },
     {
       key: "mechanic_pending",
@@ -241,7 +241,7 @@ const FooterBtns = () => {
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <UserIcon />
-            <span>Недавние поездки</span>
+            <span>Часто используемые</span>
           </Button>
           <Button
             onClick={() => setCurrentComponent("free_cars")}

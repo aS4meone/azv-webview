@@ -11,7 +11,6 @@ import {
   ModalPortal,
 } from "@/shared/ui/modal";
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
-import { DeliveryPointProvider } from "@/shared/contexts/DeliveryPointContext";
 
 // Импортируем click fixer для автоматического исправления кликов в WebView
 import "@/shared/utils/clickFix";
@@ -62,10 +61,8 @@ export default async function RootLayout({
             <PhotoUploadProvider>
               <NextIntlClientProvider>
                 <AuthProvider>
-                  <DeliveryPointProvider>
-                    {children}
-                    <ModalPortal />
-                  </DeliveryPointProvider>
+                  {children}
+                  <ModalPortal />
                 </AuthProvider>
               </NextIntlClientProvider>
             </PhotoUploadProvider>

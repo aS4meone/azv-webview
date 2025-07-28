@@ -16,8 +16,8 @@ import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
-import { useDeliveryPoint } from "@/shared/contexts/DeliveryPointContext";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
+import { openIn2GIS } from "@/shared/utils/urlUtils";
 
 interface MechanicDeliveryInUseModalProps {
   user: IUser;
@@ -32,9 +32,8 @@ export const MechanicDeliveryInUseModal = ({
 }: MechanicDeliveryInUseModalProps) => {
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
-  const { fetchAllMechanicVehicles, fetchCurrentDeliveryVehicle } =
+  const { fetchCurrentDeliveryVehicle, forceClearCacheAndRefresh } =
     useVehiclesStore();
-  const { setDeliveryPoint, setIsVisible } = useDeliveryPoint();
   const [isLoading, setIsLoading] = useState(false);
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
@@ -46,26 +45,42 @@ export const MechanicDeliveryInUseModal = ({
   const car: ICar = notRentedCar || ({} as ICar);
 
   const handleClose = async () => {
-    await fetchCurrentDeliveryVehicle();
-    await refreshUser();
-    await fetchAllMechanicVehicles();
+    try {
+      // Обновляем данные о текущей доставке (может вернуть 404, что нормально)
+      try {
+        await fetchCurrentDeliveryVehicle();
+      } catch {
+        console.log("No current delivery after completion - this is expected");
+      }
+
+      // Обновляем данные пользователя
+      await refreshUser();
+
+      // Принудительно очищаем кэш и обновляем все данные механика
+      await forceClearCacheAndRefresh();
+
+      // Отправляем событие для принудительной очистки кэша карты
+      window.dispatchEvent(new CustomEvent("deliveryCompleted"));
+
+      // Дополнительное обновление с задержкой для гарантии
+      setTimeout(async () => {
+        try {
+          await forceClearCacheAndRefresh();
+        } catch (error) {
+          console.warn(
+            "Failed to refresh data after delay in handleClose:",
+            error
+          );
+        }
+      }, 500);
+    } catch (error) {
+      console.warn("Failed to refresh data on modal close:", error);
+      // Продолжаем закрытие даже если обновление не удалось
+    }
+
     setResponseModal(null);
     onClose();
   };
-
-  useEffect(() => {
-    // Устанавливаем точку доставки при монтировании компонента
-    if (notRentedCar.delivery_coordinates) {
-      setDeliveryPoint(notRentedCar.delivery_coordinates);
-      setIsVisible(true);
-    }
-
-    return () => {
-      // Очищаем точку доставки при размонтировании
-      setDeliveryPoint(null);
-      setIsVisible(false);
-    };
-  }, [notRentedCar.delivery_coordinates, setDeliveryPoint, setIsVisible]);
 
   const handleUploadAfterDelivery = async (files: {
     [key: string]: File[];
@@ -87,8 +102,29 @@ export const MechanicDeliveryInUseModal = ({
           setIsLoading(false);
           setShowUploadPhoto(false);
 
-          setDeliveryPoint(null);
-          setIsVisible(false);
+          // Дополнительно обновляем данные после завершения доставки
+          try {
+            await refreshUser();
+            await forceClearCacheAndRefresh();
+
+            // Отправляем событие для принудительной очистки кэша карты
+            window.dispatchEvent(new CustomEvent("deliveryCompleted"));
+
+            // Небольшая задержка для обновления карты
+            setTimeout(async () => {
+              try {
+                await forceClearCacheAndRefresh();
+              } catch (error) {
+                console.warn("Failed to refresh data after delay:", error);
+              }
+            }, 1000);
+          } catch (error) {
+            console.warn(
+              "Failed to refresh data after delivery completion:",
+              error
+            );
+          }
+
           setResponseModal({
             type: "success",
             isOpen: true,
@@ -280,6 +316,35 @@ export const MechanicDeliveryInUseModal = ({
         <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
           Завершить доставку
         </Button>
+
+        {/* Кнопка для просмотра в 2GIS */}
+        {notRentedCar.delivery_coordinates && (
+          <Button
+            variant="outline"
+            onClick={() =>
+              openIn2GIS(
+                notRentedCar.delivery_coordinates!.latitude,
+                notRentedCar.delivery_coordinates!.longitude
+              )
+            }
+            className="flex items-center justify-center gap-2"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            Открыть в 2GIS
+          </Button>
+        )}
       </div>
     </div>
   );

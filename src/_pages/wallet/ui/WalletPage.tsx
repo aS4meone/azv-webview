@@ -4,6 +4,7 @@ import { Button } from "@/shared/ui";
 import { PlusIcon } from "@/shared/icons";
 import { useTranslations } from "next-intl";
 import { userApi } from "@/shared/api/routes/user";
+import { rentApi } from "@/shared/api/routes/rent";
 import { ResponseBottomModalContent } from "@/shared/ui/modal/ResponseBottomModal";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
@@ -91,12 +92,20 @@ const WalletPage = () => {
       const response = await userApi.addMoney(100000);
       if (response.status === 200) {
         await getBalance();
+        const responseData = response.data;
+        const promoApplied = responseData.promo_applied;
+        const bonus = responseData.bonus || 0;
+
         setResponseModal({
           isOpen: true,
-          title: "Баланс успешно пополнен",
+          title: "Баланс пополнен",
           type: "success",
-          description: `Баланс успешно пополнен на 100000 ₸`,
-          buttonText: "Хорошо",
+          description: promoApplied
+            ? `Пополнено: 100 000 ₸\nБонус: ${bonus} ₸\nИтого: ${
+                100000 + bonus
+              } ₸`
+            : "Баланс пополнен на 100 000 ₸",
+          buttonText: "Отлично",
         });
       }
     } catch (error) {
@@ -105,7 +114,7 @@ const WalletPage = () => {
         isOpen: true,
         title: "Ошибка",
         type: "error",
-        description: "Не удалось пополнить баланс",
+        description: "Не удалось пополнить баланс. Попробуйте еще раз.",
         buttonText: "Понятно",
       });
     } finally {
@@ -117,8 +126,7 @@ const WalletPage = () => {
     if (!promoCode.trim()) return;
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await rentApi.applyPromoCode(promoCode);
 
       // Закрываем промокод модал перед открытием response модала
       setIsPromoCodeModalOpen(false);
@@ -126,21 +134,35 @@ const WalletPage = () => {
       setResponseModal({
         isOpen: true,
         type: "success",
-        title: "Промокод успешно активирован!",
-        description: `Промокод "${promoCode}" успешно активирован!`,
+        title: "Промокод активирован",
+        description: `Промокод "${promoCode}" успешно применен!\nСкидка: ${response.data.discount_percent}%`,
         buttonText: "Отлично",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error applying promo code:", error);
 
       // Закрываем промокод модал перед открытием response модала
       setIsPromoCodeModalOpen(false);
 
+      const errorMessage =
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response &&
+        error.response.data &&
+        typeof error.response.data === "object" &&
+        "detail" in error.response.data &&
+        typeof error.response.data.detail === "string"
+          ? error.response.data.detail
+          : "Не удалось активировать промокод";
+
       setResponseModal({
         isOpen: true,
         type: "error",
         title: "Ошибка",
-        description: "Не удалось активировать промокод",
+        description: errorMessage,
         buttonText: "Понятно",
       });
     } finally {

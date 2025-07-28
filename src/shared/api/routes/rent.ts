@@ -16,6 +16,7 @@ export const rentRoutes = {
   uploadOwnerAfterRent: `/rent/upload-photos-after-owner`,
 
   completeRent: "/rent/complete",
+  applyPromoCode: "/rent/promo_codes/apply",
 };
 
 export const rentApi = {
@@ -104,6 +105,12 @@ export const rentApi = {
   },
   completeRent: async (data: CompleteRentDto) => {
     const response = await axiosInstance.post(rentRoutes.completeRent, data);
+    return response;
+  },
+  applyPromoCode: async (code: string) => {
+    const response = await axiosInstance.post(rentRoutes.applyPromoCode, {
+      code,
+    });
     return response;
   },
 };

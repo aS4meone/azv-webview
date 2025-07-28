@@ -21,10 +21,16 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
     }
   };
   const specs = [
-    { icon: <FuelIcon />, value: `${car.fuel_level}л` },
-    { icon: <EngineVolumeIcon />, value: car.engine_volume.toFixed(1) },
-    { icon: <DriveTypeIcon type={car.drive_type} />, value: returnDriveType() },
-    { value: car.year.toString() },
+    { icon: <FuelIcon />, value: `${car.fuel_level || 0}л` },
+    {
+      icon: <EngineVolumeIcon />,
+      value: car.engine_volume ? car.engine_volume.toFixed(1) : "0.0",
+    },
+    {
+      icon: <DriveTypeIcon type={car.drive_type || 0} />,
+      value: returnDriveType(),
+    },
+    { value: car.year ? car.year.toString() : "0" },
   ];
 
   return (

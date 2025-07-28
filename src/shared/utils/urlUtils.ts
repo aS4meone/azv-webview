@@ -19,3 +19,8 @@ export const removeAllQueriesFromUrl = () => {
     window.history.replaceState({}, "", url.toString());
   }
 };
+
+export const openIn2GIS = (latitude: number, longitude: number) => {
+  const url = `https://2gis.kz/almaty/geo/${longitude},${latitude}`;
+  window.open(url, "_blank");
+};
