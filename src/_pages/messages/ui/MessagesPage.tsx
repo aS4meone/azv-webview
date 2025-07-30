@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { IMessage } from "@/shared/models/types/message";
+import {
+  notificationApi,
+  INotification,
+} from "@/shared/api/routes/notifications";
 import MessageCard from "./components/MessageCard";
 
 const MessagesPage = () => {
@@ -10,63 +14,114 @@ const MessagesPage = () => {
 
   // Состояние для сообщений
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // Примеры сообщений для демонстрации
+  // Функция для преобразования API уведомлений в IMessage
+  const mapNotificationToMessage = (notification: INotification): IMessage => {
+    return {
+      id: notification.id,
+      title: notification.title,
+      description: notification.body,
+      time: notification.sent_at,
+      isRead: notification.is_read,
+    };
+  };
+
+  // Загрузка уведомлений с API
   useEffect(() => {
-    const mockMessages: IMessage[] = [
-      {
-        id: 1,
-        title: "Успешная бронь автомобиля",
-        description:
-          "Ваша бронь автомобиля Toyota Camry на 2 часа подтверждена. Автомобиль готов к использованию.",
-        time: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 минут назад
-        isRead: false,
-      },
-      {
-        id: 2,
-        title: "Пополнение баланса",
-        description:
-          "Ваш баланс успешно пополнен на 50,000 ₸. Теперь вы можете бронировать автомобили.",
-        time: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 часа назад
-        isRead: false,
-      },
-      {
-        id: 3,
-        title: "Завершение поездки",
-        description:
-          "Поездка на BMW X5 завершена. Общая стоимость: 15,750 ₸. Спасибо за использование нашего сервиса!",
-        time: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 день назад
-        isRead: true,
-      },
-      {
-        id: 4,
-        title: "Напоминание о документах",
-        description:
-          "Пожалуйста, загрузите недостающие документы для верификации аккаунта в разделе 'Профиль'.",
-        time: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2 дня назад
-        isRead: true,
-      },
-      {
-        id: 5,
-        title: "Акция: Бесплатный час аренды",
-        description:
-          "Специальное предложение! Получите бесплатный час аренды при следующем бронировании. Акция действует до конца месяца.",
-        time: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 дня назад
-        isRead: true,
-      },
-    ];
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-    setMessages(mockMessages);
+        const result = await notificationApi.getNotifications();
+
+        if (result.error) {
+          setError(result.error);
+          return;
+        }
+
+        if (result.data) {
+          const mappedMessages = result.data.notifications.map(
+            mapNotificationToMessage
+          );
+          setMessages(mappedMessages);
+          setUnreadCount(result.data.unread_count);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
   }, []);
 
   // Функция для отметки сообщения как прочитанное
-  const handleMarkAsRead = (messageId: number) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((message) =>
-        message.id === messageId ? { ...message, isRead: true } : message
-      )
-    );
+  const handleMarkAsRead = async (messageId: number) => {
+    try {
+      const result = await notificationApi.markAsRead(messageId);
+
+      if (result.error) {
+        console.error("Failed to mark as read:", result.error);
+        return;
+      }
+
+      // Обновляем локальное состояние
+      setMessages((prevMessages) =>
+        prevMessages.map((message) =>
+          message.id === messageId ? { ...message, isRead: true } : message
+        )
+      );
+
+      // Обновляем счетчик непрочитанных
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error("Error marking message as read:", err);
+    }
   };
+
+  // Компонент загрузки
+  const LoadingState = () => (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p className="text-sm text-gray-500">{t("loading")}</p>
+    </div>
+  );
+
+  // Компонент ошибки
+  const ErrorState = () => (
+    <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+      <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-6">
+        <svg
+          className="w-12 h-12 text-red-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">
+        {t("errorTitle")}
+      </h3>
+      <p className="text-sm text-gray-500 max-w-sm mb-4">
+        {error || t("errorDescription")}
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        {t("retry")}
+      </button>
+    </div>
+  );
 
   // Компонент пустого состояния
   const EmptyState = () => (
@@ -95,16 +150,40 @@ const MessagesPage = () => {
     </div>
   );
 
+  if (loading) {
+    return (
+      <section className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+            {t("title")}
+          </h1>
+        </header>
+        <LoadingState />
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+            {t("title")}
+          </h1>
+        </header>
+        <ErrorState />
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-6">
       <header>
         <h1 className="text-2xl font-semibold text-gray-900 mb-1">
           {t("title")}
         </h1>
-        {messages.length > 0 && (
-          <p className="text-sm text-gray-500">
-            {messages.filter((m) => !m.isRead).length} новых сообщений
-          </p>
+        {messages.length > 0 && unreadCount > 0 && (
+          <p className="text-sm text-gray-500">{unreadCount} новых сообщений</p>
         )}
       </header>
 

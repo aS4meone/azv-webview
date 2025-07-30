@@ -17,9 +17,11 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
   const locale = useLocale();
 
   const formatTime = (timeStr: string) => {
-    const date = new Date(timeStr);
+    // Добавляем 5 часов к времени сервера для приведения к местному времени
+    const serverDate = new Date(timeStr);
+    const localDate = new Date(serverDate.getTime() + 5 * 60 * 60 * 1000);
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
+    const diffMs = now.getTime() - localDate.getTime();
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -29,13 +31,13 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
       if (diffMinutes < 60) return `${diffMinutes} мин назад`;
       if (diffHours < 24) return `${diffHours} ч назад`;
       if (diffDays < 7) return `${diffDays} дн назад`;
-      return date.toLocaleDateString("ru-RU");
+      return localDate.toLocaleDateString("ru-RU");
     } else {
       if (diffMinutes < 1) return "just now";
       if (diffMinutes < 60) return `${diffMinutes}m ago`;
       if (diffHours < 24) return `${diffHours}h ago`;
       if (diffDays < 7) return `${diffDays}d ago`;
-      return date.toLocaleDateString("en-US");
+      return localDate.toLocaleDateString("en-US");
     }
   };
 

@@ -110,7 +110,11 @@
     "noMessages": "No messages yet",
     "noMessagesDescription": "You will receive notifications about trips, payments, and other important updates here.",
     "markAsRead": "Mark as read",
-    "new": "New"
+    "new": "New",
+    "loading": "Loading messages...",
+    "errorTitle": "Failed to load messages",
+    "errorDescription": "Something went wrong while loading your messages. Please try again.",
+    "retry": "Try again"
   },
   "contract": {
     "title": "Vehicle Rental Agreement",
