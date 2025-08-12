@@ -7,6 +7,13 @@ import { userApi } from "@/shared/api/routes/user";
 import { rentApi } from "@/shared/api/routes/rent";
 import { ResponseBottomModalContent } from "@/shared/ui/modal/ResponseBottomModal";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { useFortePayment } from "@/shared/ui/forte-payment";
+import {
+  FORTE_CONFIG,
+  formatAmount,
+  generateTrackingId,
+} from "@/shared/config/forte";
+import AmountInputModal from "./components/AmountInputModal";
 
 const PromoCodeModal = ({
   onSubmit,
@@ -78,6 +85,7 @@ const WalletPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isTopUpLoading, setIsTopUpLoading] = useState(false);
   const [isPromoCodeModalOpen, setIsPromoCodeModalOpen] = useState(false);
+  const [isAmountInputModalOpen, setIsAmountInputModalOpen] = useState(false);
   const [responseModal, setResponseModal] = useState<{
     isOpen: boolean;
     type: "success" | "error";
@@ -86,40 +94,137 @@ const WalletPage = () => {
     buttonText: string;
   } | null>(null);
 
-  const handleTopUp = async () => {
-    setIsTopUpLoading(true);
-    try {
-      const response = await userApi.addMoney(100000);
-      if (response.status === 200) {
-        await getBalance();
-        const responseData = response.data;
-        const promoApplied = responseData.promo_applied;
-        const bonus = responseData.bonus || 0;
+  // Инициализация Forte Payment
+  const { initiatePayment } = useFortePayment({
+    publicKey: FORTE_CONFIG.PUBLIC_KEY,
+    isTest: FORTE_CONFIG.IS_TEST,
+    fromWebview: FORTE_CONFIG.FROM_WEBVIEW,
+    language: "ru", // Русский язык по умолчанию
+  });
 
-        setResponseModal({
-          isOpen: true,
-          title: "Баланс пополнен",
-          type: "success",
-          description: promoApplied
-            ? `Пополнено: 100 000 ₸\nБонус: ${bonus} ₸\nИтого: ${
-                100000 + bonus
-              } ₸`
-            : "Баланс пополнен на 100 000 ₸",
-          buttonText: "Отлично",
-        });
-      }
+  const handleTopUpWithAmount = async (amount: number) => {
+    setIsTopUpLoading(true);
+    setIsAmountInputModalOpen(false); // Закрываем модал выбора суммы
+
+    const trackingId = generateTrackingId("topup");
+
+    try {
+      initiatePayment({
+        amount: amount,
+        currency: FORTE_CONFIG.DEFAULT_CURRENCY,
+        description: "Пополнение баланса AZV Motors",
+        trackingId: trackingId,
+        onSuccess: async (result) => {
+          console.log("Payment successful:", result);
+          setIsTopUpLoading(false);
+
+          try {
+            // Пополняем баланс через API после успешной оплаты
+            console.log(
+              `Adding money via API: ${amount} KZT, trackingId: ${trackingId}`
+            );
+            await userApi.addMoney(amount, trackingId);
+
+            // Обновляем баланс после успешного пополнения
+            await getBalance();
+
+            setResponseModal({
+              isOpen: true,
+              title: "Баланс пополнен",
+              type: "success",
+              description: `Баланс успешно пополнен на ${formatAmount(amount)}`,
+              buttonText: "Отлично",
+            });
+          } catch (error) {
+            console.error(
+              "Error adding money to balance:",
+              error,
+              `trackingId: ${trackingId}`
+            );
+
+            // Даже если API вызов не удался, пытаемся обновить баланс
+            try {
+              await getBalance();
+            } catch (balanceError) {
+              console.error("Error updating balance:", balanceError);
+            }
+
+            setResponseModal({
+              isOpen: true,
+              title: "Внимание",
+              type: "success",
+              description: `Оплата прошла успешно (ID: ${trackingId.slice(
+                -8
+              )}). Если баланс не обновился, обратитесь в поддержку.`,
+              buttonText: "Понятно",
+            });
+          }
+        },
+        onError: (error) => {
+          console.error("Payment failed:", error);
+          setIsTopUpLoading(false);
+
+          setResponseModal({
+            isOpen: true,
+            title: "Ошибка оплаты",
+            type: "error",
+            description: "Не удалось завершить оплату. Попробуйте еще раз.",
+            buttonText: "Понятно",
+          });
+        },
+        onClose: (status) => {
+          console.log(
+            "Payment widget closed:",
+            status,
+            `trackingId: ${trackingId}`
+          );
+          setIsTopUpLoading(false);
+
+          if (status === "pending") {
+            // Для pending статуса также пытаемся пополнить баланс
+            userApi
+              .addMoney(amount, trackingId)
+              .then(() => {
+                console.log("Pending payment processed successfully");
+                return getBalance();
+              })
+              .catch((error) => {
+                console.error("Error processing pending payment:", error);
+              });
+
+            setResponseModal({
+              isOpen: true,
+              title: "Ожидание подтверждения",
+              type: "success",
+              description: `Платеж обрабатывается (ID: ${trackingId.slice(
+                -8
+              )}). Результат будет известен в течение нескольких минут.`,
+              buttonText: "Понятно",
+            });
+          }
+        },
+      });
     } catch (error) {
-      console.log(error);
+      console.error("Error initiating payment:", error);
+      setIsTopUpLoading(false);
+
       setResponseModal({
         isOpen: true,
         title: "Ошибка",
         type: "error",
-        description: "Не удалось пополнить баланс. Попробуйте еще раз.",
+        description:
+          "Не удалось инициировать платеж. Проверьте подключение к интернету.",
         buttonText: "Понятно",
       });
-    } finally {
-      setIsTopUpLoading(false);
     }
+  };
+
+  const handleTopUp = () => {
+    setIsAmountInputModalOpen(true);
+  };
+
+  const handleCancelAmountInput = () => {
+    setIsAmountInputModalOpen(false);
   };
 
   const handleApplyPromoCode = async (promoCode: string) => {
@@ -219,7 +324,7 @@ const WalletPage = () => {
         <Button
           variant="secondary"
           onClick={handleTopUp}
-          disabled={isTopUpLoading}
+          disabled={isTopUpLoading || isAmountInputModalOpen}
         >
           <div className="flex items-center justify-center gap-3">
             <div
@@ -234,7 +339,7 @@ const WalletPage = () => {
               )}
             </div>
             <span className="font-semibold text-lg text-white">
-              {isTopUpLoading ? "Пополняем..." : t("topUp")}
+              {isTopUpLoading ? "Обрабатывается..." : t("topUp")}
             </span>
           </div>
         </Button>
@@ -250,6 +355,22 @@ const WalletPage = () => {
           </div>
         </Button>
       </section>
+
+      <CustomPushScreen
+        isOpen={isAmountInputModalOpen}
+        onClose={handleCancelAmountInput}
+        fullScreen={false}
+        direction="bottom"
+        withCloseButton={false}
+        isCloseable={true}
+        height="auto"
+      >
+        <AmountInputModal
+          onSubmit={handleTopUpWithAmount}
+          onCancel={handleCancelAmountInput}
+          isLoading={isTopUpLoading}
+        />
+      </CustomPushScreen>
 
       <CustomPushScreen
         isOpen={isPromoCodeModalOpen}

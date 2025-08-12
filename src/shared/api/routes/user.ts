@@ -29,9 +29,14 @@ export const userApi = {
     const response = await axiosInstance.delete(userRoutes.deleteUser);
     return response;
   },
-  addMoney: async (amount: number) => {
+  addMoney: async (amount: number, trackingId?: string) => {
+    const params = new URLSearchParams({ amount: amount.toString() });
+    if (trackingId) {
+      params.append("tracking_id", trackingId);
+    }
+
     const response = await axiosInstance.post(
-      `${userRoutes.addMoney}?amount=${amount}`
+      `${userRoutes.addMoney}?${params.toString()}`
     );
     return response;
   },

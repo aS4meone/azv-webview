@@ -51,6 +51,13 @@ export default async function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-touch-fullscreen" content="yes" />
+
+        {/* Forte Bank Payment Widget Script */}
+        <script
+          type="text/javascript"
+          src="https://js.fortebank.com/widget/be_gateway.js"
+          async
+        />
       </head>
       <body
         className={`${montserrat.variable} antialiased`}

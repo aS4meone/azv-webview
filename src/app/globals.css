@@ -1,6 +1,39 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Скрытие альтернативных способов оплаты в Forte виджете */
+.google-pay-button,
+.samsung-pay-button,
+.apple-pay-button,
+.alternative-payment-methods,
+.alternative-payments,
+.wallet-payments,
+.digital-wallets,
+.card-page__methods,
+.payment-methods,
+.payment-methods__item,
+.google-pay-button__container,
+.samsung-pay-button__container,
+.apple-pay-button__container,
+[data-payment-method="google_pay"],
+[data-payment-method="samsung_pay"],
+[data-payment-method="apple_pay"],
+.payment-method-google,
+.payment-method-samsung,
+.payment-method-apple,
+.payment-option[data-method="google_pay"],
+.payment-option[data-method="samsung_pay"],
+.payment-option[data-method="apple_pay"] {
+  display: none !important;
+}
+
+/* Гарантируем отображение формы карты */
+.card-form,
+.card-input,
+.payment-form {
+  display: block !important;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
