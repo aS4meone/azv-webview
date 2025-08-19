@@ -594,21 +594,21 @@ export const MapWithMarkers = ({
               textColor = "#92400e";
               break;
             case CarStatus.delivering:
-              backgroundColor = "rgba(255, 228, 148, 0.95)"; // Зеленый
+              backgroundColor = "rgba(255, 228, 148, 0.95)"; // Желтый
               borderColor = "#f59e0b";
               textColor = "#92400e";
               break;
             case CarStatus.inUse:
+              backgroundColor = "rgba(239, 124, 124, 0.95)"; // Зеленый
+              borderColor = "#dc2626";
+              textColor = "#991b1b";
+              break;
+            case CarStatus.free:
               backgroundColor = "rgba(34, 197, 94, 0.95)"; // Красный
               // borderColor = "#dc2626";
               // textColor = "#991b1b";
               borderColor = "#16a34a";
               textColor = "#15803d";
-              break;
-            case CarStatus.free:
-              backgroundColor = "rgba(239, 124, 124, 0.95)"; // Красный
-              borderColor = "#dc2626";
-              textColor = "#991b1b";
               break;
             default:
               // Оставляем стандартные цвета для других статусов
