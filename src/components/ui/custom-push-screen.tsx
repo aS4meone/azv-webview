@@ -103,35 +103,6 @@ export function CustomPushScreen({
             exit={exitPosition}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            {withCloseButton && (
-              <div className="absolute right-4 top-10 z-10 pt-6">
-                <Button onClick={onClose} variant="icon" className="shadow-sm">
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M18 6L6 18"
-                      stroke="black"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M6 6L18 18"
-                      stroke="black"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </Button>
-              </div>
-            )}
-
             {withHeader &&
               (direction === "bottom" ? (
                 <>

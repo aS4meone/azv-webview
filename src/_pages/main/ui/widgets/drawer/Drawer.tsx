@@ -125,7 +125,8 @@ const Drawer = () => {
     <>
       <Button
         variant="icon"
-        className="absolute top-10 left-4 h-14 w-14 rounded-full bg-white shadow-lg hover:bg-gray-50 z-10"
+        className="fixed top-10 left-4 z-20 h-14 w-14 rounded-full bg-white shadow-lg ring-1 ring-black/5 hover:bg-gray-50
+                   pointer-events-auto touch-manipulation"
         onClick={() => setIsDrawerOpen(true)}
       >
         <MenuIcon />
