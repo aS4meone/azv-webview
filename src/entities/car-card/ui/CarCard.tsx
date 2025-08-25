@@ -51,8 +51,8 @@ const CarStatusBadge = ({ status }: { status: CarStatus }) => {
   };
 
   const color = {
-    [CarStatus.free]: "#EF7C7C",
-    [CarStatus.inUse]: "#BAF2AF",
+    [CarStatus.free]: "#BAF2AF",
+    [CarStatus.inUse]: "#EF7C7C",
     [CarStatus.service]: "#FFE494",
     [CarStatus.owner]: "#AEC9F1",
     [CarStatus.pending]: "#FFE494",

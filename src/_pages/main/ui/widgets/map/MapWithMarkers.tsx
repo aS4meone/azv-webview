@@ -581,7 +581,6 @@ export const MapWithMarkers = ({
         const nameDiv = document.createElement("div");
         nameDiv.className = "marker-name";
 
-        // Определяем цвет фона в зависимости от роли пользователя и статуса автомобиля
         let backgroundColor = "rgba(255, 255, 255, 0.95)";
         let borderColor = "#e5e7eb";
         let textColor = "#374151";
@@ -589,24 +588,22 @@ export const MapWithMarkers = ({
         if (user?.role === UserRole.MECHANIC) {
           switch (vehicle.status) {
             case CarStatus.pending:
-              backgroundColor = "rgba(255, 228, 148, 0.95)"; // Желтый
+              backgroundColor = "rgba(255, 228, 148, 0.95)";
               borderColor = "#f59e0b";
               textColor = "#92400e";
               break;
             case CarStatus.delivering:
-              backgroundColor = "rgba(255, 228, 148, 0.95)"; // Желтый
+              backgroundColor = "rgba(255, 228, 148, 0.95)";
               borderColor = "#f59e0b";
               textColor = "#92400e";
               break;
             case CarStatus.inUse:
-              backgroundColor = "rgba(239, 124, 124, 0.95)"; // Зеленый
+              backgroundColor = "rgba(239, 124, 124, 0.95)";
               borderColor = "#dc2626";
               textColor = "#991b1b";
               break;
             case CarStatus.free:
-              backgroundColor = "rgba(34, 197, 94, 0.95)"; // Красный
-              // borderColor = "#dc2626";
-              // textColor = "#991b1b";
+              backgroundColor = "rgba(34, 197, 94, 0.95)";
               borderColor = "#16a34a";
               textColor = "#15803d";
               break;

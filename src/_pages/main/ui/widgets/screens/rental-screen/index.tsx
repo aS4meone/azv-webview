@@ -93,6 +93,10 @@ export const RentalPage = ({
             {isDelivery ? "Заказать доставку" : "Забронировать"}
           </Button>
         </div>
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-sm">
+          <span className="font-medium">Внимание:</span> по истечении{" "}
+          <b>15 минут</b> после бронирования начинается платное ожидание.
+        </div>
       </div>
     </article>
   );
