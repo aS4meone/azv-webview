@@ -159,7 +159,7 @@ export const isGeolocationAvailable = (): boolean => {
   return isFlutterWebView() || (typeof navigator !== "undefined" && !!navigator.geolocation);
 };
 
-export const getMyLocation = async (): Promise<{ lat: number; lng: number } | null> => {
+export const getMyLocation = async (p: { enableHighAccuracy: boolean; timeout: number }): Promise<{ lat: number; lng: number } | null> => {
   try {
     const result = await getCurrentPosition({
       enableHighAccuracy: true,
