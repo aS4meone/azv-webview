@@ -102,7 +102,6 @@ export const BaseMap = ({
       center: initialCenter,
       zoom: initialZoom,
     });
-
   // Выбираем какое состояние камеры использовать
   const cameraProps = externalCameraProps || internalCameraProps;
   const setCameraProps: Dispatch<SetStateAction<MapCameraProps>> =
@@ -113,55 +112,48 @@ export const BaseMap = ({
     lng: number;
   } | null>(null);
 
-  // Refs для оптимизации
   const isLocationLoadingRef = useRef(false);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const lastCameraUpdateRef = useRef<MapCameraProps>(cameraProps);
+  const [isLocating, setIsLocating] = useState(false); // ⬅️ для UI
+
 
   const centerToUser = useCallback(async () => {
     if (isLocationLoadingRef.current) return;
-
     isLocationLoadingRef.current = true;
     const startTime = performance.now();
 
     try {
-      const location = await getMyLocation();
-      if (location) {
-        const newCenter = {
-          lat: location.lat,
-          lng: location.lng,
-        };
-
-        setUserLocation(newCenter);
-
-        if (enableMyLocationAutoCenter) {
-          // Плавное обновление камеры
-          const newCameraProps = {
-            center: newCenter,
-            zoom: ZOOM_CONSTRAINTS.USER_LOCATION,
-          };
-          setCameraProps(newCameraProps);
-          lastCameraUpdateRef.current = newCameraProps;
-        }
-
-        if (onLocationFound) {
-          onLocationFound(newCenter);
-        }
-
-        logPerformance("Get user location", startTime);
-      } else {
-        console.error("Не удалось получить местоположение");
-        alert(
-          "Не удалось получить ваше местоположение. Проверьте разрешения на геолокацию."
-        );
+      const location = await getMyLocation({ timeout: 12000, enableHighAccuracy: true });
+      if (!location) {
+        alert("Не удалось получить местоположение. Проверьте разрешения / HTTPS.");
+        return;
       }
-    } catch (error) {
-      console.error("Ошибка получения местоположения:", error);
+
+      const newCenter = { lat: location.lat, lng: location.lng };
+      setUserLocation(newCenter);
+
+      setCameraProps(prev => ({
+        ...prev,
+        center: newCenter,
+        zoom: ZOOM_CONSTRAINTS.USER_LOCATION,
+      }));
+      lastCameraUpdateRef.current = {
+        ...lastCameraUpdateRef.current,
+        center: newCenter,
+        zoom: ZOOM_CONSTRAINTS.USER_LOCATION,
+      };
+
+      onLocationFound?.(newCenter);
+      logPerformance("Get user location", startTime);
+    } catch (e) {
+      console.error("Ошибка геолокации", e);
       alert("Ошибка при получении местоположения");
     } finally {
       isLocationLoadingRef.current = false;
+      setIsLocating(false);
     }
-  }, [enableMyLocationAutoCenter, onLocationFound, setCameraProps]);
+  }, [onLocationFound, setCameraProps]);
 
   // Оптимизированные функции зума с ограничениями
   const zoomIn = useCallback(() => {
@@ -179,20 +171,25 @@ export const BaseMap = ({
   }, [setCameraProps, initialZoom, minZoom]);
 
   // Обработчик изменения камеры
-  const handleCameraChanged = useCallback(
-    (event: MapCameraChangedEvent) => {
-      const { center, zoom, heading, tilt } = event.detail;
-      const newCameraProps = { center, zoom, heading, tilt };
+  const handleCameraChanged = useCallback((event: MapCameraChangedEvent) => {
+    const { center, zoom, heading, tilt } = event.detail;
+    const prev = lastCameraUpdateRef.current;
 
-      setCameraProps(newCameraProps);
-      lastCameraUpdateRef.current = newCameraProps;
+    const same =
+      prev?.zoom === zoom &&
+      prev?.heading === heading &&
+      prev?.tilt === tilt &&
+      prev?.center?.lat === center.lat &&
+      prev?.center?.lng === center.lng;
 
-      if (onCameraChange) {
-        onCameraChange(event);
-      }
-    },
-    [setCameraProps, onCameraChange]
-  );
+    if (same) return;
+
+    const newCameraProps = { center, zoom, heading, tilt };
+    setCameraProps(newCameraProps);
+    lastCameraUpdateRef.current = newCameraProps;
+    onCameraChange?.(event);
+  }, [onCameraChange, setCameraProps]);
+
 
   // Мемоизированные настройки карты для максимальной производительности
   const mapSettings = useMemo(
@@ -253,6 +250,10 @@ export const BaseMap = ({
     );
   }
 
+  useEffect(() => {
+    centerToUser();
+  }, []);
+
   return (
     <div
       ref={mapContainerRef}
@@ -262,6 +263,7 @@ export const BaseMap = ({
     >
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
+        libraries={['marker']}
         onLoad={() => console.log("Google Maps API loaded")}
         onError={(error) => console.error("Google Maps API error:", error)}
       >
@@ -306,7 +308,7 @@ export const BaseMap = ({
               onClick={centerToUser}
               variant="icon"
               className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
-              disabled={isLocationLoadingRef.current}
+              disabled={isLocating}
             >
               {isLocationLoadingRef.current ? (
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-300 border-t-black" />
