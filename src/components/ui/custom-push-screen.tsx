@@ -34,7 +34,6 @@ export function CustomPushScreen({
   title,
   className,
   isCloseable = false,
-  withCloseButton = true,
 }: CustomPushScreenProps) {
   const [zIndex, setZIndex] = useState(zIndexManager.current());
   const [mounted, setMounted] = useState(false);
