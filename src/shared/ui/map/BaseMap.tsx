@@ -84,7 +84,7 @@ export const BaseMap = ({
   maxZoom = ZOOM_CONSTRAINTS.MAX,
   showZoomControls = true,
   showMyLocationButton = true,
-  enableMyLocationAutoCenter = false,
+  // enableMyLocationAutoCenter = false,
   onCameraChange,
   onMapReady,
   onLocationFound,
@@ -233,6 +233,11 @@ export const BaseMap = ({
     }
   }, [onMapReady]);
 
+  useEffect(() => {
+    centerToUser();
+  }, [centerToUser]);
+
+
   // Check if API key is missing
   if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
     return (
@@ -249,10 +254,6 @@ export const BaseMap = ({
       </div>
     );
   }
-
-  useEffect(() => {
-    centerToUser();
-  }, []);
 
   return (
     <div
@@ -310,7 +311,7 @@ export const BaseMap = ({
               className="shadow-lg hover:shadow-xl transition-shadow duration-200 touch-manipulation"
               disabled={isLocating}
             >
-              {isLocationLoadingRef.current ? (
+              {isLocating ? (
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-300 border-t-black" />
               ) : (
                 <ArrowLocationIcon />
