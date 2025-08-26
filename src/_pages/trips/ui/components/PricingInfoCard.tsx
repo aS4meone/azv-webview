@@ -85,7 +85,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           )}
           {overtimeFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Штраф за превышение</span>
+              <span className="text-gray-500 text-sm">Плата сверх тарифа</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(overtimeFee)}
               </span>

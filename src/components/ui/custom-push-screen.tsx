@@ -20,6 +20,8 @@ interface CustomPushScreenProps {
   title?: string;
   className?: string;
   isCloseable?: boolean;
+  touchPropagation?: "block" | "bubble";
+  lockBodyScroll?: boolean;
   withCloseButton?: boolean;
 }
 
@@ -33,7 +35,10 @@ export function CustomPushScreen({
   height = "auto",
   title,
   className,
+  touchPropagation = "block",
+  lockBodyScroll=true,
   isCloseable = false,
+  withCloseButton = true,
 }: CustomPushScreenProps) {
   const [zIndex, setZIndex] = useState(zIndexManager.current());
   const [mounted, setMounted] = useState(false);
@@ -41,13 +46,22 @@ export function CustomPushScreen({
 
   useEffect(() => {
     setMounted(true);
-    if (isOpen) {
-      setZIndex(zIndexManager.increment());
-    }
+  }, []);
+
+  // ✅ Лочим body только когда панель открыта (и если это нужно вызывающему коду)
+  useEffect(() => {
+    if (!mounted || !lockBodyScroll) return;
+    const prev = document.body.style.overflow;
+    if (isOpen) document.body.style.overflow = "hidden";
     return () => {
-      if (isOpen) {
-        zIndexManager.decrement();
-      }
+      document.body.style.overflow = prev;
+    };
+  }, [isOpen, mounted, lockBodyScroll]);
+
+  useEffect(() => {
+    if (isOpen) setZIndex(zIndexManager.increment());
+    return () => {
+      if (isOpen) zIndexManager.decrement();
     };
   }, [isOpen]);
 
@@ -95,13 +109,40 @@ export function CustomPushScreen({
               zIndex,
               height: !fullScreen && isVertical ? height : undefined,
               width: !fullScreen && !isVertical ? height : undefined,
-              touchAction: "auto",
             }}
             initial={initialPosition}
             animate={{ x: 0, y: 0 }}
             exit={exitPosition}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
+            {withCloseButton && (
+              <div className="absolute right-4 top-10 z-10 pt-6">
+                <Button onClick={onClose} variant="icon" className="shadow-sm">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M18 6L6 18"
+                      stroke="black"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M6 6L18 18"
+                      stroke="black"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </Button>
+              </div>
+            )}
             {withHeader &&
               (direction === "bottom" ? (
                 <>
@@ -161,9 +202,13 @@ export function CustomPushScreen({
                 overscrollBehavior: "contain",
                 WebkitOverflowScrolling: "touch",
               }}
-              onTouchStart={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
+              {...(touchPropagation === "block"
+                ? {
+                  onTouchStart: (e) => e.stopPropagation(),
+                  onTouchMove: (e) => e.stopPropagation(),
+                  onTouchEnd: (e) => e.stopPropagation(),
+                }
+                : {})}
             >
               {children}
             </div>

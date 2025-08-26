@@ -95,6 +95,8 @@ export const CarImageCarousel = ({
         direction="bottom"
         isCloseable={false}
         className="bg-black p-0"
+        touchPropagation="bubble"
+        withCloseButton={false}
       >
         <Button
           onClick={() => setShowImageViewer(false)}
@@ -141,7 +143,8 @@ export const CarImageCarousel = ({
           setActiveSlide(swiper.realIndex);
         }}
         loop={photos.length > 1}
-        allowTouchMove={false}
+        allowTouchMove
+        grabCursor
       >
         {photos.map((photo, index) => (
           <SwiperSlide key={index} className="h-full relative">

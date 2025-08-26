@@ -82,7 +82,7 @@ export const ImageViewerPage = ({
       <div className="flex-1 relative">
         <Swiper
           ref={swiperRef}
-          className="h-full w-full"
+          className="h-full w-full [touch-action:pan-y]"
           slidesPerView={1}
           spaceBetween={0}
           initialSlide={initialSlide}
@@ -132,7 +132,7 @@ export const ImageViewerPage = ({
                       src={formatImage(photo)}
                       alt={`${car.name} - фото ${index + 1}`}
                       fill
-                      className="object-contain select-none"
+                      className="object-contain select-none swiper-zoom-target"
                       onError={() => handleImageError(index)}
                       onLoad={() => handleImageLoad(index)}
                       onLoadStart={() => handleImageLoadStart(index)}
@@ -140,7 +140,6 @@ export const ImageViewerPage = ({
                       blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                       draggable={false}
                       priority={index === initialSlide}
-                      style={{ pointerEvents: isZoomed ? "auto" : "none" }}
                     />
                   </>
                 )}
