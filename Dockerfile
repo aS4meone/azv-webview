@@ -16,9 +16,8 @@ RUN apk add --no-cache libc6-compat \
 # <<< ВАЖНО: пробрасываем публичные env на ЭТАП СБОРКИ >>>
 ARG NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
-# при необходимости добавьте и другие публичные ключи:
-# ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-# ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
