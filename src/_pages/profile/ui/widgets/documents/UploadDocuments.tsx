@@ -204,7 +204,6 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       <Button variant="secondary" onClick={() => setIsUploadOpen(true)}>
         Заменить документы
       </Button>
-
       <UploadPhoto
         config={uploadConfig}
         withCloseButton

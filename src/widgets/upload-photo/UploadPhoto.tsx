@@ -114,6 +114,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     setProgressStates((prev) => ({ ...prev, [photoId]: progress }));
   };
 
+  const wrappedOnClose = () => {
+    onClose?.();
+  };
+
   const handleFlutterPhotoSelect = async (
     photoId: string,
     photoConfig: PhotoConfig
@@ -324,9 +328,33 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   });
 
   const content = (
-    <div className="flex flex-col gap-20 pb-[100px] pt-12 h-full">
-      <div className="pt-24"></div>
-
+    <div className="flex flex-col gap-10 pt-16 pb-24 min-h-screen">
+      <div className="absolute right-4 top-6 z-10">
+        <Button onClick={wrappedOnClose} variant="icon">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 6L6 18"
+              stroke="black"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M6 6L18 18"
+              stroke="black"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </Button>
+      </div>
       <div className="flex flex-col gap-8 ">
         {config.map((photo) => (
           <div key={photo.id} className="flex flex-col gap-2">
