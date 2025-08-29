@@ -6,17 +6,18 @@ import { Button } from "@/shared/ui";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import Loader from "@/shared/ui/loader";
 import { FlutterCamera } from "@/shared/utils/flutter-camera";
+import {StencilConfig} from "@/shared/models/types/stencil";
+import {StencilOverlay} from "@/widgets/upload-photo/StencilOverlay";
 
 export interface PhotoConfig {
   id: string;
   title: string;
   isSelfy?: boolean;
   cameraType?: "front" | "back";
-  multiple?: {
-    min: number;
-    max: number;
-  };
+  multiple?: { min: number; max: number };
+  stencil?: StencilConfig;
 }
+
 
 interface UploadPhotoProps {
   config: PhotoConfig[];
@@ -86,12 +87,12 @@ const ProgressIndicator: React.FC<{ progress: number }> = ({ progress }) => {
 };
 
 export const UploadPhoto: React.FC<UploadPhotoProps> = ({
-  config,
-  onPhotoUpload,
-  isOpen = false,
-  onClose,
-  isLoading = false,
-}) => {
+                                                          config,
+                                                          onPhotoUpload,
+                                                          isOpen = false,
+                                                          onClose,
+                                                          isLoading = false,
+                                                        }) => {
   const { showModal } = useResponseModal();
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
     {}
@@ -102,6 +103,8 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const [progressStates, setProgressStates] = useState<{
     [key: string]: number;
   }>({});
+  const [activeStencil, setActiveStencil] = useState<StencilConfig | undefined>();
+
 
   const setPhotoLoading = (photoId: string, loading: boolean) => {
     setLoadingStates((prev) => ({ ...prev, [photoId]: loading }));
@@ -118,122 +121,53 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     onClose?.();
   };
 
-  const handleFlutterPhotoSelect = async (
-    photoId: string,
-    photoConfig: PhotoConfig
-  ) => {
+  const handleFlutterPhotoSelect = async (photoId: string, photoConfig: PhotoConfig) => {
     try {
+      setActiveStencil(photoConfig.stencil);  // показать трафарет
       setPhotoLoading(photoId, true);
-
-      // Очищаем старые фотографии сразу при входе в камеру
-      setSelectedFiles((prev) => ({
-        ...prev,
-        [photoId]: [],
-      }));
+      setSelectedFiles((prev) => ({ ...prev, [photoId]: [] }));
 
       let files: File[] = [];
-
       let cameraType: "front" | "back" =
         photoConfig.cameraType || (photoConfig.isSelfy ? "front" : "back");
 
-      console.log(`🔍 Отладка для ${photoId}:`, {
-        "photoConfig.cameraType": photoConfig.cameraType,
-        "photoConfig.isSelfy": photoConfig.isSelfy,
-        "photoConfig.multiple": photoConfig.multiple,
-        "итоговый cameraType": cameraType,
-        "полная конфигурация": photoConfig,
-      });
-
-      if (cameraType !== "front" && cameraType !== "back") {
-        console.warn(
-          `⚠️ Некорректный cameraType: ${cameraType}, используем 'back'`
-        );
-        cameraType = "back";
-      }
-
-      console.log(`📱 Финальный cameraType для съемки: ${cameraType}`);
-
-      // Всегда используем кастомный экран камеры для множественных фото
       if (photoConfig.multiple) {
-        console.log(
-          `📷 Множественные фото с камеры: ${photoConfig.multiple.min}-${photoConfig.multiple.max}, камера: ${cameraType}`
-        );
-
+        // ПЕРЕДАЁМ трафарет 4-м параметром (если нативная камера его поддержит)
         const base64Images = await FlutterCamera.captureMultiplePhotos(
           photoConfig.multiple.min,
           photoConfig.multiple.max,
-          cameraType
+          cameraType,
+          photoConfig.stencil // 👈
         );
-
-        console.log(
-          `✅ Получено ${base64Images.length} фото от React Native камеры`
-        );
-
-        if (base64Images.length < photoConfig.multiple.min) {
-          showModal({
-            type: "error",
-            title: "Ошибка",
-            description: `Минимальное количество фото: ${photoConfig.multiple.min}`,
-            buttonText: "Понятно",
-          });
-          return;
-        }
-
-        // Показываем прогресс обработки
         setPhotoProgress(photoId, 50);
         files = FlutterCamera.base64ArrayToFiles(base64Images, photoId);
         setPhotoProgress(photoId, 100);
       } else {
-        console.log(
-          `📸 ${
-            photoConfig.isSelfy ? "Селфи" : "Фото"
-          } с камеры ${cameraType} для ${photoId} - используем обычную камеру`
+        const base64Image = await FlutterCamera.capturePhoto(
+          cameraType,
+          photoConfig.stencil // 👈
         );
-
-        const base64Image = await FlutterCamera.capturePhoto(cameraType);
         if (base64Image) {
           setPhotoProgress(photoId, 50);
-          const fileName = photoConfig.isSelfy
-            ? `${photoId}_selfie.jpg`
-            : `${photoId}.jpg`;
+          const fileName = photoConfig.isSelfy ? `${photoId}_selfie.jpg` : `${photoId}.jpg`;
           files = [FlutterCamera.base64ToFile(base64Image, fileName)];
           setPhotoProgress(photoId, 100);
         }
       }
 
       if (files.length === 0) {
-        showModal({
-          type: "error",
-          title: "Ошибка",
-          description: "Не удалось сделать фотографии",
-          buttonText: "Понятно",
-        });
+        showModal({ type: "error", title: "Ошибка", description: "Не удалось сделать фотографии", buttonText: "Понятно" });
         return;
       }
 
-      console.log(`✅ Успешно сделано ${files.length} фото для ${photoId}`);
-      setSelectedFiles((prev) => ({
-        ...prev,
-        [photoId]: files,
-      }));
-
-      // Показываем 100% прогресс
-      setPhotoProgress(photoId, 100);
-    } catch (error) {
-      console.error("React Native camera error:", error);
-
-      // При ошибке или отмене оставляем фотографии очищенными
-      // (они уже были очищены в начале функции)
-
-      showModal({
-        type: "error",
-        title: "Ошибка",
-        description:
-          error instanceof Error ? error.message : "Ошибка работы с камерой",
-        buttonText: "Понятно",
-      });
+      setSelectedFiles((prev) => ({ ...prev, [photoId]: files }));
+    } catch (e) {
+      console.error(e);
+      showModal({ type: "error", title: "Ошибка", description: "Ошибка работы с камерой", buttonText: "Понятно" });
     } finally {
       setPhotoLoading(photoId, false);
+      // скрыть трафарет через небольшой таймаут, чтобы пользователь увидел 100%
+      setTimeout(() => setActiveStencil(undefined), 120);
     }
   };
 
@@ -413,10 +347,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                           {selectedFiles[photo.id]?.length > 0
                             ? `${selectedFiles[photo.id].length} фото готово`
                             : photo.multiple
-                            ? "Сделать фото"
-                            : photo.isSelfy
-                            ? "Сделать селфи"
-                            : "Сделать фото"}
+                              ? "Сделать фото"
+                              : photo.isSelfy
+                                ? "Сделать селфи"
+                                : "Сделать фото"}
                         </span>
                       </>
                     )}
@@ -454,10 +388,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                           {selectedFiles[photo.id]
                             ? `${selectedFiles[photo.id].length} фото сделано`
                             : photo.multiple
-                            ? "Сделать фото"
-                            : photo.isSelfy
-                            ? "Сделать селфи"
-                            : "Сделать фото"}
+                              ? "Сделать фото"
+                              : photo.isSelfy
+                                ? "Сделать селфи"
+                                : "Сделать фото"}
                         </span>
                       </>
                     )}
@@ -473,10 +407,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                     photo.cameraType === "front"
                       ? "user"
                       : photo.cameraType === "back"
-                      ? "environment"
-                      : photo.isSelfy
-                      ? "user"
-                      : undefined
+                        ? "environment"
+                        : photo.isSelfy
+                          ? "user"
+                          : undefined
                   }
                 />
               </label>
@@ -515,6 +449,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
           </div>
         )}
       </div>
+      <StencilOverlay stencil={activeStencil} visible={!!activeStencil} />
     </CustomPushScreen>
   );
 

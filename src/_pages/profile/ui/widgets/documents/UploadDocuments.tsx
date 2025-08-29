@@ -157,45 +157,38 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
     {
       id: "id_front",
       title: "Сфотографируйте лицевую сторону удостоверения личности",
-      multiple: {
-        min: 1,
-        max: 1,
-      },
+      multiple: { min: 1, max: 1 },
+      stencil: { type: "rect", rect: { aspect: 1.58, widthPct: 86, borderRadiusPct: 3, offsetYPct: -2 } }
     },
     {
       id: "id_back",
       title: "Сфотографируйте обратную сторону удостоверения личности",
-      multiple: {
-        min: 1,
-        max: 1,
-      },
+      multiple: { min: 1, max: 1 },
+      stencil: { type: "rect", rect: { aspect: 1.58, widthPct: 86, borderRadiusPct: 3, offsetYPct: -2 } }
     },
     {
       id: "selfie_with_license",
       title: "Сделайте селфи, держа водительское удостоверение рядом с лицом",
-      isSelfy: true, // Только это селфи!
-      multiple: {
-        min: 1,
-        max: 1,
-      },
+      isSelfy: true,
+      multiple: { min: 1, max: 1 },
+      stencil: {
+        type: "rect+circle",
+        rect: { aspect: 1.58, widthPct: 72, borderRadiusPct: 3, offsetYPct: 18 },
+        circle: { diameterPct: 46, offsetYPct: -14 }
+      }
     },
-
     {
       id: "drivers_license",
       title: "Сфотографируйте лицевую сторону водительского удостоверения",
-      multiple: {
-        min: 1,
-        max: 1,
-      },
+      multiple: { min: 1, max: 1 },
+      stencil: { type: "rect", rect: { aspect: 1.58, widthPct: 86, borderRadiusPct: 3, offsetYPct: -2 } }
     },
     {
       id: "selfie",
       title: "Сделайте селфи",
-      isSelfy: true, // Только это селфи!
-      multiple: {
-        min: 1,
-        max: 1,
-      },
+      isSelfy: true,
+      multiple: { min: 1, max: 1 },
+      stencil: { type: "circle", circle: { diameterPct: 58, offsetYPct: -6 } }
     },
   ];
 
