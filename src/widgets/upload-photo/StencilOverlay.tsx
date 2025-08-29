@@ -23,7 +23,7 @@ export const StencilOverlay: React.FC<Props> = ({ stencil, visible }) => {
 
   // Базовый слой затемнения
   return (
-    <div className="fixed inset-0 z-[60] pointer-events-none">
+    <div className="fixed inset-0 z-[9999] pointer-events-none">
       {/* затемнение фона */}
       <div className="absolute inset-0 bg-black/45" />
 
