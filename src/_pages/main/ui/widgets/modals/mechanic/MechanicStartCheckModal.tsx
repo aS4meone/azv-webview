@@ -9,6 +9,7 @@ import { DescriptionScreen } from "../../screens/description-screen/DescriptionS
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { openIn2GIS } from "@/shared/utils/urlUtils";
+import { FaCar, FaMapMarkerAlt } from "react-icons/fa";
 
 interface MechanicStartCheckModalProps {
   car: ICar;
@@ -62,7 +63,7 @@ export const MechanicStartCheckModal = ({
         type: "error",
         description: error.response.data.detail,
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onClose: () => { },
       });
     }
   };
@@ -100,7 +101,7 @@ export const MechanicStartCheckModal = ({
         type: "error",
         description: error.response.data.detail,
         buttonText: "Попробовать снова",
-        onClose: () => {},
+        onClose: () => { },
       });
     }
   };
@@ -144,11 +145,11 @@ export const MechanicStartCheckModal = ({
 
         <CustomResponseModal
           isOpen={responseModal?.isOpen || false}
-          onClose={responseModal?.onClose || (() => {})}
+          onClose={responseModal?.onClose || (() => { })}
           title={responseModal?.title || ""}
           description={responseModal?.description || ""}
           buttonText={responseModal?.buttonText || ""}
-          onButtonClick={responseModal?.onButtonClick || (() => {})}
+          onButtonClick={responseModal?.onButtonClick || (() => { })}
         />
 
         <CarImageCarousel car={car} rounded={true} />
@@ -171,31 +172,35 @@ export const MechanicStartCheckModal = ({
 
             {/* Кнопка для просмотра в 2GIS */}
             {car.delivery_coordinates && (
-              <Button
-                variant="outline"
-                onClick={() =>
-                  openIn2GIS(
-                    car.delivery_coordinates!.latitude,
-                    car.delivery_coordinates!.longitude
-                  )
-                }
-                className="flex items-center justify-center gap-2"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    openIn2GIS(
+                      car.latitude,
+                      car.longitude
+                    )
+                  }
+                  className="flex items-center justify-center gap-2"
                 >
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                </svg>
-                Открыть в 2GIS
-              </Button>
+                  <FaCar className="w-4 h-4" />
+                  Точка авто
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    openIn2GIS(
+                      car.delivery_coordinates!.latitude,
+                      car.delivery_coordinates!.longitude
+                    )
+                  }
+                  className="flex items-center justify-center gap-2"
+                >
+                  <FaMapMarkerAlt className="w-4 h-4" />
+                  Точка доставки
+                </Button>
+              </>
+
             )}
 
             <Button
@@ -213,8 +218,8 @@ export const MechanicStartCheckModal = ({
               {delivering
                 ? "Начать доставку"
                 : tracking
-                ? "Начать слежку"
-                : "Принять осмотр"}
+                  ? "Начать слежку"
+                  : "Принять осмотр"}
             </Button>
           </div>
         </div>

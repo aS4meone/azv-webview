@@ -32,6 +32,7 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
     <div className="absolute bottom-0 w-full flex flex-col gap-4">
       <footer className="bg-white w-full rounded-t-[40px] p-6 flex flex-col gap-3">
         <div onClick={handleOpenModal} className="cursor-pointer">
+        
           <CarInfoHeader car={car} />
           <CarSpecs car={car} />
         </div>
