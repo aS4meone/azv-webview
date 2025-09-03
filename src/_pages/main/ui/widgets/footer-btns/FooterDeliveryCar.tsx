@@ -6,6 +6,7 @@ import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { FaCar, FaMapMarkerAlt } from "react-icons/fa";
+import { IoChevronUp } from "react-icons/io5";
 
 import { openIn2GIS } from "@/shared/utils/urlUtils";
 
@@ -30,7 +31,15 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
 
   return (
     <div className="absolute bottom-0 w-full flex flex-col gap-4">
-      <footer className="bg-white w-full rounded-t-[40px] p-6 flex flex-col gap-3">
+      <footer className="bg-white w-full rounded-t-[40px] p-6 flex flex-col gap-3 relative">
+        {/* Иконка "вверх" */}
+        <div 
+          onClick={handleOpenModal} 
+          className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center cursor-pointer z-10"
+        >
+          <IoChevronUp className="w-6 h-6 text-gray-700" />
+        </div>
+        
         <div onClick={handleOpenModal} className="cursor-pointer">
         
           <CarInfoHeader car={car} />

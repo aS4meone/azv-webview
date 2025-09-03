@@ -263,6 +263,7 @@ export const MechanicDeliveryInUseModal = ({
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
+      
       <div className="p-6 pt-4 space-y-6">
         <CarInfoHeader car={car} />
       </div>
@@ -320,19 +321,20 @@ export const MechanicDeliveryInUseModal = ({
 
         {/* Кнопка для просмотра в 2GIS */}
         {notRentedCar.delivery_coordinates && (
-          <> <Button
-            variant="outline"
-            onClick={() =>
-              openIn2GIS(
-                notRentedCar.latitude,
-                notRentedCar.longitude
-              )
-            }
-            className="flex items-center justify-center gap-2"
-          >
-            <FaCar className="w-4 h-4" />
-            Точка авто
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              onClick={() =>
+                openIn2GIS(
+                  notRentedCar.latitude,
+                  notRentedCar.longitude
+                )
+              }
+              className="flex items-center justify-center gap-2"
+            >
+              <FaCar className="w-4 h-4" />
+              Точка авто
+            </Button>
             <Button
               variant="outline"
               onClick={() =>
