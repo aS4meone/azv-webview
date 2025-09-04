@@ -16,11 +16,13 @@ import { SupportPage } from "@/_pages/support";
 import { TermsPage } from "@/_pages/terms";
 import { ProfilePage } from "@/_pages/profile";
 import { MessagesPage } from "@/_pages/messages";
+import { MyAutoPage } from "@/_pages/my-auto";
 import { UserRole } from "@/shared/models/types/user";
 
 type ComponentKeys =
   | "trips"
   | "wallet"
+  | "myAuto"
   | "messages"
   | "support"
   | "terms"
@@ -35,6 +37,7 @@ const Drawer = () => {
   const components = {
     trips: <TripsAndFinesPage />,
     wallet: <WalletPage />,
+    myAuto: <MyAutoPage />,
     messages: <MessagesPage />,
     support: <SupportPage />,
     terms: <TermsPage />,
@@ -51,6 +54,11 @@ const Drawer = () => {
     {
       translationKey: "main.drawer.menu.wallet",
       key: "wallet" as ComponentKeys,
+    },
+
+    {
+      translationKey: "main.drawer.menu.myAuto",
+      key: "myAuto" as ComponentKeys,
     },
 
     {
@@ -78,6 +86,33 @@ const Drawer = () => {
           {
             translationKey: "main.drawer.menu.tripsAndPayments",
             key: "trips" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.messages",
+            key: "messages" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.support",
+            key: "support" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.termsAndPolicy",
+            key: "terms" as ComponentKeys,
+          },
+        ]
+      : user?.role === UserRole.FIRST
+      ? [
+          {
+            translationKey: "main.drawer.menu.tripsAndPayments",
+            key: "trips" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.wallet",
+            key: "wallet" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.myAuto",
+            key: "myAuto" as ComponentKeys,
           },
           {
             translationKey: "main.drawer.menu.messages",

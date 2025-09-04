@@ -98,11 +98,60 @@
       "menu": {
         "tripsAndPayments": "Trips and Fines",
         "wallet": "Wallet",
+        "myAuto": "My Cars",
         "messages": "Messages",
         "support": "Support",
         "termsAndPolicy": "Terms and Policy"
       },
       "logout": "Logout"
+    }
+  },
+  "myAuto": {
+    "title": "My Cars",
+    "noCars": "No cars available",
+    "noCarsDescription": "You don't have any cars registered yet.",
+    "loading": "Loading cars...",
+    "errorTitle": "Failed to load cars",
+    "errorDescription": "Something went wrong while loading your cars. Please try again.",
+    "retry": "Try again",
+    "carDetails": {
+      "title": "Car Details",
+      "monthlyEarnings": "Monthly Earnings",
+      "trips": "Trips",
+      "noTrips": "No trips this month",
+      "noTripsDescription": "There are no trips recorded for this month.",
+      "loading": "Loading trips...",
+      "errorTitle": "Failed to load trips",
+      "errorDescription": "Something went wrong while loading trips. Please try again.",
+      "retry": "Try again"
+    },
+    "tripDetails": {
+      "title": "Trip Details",
+      "duration": "Duration",
+      "earnings": "Earnings",
+      "rentalType": "Rental Type",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "photos": {
+        "clientBefore": "Photos from client before trip",
+        "clientAfter": "Photos from client after trip",
+        "mechanicAfter": "Photos from mechanic after inspection",
+        "noPhotos": "No photos available"
+      },
+      "route": {
+        "title": "Route Map",
+        "noRoute": "No route data available"
+      }
+    },
+    "rentalTypes": {
+      "minutes": "Minute",
+      "hours": "Hour",
+      "days": "Day"
+    },
+    "timeUnits": {
+      "minutes": "min",
+      "hours": "h",
+      "days": "d"
     }
   },
   "messages": {

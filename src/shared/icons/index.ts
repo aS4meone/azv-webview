@@ -24,4 +24,5 @@ export * from "./ui/ClockIcon";
 export * from "./ui/InfoIcon";
 export * from "./ui/ThumbsUpIcon";
 export * from "./ui/ThumbsDownIcon";
+export * from "./ui/XIcon";
 export { CameraIcon } from "./Camera";
