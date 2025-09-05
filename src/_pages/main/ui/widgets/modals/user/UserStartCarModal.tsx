@@ -318,6 +318,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
               setIsDelivery(false);
             }}
             onAddressSelected={handleAddressSelected}
+            car={car}
           />
         </CustomPushScreen>
       )}

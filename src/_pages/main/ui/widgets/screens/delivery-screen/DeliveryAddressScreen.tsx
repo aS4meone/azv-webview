@@ -16,6 +16,9 @@ import {
 import { MapCameraProps } from "@vis.gl/react-google-maps";
 import { ServiceZonePolygon } from "../../map/ServiceZonePolygon";
 import { checkDeliveryAvailability } from "@/shared/utils/polygon";
+import { ICar } from "@/shared/models/types/car";
+import { IUser } from "@/shared/models/types/user";
+import { useUserStore } from "@/shared/stores/userStore";
 
 // Получаем настройки производительности для устройства
 
@@ -26,6 +29,7 @@ const CAMERA_DEBOUNCE_MS = 150;
 interface DeliveryAddressScreenProps {
   onBack: () => void;
   onAddressSelected: (lat: number, lng: number, address: string) => void;
+  car?: ICar;
 }
 
 const MapWithCenterListener = ({
@@ -84,7 +88,9 @@ const MapWithCenterListener = ({
 
 export const DeliveryAddressScreen = ({
   onAddressSelected,
+  car,
 }: DeliveryAddressScreenProps) => {
+  const { user } = useUserStore();
   // Состояние камеры карты
   const [cameraProps, setCameraProps] = useState<MapCameraProps>({
     center: { lat: 43.222, lng: 76.8512 },
@@ -101,6 +107,15 @@ export const DeliveryAddressScreen = ({
 
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUpdatingAddressRef = useRef(false);
+
+  // Проверяем, является ли пользователь владельцем машины
+  const isOwner = useMemo(() => {
+    if (!user || !car) return false;
+    return user.owned_cars.some(ownedCar => ownedCar.id === car.id);
+  }, [user, car]);
+
+  // Стоимость доставки с учетом скидки для владельцев
+  const deliveryCost = isOwner ? 5000 : 10000;
 
   const updateAddress = useCallback(async (lat: number, lng: number) => {
     if (isUpdatingAddressRef.current) return;
@@ -371,11 +386,17 @@ export const DeliveryAddressScreen = ({
         </div>
 
         {/* Delivery Cost Info */}
-        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className={`mb-4 rounded-lg p-3 ${
+          isOwner 
+            ? "bg-green-50 border border-green-200" 
+            : "bg-blue-50 border border-blue-200"
+        }`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <svg
-                className="w-5 h-5 text-blue-600 mr-2"
+                className={`w-5 h-5 mr-2 ${
+                  isOwner ? "text-green-600" : "text-blue-600"
+                }`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -387,11 +408,31 @@ export const DeliveryAddressScreen = ({
                   d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
                 />
               </svg>
-              <span className="text-sm font-medium text-blue-800">
-                Стоимость доставки
-              </span>
+              <div className="flex flex-col">
+                <span className={`text-sm font-medium ${
+                  isOwner ? "text-green-800" : "text-blue-800"
+                }`}>
+                  Стоимость доставки
+                </span>
+                {isOwner && (
+                  <span className="text-xs text-green-600">
+                    Скидка для владельца
+                  </span>
+                )}
+              </div>
             </div>
-            <span className="text-lg font-bold text-blue-900">10 000 ₸</span>
+            <div className="flex flex-col items-end">
+              <span className={`text-lg font-bold ${
+                isOwner ? "text-green-900" : "text-blue-900"
+              }`}>
+                {deliveryCost.toLocaleString()} ₸
+              </span>
+              {isOwner && (
+                <span className="text-xs text-green-600 line-through">
+                  10 000 ₸
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
