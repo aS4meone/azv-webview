@@ -12,6 +12,18 @@ export enum CarStatus {
   deliveryInProgress = "delivering_in_progress",
 }
 
+export enum CarBodyType {
+  SEDAN = "SEDAN",
+  SUV = "SUV", 
+  CROSSOVER = "CROSSOVER",
+  COUPE = "COUPE",
+  HATCHBACK = "HATCHBACK",
+  CONVERTIBLE = "CONVERTIBLE",
+  WAGON = "WAGON",
+  MINIBUS = "MINIBUS",
+  ELECTRIC = "ELECTRIC", // Для электромобилей
+}
+
 import { UniqueIdentifier } from "./unique-identifier";
 
 export interface IDeliveryCoordinates {
@@ -33,6 +45,7 @@ export interface ICar extends UniqueIdentifier {
   engine_volume: number;
   year: number;
   drive_type: number;
+  body_type: string;
   photos: string[];
   owner_id: number;
   current_renter_id: number | null;
