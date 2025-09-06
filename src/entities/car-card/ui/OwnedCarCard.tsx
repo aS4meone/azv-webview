@@ -9,16 +9,19 @@ interface OwnedCarCardProps {
   index?: number;
   isTooltipOpen?: boolean;
   onTooltipHover?: (index: number | null) => void;
+  navigateToMap?: boolean; // New prop to control navigation behavior
 }
 
-const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onTooltipHover }: OwnedCarCardProps) => {
+const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onTooltipHover, navigateToMap = true }: OwnedCarCardProps) => {
   const router = useRouter();
   const [touchHandled, setTouchHandled] = useState(false);
 
   const handleClick = () => {
-    router.push(
-      `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
-    );
+    if (navigateToMap) {
+      router.push(
+        `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
+      );
+    }
     if (onCarClick) {
       onCarClick(car);
     }

@@ -76,7 +76,7 @@ export function Drawer({
           {/* Контент со скроллом */}
           <div
             className={cn(
-              "flex-1 overflow-y-auto overscroll-contain",
+              "flex-1 overflow-y-auto px-6 overscroll-contain",
               "scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent",
               "relative",
               contentClassName

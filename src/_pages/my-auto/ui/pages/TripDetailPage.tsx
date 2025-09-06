@@ -98,7 +98,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
             <img
               src={fullPhotoUrl}
               alt={`${title} ${currentIndex + 1}`}
-              className="h-full w-auto mx-auto object-contain"
+              className="h-full w-full object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/images/placeholder.jpg";
@@ -151,7 +151,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-4 py-4">
@@ -176,7 +176,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       </div>
 
       {/* Content */}
-      <div className="px-4 py-6 space-y-6">
+      <div className="py-6 space-y-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -204,27 +204,33 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                 Информация о поездке
               </h2>
               <div className="grid grid-cols-1 gap-4">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">{t("myAuto.tripDetails.duration")}:</span>
-                  <span className="font-medium">{formatDuration(tripDetails.duration_minutes)}</span>
+                  <span className="font-medium text-gray-900">{formatDuration(tripDetails.duration_minutes)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">{t("myAuto.tripDetails.earnings")}:</span>
-                  <span className="font-medium text-green-600">
+                  <span className="font-bold text-green-600 text-2xl">
                     {tripDetails.earnings.toLocaleString()} ₸
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">{t("myAuto.tripDetails.rentalType")}:</span>
-                  <span className="font-medium">{formatRentalType(tripDetails.rental_type)}</span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    tripDetails.rental_type === 'minutes' ? 'bg-blue-100 text-blue-800' :
+                    tripDetails.rental_type === 'hours' ? 'bg-green-100 text-green-800' :
+                    'bg-purple-100 text-purple-800'
+                  }`}>
+                    {formatRentalType(tripDetails.rental_type)}
+                  </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
                   <span className="text-gray-600">{t("myAuto.tripDetails.startTime")}:</span>
-                  <span className="font-medium">{formatDate(tripDetails.start_time)}</span>
+                  <span className="font-medium text-gray-900">{formatDate(tripDetails.start_time)}</span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center py-2">
                   <span className="text-gray-600">{t("myAuto.tripDetails.endTime")}:</span>
-                  <span className="font-medium">{formatDate(tripDetails.end_time)}</span>
+                  <span className="font-medium text-gray-900">{formatDate(tripDetails.end_time)}</span>
                 </div>
               </div>
             </div>
@@ -250,22 +256,28 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                   {t("myAuto.tripDetails.route.title")}
                 </h3>
                 {tripDetails.route_map.route_data ? (
-                  <div className="text-sm text-gray-600">
-                    <p>
-                      <span className="font-medium">Длительность:</span>{" "}
-                      {tripDetails.route_map.duration_over_24h ? "Более 24 часов" : "Менее 24 часов"}
-                    </p>
-                    <p>
-                      <span className="font-medium">Дней маршрута:</span>{" "}
-                      {tripDetails.route_map.route_data.daily_routes.length}
-                    </p>
-                    <p>
-                      <span className="font-medium">Всего точек:</span>{" "}
-                      {tripDetails.route_map.route_data.total_coordinates}
-                    </p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600 font-medium">Длительность:</span>
+                      <span className="text-gray-900">
+                        {tripDetails.route_map.duration_over_24h ? "Более 24 часов" : "Менее 24 часов"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-600 font-medium">Дней маршрута:</span>
+                      <span className="text-gray-900">
+                        {tripDetails.route_map.route_data.daily_routes.length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600 font-medium">Всего точек:</span>
+                      <span className="text-gray-900">
+                        {tripDetails.route_map.route_data.total_coordinates}
+                      </span>
+                    </div>
                   </div>
                 ) : (
-                  <p className="text-gray-600">{t("myAuto.tripDetails.route.noRoute")}</p>
+                  <p className="text-gray-600 text-center py-4">{t("myAuto.tripDetails.route.noRoute")}</p>
                 )}
               </div>
             )}

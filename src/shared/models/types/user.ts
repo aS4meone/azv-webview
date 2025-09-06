@@ -30,6 +30,7 @@ interface IdCard {
 }
 
 export interface IUser {
+  id: number;
   phone_number: string;
   full_name: string | null;
   role: UserRole;

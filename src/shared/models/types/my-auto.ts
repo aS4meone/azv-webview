@@ -17,6 +17,7 @@ export interface MonthEarnings {
   month: number;
   total_earnings: number;
   trip_count: number;
+  available_minutes?: number;
 }
 
 export interface Trip {
@@ -26,6 +27,7 @@ export interface Trip {
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
+  user_id?: number;
 }
 
 export interface CarTripsResponse {

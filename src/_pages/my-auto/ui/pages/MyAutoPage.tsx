@@ -9,9 +9,11 @@ import { myAutoApi } from "@/shared/api/routes/my-auto";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { MyAutoDetailPage } from "./index";
 import { OwnedCarCard } from "@/entities/car-card";
+import { useUserStore } from "@/shared/stores/userStore";
 
 export const MyAutoPage = () => {
   const t = useTranslations();
+  const { user } = useUserStore();
   const [cars, setCars] = useState<MyCar[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,9 +25,22 @@ export const MyAutoPage = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await myAutoApi.getMyCars();
-      const data: MyCarsResponse = response.data;
-      setCars(data.cars);
+      
+      // Get cars from user store (owned_cars) and add photos
+      if (user?.owned_cars) {
+        const carsWithPhotos = user.owned_cars.map((car: any) => ({
+          id: car.id,
+          name: car.name,
+          plate_number: car.plate_number,
+          photos: car.photos || [],
+          available_minutes: car.available_minutes || 0,
+          latitude: car.latitude || 0,
+          longitude: car.longitude || 0,
+        }));
+        setCars(carsWithPhotos);
+      } else {
+        setCars([]);
+      }
     } catch (err) {
       console.error("Error fetching cars:", err);
       setError("Failed to load cars");
@@ -35,8 +50,15 @@ export const MyAutoPage = () => {
   };
 
   useEffect(() => {
-    fetchCars();
-  }, []);
+    console.log('=== User Effect Debug ===');
+    console.log('user:', user);
+    console.log('user?.id:', user?.id);
+    console.log('========================');
+    
+    if (user) {
+      fetchCars();
+    }
+  }, [user]);
 
   // Close tooltip when clicking outside
   useEffect(() => {
@@ -56,6 +78,11 @@ export const MyAutoPage = () => {
   }, [openTooltipIndex]);
 
   const handleCarSelect = (car: MyCar) => {
+    console.log('=== Car Selection Debug ===');
+    console.log('Selected car:', car);
+    console.log('User object:', user);
+    console.log('User ID:', user?.id, 'type:', typeof user?.id);
+    console.log('===========================');
     setSelectedCar(car);
   };
 
@@ -68,19 +95,35 @@ export const MyAutoPage = () => {
   };
 
   if (selectedCar) {
+    // Wait for user to be loaded before showing detail page
+    if (!user) {
+      return (
+        <div className="min-h-screen bg-[#F7F7F7] flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Загрузка пользователя...</p>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <CustomPushScreen
         direction="right"
         isOpen={true}
         onClose={handleBack}
       >
-        <MyAutoDetailPage car={selectedCar} onBackAction={handleBack} />
+        <MyAutoDetailPage 
+          car={selectedCar} 
+          onBackAction={handleBack} 
+          userId={user.id} 
+        />
       </CustomPushScreen>
     );
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gray-50">
+    <div ref={containerRef} className="min-h-screen">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="px-4 py-4">
@@ -93,7 +136,7 @@ export const MyAutoPage = () => {
       </div>
 
       {/* Content */}
-      <div className="px-4 py-6">
+      <div className="py-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -125,15 +168,55 @@ export const MyAutoPage = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {cars.map((car, index) => (
-              <div key={car.id} onClick={() => handleCarSelect(car)}>
-                <OwnedCarCard 
-                  car={car} 
-                  index={index}
-                  isTooltipOpen={openTooltipIndex === index}
-                  onTooltipHover={handleTooltipHover}
-                />
+              <div 
+                key={car.id} 
+                onClick={() => handleCarSelect(car)}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-4">
+                  {/* Car Photo */}
+                  {car.photos && car.photos.length > 0 && (
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                      <img
+                        src={`https://api.azvmotors.kz${car.photos[0]}`}
+                        alt={car.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Car Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      {car.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {car.plate_number}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Доступно минут:</span>
+                      <span className={`text-sm font-medium ${
+                        car.available_minutes >= 21600 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {car.available_minutes.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Available Minutes Badge */}
+                  <div className="flex-shrink-0">
+                    <div
+                      className={`w-16 h-16 rounded-full flex flex-col items-center justify-center text-white text-xs font-bold ${
+                        car.available_minutes >= 21600 ? 'bg-green-500' : 'bg-red-500'
+                      }`}
+                    >
+                      <span className="text-sm">{car.available_minutes}</span>
+                      <span className="text-[10px]">мин</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

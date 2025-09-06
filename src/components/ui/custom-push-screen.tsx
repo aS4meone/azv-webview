@@ -193,7 +193,7 @@ export function CustomPushScreen({
 
             <div
               className={cn(
-                "flex-1 overflow-y-auto px-6",
+                "flex-1 overflow-y-auto px-3",
                 direction === "bottom" && "pb-10",
                 className
               )}
