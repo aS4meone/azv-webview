@@ -2,6 +2,10 @@ export interface MyCar {
   id: number;
   name: string;
   plate_number: string;
+  photos: string[];
+  available_minutes: number;
+  latitude: number;
+  longitude: number;
 }
 
 export interface MyCarsResponse {

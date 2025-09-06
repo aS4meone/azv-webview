@@ -114,7 +114,6 @@ const CarCard = ({ car, onCarClickAction }: { car: ICar; onCarClickAction: (car:
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span>{car.year} год</span>
             <span>{car.engine_volume === 0 ? 'Электро' : `${car.engine_volume}л`}</span>
-            <span>{car.drive_type}WD</span>
           </div>
           
         </div>
