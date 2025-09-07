@@ -8,6 +8,7 @@ import { MyCar, Trip, TripDetailsResponse } from "@/shared/models/types/my-auto"
 import { myAutoApi } from "@/shared/api/routes/my-auto";
 import { BaseMap } from "@/shared/ui/map";
 import { RouteMap, FullScreenMapModal } from "../components";
+import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 
 interface TripDetailPageProps {
   car: MyCar;
@@ -21,6 +22,13 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [showImageViewer, setShowImageViewer] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [currentPhotoSet, setCurrentPhotoSet] = useState<string[]>([]);
+  const [imageLoading, setImageLoading] = useState<{ [key: number]: boolean }>({});
+  const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({});
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const fetchTripDetails = async () => {
     try {
@@ -66,12 +74,69 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
     });
   };
 
+  // Filter out selfie photos from mechanic_after
+  const filterSelfiePhotos = (photos: string[]) => {
+    return photos.filter(photo => !photo.includes('/selfie/'));
+  };
+
+  const openImageViewer = (photos: string[], index: number = 0) => {
+    setCurrentPhotoSet(photos);
+    setCurrentPhotoIndex(index);
+    setShowImageViewer(true);
+  };
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }));
+    setImageLoading((prev) => ({ ...prev, [index]: false }));
+  };
+
+  const handleImageLoad = (index: number) => {
+    setImageLoading((prev) => ({ ...prev, [index]: false }));
+  };
+
+  const handleImageLoadStart = (index: number) => {
+    setImageLoading((prev) => ({ ...prev, [index]: true }));
+  };
+
+  const nextPhoto = () => {
+    setCurrentPhotoIndex((prev) => (prev + 1) % currentPhotoSet.length);
+  };
+
+  const prevPhoto = () => {
+    setCurrentPhotoIndex((prev) => (prev - 1 + currentPhotoSet.length) % currentPhotoSet.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentPhotoSet.length > 1) {
+      nextPhoto();
+    }
+    if (isRightSwipe && currentPhotoSet.length > 1) {
+      prevPhoto();
+    }
+  };
+
+
   const PhotoSection = ({ title, photos }: { title: string; photos: string[] }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     if (photos.length === 0) {
       return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="bg-white rounded-lg shadow-sm p-4">
           <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
           <p className="text-gray-600">{t("myAuto.tripDetails.photos.noPhotos")}</p>
         </div>
@@ -91,14 +156,24 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       : `https://api.azvmotors.kz/${photos[currentIndex]}`;
 
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h3 className="text-lg font-medium text-gray-900 mb-3">{title}</h3>
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+          <button
+            onClick={() => openImageViewer(photos, currentIndex)}
+            className="bg-[#1D77FF] hover:bg-[#1D77FF]/90 text-white p-2 rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+          </button>
+        </div>
         <div className="relative">
-          <div className="h-64 w-full overflow-hidden rounded-lg bg-gray-100">
+          <div className="h-80 w-full overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
             <img
               src={fullPhotoUrl}
               alt={`${title} ${currentIndex + 1}`}
-              className="h-full w-full object-cover"
+              className="h-full w-auto object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/images/placeholder.jpg";
@@ -153,7 +228,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm">
         <div className="px-4 py-4">
           <div className="flex items-center">
             <Button
@@ -199,22 +274,22 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
         ) : tripDetails ? (
           <>
             {/* Trip Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 Информация о поездке
               </h2>
               <div className="grid grid-cols-1 gap-4">
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-2">
                   <span className="text-gray-600">{t("myAuto.tripDetails.duration")}:</span>
                   <span className="font-medium text-gray-900">{formatDuration(tripDetails.duration_minutes)}</span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-2">
                   <span className="text-gray-600">{t("myAuto.tripDetails.earnings")}:</span>
                   <span className="font-bold text-green-600 text-2xl">
                     {tripDetails.earnings.toLocaleString()} ₸
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-2">
                   <span className="text-gray-600">{t("myAuto.tripDetails.rentalType")}:</span>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                     tripDetails.rental_type === 'minutes' ? 'bg-blue-100 text-blue-800' :
@@ -224,7 +299,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                     {formatRentalType(tripDetails.rental_type)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-2">
                   <span className="text-gray-600">{t("myAuto.tripDetails.startTime")}:</span>
                   <span className="font-medium text-gray-900">{formatDate(tripDetails.start_time)}</span>
                 </div>
@@ -246,24 +321,24 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
             />
             <PhotoSection
               title={t("myAuto.tripDetails.photos.mechanicAfter")}
-              photos={tripDetails.photos.mechanic_after.photos}
+              photos={filterSelfiePhotos(tripDetails.photos.mechanic_after.photos)}
             />
 
             {/* Route Map Info */}
             {tripDetails.route_map && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="bg-white rounded-lg shadow-sm p-4">
                 <h3 className="text-lg font-medium text-gray-900 mb-3">
                   {t("myAuto.tripDetails.route.title")}
                 </h3>
                 {tripDetails.route_map.route_data ? (
                   <div className="space-y-3">
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600 font-medium">Длительность:</span>
                       <span className="text-gray-900">
                         {tripDetails.route_map.duration_over_24h ? "Более 24 часов" : "Менее 24 часов"}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600 font-medium">Дней маршрута:</span>
                       <span className="text-gray-900">
                         {tripDetails.route_map.route_data.daily_routes.length}
@@ -310,6 +385,115 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
           endLng={tripDetails.route_map.end_longitude}
           durationOver24h={tripDetails.route_map.duration_over_24h}
         />
+      )}
+
+      {/* Full Screen Image Viewer Modal */}
+      {showImageViewer && (
+        <div className="fixed inset-0 z-50 bg-black">
+          {/* Header */}
+          <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent">
+            <div className="flex items-center justify-between p-4 pt-12">
+              {currentPhotoSet.length > 1 && (
+                <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                  <span className="text-white text-sm font-medium">
+                    {currentPhotoIndex + 1} / {currentPhotoSet.length}
+                  </span>
+                </div>
+              )}
+
+              {/* Car Name */}
+              <h1 className="text-white text-lg font-medium">{car.name}</h1>
+
+              <button
+                onClick={() => setShowImageViewer(false)}
+                className="bg-white/20 backdrop-blur-sm rounded-full p-2 hover:bg-white/30 transition-colors"
+              >
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Image Viewer */}
+          <div 
+            className="h-full w-full flex items-center justify-center"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {imageErrors[currentPhotoIndex] ? (
+              <div className="w-full h-full bg-gray-800 flex flex-col items-center justify-center">
+                <svg className="w-16 h-16 text-white/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <p className="text-white text-sm font-medium">Фото недоступно</p>
+              </div>
+            ) : (
+              <>
+                {imageLoading[currentPhotoIndex] && (
+                  <div className="absolute inset-0 bg-black flex items-center justify-center z-10">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                  </div>
+                )}
+                <img
+                  src={currentPhotoSet[currentPhotoIndex]?.startsWith('http') 
+                    ? currentPhotoSet[currentPhotoIndex] 
+                    : `https://api.azvmotors.kz/${currentPhotoSet[currentPhotoIndex]}`}
+                  alt={`Фото ${currentPhotoIndex + 1}`}
+                  className="max-h-full max-w-full object-contain"
+                  onError={() => handleImageError(currentPhotoIndex)}
+                  onLoad={() => handleImageLoad(currentPhotoIndex)}
+                  onLoadStart={() => handleImageLoadStart(currentPhotoIndex)}
+                  draggable={false}
+                />
+              </>
+            )}
+          </div>
+
+          {/* Navigation arrows */}
+          {currentPhotoSet.length > 1 && (
+            <>
+              <button
+                onClick={prevPhoto}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-3 transition-colors z-10"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={nextPhoto}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full p-3 transition-colors z-10"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Bottom progress bar */}
+          {currentPhotoSet.length > 1 && (
+            <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/50 to-transparent">
+              <div className="p-4 pb-8">
+                <div className="w-full bg-white/20 rounded-full h-1">
+                  <div 
+                    className="bg-white rounded-full h-1 transition-all duration-300"
+                    style={{ width: `${((currentPhotoIndex + 1) / currentPhotoSet.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Instruction Text */}
+          <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10">
+            <p className="text-white/70 text-sm text-center">
+              Приближайте пальцами
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
