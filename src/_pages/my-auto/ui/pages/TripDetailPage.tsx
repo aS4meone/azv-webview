@@ -49,6 +49,27 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
     fetchTripDetails();
   }, [car.id, trip.id]);
 
+  // Handle Escape key to close image viewer
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showImageViewer) {
+        closeImageViewer();
+      }
+    };
+
+    if (showImageViewer) {
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleEscape);
+      return () => {
+        document.body.style.overflow = 'unset';
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [showImageViewer]);
+
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
@@ -80,9 +101,18 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
   };
 
   const openImageViewer = (photos: string[], index: number = 0) => {
+    console.log('Opening image viewer with photos:', photos);
     setCurrentPhotoSet(photos);
     setCurrentPhotoIndex(index);
     setShowImageViewer(true);
+  };
+
+  const closeImageViewer = () => {
+    console.log('Closing image viewer - showImageViewer was:', showImageViewer);
+    setShowImageViewer(false);
+    setCurrentPhotoIndex(0);
+    setCurrentPhotoSet([]);
+    console.log('Image viewer closed');
   };
 
   const handleImageError = (index: number) => {
@@ -225,8 +255,17 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
     );
   };
 
+  console.log('TripDetailPage render - showImageViewer:', showImageViewer);
+
   return (
     <div className="min-h-screen">
+      {/* Debug info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-0 left-0 bg-red-500 text-white p-2 z-50">
+          showImageViewer: {showImageViewer.toString()}
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="px-4 py-4">
@@ -389,31 +428,40 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
 
       {/* Full Screen Image Viewer Modal */}
       {showImageViewer && (
-        <div className="fixed inset-0 z-50 bg-black">
-          {/* Header */}
-          <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent">
-            <div className="flex items-center justify-between p-4 pt-12">
-              {currentPhotoSet.length > 1 && (
-                <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                  <span className="text-white text-sm font-medium">
-                    {currentPhotoIndex + 1} / {currentPhotoSet.length}
-                  </span>
-                </div>
-              )}
-
-              {/* Car Name */}
-              <h1 className="text-white text-lg font-medium">{car.name}</h1>
-
-              <button
-                onClick={() => setShowImageViewer(false)}
-                className="bg-white/20 backdrop-blur-sm rounded-full p-2 hover:bg-white/30 transition-colors"
-              >
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+        <div 
+          className="fixed top-0 left-0 w-full h-full bg-black z-[9999]"
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 9999
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeImageViewer();
+            }
+          }}
+        >
+          {/* Photo Counter - Top Right */}
+          {currentPhotoSet.length > 1 && (
+            <div className="absolute top-4 right-4 z-10 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
+              <span className="text-white text-sm font-medium">
+                {currentPhotoIndex + 1} / {currentPhotoSet.length}
+              </span>
             </div>
-          </div>
+          )}
+
+          {/* Close Button - Top Left */}
+          <button
+            onClick={closeImageViewer}
+            className="absolute top-4 left-4 z-10 bg-black/50 backdrop-blur-sm rounded-full p-2 hover:bg-black/70 transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
 
           {/* Image Viewer */}
           <div 

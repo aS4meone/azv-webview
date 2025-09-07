@@ -74,10 +74,10 @@ export const FullScreenMapModal = ({
       <div className="absolute top-16 bottom-0 left-0 right-0">
         <BaseMap
           initialCenter={{
-            lat: 43.222, // Центр Алматы
-            lng: 76.8512
+            lat: startLat,
+            lng: startLng
           }}
-          initialZoom={13}
+          initialZoom={15}
           className="w-full h-full"
           showZoomControls={true}
           showMyLocationButton={true}

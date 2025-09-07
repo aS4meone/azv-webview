@@ -390,7 +390,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               {isOwnerTrip && (
-                                <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-green-400">
+                                <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-gray-400 bg-gray-100">
                                   ВАША ПОЕЗДКА
                                 </div>
                               )}
