@@ -166,9 +166,9 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
 
     if (photos.length === 0) {
       return (
-        <div className="bg-white rounded-lg shadow-sm p-4">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
-          <p className="text-gray-600">{t("myAuto.tripDetails.photos.noPhotos")}</p>
+        <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
+          <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">{title}</h3>
+          <p className="text-[#666666]">{t("myAuto.tripDetails.photos.noPhotos")}</p>
         </div>
       );
     }
@@ -186,12 +186,12 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       : `https://api.azvmotors.kz/${photos[currentIndex]}`;
 
     return (
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+          <h3 className="text-lg font-medium text-[#2D2D2D]">{title}</h3>
           <button
             onClick={() => openImageViewer(photos, currentIndex)}
-            className="bg-[#1D77FF] hover:bg-[#1D77FF]/90 text-white p-2 rounded-lg transition-colors"
+            className="bg-[#967642] hover:bg-[#967642]/90 text-white p-2 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -238,14 +238,14 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                     key={index}
                     onClick={() => setCurrentIndex(index)}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentIndex ? 'bg-blue-600' : 'bg-gray-300'
+                      index === currentIndex ? 'bg-[#967642]' : 'bg-[#E5E5E5]'
                     }`}
                   />
                 ))}
               </div>
               
               {/* Photo counter */}
-              <div className="text-center mt-2 text-sm text-gray-600">
+              <div className="text-center mt-2 text-sm text-[#666666]">
                 {currentIndex + 1} / {photos.length}
               </div>
             </>
@@ -258,7 +258,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
   console.log('TripDetailPage render - showImageViewer:', showImageViewer);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F5F5F5]">
       {/* Debug info */}
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed top-0 left-0 bg-red-500 text-white p-2 z-50">
@@ -267,7 +267,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       )}
       
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-white shadow-sm border-b border-[#E5E5E5]">
         <div className="px-4 py-4">
           <div className="flex items-center">
             <Button
@@ -278,10 +278,10 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
               <ArrowLeftIcon />
             </Button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-[#2D2D2D]">
                 {t("myAuto.tripDetails.title")}
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#666666]">
                 {car.name} • {car.plate_number}
               </p>
             </div>
@@ -293,16 +293,16 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       <div className="py-6 space-y-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Загрузка деталей поездки...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+            <p className="mt-4 text-[#666666]">Загрузка деталей поездки...</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">
                 Ошибка загрузки
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-[#666666] mb-4">
                 Не удалось загрузить детали поездки. Попробуйте еще раз.
               </p>
               <Button onClick={fetchTripDetails} variant="primary">
@@ -313,38 +313,38 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
         ) : tripDetails ? (
           <>
             {/* Trip Info */}
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
+              <h2 className="text-lg font-medium text-[#2D2D2D] mb-4">
                 Информация о поездке
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{t("myAuto.tripDetails.duration")}:</span>
-                  <span className="font-medium text-gray-900">{formatDuration(tripDetails.duration_minutes)}</span>
+                  <span className="text-[#666666]">{t("myAuto.tripDetails.duration")}:</span>
+                  <span className="font-medium text-[#2D2D2D]">{formatDuration(tripDetails.duration_minutes)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{t("myAuto.tripDetails.earnings")}:</span>
-                  <span className="font-bold text-green-600 text-2xl">
+                  <span className="text-[#666666]">{t("myAuto.tripDetails.earnings")}:</span>
+                  <span className="font-bold text-[#967642] text-2xl">
                     {tripDetails.earnings.toLocaleString()} ₸
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{t("myAuto.tripDetails.rentalType")}:</span>
+                  <span className="text-[#666666]">{t("myAuto.tripDetails.rentalType")}:</span>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    tripDetails.rental_type === 'minutes' ? 'bg-blue-100 text-blue-800' :
-                    tripDetails.rental_type === 'hours' ? 'bg-green-100 text-green-800' :
-                    'bg-purple-100 text-purple-800'
+                    tripDetails.rental_type === 'minutes' ? 'bg-[#E3F2FD] text-[#1565C0]' :
+                    tripDetails.rental_type === 'hours' ? 'bg-[#E8F5E8] text-[#2E7D32]' :
+                    'bg-[#F3E5F5] text-[#7B1FA2]'
                   }`}>
                     {formatRentalType(tripDetails.rental_type)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{t("myAuto.tripDetails.startTime")}:</span>
-                  <span className="font-medium text-gray-900">{formatDate(tripDetails.start_time)}</span>
+                  <span className="text-[#666666]">{t("myAuto.tripDetails.startTime")}:</span>
+                  <span className="font-medium text-[#2D2D2D]">{formatDate(tripDetails.start_time)}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">{t("myAuto.tripDetails.endTime")}:</span>
-                  <span className="font-medium text-gray-900">{formatDate(tripDetails.end_time)}</span>
+                  <span className="text-[#666666]">{t("myAuto.tripDetails.endTime")}:</span>
+                  <span className="font-medium text-[#2D2D2D]">{formatDate(tripDetails.end_time)}</span>
                 </div>
               </div>
             </div>
@@ -365,33 +365,33 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
 
             {/* Route Map Info */}
             {tripDetails.route_map && (
-              <div className="bg-white rounded-lg shadow-sm p-4">
-                <h3 className="text-lg font-medium text-gray-900 mb-3">
+              <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
+                <h3 className="text-lg font-medium text-[#2D2D2D] mb-3">
                   {t("myAuto.tripDetails.route.title")}
                 </h3>
                 {tripDetails.route_map.route_data ? (
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600 font-medium">Длительность:</span>
-                      <span className="text-gray-900">
+                      <span className="text-[#666666] font-medium">Длительность:</span>
+                      <span className="text-[#2D2D2D]">
                         {tripDetails.route_map.duration_over_24h ? "Более 24 часов" : "Менее 24 часов"}
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600 font-medium">Дней маршрута:</span>
-                      <span className="text-gray-900">
+                      <span className="text-[#666666] font-medium">Дней маршрута:</span>
+                      <span className="text-[#2D2D2D]">
                         {tripDetails.route_map.route_data.daily_routes.length}
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-gray-600 font-medium">Всего точек:</span>
-                      <span className="text-gray-900">
+                      <span className="text-[#666666] font-medium">Всего точек:</span>
+                      <span className="text-[#2D2D2D]">
                         {tripDetails.route_map.route_data.total_coordinates}
                       </span>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-600 text-center py-4">{t("myAuto.tripDetails.route.noRoute")}</p>
+                  <p className="text-[#666666] text-center py-4">{t("myAuto.tripDetails.route.noRoute")}</p>
                 )}
               </div>
             )}
@@ -403,7 +403,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       {tripDetails?.route_map?.route_data && (
         <button
           onClick={() => setIsMapModalOpen(true)}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#967642] hover:bg-[#967642]/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

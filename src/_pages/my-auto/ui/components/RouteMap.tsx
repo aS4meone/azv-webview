@@ -49,7 +49,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
       const polyline = new google.maps.Polyline({
         path: path,
         geodesic: true,
-        strokeColor: dayIndex === selectedDay ? "#1D77FF" : "#94A3B8",
+        strokeColor: dayIndex === selectedDay ? "#967642" : "#cccaca",
         strokeOpacity: dayIndex === selectedDay ? 1.0 : 0.6,
         strokeWeight: dayIndex === selectedDay ? 4 : 2,
       });
@@ -76,7 +76,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 12,
-            fillColor: dayIndex === selectedDay ? "#1D77FF" : "#94A3B8",
+            fillColor: dayIndex === selectedDay ? "#967642" : "#cccaca",
             fillOpacity: 1,
             strokeColor: "#FFFFFF",
             strokeWeight: 3,
@@ -98,7 +98,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
             icon: {
               path: google.maps.SymbolPath.CIRCLE,
               scale: 12,
-              fillColor: dayIndex === selectedDay ? "#10B981" : "#94A3B8",
+              fillColor: dayIndex === selectedDay ? "#2E7D32" : "#cccaca",
               fillOpacity: 1,
               strokeColor: "#FFFFFF",
               strokeWeight: 3,
@@ -158,7 +158,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
   if (!hasValidRoutes) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-600">Нет данных о маршруте для отображения</p>
+        <p className="text-[#666666]">Нет данных о маршруте для отображения</p>
       </div>
     );
   }
@@ -174,8 +174,8 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
               onClick={() => setInternalSelectedDay(index)}
               className={`px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 index === selectedDay
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-[#967642] text-white"
+                  : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
               }`}
             >
               {new Date(dayRoute.date).toLocaleDateString("ru-RU", {
@@ -188,7 +188,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
       )}
 
       {/* Информация о выбранном дне */}
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-[#666666]">
         <p>Дата: {new Date(routeData.daily_routes[selectedDay].date).toLocaleDateString("ru-RU")}</p>
         <p>Точек маршрута: {
           routeData.daily_routes[selectedDay].coordinates.filter(coord => 
@@ -198,13 +198,13 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
       </div>
 
       {/* Легенда маркеров */}
-      <div className="flex justify-center space-x-4 text-xs text-gray-600">
+      <div className="flex justify-center space-x-4 text-xs text-[#666666]">
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+          <div className="w-3 h-3 rounded-full bg-[#967642]"></div>
           <span>Точка А (начало)</span>
         </div>
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded-full bg-green-600"></div>
+          <div className="w-3 h-3 rounded-full bg-[#2E7D32]"></div>
           <span>Точка Б (конец)</span>
         </div>
       </div>

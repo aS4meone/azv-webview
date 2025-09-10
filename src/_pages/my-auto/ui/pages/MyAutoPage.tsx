@@ -123,12 +123,12 @@ export const MyAutoPage = () => {
   }
 
   return (
-    <div ref={containerRef} className="min-h-screen">
+    <div ref={containerRef} className="min-h-screen bg-[#F5F5F5]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-[#E5E5E5]">
         <div className="px-4 py-4">
           <div className="flex items-center">
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-[#2D2D2D]">
               {t("myAuto.title")}
             </h1>
           </div>
@@ -139,16 +139,16 @@ export const MyAutoPage = () => {
       <div className="py-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">{t("myAuto.loading")}</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+            <p className="mt-4 text-[#666666]">{t("myAuto.loading")}</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">
                 {t("myAuto.errorTitle")}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-[#666666] mb-4">
                 {t("myAuto.errorDescription")}
               </p>
               <Button onClick={fetchCars} variant="primary">
@@ -159,10 +159,10 @@ export const MyAutoPage = () => {
         ) : cars.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">
                 {t("myAuto.noCars")}
               </h3>
-              <p className="text-gray-600">
+              <p className="text-[#666666]">
                 {t("myAuto.noCarsDescription")}
               </p>
             </div>
@@ -173,7 +173,7 @@ export const MyAutoPage = () => {
               <div 
                 key={car.id} 
                 onClick={() => handleCarSelect(car)}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4 cursor-pointer hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-4">
                   {/* Car Photo */}
@@ -189,16 +189,16 @@ export const MyAutoPage = () => {
                   
                   {/* Car Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    <h3 className="text-lg font-semibold text-[#2D2D2D] mb-1">
                       {car.name}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-2">
+                    <p className="text-sm text-[#666666] mb-2">
                       {car.plate_number}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Доступно минут:</span>
+                      <span className="text-xs text-[#888888]">Доступно минут:</span>
                       <span className={`text-sm font-medium ${
-                        car.available_minutes >= 21600 ? 'text-green-600' : 'text-red-600'
+                        car.available_minutes >= 21600 ? 'text-[#2E7D32]' : 'text-[#D32F2F]'
                       }`}>
                         {car.available_minutes.toLocaleString()}
                       </span>
@@ -209,7 +209,7 @@ export const MyAutoPage = () => {
                   <div className="flex-shrink-0">
                     <div
                       className={`w-16 h-16 rounded-full flex flex-col items-center justify-center text-white text-xs font-bold ${
-                        car.available_minutes >= 21600 ? 'bg-green-500' : 'bg-red-500'
+                        car.available_minutes >= 21600 ? 'bg-[#2E7D32]' : 'bg-[#D32F2F]'
                       }`}
                     >
                       <span className="text-sm">{car.available_minutes}</span>

@@ -185,9 +185,9 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
     (tripsData.month_earnings.total_earnings >= 21600) : false;
 
   return (
-    <div className="min-h-screen ">
+    <div className="min-h-screen bg-[#F5F5F5]">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white shadow-sm border-b border-[#E5E5E5]">
         <div className="px-4 py-4">
           <div className="flex items-center">
             <Button
@@ -198,10 +198,10 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
               <ArrowLeftIcon />
             </Button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-[#2D2D2D]">
                 {car.name}
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#666666]">
                 {car.plate_number}
               </p>
             </div>
@@ -213,16 +213,16 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
       <div className="py-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">{t("myAuto.carDetails.loading")}</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+            <p className="mt-4 text-[#666666]">{t("myAuto.carDetails.loading")}</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">
                 {t("myAuto.carDetails.errorTitle")}
               </h3>
-              <p className="text-gray-600 mb-4">
+              <p className="text-[#666666] mb-4">
                 {t("myAuto.carDetails.errorDescription")}
               </p>
               <Button onClick={() => fetchTrips(currentMonth, currentYear)} variant="primary">
@@ -234,7 +234,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
           <div className="space-y-4">
             {/* Car Photos Slider */}
             {car.photos && car.photos.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
                 <div className="relative">
                   <div className="h-64 w-full overflow-hidden rounded-lg bg-gray-100">
                     <img
@@ -285,21 +285,21 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
             )}
 
             {/* Monthly Earnings */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-6">
+              <h2 className="text-lg font-medium text-[#2D2D2D] mb-4">
                 {t("myAuto.carDetails.monthlyEarnings")}
               </h2>
-              <div className="text-4xl font-bold text-green-600 mb-2">
+              <div className="text-4xl font-bold text-[#967642] mb-2">
                 {tripsData.month_earnings.total_earnings.toLocaleString()} ₸
               </div>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-[#666666]">
                 {tripsData.month_earnings.trip_count} {t("myAuto.carDetails.trips").toLowerCase()}
               </p>
             </div>
 
             {/* Month Selector with Earnings and Minutes */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-4">
                 {new Date(currentYear, currentMonth - 1).toLocaleDateString("ru-RU", { 
                   month: "long", 
                   year: "numeric" 
@@ -318,8 +318,8 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                         onClick={() => handleMonthChange(month.month, month.year)}
                         className={`w-28 h-28 rounded-lg text-sm font-medium transition-colors flex-shrink-0 ${
                           isCurrentMonth
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            ? "bg-[#967642] text-white"
+                            : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
                         }`}
                       >
                         <div className="text-center w-full h-full flex flex-col justify-center p-3">
@@ -330,14 +330,14 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                             })}
                           </div>
                           <div className={`text-xs mb-2 ${
-                            isCurrentMonth ? 'text-blue-100' : 'text-gray-500'
+                            isCurrentMonth ? 'text-[#D4C4A8]' : 'text-[#888888]'
                           }`}>
                             {month.total_earnings.toLocaleString()} ₸
                           </div>
                           <div className={`text-xs px-2 py-1 rounded-full font-bold ${
                             isMinutesGood 
-                              ? 'bg-green-500 text-white' 
-                              : 'bg-red-500 text-white'
+                              ? 'bg-[#2E7D32] text-white' 
+                              : 'bg-[#D32F2F] text-white'
                           }`}>
                             {monthMinutes} мин
                           </div>
@@ -350,13 +350,13 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
             </div>
 
             {/* Trips List */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-4">
                 {t("myAuto.carDetails.trips")}
               </h3>
               {tripsData.trips.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-gray-600">
+                  <p className="text-[#666666]">
                     {t("myAuto.carDetails.noTrips")}
                   </p>
                 </div>
@@ -378,24 +378,24 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                     return (
                       <div
                         key={trip.id}
-                        className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors relative"
+                        className="border border-[#E5E5E5] rounded-lg p-4 cursor-pointer hover:bg-[#F5F5F5] transition-colors relative"
                         onClick={() => handleTripSelect(trip)}
                       >
                         {/* Owner Trip Indicator */}
                         {isOwnerTrip && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-l-lg"></div>
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#967642] rounded-l-lg"></div>
                         )}
                         
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               {isOwnerTrip && (
-                                <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-gray-400 bg-gray-100">
+                                <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-[#967642] bg-[#F5F5F5] text-[#967642]">
                                   ВАША ПОЕЗДКА
                                 </div>
                               )}
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-[#666666]">
                               <div className="font-medium">
                                 {tripDateInfo.date}
                               </div>
@@ -405,23 +405,23 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-green-600">
+                            <p className="text-2xl font-bold text-[#967642]">
                               {trip.earnings.toLocaleString()} ₸
                             </p>
                           </div>
                         </div>
                         <div className="flex justify-between items-center">
-                          <div className="flex space-x-4 text-sm text-gray-600">
+                          <div className="flex space-x-4 text-sm text-[#666666]">
                             <span className="font-medium">{formatDuration(trip.duration_minutes)}</span>
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              trip.rental_type === 'minutes' ? 'bg-blue-100 text-blue-800' :
-                              trip.rental_type === 'hours' ? 'bg-green-100 text-green-800' :
-                              'bg-purple-100 text-purple-800'
+                              trip.rental_type === 'minutes' ? 'bg-[#E3F2FD] text-[#1565C0]' :
+                              trip.rental_type === 'hours' ? 'bg-[#E8F5E8] text-[#2E7D32]' :
+                              'bg-[#F3E5F5] text-[#7B1FA2]'
                             }`}>
                               {formatRentalType(trip.rental_type)}
                             </span>
                           </div>
-                          <ArrowLeftIcon className="rotate-180 text-gray-400" />
+                          <ArrowLeftIcon className="rotate-180 text-[#888888]" />
                         </div>
                       </div>
                     );

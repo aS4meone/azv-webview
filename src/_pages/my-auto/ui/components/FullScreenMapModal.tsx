@@ -39,7 +39,7 @@ export const FullScreenMapModal = ({
   return (
     <div className="fixed inset-0 z-50 bg-black">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-white shadow-sm border-b border-gray-200">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-white shadow-sm border-b border-[#E5E5E5]">
         <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -51,10 +51,10 @@ export const FullScreenMapModal = ({
                 <ArrowLeftIcon />
               </Button>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">
+                <h1 className="text-xl font-semibold text-[#2D2D2D]">
                   {t("myAuto.tripDetails.route.title")}
                 </h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[#666666]">
                   {shouldShowCalendar ? "Выберите день для просмотра маршрута" : "Маршрут поездки"}
                 </p>
               </div>
@@ -62,7 +62,7 @@ export const FullScreenMapModal = ({
             <Button
               variant="icon"
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-[#888888] hover:text-[#666666]"
             >
               <XIcon />
             </Button>
@@ -94,10 +94,10 @@ export const FullScreenMapModal = ({
       </div>
 
       {/* Calendar for multiple days - Always at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 bg-white border-t border-gray-200">
+      <div className="absolute bottom-0 left-0 right-0 z-10 bg-white border-t border-[#E5E5E5]">
         {shouldShowCalendar ? (
           <div className="px-4 py-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">
+            <h3 className="text-lg font-medium text-[#2D2D2D] mb-3">
               Выберите день
             </h3>
             <div className="flex space-x-2 overflow-x-auto pb-2">
@@ -107,8 +107,8 @@ export const FullScreenMapModal = ({
                   onClick={() => setSelectedDay(index)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     index === selectedDay
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-[#967642] text-white"
+                      : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
                   }`}
                 >
                   <div className="text-center">
@@ -129,7 +129,7 @@ export const FullScreenMapModal = ({
             </div>
             
             {/* Day info */}
-            <div className="mt-3 text-sm text-gray-600">
+            <div className="mt-3 text-sm text-[#666666]">
               <p>
                 <span className="font-medium">Дата:</span>{" "}
                 {new Date(routeData.daily_routes[selectedDay].date).toLocaleDateString("ru-RU", {
@@ -148,7 +148,7 @@ export const FullScreenMapModal = ({
           </div>
         ) : (
           <div className="px-4 py-4">
-            <div className="text-center text-gray-600">
+            <div className="text-center text-[#666666]">
               <p className="text-sm">
                 <span className="font-medium">Маршрут за один день</span>
               </p>
