@@ -17,12 +17,14 @@ import { TermsPage } from "@/_pages/terms";
 import { ProfilePage } from "@/_pages/profile";
 import { MessagesPage } from "@/_pages/messages";
 import { MyAutoPage } from "@/_pages/my-auto";
+import { GuarantorPage } from "@/_pages/guarantor";
 import { UserRole } from "@/shared/models/types/user";
 
 type ComponentKeys =
   | "trips"
   | "wallet"
   | "myAuto"
+  | "guarantor"
   | "messages"
   | "support"
   | "terms"
@@ -38,6 +40,7 @@ const Drawer = () => {
     trips: <TripsAndFinesPage />,
     wallet: <WalletPage />,
     myAuto: <MyAutoPage />,
+    guarantor: <GuarantorPage />,
     messages: <MessagesPage />,
     support: <SupportPage />,
     terms: <TermsPage />,
@@ -59,6 +62,11 @@ const Drawer = () => {
     {
       translationKey: "main.drawer.menu.myAuto",
       key: "myAuto" as ComponentKeys,
+    },
+
+    {
+      translationKey: "main.drawer.menu.guarantor",
+      key: "guarantor" as ComponentKeys,
     },
 
     {
@@ -115,6 +123,10 @@ const Drawer = () => {
             key: "myAuto" as ComponentKeys,
           },
           {
+            translationKey: "main.drawer.menu.guarantor",
+            key: "guarantor" as ComponentKeys,
+          },
+          {
             translationKey: "main.drawer.menu.messages",
             key: "messages" as ComponentKeys,
           },
@@ -135,6 +147,10 @@ const Drawer = () => {
           {
             translationKey: "main.drawer.menu.wallet",
             key: "wallet" as ComponentKeys,
+          },
+          {
+            translationKey: "main.drawer.menu.guarantor",
+            key: "guarantor" as ComponentKeys,
           },
           {
             translationKey: "main.drawer.menu.messages",
