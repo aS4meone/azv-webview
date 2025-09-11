@@ -38,55 +38,62 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
             </div>
             <h2 className="text-lg font-semibold text-[#2D2D2D]">
               Новые заявки
+              {requests.length > 0 && (
+                <span className="ml-2 px-2 py-1 bg-[#967642] text-white text-xs font-medium rounded-full">
+                  {requests.length}
+                </span>
+              )}
             </h2>
           </div>
           <div className="space-y-4">
             {requests.map((request) => (
               <div
                 key={request.id}
-                className="bg-white rounded-2xl border border-[#E5E5E5] p-6 shadow-sm hover:shadow-md transition-all duration-300"
+                className="bg-white rounded-2xl border border-[#E5E5E5] p-4 shadow-sm hover:shadow-md transition-all duration-300 w-full"
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#967642]/10 to-[#B8860B]/10 flex items-center justify-center">
-                        <span className="text-[#967642] font-bold text-sm">
-                          {request.requestor_name?.charAt(0) || "?"}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-[#2D2D2D] text-lg">
-                          {request.requestor_name || "Не указано"}
-                        </h3>
-                        <p className="text-sm text-[#666666]">
-                          {request.requestor_phone}
-                        </p>
-                      </div>
+                <div className="flex items-start justify-between w-full">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">
+                        {request.requestor_name?.charAt(0) || "?"}
+                      </span>
                     </div>
-                    {request.reason && (
-                      <div className="bg-[#F8F8F8] rounded-lg p-3 mt-3">
-                        <p className="text-sm text-[#666666]">
-                          <span className="font-medium">Причина:</span> {request.reason}
-                        </p>
-                      </div>
-                    )}
-                    <p className="text-xs text-[#999999] mt-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-[#2D2D2D] text-lg truncate">
+                        {request.requestor_name || "Не указано"}
+                      </h3>
+                      <p className="text-sm text-[#666666] truncate">
+                        {request.requestor_phone}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {request.reason && (
+                  <div className="mt-3">
+                    <div className="bg-[#F8F8F8] rounded-lg p-3">
+                      <p className="text-sm text-[#666666]">
+                        <span className="font-medium">Причина:</span> {request.reason}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="mt-3 w-full">
+                    <p className="text-xs text-[#999999] mb-2">
                       {new Date(request.created_at).toLocaleString("ru-RU")}
                     </p>
-                  </div>
-                  <div className="flex flex-col space-y-2 ml-4">
+                  <div className="flex flex-col space-y-2 flex-shrink-0">
                     <button
                       onClick={() => onAccept(request.id)}
-                      className="px-6 py-3 bg-[#2E7D32] text-white text-sm font-semibold rounded-xl hover:bg-[#4CAF50] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
+                      className="px-3 py-3 bg-[#2E7D32] text-white text-xs font-semibold rounded-lg hover:bg-[#4CAF50] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-1 whitespace-nowrap"
                     >
-                      <HiCheckCircle className="w-4 h-4" />
+                      <HiCheckCircle className="w-3 h-3" />
                       Принять
                     </button>
                     <button
                       onClick={() => setShowRejectModal(request.id)}
-                      className="px-6 py-3 bg-[#D32F2F] text-white text-sm font-semibold rounded-xl hover:bg-[#F44336] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
+                      className="px-3 py-3 bg-[#D32F2F] text-white text-xs font-semibold rounded-lg hover:bg-[#F44336] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-1 whitespace-nowrap"
                     >
-                      <HiXCircle className="w-4 h-4" />
+                      <HiXCircle className="w-3 h-3" />
                       Отклонить
                     </button>
                   </div>
@@ -105,6 +112,11 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
           </div>
           <h2 className="text-base font-semibold text-[#2D2D2D]">
             Люди, за которых я несу ответственность
+            {clients.length > 0 && (
+              <span className="ml-2 px-2 py-1 bg-[#967642] text-white text-xs font-medium rounded-full">
+                {clients.length}
+              </span>
+            )}
           </h2>
         </div>
         {clients.length === 0 ? (
@@ -189,17 +201,17 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
       {/* Модальное окно отклонения */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-[#D32F2F] flex items-center justify-center">
                 <HiExclamationTriangle className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-[#2D2D2D]">
+              <h3 className="text-base font-semibold text-[#2D2D2D]">
                 Отклонить заявку
               </h3>
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-[#666666] mb-3">
+              <label className="block text-sm font-medium text-[#666666] mb-2">
                 Причина отклонения (необязательно)
               </label>
               <textarea

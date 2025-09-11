@@ -83,6 +83,11 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
           </div>
           <h2 className="text-base font-semibold text-[#2D2D2D]">
             Мои гаранты
+            {guarantors.length > 0 && (
+              <span className="ml-2 px-2 py-1 bg-[#967642] text-white text-xs font-medium rounded-full">
+                {guarantors.length}
+              </span>
+            )}
           </h2>
         </div>
         {guarantors.length === 0 ? (
@@ -165,13 +170,13 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
       {/* Модальное окно добавления гаранта */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center">
                   <HiUserPlus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-[#2D2D2D]">
+                <h3 className="text-base font-semibold text-[#2D2D2D]">
                   Добавить гаранта
                 </h3>
               </div>
@@ -219,7 +224,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
             )}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-[#666666] mb-3">
+                <label className="block text-sm font-medium text-[#666666] mb-2">
                   ФИО гаранта *
                 </label>
                 <input
@@ -233,7 +238,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#666666] mb-3">
+                <label className="block text-sm font-medium text-[#666666] mb-2">
                   Номер телефона *
                 </label>
                 <input
@@ -247,7 +252,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#666666] mb-3">
+                <label className="block text-sm font-medium text-[#666666] mb-2">
                   Причина (необязательно)
                 </label>
                 <textarea
