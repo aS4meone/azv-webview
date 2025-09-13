@@ -7,12 +7,14 @@ import { VehicleInfoCard } from "./components/VehicleInfoCard";
 import { TripInfoCard } from "./components/TripInfoCard";
 import { LocationInfoCard } from "./components/LocationInfoCard";
 import { PricingInfoCard } from "./components/PricingInfoCard";
+import { FullScreenMapModal } from "./components/FullScreenMapModal";
 
 const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
   const [historyDetail, setHistoryDetail] = useState<IHistoryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isActionHistoryOpen, setIsActionHistoryOpen] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchHistoryDetail = async () => {
@@ -181,6 +183,33 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
 
       {/* Bottom spacing for better scroll experience */}
       <div className="h-8" />
+
+      {/* Fixed Map Button */}
+      {historyDetail?.rental_history_detail?.route_map?.route_data && (
+        <button
+          onClick={() => setIsMapModalOpen(true)}
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#967642] hover:bg-[#967642]/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      )}
+
+      {/* Full Screen Map Modal */}
+      {historyDetail?.rental_history_detail?.route_map?.route_data && (
+        <FullScreenMapModal
+          isOpen={isMapModalOpen}
+          onClose={() => setIsMapModalOpen(false)}
+          routeData={historyDetail.rental_history_detail.route_map.route_data}
+          startLat={historyDetail.rental_history_detail.route_map.start_latitude}
+          startLng={historyDetail.rental_history_detail.route_map.start_longitude}
+          endLat={historyDetail.rental_history_detail.route_map.end_latitude}
+          endLng={historyDetail.rental_history_detail.route_map.end_longitude}
+          durationOver24h={historyDetail.rental_history_detail.route_map.duration_over_24h}
+        />
+      )}
     </div>
   );
 };

@@ -22,6 +22,47 @@ export interface ICarDetails {
   status: string;
 }
 
+
+export interface IHistoryItem {
+  rental_history_detail: IRentalHistoryDetail;
+}
+
+export interface IActionHistory {
+  action_type: string;
+  timestamp: string;
+}
+
+export interface RouteCoordinate {
+  lat: number;
+  lon: number;
+  altitude: number;
+  timestamp: number;
+}
+
+export interface DailyRoute {
+  date: string;
+  coordinates: RouteCoordinate[];
+}
+
+export interface RouteData {
+  device_id: string;
+  start_date: string;
+  end_date: string;
+  total_coordinates: number;
+  daily_routes: DailyRoute[];
+  fuel_start: string;
+  fuel_end: string;
+}
+
+export interface RouteMap {
+  start_latitude: number;
+  start_longitude: number;
+  end_latitude: number;
+  end_longitude: number;
+  duration_over_24h: boolean;
+  route_data: RouteData | null;
+}
+
 export interface IRentalHistoryDetail {
   history_id: number;
   user_id: number;
@@ -48,13 +89,5 @@ export interface IRentalHistoryDetail {
   distance_fee: number;
   car_details: ICarDetails;
   action_history: IActionHistory[];
-}
-
-export interface IHistoryItem {
-  rental_history_detail: IRentalHistoryDetail;
-}
-
-export interface IActionHistory {
-  action_type: string;
-  timestamp: string;
+  route_map: RouteMap;
 }
