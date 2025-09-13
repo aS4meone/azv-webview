@@ -91,9 +91,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
     >
       <div className="relative w-full h-screen flex flex-col bg-white">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200 mt-[48px]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center">
               <HiDocumentText className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-lg font-semibold text-gray-900">
@@ -124,7 +124,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   href={contractUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-[#967642] text-white rounded-lg hover:bg-[#B8860B] transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-[#191919] text-white rounded-lg hover:bg-[#333333] transition-colors"
                 >
                   Открыть в браузере
                 </a>
@@ -132,11 +132,16 @@ export const ContractModal: React.FC<ContractModalProps> = ({
             ) : (
               <div className="space-y-6">
                 <div className="bg-[#F8F8F8] rounded-xl p-6">
-                  <h4 className="font-semibold text-[#2D2D2D] mb-4">Условия договора:</h4>
-                  <div className="text-sm text-[#666666] leading-relaxed space-y-4">
+                  <h4 className="font-semibold text-[#191919] mb-4">Условия договора:</h4>
+                  <div className="text-sm text-[#191919] leading-relaxed space-y-4">
                     <p>
                       {getContractDescription()}
                     </p>
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                      <p className="text-sm text-gray-600 text-center">
+                        Для подписания договора необходимо прочитать весь документ до конца
+                      </p>
+                    </div>
                     <p>
                       Нажимая "Подписать", вы соглашаетесь с условиями данного договора.
                     </p>
@@ -146,14 +151,14 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 {contractUrl && (
                   <div className="border border-[#E5E5E5] rounded-xl p-4 bg-white">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-medium text-[#666666]">
+                      <span className="text-sm font-medium text-[#191919]">
                         Документ договора:
                       </span>
                       <a
                         href={contractUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#967642] hover:text-[#B8860B] text-sm font-medium transition-colors duration-200"
+                        className="text-[#191919] hover:text-[#333333] text-sm font-medium transition-colors duration-200"
                       >
                         Открыть в новой вкладке
                       </a>
@@ -166,7 +171,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                         onLoadError={onDocumentLoadError}
                         loading={
                           <div className="flex flex-col items-center justify-center gap-4 py-12">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#191919]"></div>
                             <p className="text-gray-600">Загрузка договора...</p>
                           </div>
                         }
@@ -187,16 +192,6 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   </div>
                 )}
 
-                {!hasScrolledToBottom && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                    <div className="flex items-center gap-2 text-blue-800">
-                      <HiExclamationTriangle className="w-4 h-4" />
-                      <span className="text-sm font-medium">
-                        Пожалуйста, прочитайте весь договор до конца, чтобы продолжить
-                      </span>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -212,7 +207,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 checked={isAgreed}
                 onChange={(e) => setIsAgreed(e.target.checked)}
                 disabled={!hasScrolledToBottom}
-                className="w-4 h-4 text-[#967642] bg-gray-100 border-gray-300 rounded focus:ring-[#967642] focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-4 h-4 text-[#191919] bg-gray-100 border-gray-300 rounded focus:ring-[#191919] focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <label htmlFor="agree" className={`text-sm ${!hasScrolledToBottom ? 'text-gray-400' : 'text-gray-700'}`}>
                 Я прочитал весь договор и согласен с условиями
@@ -236,13 +231,13 @@ export const ContractModal: React.FC<ContractModalProps> = ({
             </div>
           </div>
           {!hasScrolledToBottom && (
-            <p className="text-xs text-gray-500 mt-2">
-              Для принятия договора необходимо прочитать весь документ
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Прочитайте весь договор для подписания
             </p>
           )}
           {hasScrolledToBottom && !isAgreed && (
-            <p className="text-xs text-gray-500 mt-2">
-              Пожалуйста, подтвердите согласие с условиями договора
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Подтвердите согласие с условиями договора
             </p>
           )}
         </div>

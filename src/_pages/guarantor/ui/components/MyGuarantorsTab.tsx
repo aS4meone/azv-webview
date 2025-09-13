@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { SimpleGuarantor } from "@/shared/models/types/guarantor";
+import { SimpleGuarantor, ClientGuarantorRequestItem, GuarantorRequestStatus } from "@/shared/models/types/guarantor";
 import { ContractType, GuarantorFormData } from "@/shared/models/types/guarantor-page";
-import { HiUserPlus, HiUsers, HiDocumentText, HiPlus } from "react-icons/hi2";
+import { HiUserPlus, HiUsers, HiDocumentText, HiPlus, HiClock, HiCheckCircle, HiXCircle, HiExclamationTriangle } from "react-icons/hi2";
 import { HiX } from "react-icons/hi";
 
 interface MyGuarantorsTabProps {
   guarantors: SimpleGuarantor[];
+  requests: ClientGuarantorRequestItem[];
   onAddGuarantor: (guarantorInfo: GuarantorFormData) => void;
-  onViewContract: (contractType: ContractType) => void;
+  onViewContract: (contractType: ContractType, relationshipId: number) => void;
 }
 
 export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
   guarantors,
+  requests,
   onAddGuarantor,
   onViewContract,
 }) => {
@@ -62,29 +64,141 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
     }
   };
 
+  const getStatusInfo = (status: GuarantorRequestStatus) => {
+    switch (status) {
+      case GuarantorRequestStatus.PENDING:
+        return {
+          text: "Ожидание",
+          color: "text-amber-600",
+          bgColor: "bg-amber-50",
+          borderColor: "border-amber-200",
+          icon: HiClock
+        };
+      case GuarantorRequestStatus.ACCEPTED:
+        return {
+          text: "Принято",
+          color: "text-green-600",
+          bgColor: "bg-green-50",
+          borderColor: "border-green-200",
+          icon: HiCheckCircle
+        };
+      case GuarantorRequestStatus.REJECTED:
+        return {
+          text: "Отклонено",
+          color: "text-red-600",
+          bgColor: "bg-red-50",
+          borderColor: "border-red-200",
+          icon: HiXCircle
+        };
+      case GuarantorRequestStatus.EXPIRED:
+        return {
+          text: "Истекло",
+          color: "text-gray-600",
+          bgColor: "bg-gray-50",
+          borderColor: "border-gray-200",
+          icon: HiExclamationTriangle
+        };
+      default:
+        return {
+          text: "Неизвестно",
+          color: "text-gray-600",
+          bgColor: "bg-gray-50",
+          borderColor: "border-gray-200",
+          icon: HiExclamationTriangle
+        };
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Кнопка добавления */}
       <div >
         <button
           onClick={() => setShowAddModal(true)}
-          className="w-full px-6 py-3 bg-[#967642] text-white font-semibold rounded-xl hover:bg-[#B8860B] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 bg-[#191919] text-white font-semibold rounded-xl hover:bg-[#333333] transition-all duration-300  flex items-center justify-center gap-2"
         >
           <HiPlus className="w-5 h-5" />
           Добавить
         </button>
       </div>
 
-      {/* Список гарантов */}
+      {/* Заявки в ожидании */}
+      {requests.filter(req => req.status === GuarantorRequestStatus.PENDING).length > 0 && (
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+              <HiClock className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-base font-semibold text-[#191919]">
+              В ожидании
+              <span className="ml-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded-full">
+                {requests.filter(req => req.status === GuarantorRequestStatus.PENDING).length}
+              </span>
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {requests
+              .filter(req => req.status === GuarantorRequestStatus.PENDING)
+              .map((request) => {
+                const statusInfo = getStatusInfo(request.status);
+                const StatusIcon = statusInfo.icon;
+                return (
+                  <div
+                    key={request.id}
+                    className="bg-[#F8F8F8] rounded-2xl p-4 w-full"
+                  >
+                    <div className="flex items-start justify-between w-full">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-bold text-sm">
+                            {request.guarantor_name?.charAt(0) || "?"}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-[#191919] text-lg truncate">
+                            {request.guarantor_name || "Не указано"}
+                          </h3>
+                          <p className="text-sm text-[#191919] truncate">
+                            {request.guarantor_phone}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 w-full">
+                      <div className="flex flex-col space-y-2 flex-shrink-0 w-full">
+                        <p className="text-xs text-[#191919] justify-center items-center">
+                          Отправлено: {new Date(request.created_at).toLocaleDateString("ru-RU")}
+                        </p>
+                        <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
+                          <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
+                          <span className={`text-sm font-medium ${statusInfo.color}`}>
+                            {statusInfo.text}
+                          </span>
+                        </div>
+                        {request.reason && (
+                          <p className="text-xs text-[#191919] bg-gray-100 rounded-lg p-2">
+                            <strong>Причина:</strong> {request.reason}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Принятые заявки (Мои гаранты) */}
       <div>
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 rounded-full bg-[#967642] flex items-center justify-center">
-            <HiUsers className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+            <HiCheckCircle className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-base font-semibold text-[#2D2D2D]">
-            Мои гаранты
+          <h2 className="text-base font-semibold text-[#191919]">
+            Принятые заявки
             {guarantors.length > 0 && (
-              <span className="ml-2 px-2 py-1 bg-[#967642] text-white text-xs font-medium rounded-full">
+              <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
                 {guarantors.length}
               </span>
             )}
@@ -93,11 +207,11 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         {guarantors.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#F5F5F5] flex items-center justify-center">
-              <HiUsers className="w-10 h-10 text-[#967642]" />
+              <HiCheckCircle className="w-10 h-10 text-[#191919]" />
             </div>
-            <p className="text-[#666666] text-base font-medium">У вас нет гарантов</p>
-            <p className="text-[#999999] text-sm mt-1">
-              Нажмите "Добавить" чтобы пригласить гаранта
+            <p className="text-[#191919] text-base font-medium">Нет принятых заявок</p>
+            <p className="text-[#191919] text-sm mt-1">
+              Здесь будут отображаться заявки, которые приняли ваши гаранты
             </p>
           </div>
         ) : (
@@ -105,20 +219,20 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
             {guarantors.map((guarantor) => (
               <div
                 key={guarantor.id}
-                className="bg-white rounded-2xl border border-[#E5E5E5] p-4 shadow-sm hover:shadow-md transition-all duration-300 w-full"
+                className="bg-[#F8F8F8] rounded-2xl p-4 w-full"
               >
                 <div className="flex items-start justify-between w-full">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">
                         {guarantor.name?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#2D2D2D] text-lg truncate">
+                      <h3 className="font-semibold text-[#191919] text-lg truncate">
                         {guarantor.name || "Не указано"}
                       </h3>
-                      <p className="text-sm text-[#666666] truncate">
+                      <p className="text-sm text-[#191919] truncate">
                         {guarantor.phone}
                       </p>
                     </div>
@@ -127,7 +241,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                 <div className="flex items-center justify-between mt-3 w-full">
                   
                   <div className="flex flex-col space-y-2 flex-shrink-0 w-full ">
-                  <p className="text-xs text-[#999999] justify-center items-center ">
+                  <p className="text-xs text-[#191919] justify-center items-center ">
                       Добавлен: {new Date(guarantor.created_at).toLocaleDateString("ru-RU")}
                     </p>
                     <span
@@ -150,14 +264,6 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                       <HiDocumentText className="w-3 h-3" />
                       {guarantor.sublease_contract_signed ? "Субаренда подписана" : "Субаренда не подписана"}
                     </span>
-                    {guarantor.contract_signed && (
-                      <button
-                        onClick={() => onViewContract("guarantor")}
-                        className="px-3 py-2 bg-[#967642] text-white text-xs font-semibold rounded-lg hover:bg-[#B8860B] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap"
-                      >
-                        Подписать договор
-                      </button>
-                    )}
                     
                   </div>
                 </div>
@@ -167,23 +273,95 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         )}
       </div>
 
+      {/* Отклоненные заявки */}
+      {requests.filter(req => req.status === GuarantorRequestStatus.REJECTED).length > 0 && (
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+              <HiXCircle className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-base font-semibold text-[#191919]">
+              Отклоненные
+              <span className="ml-2 px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-full">
+                {requests.filter(req => req.status === GuarantorRequestStatus.REJECTED).length}
+              </span>
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {requests
+              .filter(req => req.status === GuarantorRequestStatus.REJECTED)
+              .map((request) => {
+                const statusInfo = getStatusInfo(request.status);
+                const StatusIcon = statusInfo.icon;
+                return (
+                  <div
+                    key={request.id}
+                    className="bg-[#F8F8F8] rounded-2xl p-4 w-full"
+                  >
+                    <div className="flex items-start justify-between w-full">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
+                          <span className="text-white font-bold text-sm">
+                            {request.guarantor_name?.charAt(0) || "?"}
+                          </span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-[#191919] text-lg truncate">
+                            {request.guarantor_name || "Не указано"}
+                          </h3>
+                          <p className="text-sm text-[#191919] truncate">
+                            {request.guarantor_phone}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-3 w-full">
+                      <div className="flex flex-col space-y-2 flex-shrink-0 w-full">
+                        <p className="text-xs text-[#191919] justify-center items-center">
+                          Отклонено: {request.responded_at ? new Date(request.responded_at).toLocaleDateString("ru-RU") : "Не указано"}
+                        </p>
+                        <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
+                          <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
+                          <span className={`text-sm font-medium ${statusInfo.color}`}>
+                            {statusInfo.text}
+                          </span>
+                        </div>
+                        {request.reason && (
+                          <p className="text-xs text-[#191919] bg-gray-100 rounded-lg p-2">
+                            <strong>Причина:</strong> {request.reason}
+                          </p>
+                        )}
+                        {request.admin_notes && (
+                          <p className="text-xs text-[#191919] bg-red-50 rounded-lg p-2">
+                            <strong>Причина отклонения:</strong> {request.admin_notes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
       {/* Модальное окно добавления гаранта */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center">
                   <HiUserPlus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-base font-semibold text-[#2D2D2D]">
+                <h3 className="text-base font-semibold text-[#191919]">
                   Добавить гаранта
                 </h3>
               </div>
               <button
                 onClick={handleCloseModal}
                 disabled={loading || success}
-                className={`text-[#999999] hover:text-[#666666] transition-colors duration-200 ${
+                className={`text-[#191919] hover:text-[#191919] transition-colors duration-200 ${
                   loading || success ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -224,41 +402,41 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
             )}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-[#666666] mb-2">
+                <label className="block text-sm font-medium text-[#191919] mb-2">
                   ФИО гаранта *
                 </label>
                 <input
                   type="text"
                   value={formData.full_name}
                   onChange={(e) => handleInputChange("full_name", e.target.value)}
-                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#967642]/20 focus:border-[#967642] transition-all duration-300"
+                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300"
                   placeholder="Введите ФИО гаранта"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#666666] mb-2">
+                <label className="block text-sm font-medium text-[#191919] mb-2">
                   Номер телефона *
                 </label>
                 <input
                   type="tel"
                   value={formData.phone_number}
                   onChange={(e) => handleInputChange("phone_number", e.target.value)}
-                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#967642]/20 focus:border-[#967642] transition-all duration-300"
+                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300"
                   placeholder="Введите номер телефона"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#666666] mb-2">
+                <label className="block text-sm font-medium text-[#191919] mb-2">
                   Причина (необязательно)
                 </label>
                 <textarea
                   value={formData.reason}
                   onChange={(e) => handleInputChange("reason", e.target.value)}
-                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#967642]/20 focus:border-[#967642] transition-all duration-300 resize-none"
+                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300 resize-none"
                   rows={3}
                   placeholder="Укажите причину приглашения гаранта..."
                 />
@@ -269,7 +447,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                   type="button"
                   onClick={handleCloseModal}
                   disabled={loading || success}
-                  className={`flex-1 px-4 py-3 border border-[#E5E5E5] text-[#666666] rounded-xl hover:bg-[#F8F8F8] transition-all duration-300 font-medium ${
+                  className={`flex-1 px-4 py-3 border border-[#E5E5E5] text-[#191919] rounded-xl hover:bg-[#F8F8F8] transition-all duration-300 font-medium ${
                     loading || success ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -278,7 +456,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                 <button
                   type="submit"
                   disabled={loading || success}
-                  className={`flex-1 px-4 py-3 bg-[#967642] text-white rounded-xl hover:bg-[#B8860B] transition-all duration-300 font-semibold shadow-lg hover:shadow-xl ${
+                  className={`flex-1 px-4 py-3 bg-[#191919] text-white rounded-xl hover:bg-[#333333] transition-all duration-300 font-semibold  ${
                     loading || success ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >

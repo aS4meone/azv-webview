@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UserRole } from "@/shared/models/types/user";
 import { guarantorApi } from "@/shared/api/routes/guarantor";
-import { IncomingRequest, SimpleGuarantor, SimpleClient } from "@/shared/models/types/guarantor";
+import { IncomingRequest, SimpleGuarantor, SimpleClient, ClientGuarantorRequestItem } from "@/shared/models/types/guarantor";
 import { 
   GuarantorTabs, 
   IncomingRequestsTab, 
@@ -21,11 +21,13 @@ export const GuarantorPage: React.FC = () => {
   const [incomingRequests, setIncomingRequests] = useState<IncomingRequest[]>([]);
   const [myGuarantors, setMyGuarantors] = useState<SimpleGuarantor[]>([]);
   const [myClients, setMyClients] = useState<SimpleClient[]>([]);
+  const [myGuarantorRequests, setMyGuarantorRequests] = useState<ClientGuarantorRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showContractModal, setShowContractModal] = useState(false);
   const [contractType, setContractType] = useState<ContractType>("guarantor");
   const [contractUrl, setContractUrl] = useState<string>("");
+  const [guarantorRelationshipId, setGuarantorRelationshipId] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
   // Проверяем, что пользователь не механик
@@ -70,6 +72,12 @@ export const GuarantorPage: React.FC = () => {
       if (clientsResponse.data) {
         setMyClients(clientsResponse.data);
       }
+
+      // Загружаем мои заявки на гарантов
+      const requestsResponse = await guarantorApi.getMyGuarantorRequests();
+      if (requestsResponse.data) {
+        setMyGuarantorRequests(requestsResponse.data.items);
+      }
     } catch (error: any) {
       console.error("Error loading guarantor data:", error);
       setError(error?.response?.data?.detail || "Ошибка загрузки данных. Попробуйте позже.");
@@ -85,9 +93,14 @@ export const GuarantorPage: React.FC = () => {
       if (response.data) {
         // Обновляем список входящих заявок
         await loadData();
-        // Показываем модальное окно для подписания договора
-        setContractType("guarantor");
-        setShowContractModal(true);
+        // Загружаем договор гаранта
+        const contractResponse = await guarantorApi.getGuarantorContract();
+        if (contractResponse.data) {
+          setContractUrl(contractResponse.data.file_url);
+          setContractType("guarantor");
+          setGuarantorRelationshipId(response.data.guarantor_relationship_id);
+          setShowContractModal(true);
+        }
       }
     } catch (error: any) {
       console.error("Error accepting request:", error);
@@ -123,7 +136,7 @@ export const GuarantorPage: React.FC = () => {
 
   const handleSignContract = async (contractType: ContractType) => {
     try {
-      const response = await guarantorApi.signContract(contractType);
+      const response = await guarantorApi.signContract(contractType, guarantorRelationshipId);
       if (response.data) {
         // Обновляем данные
         await loadData();
@@ -134,7 +147,7 @@ export const GuarantorPage: React.FC = () => {
     }
   };
 
-  const handleViewContract = async (contractType: ContractType) => {
+  const handleViewContract = async (contractType: ContractType, relationshipId: number) => {
     try {
       let response;
       if (contractType === "guarantor") {
@@ -146,6 +159,7 @@ export const GuarantorPage: React.FC = () => {
       if (response.data) {
         setContractUrl(response.data.file_url);
         setContractType(contractType);
+        setGuarantorRelationshipId(relationshipId);
         setShowContractModal(true);
       }
     } catch (error) {
@@ -165,18 +179,18 @@ export const GuarantorPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="bg-white shadow-lg">
+      <div className="bg-white shadow-lg flex-shrink-0">
         <div className="px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               
-              <h1 className="text-xl font-semibold text-[#2D2D2D]">Гарант</h1>
+              <h1 className="text-xl font-semibold text-[#191919]">Гарант</h1>
             </div>
             <button
               onClick={() => setShowHelpModal(true)}
-              className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center text-white hover:bg-[#B8860B] transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center text-white hover:bg-[#333333] transition-all duration-300 shadow-lg hover:shadow-xl"
             >
               <HiQuestionMarkCircle className="w-5 h-5" />
             </button>
@@ -185,11 +199,13 @@ export const GuarantorPage: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <GuarantorTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="flex-shrink-0">
+        <GuarantorTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      </div>
 
       {/* Error Message */}
       {error && (
-        <div className="mx-4 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+        <div className="mx-4 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
               <HiX className="w-4 h-4 text-white" />
@@ -208,8 +224,15 @@ export const GuarantorPage: React.FC = () => {
         </div>
       )}
 
-      {/* Tab Content */}
-      <div className="py-4 space-y-6">
+      {/* Tab Content with Scroll */}
+      <div 
+        className="flex-1 px-2 py-4"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-y",
+          overscrollBehaviorY: "auto",
+        }}
+      >
         {activeTab === "incoming" ? (
           <IncomingRequestsTab
             requests={incomingRequests}
@@ -221,6 +244,7 @@ export const GuarantorPage: React.FC = () => {
         ) : (
           <MyGuarantorsTab
             guarantors={myGuarantors}
+            requests={myGuarantorRequests}
             onAddGuarantor={handleAddGuarantor}
             onViewContract={handleViewContract}
           />

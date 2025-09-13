@@ -5,6 +5,7 @@ export const guarantorRoutes = {
   accept: (id: number) => `/guarantor/${id}/accept`,
   reject: (id: number) => `/guarantor/${id}/reject`,
   myGuarantors: "/guarantor/my_guarantors",
+  myGuarantorRequests: "/guarantor/my_guarantor_requests",
   incoming: "/guarantor/incoming",
   myClients: "/guarantor/my_clients",
   contracts: "/guarantor/contracts",
@@ -54,6 +55,38 @@ export interface IncomingRequest {
   requestor_phone: string;
   reason?: string;
   created_at: string;
+}
+
+export enum GuarantorRequestStatus {
+  PENDING = "pending",
+  ACCEPTED = "accepted", 
+  REJECTED = "rejected",
+  EXPIRED = "expired"
+}
+
+export enum VerificationStatus {
+  NOT_VERIFIED = "not_verified",
+  VERIFIED = "verified",
+  REJECTED_BY_ADMIN = "rejected_by_admin"
+}
+
+export interface ClientGuarantorRequestItem {
+  id: number;
+  guarantor_id?: number;
+  guarantor_name?: string;
+  guarantor_phone?: string;
+  status: GuarantorRequestStatus;
+  verification_status: VerificationStatus;
+  reason?: string;
+  admin_notes?: string;
+  created_at: string;
+  responded_at?: string;
+  verified_at?: string;
+}
+
+export interface ClientGuarantorRequestsResponse {
+  total: number;
+  items: ClientGuarantorRequestItem[];
 }
 
 export interface ContractFile {
@@ -167,6 +200,22 @@ export const guarantorApi = {
     }
   },
 
+  // Получить мои заявки на гарантов
+  getMyGuarantorRequests: async () => {
+    try {
+      const response = await axiosInstance.get<ClientGuarantorRequestsResponse>(
+        guarantorRoutes.myGuarantorRequests
+      );
+      return { data: response.data, error: null, statusCode: response.status };
+    } catch (error: any) {
+      return {
+        data: null,
+        error: error.response?.data?.detail || "Failed to get my guarantor requests",
+        statusCode: error.response?.status,
+      };
+    }
+  },
+
   // Получить входящие заявки (Я гарант)
   getIncomingRequests: async () => {
     try {
@@ -248,11 +297,14 @@ export const guarantorApi = {
   },
 
   // Подписать договор
-  signContract: async (contractType: "guarantor" | "sublease") => {
+  signContract: async (contractType: "guarantor" | "sublease", guarantorRelationshipId: number) => {
     try {
       const response = await axiosInstance.post<MessageResponse>(
         guarantorRoutes.signContract,
-        { contract_type: contractType }
+        { 
+          contract_type: contractType,
+          guarantor_relationship_id: guarantorRelationshipId
+        }
       );
       return { data: response.data, error: null, statusCode: response.status };
     } catch (error: any) {

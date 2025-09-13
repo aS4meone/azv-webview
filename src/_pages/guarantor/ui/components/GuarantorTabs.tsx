@@ -10,24 +10,24 @@ export const GuarantorTabs: React.FC<GuarantorTabsProps> = ({
   onTabChange,
 }) => {
   return (
-    <div className="bg-white border-b border-[#E5E5E5]">
-      <div className="flex">
+    <div className="bg-white p-2 ">
+      <div className="flex bg-[#F4F4F4] rounded-full gap-2 p-1 mb-6">
         <button
           onClick={() => onTabChange("incoming")}
-          className={`flex-1 px-6 py-5 text-center font-semibold text-lg transition-all duration-300 relative ${
+          className={`flex-1 py-3 px-6 rounded-full text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
             activeTab === "incoming"
-              ? "text-[#967642] border-b-2 border-[#967642]"
-              : "text-[#666666] hover:text-[#2D2D2D]"
+              ? "bg-[#191919] text-white transform scale-[0.98]"
+              : "bg-transparent text-[#191919] hover:bg-gray-200"
           }`}
         >
           Я Гарант
         </button>
         <button
           onClick={() => onTabChange("my_guarantors")}
-          className={`flex-1 px-6 py-5 text-center font-semibold text-lg transition-all duration-300 relative ${
+          className={`flex-1 py-3 px-6 rounded-full text-base transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
             activeTab === "my_guarantors"
-              ? "text-[#967642] border-b-2 border-[#967642]"
-              : "text-[#666666] hover:text-[#2D2D2D]"
+              ? "bg-[#191919] text-white transform scale-[0.98]"
+              : "bg-transparent text-[#191919] hover:bg-gray-200"
           }`}
         >
           Мои Гаранты

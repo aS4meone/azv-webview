@@ -8,7 +8,7 @@ interface IncomingRequestsTabProps {
   clients: SimpleClient[];
   onAccept: (requestId: number) => void;
   onReject: (requestId: number, reason?: string) => void;
-  onViewContract: (contractType: ContractType) => void;
+  onViewContract: (contractType: ContractType, relationshipId: number) => void;
 }
 
 export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
@@ -33,13 +33,13 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
       {requests.length > 0 && (
         <div>
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded-full bg-[#967642] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-[#191919] flex items-center justify-center">
               <HiClipboardDocumentList className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-[#2D2D2D]">
+            <h2 className="text-lg font-semibold text-[#191919]">
               Новые заявки
               {requests.length > 0 && (
-                <span className="ml-2 px-2 py-1 bg-[#967642] text-white text-xs font-medium rounded-full">
+                <span className="ml-2 px-2 py-1 bg-[#191919] text-white text-xs font-medium rounded-full">
                   {requests.length}
                 </span>
               )}
@@ -49,20 +49,20 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
             {requests.map((request) => (
               <div
                 key={request.id}
-                className="bg-white rounded-2xl border border-[#E5E5E5] p-4 shadow-sm hover:shadow-md transition-all duration-300 w-full"
+                className="bg-[#F8F8F8] rounded-2xl p-4 w-full"
               >
                 <div className="flex items-start justify-between w-full">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">
                         {request.requestor_name?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#2D2D2D] text-lg truncate">
+                      <h3 className="font-semibold text-[#191919] text-lg truncate">
                         {request.requestor_name || "Не указано"}
                       </h3>
-                      <p className="text-sm text-[#666666] truncate">
+                      <p className="text-sm text-[#191919] truncate">
                         {request.requestor_phone}
                       </p>
                     </div>
@@ -71,27 +71,27 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                 {request.reason && (
                   <div className="mt-3">
                     <div className="bg-[#F8F8F8] rounded-lg p-3">
-                      <p className="text-sm text-[#666666]">
+                      <p className="text-sm text-[#191919]">
                         <span className="font-medium">Причина:</span> {request.reason}
                       </p>
                     </div>
                   </div>
                 )}
                 <div className="mt-3 w-full">
-                    <p className="text-xs text-[#999999] mb-2">
+                    <p className="text-xs text-[#191919] mb-2">
                       {new Date(request.created_at).toLocaleString("ru-RU")}
                     </p>
                   <div className="flex flex-col space-y-2 flex-shrink-0">
                     <button
                       onClick={() => onAccept(request.id)}
-                      className="px-3 py-3 bg-[#2E7D32] text-white text-xs font-semibold rounded-lg hover:bg-[#4CAF50] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-1 whitespace-nowrap"
+                      className="px-3 py-3 bg-[#2E7D32] text-white text-xs font-semibold rounded-lg hover:bg-[#4CAF50] transition-all duration-300  flex items-center justify-center gap-1 whitespace-nowrap"
                     >
                       <HiCheckCircle className="w-3 h-3" />
                       Принять
                     </button>
                     <button
                       onClick={() => setShowRejectModal(request.id)}
-                      className="px-3 py-3 bg-[#D32F2F] text-white text-xs font-semibold rounded-lg hover:bg-[#F44336] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-1 whitespace-nowrap"
+                      className="px-3 py-3 bg-[#D32F2F] text-white text-xs font-semibold rounded-lg hover:bg-[#F44336] transition-all duration-300  flex items-center justify-center gap-1 whitespace-nowrap"
                     >
                       <HiXCircle className="w-3 h-3" />
                       Отклонить
@@ -107,13 +107,13 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
       {/* Мои клиенты */}
       <div>
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 rounded-full bg-[#967642] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-[#191919] flex items-center justify-center">
             <HiUsers className="w-4 h-4 text-white" />
           </div>
-          <h2 className="text-base font-semibold text-[#2D2D2D]">
+          <h2 className="text-base font-semibold text-[#191919]">
             Люди, за которых я несу ответственность
             {clients.length > 0 && (
-              <span className="ml-2 px-2 py-1 bg-[#967642] text-white text-xs font-medium rounded-full">
+              <span className="ml-2 px-2 py-1 bg-[#191919] text-white text-xs font-medium rounded-full">
                 {clients.length}
               </span>
             )}
@@ -121,31 +121,31 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
         </div>
         {clients.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#967642] flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#191919] flex items-center justify-center">
               <HiUsers className="w-12 h-12 text-white" />
             </div>
-            <p className="text-[#2D2D2D] text-lg font-semibold mb-2">Нет клиентов</p>
-            <p className="text-[#666666] text-sm">Здесь будут отображаться люди, за которых вы ручаетесь</p>
+            <p className="text-[#191919] text-lg font-semibold mb-2">Нет клиентов</p>
+            <p className="text-[#191919] text-sm">Здесь будут отображаться люди, за которых вы ручаетесь</p>
           </div>
         ) : (
           <div className="space-y-4">
             {clients.map((client) => (
               <div
                 key={client.id}
-                className="bg-white rounded-2xl border border-[#E5E5E5] p-4 shadow-sm hover:shadow-md transition-all duration-300 w-full"
+                className="bg-[#F8F8F8] rounded-2xl p-4 w-full"
               >
                 <div className="flex items-start justify-between w-full">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-[#967642] flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">
                         {client.name?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#2D2D2D] text-lg truncate">
+                      <h3 className="font-semibold text-[#191919] text-lg truncate">
                         {client.name || "Не указано"}
                       </h3>
-                      <p className="text-sm text-[#666666] truncate">
+                      <p className="text-sm text-[#191919] truncate">
                         {client.phone}
                       </p>
                     </div>
@@ -176,16 +176,16 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                     </span>
                     {!client.contract_signed && (
                       <button
-                        onClick={() => onViewContract("guarantor")}
-                        className="px-3 py-2 bg-[#967642] text-white text-xs font-semibold rounded-lg hover:bg-[#B8860B] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap"
+                        onClick={() => onViewContract("guarantor", client.id)}
+                        className="px-3 py-2 bg-[#191919] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] transition-all duration-300  whitespace-nowrap"
                       >
                         Подписать договор
                       </button>
                     )}
                     {client.contract_signed && !client.sublease_contract_signed && (
                       <button
-                        onClick={() => onViewContract("sublease")}
-                        className="px-3 py-2 bg-[#2196F3] text-white text-xs font-semibold rounded-lg hover:bg-[#1976D2] transition-all duration-300 shadow-lg hover:shadow-xl whitespace-nowrap"
+                        onClick={() => onViewContract("sublease", client.id)}
+                        className="px-3 py-2 bg-[#2196F3] text-white text-xs font-semibold rounded-lg hover:bg-[#1976D2] transition-all duration-300  whitespace-nowrap"
                       >
                         Подписать субаренду
                       </button>
@@ -206,18 +206,18 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
               <div className="w-10 h-10 rounded-full bg-[#D32F2F] flex items-center justify-center">
                 <HiExclamationTriangle className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-base font-semibold text-[#2D2D2D]">
+              <h3 className="text-base font-semibold text-[#191919]">
                 Отклонить заявку
               </h3>
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-[#666666] mb-2">
+              <label className="block text-sm font-medium text-[#191919] mb-2">
                 Причина отклонения (необязательно)
               </label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#967642]/20 focus:border-[#967642] transition-all duration-300 resize-none"
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300 resize-none"
                 rows={3}
                 placeholder="Укажите причину отклонения..."
               />
@@ -228,13 +228,13 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                   setShowRejectModal(null);
                   setRejectReason("");
                 }}
-                className="flex-1 px-4 py-3 border border-[#E5E5E5] text-[#666666] rounded-xl hover:bg-[#F8F8F8] transition-all duration-300 font-medium"
+                className="flex-1 px-4 py-3 border border-[#E5E5E5] text-[#191919] rounded-xl hover:bg-[#F8F8F8] transition-all duration-300 font-medium"
               >
                 Отмена
               </button>
               <button
                 onClick={() => handleReject(showRejectModal)}
-                className="flex-1 px-4 py-3 bg-[#D32F2F] text-white rounded-xl hover:bg-[#F44336] transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                className="flex-1 px-4 py-3 bg-[#D32F2F] text-white rounded-xl hover:bg-[#F44336] transition-all duration-300 font-semibold "
               >
                 Отклонить
               </button>
