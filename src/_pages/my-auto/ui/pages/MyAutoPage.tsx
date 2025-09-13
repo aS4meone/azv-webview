@@ -139,7 +139,7 @@ export const MyAutoPage = () => {
       <div className="py-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
             <p className="mt-4 text-[#666666]">{t("myAuto.loading")}</p>
           </div>
         ) : error ? (

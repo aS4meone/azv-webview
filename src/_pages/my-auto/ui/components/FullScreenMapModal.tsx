@@ -107,7 +107,7 @@ export const FullScreenMapModal = ({
                   onClick={() => setSelectedDay(index)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     index === selectedDay
-                      ? "bg-[#967642] text-white"
+                      ? "bg-black text-white"
                       : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
                   }`}
                 >

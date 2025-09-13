@@ -188,7 +188,7 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
       {historyDetail?.rental_history_detail?.route_map?.route_data && (
         <button
           onClick={() => setIsMapModalOpen(true)}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#967642] hover:bg-[#967642]/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-black hover:bg-black/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

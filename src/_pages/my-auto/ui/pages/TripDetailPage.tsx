@@ -191,7 +191,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
           <h3 className="text-lg font-medium text-[#2D2D2D]">{title}</h3>
           <button
             onClick={() => openImageViewer(photos, currentIndex)}
-            className="bg-[#967642] hover:bg-[#967642]/90 text-white p-2 rounded-lg transition-colors"
+            className="bg-black hover:bg-black/90 text-white p-2 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
@@ -238,7 +238,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                     key={index}
                     onClick={() => setCurrentIndex(index)}
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentIndex ? 'bg-[#967642]' : 'bg-[#E5E5E5]'
+                      index === currentIndex ? 'bg-black' : 'bg-[#E5E5E5]'
                     }`}
                   />
                 ))}
@@ -293,7 +293,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       <div className="py-6 space-y-4">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
             <p className="mt-4 text-[#666666]">Загрузка деталей поездки...</p>
           </div>
         ) : error ? (
@@ -324,7 +324,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-[#666666]">{t("myAuto.tripDetails.earnings")}:</span>
-                  <span className="font-bold text-[#967642] text-2xl">
+                  <span className="font-bold text-black text-2xl">
                     {tripDetails.earnings.toLocaleString()} ₸
                   </span>
                 </div>
@@ -403,7 +403,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       {tripDetails?.route_map?.route_data && (
         <button
           onClick={() => setIsMapModalOpen(true)}
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#967642] hover:bg-[#967642]/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
+          className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-black hover:bg-black/90 text-white rounded-full shadow-lg flex items-center justify-center transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

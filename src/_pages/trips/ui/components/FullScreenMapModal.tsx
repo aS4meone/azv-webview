@@ -39,39 +39,30 @@ export const FullScreenMapModal = ({
   return (
     <div className="fixed inset-0 z-50 bg-black">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-white shadow-sm border-b border-[#E5E5E5]">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-white shadow-sm border-b border-[#E5E5E5] pt-12">
         <div className="px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Button
-                variant="icon"
-                onClick={onClose}
-                className="mr-3"
-              >
-                <ArrowLeftIcon />
-              </Button>
-              <div>
-                <h1 className="text-xl font-semibold text-[#2D2D2D]">
-                  Маршрут поездки
-                </h1>
-                <p className="text-sm text-[#666666]">
-                  {shouldShowCalendar ? "Выберите день для просмотра маршрута" : "Маршрут поездки"}
-                </p>
-              </div>
-            </div>
+          <div className="flex items-center">
             <Button
               variant="icon"
               onClick={onClose}
-              className="text-[#888888] hover:text-[#666666]"
+              className="mr-3"
             >
-              <XIcon />
+              <ArrowLeftIcon />
             </Button>
+            <div>
+              <h1 className="text-xl font-semibold text-[#2D2D2D]">
+                Маршрут поездки
+              </h1>
+              <p className="text-sm text-[#666666]">
+                {shouldShowCalendar ? "Выберите день для просмотра маршрута" : "Маршрут поездки"}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Map Container */}
-      <div className="absolute top-16 bottom-0 left-0 right-0">
+      <div className="absolute top-28 bottom-0 left-0 right-0">
         <BaseMap
           initialCenter={{
             lat: startLat,
@@ -107,7 +98,7 @@ export const FullScreenMapModal = ({
                   onClick={() => setSelectedDay(index)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                     index === selectedDay
-                      ? "bg-[#967642] text-white"
+                      ? "bg-black text-white"
                       : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
                   }`}
                 >

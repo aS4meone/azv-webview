@@ -213,7 +213,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
       <div className="py-6">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#967642]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
             <p className="mt-4 text-[#666666]">{t("myAuto.carDetails.loading")}</p>
           </div>
         ) : error ? (
@@ -289,7 +289,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
               <h2 className="text-lg font-medium text-[#2D2D2D] mb-4">
                 {t("myAuto.carDetails.monthlyEarnings")}
               </h2>
-              <div className="text-4xl font-bold text-[#967642] mb-2">
+              <div className="text-4xl font-bold text-black mb-2">
                 {tripsData.month_earnings.total_earnings.toLocaleString()} ₸
               </div>
               <p className="text-lg text-[#666666]">
@@ -318,7 +318,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                         onClick={() => handleMonthChange(month.month, month.year)}
                         className={`w-28 h-28 rounded-lg text-sm font-medium transition-colors flex-shrink-0 ${
                           isCurrentMonth
-                            ? "bg-[#967642] text-white"
+                            ? "bg-black text-white"
                             : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
                         }`}
                       >
@@ -383,14 +383,14 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                       >
                         {/* Owner Trip Indicator */}
                         {isOwnerTrip && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#967642] rounded-l-lg"></div>
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-black rounded-l-lg"></div>
                         )}
                         
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               {isOwnerTrip && (
-                                <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-[#967642] bg-[#F5F5F5] text-[#967642]">
+                                <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-black bg-[#F5F5F5] text-black">
                                   ВАША ПОЕЗДКА
                                 </div>
                               )}
@@ -405,7 +405,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-[#967642]">
+                            <p className="text-2xl font-bold text-black">
                               {trip.earnings.toLocaleString()} ₸
                             </p>
                           </div>

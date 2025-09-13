@@ -49,7 +49,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
       const polyline = new google.maps.Polyline({
         path: path,
         geodesic: true,
-        strokeColor: dayIndex === selectedDay ? "#967642" : "#cccaca",
+        strokeColor: dayIndex === selectedDay ? "#000000" : "#cccaca",
         strokeOpacity: dayIndex === selectedDay ? 1.0 : 0.6,
         strokeWeight: dayIndex === selectedDay ? 4 : 2,
       });
@@ -76,7 +76,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 12,
-            fillColor: dayIndex === selectedDay ? "#967642" : "#cccaca",
+            fillColor: dayIndex === selectedDay ? "#000000" : "#cccaca",
             fillOpacity: 1,
             strokeColor: "#FFFFFF",
             strokeWeight: 3,
@@ -174,7 +174,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
               onClick={() => setInternalSelectedDay(index)}
               className={`px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 index === selectedDay
-                  ? "bg-[#967642] text-white"
+                  ? "bg-black text-white"
                   : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
               }`}
             >
@@ -200,7 +200,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
       {/* Легенда маркеров */}
       <div className="flex justify-center space-x-4 text-xs text-[#666666]">
         <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 rounded-full bg-[#967642]"></div>
+          <div className="w-3 h-3 rounded-full bg-black"></div>
           <span>Точка А (начало)</span>
         </div>
         <div className="flex items-center space-x-1">
