@@ -5,3 +5,4 @@ export interface GuarantorFormData {
   phone_number: string;
   reason?: string;
 }
+
