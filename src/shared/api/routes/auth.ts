@@ -23,6 +23,22 @@ export const authApi = {
       };
     }
   },
+  sendSmsWithRegistration: async (phoneNumber: string, firstName: string, lastName: string) => {
+    try {
+      const response = await axiosInstance.post(authRoutes.sendSms, {
+        phone_number: phoneNumber,
+        first_name: firstName,
+        last_name: lastName,
+      });
+      return { data: response.data, error: null, statusCode: response.status };
+    } catch (error) {
+      return {
+        data: null,
+        error: error.response?.data.detail || "Failed to send SMS",
+        statusCode: error.status,
+      };
+    }
+  },
   verifySms: async (phoneNumber: string, code: string) => {
     try {
       const response = await axiosInstance.post(authRoutes.verifySms, {

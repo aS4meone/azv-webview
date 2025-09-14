@@ -138,12 +138,15 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">
-                        {client.name?.charAt(0) || "?"}
+                        {(client.first_name || client.last_name)?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[#191919] text-lg truncate">
-                        {client.name || "Не указано"}
+                        {client.first_name && client.last_name 
+                          ? `${client.first_name} ${client.last_name}`
+                          : client.first_name || client.last_name || "Не указано"
+                        }
                       </h3>
                       <p className="text-sm text-[#191919] truncate">
                         {client.phone}

@@ -1,6 +1,7 @@
 export interface SimpleGuarantor {
   id: number;
-  name: string;
+  first_name: string | null;
+  last_name: string | null;
   phone: string;
   contract_signed: boolean;
   sublease_contract_signed: boolean;
@@ -9,7 +10,8 @@ export interface SimpleGuarantor {
 
 export interface SimpleClient {
   id: number;
-  name: string;
+  first_name: string | null;
+  last_name: string | null;
   phone: string;
   contract_signed: boolean;
   sublease_contract_signed: boolean;
@@ -41,7 +43,8 @@ export enum VerificationStatus {
 export interface ClientGuarantorRequestItem {
   id: number;
   guarantor_id?: number;
-  guarantor_name?: string;
+  guarantor_first_name?: string;
+  guarantor_last_name?: string;
   guarantor_phone?: string;
   status: GuarantorRequestStatus;
   verification_status: VerificationStatus;

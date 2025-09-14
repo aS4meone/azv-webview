@@ -29,6 +29,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const [isAgreed, setIsAgreed] = useState(false);
   const [numPages, setNumPages] = useState<number>(0);
   const [pdfError, setPdfError] = useState(false);
+  const [pdfLoaded, setPdfLoaded] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Сброс состояния при открытии модала
@@ -37,6 +38,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setHasScrolledToBottom(false);
       setIsAgreed(false);
       setPdfError(false);
+      setPdfLoaded(false);
     }
   }, [isOpen]);
 
@@ -60,11 +62,13 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPdfError(false);
+    setPdfLoaded(true);
   };
 
   const onDocumentLoadError = (error: Error) => {
     console.error("PDF load error:", error);
     setPdfError(true);
+    setPdfLoaded(false);
   };
 
   if (!isOpen) return null;
@@ -88,6 +92,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       direction="right"
       withHeader={false}
       fullScreen={true}
+      lockBodyScroll={false}
     >
       <div className="relative w-full h-screen flex flex-col bg-white">
         {/* Header */}
@@ -108,7 +113,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           onScroll={handleScroll}
           className="w-full overflow-auto px-4 flex-1"
         >
-          <div className="max-w-4xl mx-auto py-6">
+          <div className="max-w-4xl mx-auto py-6 pb-0">
             {pdfError ? (
               <div className="text-center py-12">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
@@ -165,29 +170,39 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     </div>
                     
                     <div className="flex flex-col items-center justify-center py-4">
-                      <Document
-                        file={contractUrl}
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        onLoadError={onDocumentLoadError}
-                        loading={
-                          <div className="flex flex-col items-center justify-center gap-4 py-12">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#191919]"></div>
-                            <p className="text-gray-600">Загрузка договора...</p>
-                          </div>
-                        }
-                      >
-                        {Array.from(new Array(numPages), (_, index) => (
-                          <div key={`page_${index + 1}`} className="mb-4 shadow-lg">
-                            <Page
-                              pageNumber={index + 1}
-                              width={Math.min(800, window.innerWidth - 100)}
-                              className="border border-gray-200 rounded-lg"
-                              renderTextLayer={true}
-                              renderAnnotationLayer={true}
-                            />
-                          </div>
-                        ))}
-                      </Document>
+                      {pdfError ? (
+                        <div className="flex flex-col items-center justify-center gap-4 py-12">
+                          <HiExclamationTriangle className="w-12 h-12 text-red-500" />
+                          <p className="text-red-600 font-medium">Ошибка загрузки договора</p>
+                          <p className="text-gray-500 text-sm text-center">
+                            Не удалось загрузить документ. Попробуйте открыть его в новой вкладке.
+                          </p>
+                        </div>
+                      ) : (
+                        <Document
+                          file={contractUrl}
+                          onLoadSuccess={onDocumentLoadSuccess}
+                          onLoadError={onDocumentLoadError}
+                          loading={
+                            <div className="flex flex-col items-center justify-center gap-4 py-12">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#191919]"></div>
+                              <p className="text-gray-600">Загрузка договора...</p>
+                            </div>
+                          }
+                        >
+                          {pdfLoaded && numPages > 0 && Array.from(new Array(numPages), (_, index) => (
+                            <div key={`page_${index + 1}`} className="mb-4 shadow-lg">
+                              <Page
+                                pageNumber={index + 1}
+                                width={Math.min(800, window.innerWidth - 100)}
+                                className="border border-gray-200 rounded-lg"
+                                renderTextLayer={true}
+                                renderAnnotationLayer={true}
+                              />
+                            </div>
+                          ))}
+                        </Document>
+                      )}
                     </div>
                   </div>
                 )}

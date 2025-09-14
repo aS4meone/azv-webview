@@ -122,11 +122,29 @@ export const GuarantorPage: React.FC = () => {
     }
   };
 
-  const handleAddGuarantor = async (guarantorInfo: { full_name: string; phone_number: string; reason?: string }) => {
+  const handleAddGuarantor = async (guarantorInfo: { first_name: string; last_name: string; phone_number: string; reason?: string }): Promise<{ statusCode: number; data: any; error: string | null }> => {
+    // Логируем данные перед отправкой в API
+    console.log("🚀 Вызываем guarantorApi.inviteGuarantor с данными:", {
+      guarantor_info: guarantorInfo,
+      reason: guarantorInfo.reason,
+      full_api_payload: {
+        guarantor_info: guarantorInfo,
+        reason: guarantorInfo.reason,
+      }
+    });
+    
     const response = await guarantorApi.inviteGuarantor({
       guarantor_info: guarantorInfo,
       reason: guarantorInfo.reason,
     });
+    
+    // Логируем ответ от API
+    console.log("📥 Ответ от guarantorApi.inviteGuarantor:", {
+      statusCode: response.statusCode,
+      data: response.data,
+      error: response.error
+    });
+    
     if (response.data) {
       // Обновляем список моих гарантов
       await loadData();
@@ -140,7 +158,27 @@ export const GuarantorPage: React.FC = () => {
       if (response.data) {
         // Обновляем данные
         await loadData();
-        setShowContractModal(false);
+        
+        // Если подписан договор гаранта, автоматически открываем договор субаренды
+        if (contractType === "guarantor") {
+          console.log("✅ Договор гаранта подписан, открываем договор субаренды...");
+          
+          // Получаем договор субаренды
+          const subleaseResponse = await guarantorApi.getSubleaseContract();
+          if (subleaseResponse.data) {
+            setContractUrl(subleaseResponse.data.file_url);
+            setContractType("sublease");
+            setGuarantorRelationshipId(guarantorRelationshipId);
+            // Не закрываем модальное окно, а переключаем на договор субаренды
+            console.log("📄 Открываем договор субаренды");
+          } else {
+            console.error("❌ Ошибка получения договора субаренды:", subleaseResponse.error);
+            setShowContractModal(false);
+          }
+        } else {
+          // Если подписан договор субаренды, закрываем модальное окно
+          setShowContractModal(false);
+        }
       }
     } catch (error) {
       console.error("Error signing contract:", error);

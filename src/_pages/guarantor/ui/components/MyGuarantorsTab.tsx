@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { SimpleGuarantor, ClientGuarantorRequestItem, GuarantorRequestStatus } from "@/shared/models/types/guarantor";
-import { ContractType, GuarantorFormData } from "@/shared/models/types/guarantor-page";
+import { ContractType, GuarantorFormData, GuarantorFormInputs } from "@/shared/models/types/guarantor-page";
 import { HiUserPlus, HiUsers, HiDocumentText, HiPlus, HiClock, HiCheckCircle, HiXCircle, HiExclamationTriangle } from "react-icons/hi2";
 import { HiX } from "react-icons/hi";
+import { PhoneInput } from "@/_pages/auth/ui/widgets/PhoneInput";
 
 interface MyGuarantorsTabProps {
   guarantors: SimpleGuarantor[];
   requests: ClientGuarantorRequestItem[];
-  onAddGuarantor: (guarantorInfo: GuarantorFormData) => void;
+  onAddGuarantor: (guarantorInfo: GuarantorFormData) => Promise<{ statusCode: number; data: any; error: string | null }>;
   onViewContract: (contractType: ContractType, relationshipId: number) => void;
 }
 
@@ -18,8 +19,9 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
   onViewContract,
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [formData, setFormData] = useState<GuarantorFormData>({
-    full_name: "",
+  const [formData, setFormData] = useState<GuarantorFormInputs>({
+    first_name: "",
+    last_name: "",
     phone_number: "",
     reason: "",
   });
@@ -27,22 +29,59 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    
+    // Валидация полей
+    if (!formData.first_name.trim() || !formData.last_name.trim()) {
+      setError("Пожалуйста, заполните все обязательные поля");
+      return;
+    }
+    
+    // Проверяем, что номер телефона содержит только цифры и имеет правильную длину
+    const phoneDigits = formData.phone_number.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      setError("Пожалуйста, введите корректный номер телефона (10 цифр)");
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     setSuccess(false);
     
     try {
-      await onAddGuarantor(formData);
-      setSuccess(true);
-      setFormData({ full_name: "", phone_number: "", reason: "" });
+      // Формируем данные согласно структуре бэкенда
+      const guarantorData: GuarantorFormData = {
+        first_name: formData.first_name.trim(),
+        last_name: formData.last_name.trim(),
+        phone_number: "7" + formData.phone_number, // Добавляем код страны как в AuthPage
+        reason: formData.reason,
+      };
       
-      // Закрываем модальное окно через 2 секунды после успешной отправки
-      setTimeout(() => {
-        setShowAddModal(false);
-        setSuccess(false);
-      }, 2000);
+      
+      
+      const response = await onAddGuarantor(guarantorData);
+      
+      // Логируем ответ от API для отладки
+      console.log("📥 Ответ от onAddGuarantor:", {
+        statusCode: response.statusCode,
+        data: response.data,
+        error: response.error
+      });
+      
+      // Проверяем статус ответа от API
+      if (response.statusCode === 200 && response.data) {
+        setSuccess(true);
+        setFormData({ first_name: "", last_name: "", phone_number: "", reason: "" });
+        
+        // Закрываем модальное окно через 2 секунды после успешной отправки
+        setTimeout(() => {
+          setShowAddModal(false);
+          setSuccess(false);
+        }, 2000);
+      } else {
+        // Если API вернул ошибку, показываем её
+        setError(response.error || "Ошибка при добавлении гаранта. Попробуйте позже.");
+      }
     } catch (error: any) {
       console.error("Error adding guarantor:", error);
       setError(error?.response?.data?.detail || "Ошибка при добавлении гаранта. Попробуйте позже.");
@@ -51,17 +90,30 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
     }
   };
 
-  const handleInputChange = (field: keyof GuarantorFormData, value: string) => {
+  const handleInputChange = (field: keyof GuarantorFormInputs, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Очищаем ошибку при изменении полей
+    if (error) {
+      setError(null);
+    }
   };
 
   const handleCloseModal = () => {
-    if (!loading && !success) {
+    // Закрываем модальное окно только если нет загрузки, успеха И ошибки
+    if (!loading && !success && !error) {
       setShowAddModal(false);
       setError(null);
       setSuccess(false);
-      setFormData({ full_name: "", phone_number: "", reason: "" });
+      setFormData({ first_name: "", last_name: "", phone_number: "", reason: "" });
     }
+  };
+
+  const handleForceCloseModal = () => {
+    // Принудительное закрытие модального окна (для кнопки "Отмена")
+    setShowAddModal(false);
+    setError(null);
+    setSuccess(false);
+    setFormData({ first_name: "", last_name: "", phone_number: "", reason: "" });
   };
 
   const getStatusInfo = (status: GuarantorRequestStatus) => {
@@ -151,12 +203,15 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                           <span className="text-white font-bold text-sm">
-                            {request.guarantor_name?.charAt(0) || "?"}
+                            {(request.guarantor_first_name || request.guarantor_last_name)?.charAt(0) || "?"}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-[#191919] text-lg truncate">
-                            {request.guarantor_name || "Не указано"}
+                            {request.guarantor_first_name && request.guarantor_last_name 
+                              ? `${request.guarantor_first_name} ${request.guarantor_last_name}`
+                              : request.guarantor_first_name || request.guarantor_last_name || "Не указано"
+                            }
                           </h3>
                           <p className="text-sm text-[#191919] truncate">
                             {request.guarantor_phone}
@@ -225,12 +280,15 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">
-                        {guarantor.name?.charAt(0) || "?"}
+                        {(guarantor.first_name || guarantor.last_name)?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[#191919] text-lg truncate">
-                        {guarantor.name || "Не указано"}
+                        {guarantor.first_name && guarantor.last_name 
+                          ? `${guarantor.first_name} ${guarantor.last_name}`
+                          : guarantor.first_name || guarantor.last_name || "Не указано"
+                        }
                       </h3>
                       <p className="text-sm text-[#191919] truncate">
                         {guarantor.phone}
@@ -302,12 +360,15 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                           <span className="text-white font-bold text-sm">
-                            {request.guarantor_name?.charAt(0) || "?"}
+                            {(request.guarantor_first_name || request.guarantor_last_name)?.charAt(0) || "?"}
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-[#191919] text-lg truncate">
-                            {request.guarantor_name || "Не указано"}
+                            {request.guarantor_first_name && request.guarantor_last_name 
+                              ? `${request.guarantor_first_name} ${request.guarantor_last_name}`
+                              : request.guarantor_first_name || request.guarantor_last_name || "Не указано"
+                            }
                           </h3>
                           <p className="text-sm text-[#191919] truncate">
                             {request.guarantor_phone}
@@ -347,22 +408,22 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
 
       {/* Модальное окно добавления гаранта */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#191919] rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto border border-[#333333]">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
                   <HiUserPlus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-base font-semibold text-[#191919]">
+                <h3 className="text-base font-semibold text-white">
                   Добавить гаранта
                 </h3>
               </div>
               <button
-                onClick={handleCloseModal}
-                disabled={loading || success}
-                className={`text-[#191919] hover:text-[#191919] transition-colors duration-200 ${
-                  loading || success ? 'opacity-50 cursor-not-allowed' : ''
+                onClick={handleForceCloseModal}
+                disabled={loading}
+                className={`text-white/70 hover:text-white transition-colors duration-200 ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 <HiX className="w-6 h-6" />
@@ -371,7 +432,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
 
             {/* Сообщение об успехе */}
             {success && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,8 +440,8 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                     </svg>
                   </div>
                   <div>
-                    <p className="text-green-800 font-medium">Успешно!</p>
-                    <p className="text-green-600 text-sm">Гарант успешно добавлен</p>
+                    <p className="text-green-400 font-medium">Успешно!</p>
+                    <p className="text-green-300 text-sm">Гарант успешно добавлен</p>
                   </div>
                 </div>
               </div>
@@ -388,96 +449,109 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
 
             {/* Сообщение об ошибке */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
                     <HiX className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-red-800 font-medium">Ошибка</p>
-                    <p className="text-red-600 text-sm">{error}</p>
+                    <p className="text-red-400 font-medium">Ошибка</p>
+                    <p className="text-red-300 text-sm">{error}</p>
                   </div>
                 </div>
               </div>
             )}
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-[#191919] mb-2">
-                  ФИО гаранта *
-                </label>
-                <input
-                  type="text"
-                  value={formData.full_name}
-                  onChange={(e) => handleInputChange("full_name", e.target.value)}
-                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300"
-                  placeholder="Введите ФИО гаранта"
-                  required
-                />
+            <div className="space-y-5">
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Имя *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.first_name}
+                    onChange={(e) => handleInputChange("first_name", e.target.value)}
+                    className="w-full px-4 py-3 bg-[#292929] border border-[#404040] rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-300 text-white placeholder:text-white/50"
+                    placeholder="Введите имя"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Фамилия *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.last_name}
+                    onChange={(e) => handleInputChange("last_name", e.target.value)}
+                    className="w-full px-4 py-3 bg-[#292929] border border-[#404040] rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-300 text-white placeholder:text-white/50"
+                    placeholder="Введите фамилию"
+                    required
+                  />
+                </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#191919] mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Номер телефона *
                 </label>
-                <input
-                  type="tel"
-                  value={formData.phone_number}
-                  onChange={(e) => handleInputChange("phone_number", e.target.value)}
-                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300"
-                  placeholder="Введите номер телефона"
-                  required
+                <PhoneInput
+                  phone={formData.phone_number}
+                  setPhone={(phone) => handleInputChange("phone_number", phone)}
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-[#191919] mb-2">
+                <label className="block text-sm font-medium text-white mb-2">
                   Причина (необязательно)
                 </label>
                 <textarea
                   value={formData.reason}
                   onChange={(e) => handleInputChange("reason", e.target.value)}
-                  className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300 resize-none"
+                  className="w-full px-4 py-3 bg-[#292929] border border-[#404040] rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-300 resize-none text-white placeholder:text-white/50"
                   rows={3}
                   placeholder="Укажите причину приглашения гаранта..."
                 />
               </div>
-              
-              <div className="flex space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  disabled={loading || success}
-                  className={`flex-1 px-4 py-3 border border-[#E5E5E5] text-[#191919] rounded-xl hover:bg-[#F8F8F8] transition-all duration-300 font-medium ${
-                    loading || success ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  Отмена
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading || success}
-                  className={`flex-1 px-4 py-3 bg-[#191919] text-white rounded-xl hover:bg-[#333333] transition-all duration-300 font-semibold  ${
-                    loading || success ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                      Отправка...
-                    </div>
-                  ) : success ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Успешно!
-                    </div>
-                  ) : (
-                    "Пригласить"
-                  )}
-                </button>
-              </div>
-            </form>
+            </div>
+            
+            {/* Кнопки вне формы */}
+            <div className="flex space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={handleForceCloseModal}
+                disabled={loading}
+                className={`flex-1 px-4 py-3 border border-white/20 text-white rounded-xl hover:bg-white/10 transition-all duration-300 font-medium ${
+                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || success || !formData.first_name.trim() || !formData.last_name.trim() || formData.phone_number.replace(/\D/g, "").length !== 10}
+                className={`flex-1 px-4 py-3 bg-white text-[#191919] rounded-xl hover:bg-white/90 transition-all duration-300 font-semibold  ${
+                  loading || success || !formData.first_name.trim() || !formData.last_name.trim() || formData.phone_number.replace(/\D/g, "").length !== 10 ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    Отправка...
+                  </div>
+                ) : success ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Успешно!
+                  </div>
+                ) : (
+                  "Пригласить"
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

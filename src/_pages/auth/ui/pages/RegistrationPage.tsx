@@ -15,35 +15,38 @@ import { useUserStore } from "@/shared/stores/userStore";
 import Loader from "@/shared/ui/loader";
 import { ContractModal } from "@/_pages/main/ui/widgets/modals/user/ContractModal";
 
-const AuthPage = () => {
+const RegistrationPage = () => {
   const { fetchUser, refreshUser } = useUserStore();
   const router = useRouter();
   const t = useTranslations();
   const { showModal } = useResponseModal();
   const [activeStep, setActiveStep] = useState(0);
   const [phone, setPhone] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 
   const isDisabled =
     activeStep === 0
-      ? phone.length !== 10
+      ? phone.length !== 10 || !firstName.trim() || !lastName.trim()
       : phone.length !== 10 || code.length !== 4;
 
   const stepText = [
     {
-      title: t("auth.phoneNumber.title"),
-      description: t("auth.phoneNumber.description"),
+      title: "Регистрация",
+      description: "Укажите ваши данные для создания аккаунта",
     },
     {
       title: t("auth.otp.title"),
       description: `${t("auth.otp.description")} +7 ${formatPhone(phone)}`,
     },
   ];
+
   const handleBack = () => {
     if (activeStep === 0) {
-      router.push(ROUTES.ONBOARDING);
+      router.push(ROUTES.AUTH);
     } else {
       setActiveStep(0);
     }
@@ -81,30 +84,17 @@ const AuthPage = () => {
     setIsContractModalOpen(false);
     setIsLoading(true);
 
-    const res = await authApi.sendSms("7" + phone);
+    const res = await authApi.sendSmsWithRegistration("7" + phone, firstName.trim(), lastName.trim());
     if (res.statusCode === 200) {
       setActiveStep(1);
       setIsLoading(false);
     } else {
-      // Проверяем, является ли ошибка связанной с новым пользователем
-      if (res.error && res.error.includes("обязательно указать имя и фамилию")) {
-        showModal({
-          type: "error",
-          title: "Ошибка",
-          description: "Для новых пользователей обязательно указать имя и фамилию",
-          buttonText: "Регистрация",
-          onButtonClick: () => {
-            router.push(ROUTES.REGISTRATION);
-          }
-        });
-      } else {
-        showModal({
-          type: "error",
-          title: t("error"),
-          description: res.error,
-          buttonText: t("modal.error.button"),
-        });
-      }
+      showModal({
+        type: "error",
+        title: t("error"),
+        description: res.error,
+        buttonText: t("modal.error.button"),
+      });
       setIsLoading(false);
     }
   };
@@ -124,13 +114,33 @@ const AuthPage = () => {
           </h2>
           <p className="text-[18px] mb-6">{stepText[activeStep].description}</p>
           {activeStep === 0 ? (
-            <PhoneInput phone={phone} setPhone={setPhone} />
+            <div className="space-y-4">
+              <PhoneInput phone={phone} setPhone={setPhone} />
+              <div className="space-y-4">
+                <div className="w-full bg-[#292929] rounded-[20px] h-[60px] text-white">
+                  <input
+                    className="w-full outline-none bg-transparent p-4 text-[16px] text-white placeholder:text-white/30 rounded-[20px]"
+                    placeholder="Имя"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="w-full bg-[#292929] rounded-[20px] h-[60px] text-white">
+                  <input
+                    className="w-full outline-none bg-transparent p-4 text-[16px] text-white placeholder:text-white/30 rounded-[20px]"
+                    placeholder="Фамилия"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             <OTPInput
               setCode={setCode}
               onResend={async () => {
                 try {
-                  const res = await authApi.sendSms(phone);
+                  const res = await authApi.sendSmsWithRegistration("7" + phone, firstName.trim(), lastName.trim());
                   if (res.statusCode !== 200) {
                     showModal({
                       type: "error",
@@ -160,20 +170,6 @@ const AuthPage = () => {
           >
             {isLoading ? <Loader color="black" /> : t("auth.next")}
           </Button>
-          {activeStep === 0 && (
-            <div className="mt-2 text-center">
-              <p className="text-white/70 text-[16px] mb-3">
-                Если вы новый пользователь, то пройдите
-              </p>
-              <Button
-                variant="secondary"
-                onClick={() => router.push(ROUTES.REGISTRATION)}
-                className="w-full"
-              >
-                Регистрация
-              </Button>
-            </div>
-          )}
         </section>
       </div>
 
@@ -189,4 +185,4 @@ const AuthPage = () => {
   );
 };
 
-export default AuthPage;
+export default RegistrationPage;
