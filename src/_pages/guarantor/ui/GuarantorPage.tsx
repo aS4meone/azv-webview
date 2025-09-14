@@ -122,7 +122,7 @@ export const GuarantorPage: React.FC = () => {
     }
   };
 
-  const handleAddGuarantor = async (guarantorInfo: { first_name: string; last_name: string; phone_number: string; reason?: string }): Promise<{ statusCode: number; data: any; error: string | null }> => {
+  const handleAddGuarantor = async (guarantorInfo: { phone_number: string; reason?: string }): Promise<{ statusCode: number; data: any; error: string | null }> => {
     // Логируем данные перед отправкой в API
     console.log("🚀 Вызываем guarantorApi.inviteGuarantor с данными:", {
       guarantor_info: guarantorInfo,

@@ -20,8 +20,6 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState<GuarantorFormInputs>({
-    first_name: "",
-    last_name: "",
     phone_number: "",
     reason: "",
   });
@@ -30,12 +28,6 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async () => {
-    
-    // Валидация полей
-    if (!formData.first_name.trim() || !formData.last_name.trim()) {
-      setError("Пожалуйста, заполните все обязательные поля");
-      return;
-    }
     
     // Проверяем, что номер телефона содержит только цифры и имеет правильную длину
     const phoneDigits = formData.phone_number.replace(/\D/g, "");
@@ -51,8 +43,6 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
     try {
       // Формируем данные согласно структуре бэкенда
       const guarantorData: GuarantorFormData = {
-        first_name: formData.first_name.trim(),
-        last_name: formData.last_name.trim(),
         phone_number: "7" + formData.phone_number, // Добавляем код страны как в AuthPage
         reason: formData.reason,
       };
@@ -71,7 +61,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
       // Проверяем статус ответа от API
       if (response.statusCode === 200 && response.data) {
         setSuccess(true);
-        setFormData({ first_name: "", last_name: "", phone_number: "", reason: "" });
+        setFormData({ phone_number: "", reason: "" });
         
         // Закрываем модальное окно через 2 секунды после успешной отправки
         setTimeout(() => {
@@ -104,7 +94,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
       setShowAddModal(false);
       setError(null);
       setSuccess(false);
-      setFormData({ first_name: "", last_name: "", phone_number: "", reason: "" });
+      setFormData({ phone_number: "", reason: "" });
     }
   };
 
@@ -113,7 +103,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
     setShowAddModal(false);
     setError(null);
     setSuccess(false);
-    setFormData({ first_name: "", last_name: "", phone_number: "", reason: "" });
+    setFormData({ phone_number: "", reason: "" });
   };
 
   const getStatusInfo = (status: GuarantorRequestStatus) => {
@@ -462,34 +452,6 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               </div>
             )}
             <div className="space-y-5">
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    Имя *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.first_name}
-                    onChange={(e) => handleInputChange("first_name", e.target.value)}
-                    className="w-full px-4 py-3 bg-[#292929] border border-[#404040] rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-300 text-white placeholder:text-white/50"
-                    placeholder="Введите имя"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    Фамилия *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.last_name}
-                    onChange={(e) => handleInputChange("last_name", e.target.value)}
-                    className="w-full px-4 py-3 bg-[#292929] border border-[#404040] rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-300 text-white placeholder:text-white/50"
-                    placeholder="Введите фамилию"
-                    required
-                  />
-                </div>
-              </div>
               
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
@@ -530,9 +492,9 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               <button
                 type="button"
                 onClick={handleSubmit}
-                disabled={loading || success || !formData.first_name.trim() || !formData.last_name.trim() || formData.phone_number.replace(/\D/g, "").length !== 10}
+                disabled={loading || success || formData.phone_number.replace(/\D/g, "").length !== 10}
                 className={`flex-1 px-4 py-3 bg-white text-[#191919] rounded-xl hover:bg-white/90 transition-all duration-300 font-semibold  ${
-                  loading || success || !formData.first_name.trim() || !formData.last_name.trim() || formData.phone_number.replace(/\D/g, "").length !== 10 ? 'opacity-50 cursor-not-allowed' : ''
+                  loading || success || formData.phone_number.replace(/\D/g, "").length !== 10 ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {loading ? (
