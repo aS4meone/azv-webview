@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface GuarantorTabsProps {
   activeTab: "incoming" | "my_guarantors";
@@ -9,6 +10,8 @@ export const GuarantorTabs: React.FC<GuarantorTabsProps> = ({
   activeTab,
   onTabChange,
 }) => {
+  const t = useTranslations();
+  
   return (
     <div className="bg-white p-2 ">
       <div className="flex bg-[#F4F4F4] rounded-full gap-2 p-1 mb-6">
@@ -20,7 +23,7 @@ export const GuarantorTabs: React.FC<GuarantorTabsProps> = ({
               : "bg-transparent text-[#191919] hover:bg-gray-200"
           }`}
         >
-          Я Гарант
+          {t("guarantor.tabs.iAmGuarantor")}
         </button>
         <button
           onClick={() => onTabChange("my_guarantors")}
@@ -30,7 +33,7 @@ export const GuarantorTabs: React.FC<GuarantorTabsProps> = ({
               : "bg-transparent text-[#191919] hover:bg-gray-200"
           }`}
         >
-          Мои Гаранты
+          {t("guarantor.tabs.myGuarantors")}
         </button>
       </div>
     </div>

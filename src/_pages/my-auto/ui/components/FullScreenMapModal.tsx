@@ -55,7 +55,7 @@ export const FullScreenMapModal = ({
                   {t("myAuto.tripDetails.route.title")}
                 </h1>
                 <p className="text-sm text-[#666666]">
-                  {shouldShowCalendar ? "Выберите день для просмотра маршрута" : "Маршрут поездки"}
+                  {shouldShowCalendar ? t("myAuto.selectDayForRoute") : t("myAuto.tripRoute")}
                 </p>
               </div>
             </div>
@@ -98,7 +98,7 @@ export const FullScreenMapModal = ({
         {shouldShowCalendar ? (
           <div className="px-4 py-4">
             <h3 className="text-lg font-medium text-[#2D2D2D] mb-3">
-              Выберите день
+              {t("myAuto.selectDay")}
             </h3>
             <div className="flex space-x-2 overflow-x-auto pb-2">
               {routeData.daily_routes.map((dayRoute, index) => (
@@ -113,13 +113,13 @@ export const FullScreenMapModal = ({
                 >
                   <div className="text-center">
                     <div className="font-semibold">
-                      {new Date(dayRoute.date).toLocaleDateString("ru-RU", {
+                      {new Date(dayRoute.date).toLocaleDateString(t("myAuto.locale.dateFormat"), {
                         day: "2-digit",
                         month: "2-digit",
                       })}
                     </div>
                     <div className="text-xs opacity-75">
-                      {new Date(dayRoute.date).toLocaleDateString("ru-RU", {
+                      {new Date(dayRoute.date).toLocaleDateString(t("myAuto.locale.dateFormat"), {
                         weekday: "short",
                       })}
                     </div>
@@ -131,15 +131,15 @@ export const FullScreenMapModal = ({
             {/* Day info */}
             <div className="mt-3 text-sm text-[#666666]">
               <p>
-                <span className="font-medium">Дата:</span>{" "}
-                {new Date(routeData.daily_routes[selectedDay].date).toLocaleDateString("ru-RU", {
+                <span className="font-medium">{t("myAuto.date")}</span>{" "}
+                {new Date(routeData.daily_routes[selectedDay].date).toLocaleDateString(t("myAuto.locale.dateFormat"), {
                   day: "2-digit",
                   month: "long",
                   year: "numeric",
                 })}
               </p>
               <p>
-                <span className="font-medium">Точек маршрута:</span>{" "}
+                <span className="font-medium">{t("myAuto.routePoints")}</span>{" "}
                 {routeData.daily_routes[selectedDay].coordinates.filter(coord => 
                   coord.lat !== 0.0 && coord.lon !== 0.0
                 ).length}
@@ -150,12 +150,12 @@ export const FullScreenMapModal = ({
           <div className="px-4 py-4">
             <div className="text-center text-[#666666]">
               <p className="text-sm">
-                <span className="font-medium">Маршрут за один день</span>
+                <span className="font-medium">{t("myAuto.singleDayRoute")}</span>
               </p>
               <p className="text-xs mt-1">
                 {routeData.daily_routes[0]?.coordinates.filter(coord => 
                   coord.lat !== 0.0 && coord.lon !== 0.0
-                ).length || 0} точек маршрута
+                ).length || 0} {t("myAuto.routePointsCount")}
               </p>
             </div>
           </div>

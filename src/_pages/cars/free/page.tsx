@@ -6,11 +6,13 @@ import { CarTypeSelection } from "./ui/CarTypeSelection";
 import { FilteredCarsList } from "./ui/FilteredCarsList";
 import { ICar } from "@/shared/models/types/car";
 import { CarBodyType } from "@/shared/models/types/car";
+import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
 type ViewState = 'type-selection' | 'filtered-cars';
 
 const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
   const { fetchAllVehicles, allVehicles, isLoadingAll } = useVehiclesStore();
+  const { t } = useClientTranslations();
   const [currentView, setCurrentView] = useState<ViewState>('type-selection');
   const [selectedBodyType, setSelectedBodyType] = useState<string>('');
 
@@ -43,7 +45,7 @@ const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
     return (
       <div className="bg-white h-full flex items-center justify-center">
         <div className="text-center py-4 text-[#191919] text-[16px]">
-          Загрузка...
+          {t('cars.loading')}
         </div>
       </div>
     );
@@ -53,7 +55,7 @@ const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
     return (
       <div className="bg-white h-full flex items-center justify-center">
         <div className="text-center py-4 text-[#191919] text-[16px]">
-          Ничего не найдено
+          {t('cars.nothingFound')}
         </div>
       </div>
     );

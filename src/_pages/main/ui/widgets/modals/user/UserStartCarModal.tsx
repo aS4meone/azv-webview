@@ -1,6 +1,8 @@
+"use client";
 import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
@@ -21,6 +23,7 @@ interface UserStartCarModalProps {
 }
 
 export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
+  const t = useTranslations();
   const { refreshUser } = useUserStore();
   const [showRentalPage, setShowRentalPage] = useState(false);
   const [showAddressScreen, setShowAddressScreen] = useState(false);
@@ -100,8 +103,8 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           },
           type: "success",
 
-          description: "Успешно забронированно",
-          buttonText: "Отлично",
+          description: t("widgets.modals.startCar.successfullyBooked"),
+          buttonText: t("widgets.modals.startCar.tryAgain"),
           onButtonClick: async () => {
             await refreshUser();
             onClose();
@@ -126,9 +129,9 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
             setShowWalletPage(false);
           },
           type: "error",
-          title: "Ошибка",
+          title: t("error"),
           description: apiError.response.data.detail,
-          buttonText: "Пополнить баланс",
+          buttonText: t("widgets.modals.startCar.topUpBalance"),
           onButtonClick: () => {
             setShowWalletPage(true);
           },
@@ -138,9 +141,9 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           isOpen: true,
           onClose: handleClose,
           type: "error",
-          title: "Ошибка",
+          title: t("error"),
           description: apiError.response.data.detail,
-          buttonText: "Повторить попытку",
+          buttonText: t("widgets.modals.startCar.tryAgain"),
           onButtonClick: handleClose,
         });
       }
@@ -181,8 +184,8 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
             setResponseModal(null);
           },
           type: "success",
-          description: "Доставка успешно закзана",
-          buttonText: "Отлично",
+          description: t("widgets.modals.startCar.deliverySuccessfullyOrdered"),
+          buttonText: t("widgets.modals.startCar.tryAgain"),
           onButtonClick: async () => {
             await refreshUser();
             onClose();
@@ -201,9 +204,9 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           isOpen: true,
           onClose: handleClose,
           type: "error",
-          title: "Ошибка",
+          title: t("error"),
           description: apiError.response.data.detail,
-          buttonText: "Пополнить баланс",
+          buttonText: t("widgets.modals.startCar.topUpBalance"),
           onButtonClick: () => {
             setShowWalletPage(true);
           },
@@ -213,9 +216,9 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
           isOpen: true,
           onClose: handleClose,
           type: "error",
-          title: "Ошибка",
+          title: t("error"),
           description: apiError.response.data.detail,
-          buttonText: "Повторить попытку",
+          buttonText: t("widgets.modals.startCar.tryAgain"),
           onButtonClick: handleClose,
         });
       }
@@ -242,8 +245,8 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
             setResponseModal(null);
           },
           type: "success",
-          description: "Успешно забронированно",
-          buttonText: "Отлично",
+          description: t("widgets.modals.startCar.successfullyBooked"),
+          buttonText: t("widgets.modals.startCar.tryAgain"),
           onButtonClick: async () => {
             await refreshUser();
             onClose();
@@ -258,9 +261,9 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         isOpen: true,
         onClose: handleClose,
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description: apiError.response.data.detail,
-        buttonText: "Попробовать снова",
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: handleClose,
       });
     }
@@ -369,10 +372,10 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
               }
             }}
           >
-            {car.owned_car ? "Снять с аренды" : "Забронировать авто"}
+            {car.owned_car ? t("widgets.modals.startCar.removeFromRent") : t("widgets.modals.startCar.bookCar")}
           </Button>
           <Button onClick={handleDeliveryClick} variant="outline">
-            Заказать доставку
+            {t("widgets.modals.startCar.orderDelivery")}
           </Button>
         </div>
       </div>
@@ -383,7 +386,7 @@ export const UserStartCarModal = ({ car, onClose }: UserStartCarModalProps) => {
         onClose={handleContractClose}
         onAccept={handleContractAccept}
         onReject={handleContractReject}
-        title={"Договор аренды"}
+        title={t("widgets.modals.contract.title")}
       />
     </div>
   );

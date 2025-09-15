@@ -9,9 +9,11 @@ import debounce from "lodash/debounce";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UserRole } from "@/shared/models/types/user";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
+import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
 const SearchPage = ({ onClose }: { onClose: () => void }) => {
   const { user } = useUserStore();
+  const { t } = useClientTranslations();
   const [search, setSearch] = useState("");
   const [cars, setCars] = useState<ICar[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +72,7 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
       <div className="relative">
         <Input
           className="pl-10"
-          placeholder="Поиск..."
+          placeholder={t("search.placeholder", "Поиск...")}
           value={search}
           onChange={handleInputChange}
         />
@@ -79,7 +81,7 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
       <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
         {isLoading ? (
           <div className="text-center py-4 text-[#191919] text-[16px]">
-            Загрузка...
+            {t("search.loading", "Загрузка...")}
           </div>
         ) : cars.length > 0 ? (
           cars.map((car) => (
@@ -87,7 +89,7 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
           ))
         ) : search ? (
           <div className="text-center py-4 text-[#191919] text-[16px]">
-            Ничего не найдено
+            {t("search.noResults", "Ничего не найдено")}
           </div>
         ) : null}
       </div>

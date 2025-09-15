@@ -8,6 +8,7 @@ import Loader from "@/shared/ui/loader";
 import { FlutterCamera } from "@/shared/utils/flutter-camera";
 import {StencilConfig} from "@/shared/models/types/stencil";
 import {StencilOverlay} from "@/widgets/upload-photo/StencilOverlay";
+import { useTranslations } from "next-intl";
 
 export interface PhotoConfig {
   id: string;
@@ -93,6 +94,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                                                           onClose,
                                                           isLoading = false,
                                                         }) => {
+  const t = useTranslations("uploadPhoto");
   const { showModal } = useResponseModal();
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
     {}
@@ -136,16 +138,14 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
         const base64Images = await FlutterCamera.captureMultiplePhotos(
           photoConfig.multiple.min,
           photoConfig.multiple.max,
-          cameraType,
-          photoConfig.stencil // 👈
+          cameraType
         );
         setPhotoProgress(photoId, 50);
         files = FlutterCamera.base64ArrayToFiles(base64Images, photoId);
         setPhotoProgress(photoId, 100);
       } else {
         const base64Image = await FlutterCamera.capturePhoto(
-          cameraType,
-          photoConfig.stencil // 👈
+          cameraType
         );
         if (base64Image) {
           setPhotoProgress(photoId, 50);
@@ -156,14 +156,14 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       }
 
       if (files.length === 0) {
-        showModal({ type: "error", title: "Ошибка", description: "Не удалось сделать фотографии", buttonText: "Понятно" });
+        showModal({ type: "error", title: t("error"), description: t("failedToTakePhotos"), buttonText: t("understood") });
         return;
       }
 
       setSelectedFiles((prev) => ({ ...prev, [photoId]: files }));
     } catch (e) {
       console.error(e);
-      showModal({ type: "error", title: "Ошибка", description: "Ошибка работы с камерой", buttonText: "Понятно" });
+      showModal({ type: "error", title: t("error"), description: t("cameraError"), buttonText: t("understood") });
     } finally {
       setPhotoLoading(photoId, false);
       // скрыть трафарет через небольшой таймаут, чтобы пользователь увидел 100%
@@ -182,27 +182,27 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       if (files.length < photoConfig.multiple.min) {
         showModal({
           type: "error",
-          title: "Ошибка",
-          description: `Минимальное количество фото: ${photoConfig.multiple.min}`,
-          buttonText: "Понятно",
+          title: t("error"),
+          description: `${t("minPhotosRequired")} ${photoConfig.multiple.min}`,
+          buttonText: t("understood"),
         });
         return;
       }
       if (files.length > photoConfig.multiple.max) {
         showModal({
           type: "error",
-          title: "Ошибка",
-          description: `Максимальное количество фото: ${photoConfig.multiple.max}`,
-          buttonText: "Понятно",
+          title: t("error"),
+          description: `${t("maxPhotosExceeded")} ${photoConfig.multiple.max}`,
+          buttonText: t("understood"),
         });
         return;
       }
     } else if (files.length > 1) {
       showModal({
         type: "error",
-        title: "Ошибка",
-        description: "Можно загрузить только одно фото",
-        buttonText: "Понятно",
+        title: t("error"),
+        description: t("onlyOnePhotoAllowed"),
+        buttonText: t("understood"),
       });
       return;
     }
@@ -212,9 +212,9 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     if (oversizedFiles.length > 0) {
       showModal({
         type: "error",
-        title: "Ошибка",
-        description: "Размер каждого файла не должен превышать 10MB",
-        buttonText: "Понятно",
+        title: t("error"),
+        description: t("fileSizeExceeded"),
+        buttonText: t("understood"),
       });
       return;
     }
@@ -306,7 +306,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                 </h3>
                 {photo.multiple && (
                   <p className="text-[17px] leading-[22px] font-normal text-[#000000]">
-                    Минимум {photo.multiple.min}, максимум {photo.multiple.max}.
+                    {t("minMaxPhotos", { min: photo.multiple.min, max: photo.multiple.max })}
                   </p>
                 )}
               </div>
@@ -345,12 +345,12 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                         />
                         <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
                           {selectedFiles[photo.id]?.length > 0
-                            ? `${selectedFiles[photo.id].length} фото готово`
+                            ? t("photosReady", { count: selectedFiles[photo.id].length })
                             : photo.multiple
-                              ? "Сделать фото"
+                              ? t("takePhoto")
                               : photo.isSelfy
-                                ? "Сделать селфи"
-                                : "Сделать фото"}
+                                ? t("takeSelfie")
+                                : t("takePhoto")}
                         </span>
                       </>
                     )}
@@ -386,12 +386,12 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                         />
                         <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
                           {selectedFiles[photo.id]
-                            ? `${selectedFiles[photo.id].length} фото сделано`
+                            ? t("photosTaken", { count: selectedFiles[photo.id].length })
                             : photo.multiple
-                              ? "Сделать фото"
+                              ? t("takePhoto")
                               : photo.isSelfy
-                                ? "Сделать селфи"
-                                : "Сделать фото"}
+                                ? t("takeSelfie")
+                                : t("takePhoto")}
                         </span>
                       </>
                     )}
@@ -444,7 +444,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? <Loader color="#fff" /> : "Отправить"}
+              {isLoading ? <Loader color="#fff" /> : t("submit")}
             </Button>
           </div>
         )}

@@ -1,5 +1,6 @@
-import { Button } from "@/shared/ui";
+"use client";import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { CarInfoHeader, CarControlsSlider } from "../ui";
 import { ThumbsUpIcon, ThumbsDownIcon } from "@/shared/icons";
 import {
@@ -30,6 +31,7 @@ export const MechanicInUseModal = ({
   user,
   onClose,
 }: MechanicInUseModalProps) => {
+  const t = useTranslations();
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const { fetchAllMechanicVehicles } = useVehiclesStore();
@@ -76,8 +78,8 @@ export const MechanicInUseModal = ({
       showModal({
         type: "error",
         description:
-          error.response?.data?.detail || "Ошибка при загрузке фотографий",
-        buttonText: "Попробовать снова",
+          error.response?.data?.detail || t("mechanic.inspection.photoUploadError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -110,12 +112,12 @@ export const MechanicInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке приостановить осмотр";
+          : t("mechanic.inspection.pauseError");
 
       showModal({
         type: "error",
-        description: errorMessage || "Ошибка при попытке приостановить осмотр",
-        buttonText: "Попробовать снова",
+        description: errorMessage || t("mechanic.inspection.pauseError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -134,12 +136,12 @@ export const MechanicInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке возобновить осмотр";
+          : t("mechanic.inspection.resumeError");
 
       showModal({
         type: "error",
-        description: errorMessage || "Ошибка при попытке возобновить осмотр",
-        buttonText: "Попробовать снова",
+        description: errorMessage || t("mechanic.inspection.resumeError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -158,8 +160,8 @@ export const MechanicInUseModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          description: "Осмотр успешно завершен",
-          buttonText: "Отлично",
+          description: t("mechanic.inspection.successfullyCompleted"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: handleClose,
           onClose: handleClose,
         });
@@ -170,12 +172,12 @@ export const MechanicInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Произошла ошибка при завершении осмотра";
+          : t("mechanic.inspection.completionError");
 
       showModal({
         type: "error",
-        description: errorMessage || "Произошла ошибка при завершении осмотра",
-        buttonText: "Попробовать снова",
+        description: errorMessage || t("mechanic.inspection.completionError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -194,13 +196,13 @@ export const MechanicInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке заблокировать автомобиль";
+          : t("mechanic.common.lockError");
 
       showModal({
         type: "error",
         description:
-          errorMessage || "Ошибка при попытке заблокировать автомобиль",
-        buttonText: "Попробовать снова",
+          errorMessage || t("mechanic.common.lockError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -219,13 +221,13 @@ export const MechanicInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке разблокировать автомобиль";
+          : t("mechanic.common.unlockError");
 
       showModal({
         type: "error",
         description:
-          errorMessage || "Ошибка при попытке разблокировать автомобиль",
-        buttonText: "Попробовать снова",
+          errorMessage || t("mechanic.common.unlockError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -284,7 +286,7 @@ export const MechanicInUseModal = ({
       {car.status === CarStatus.inUse && (
         <div className="flex justify-center px-6">
           <Button variant="outline" onClick={handleViewData}>
-            Посмотреть данные
+            {t("mechanic.inspection.viewData")}
           </Button>
         </div>
       )}
@@ -296,14 +298,14 @@ export const MechanicInUseModal = ({
             className="text-[14px]"
             onClick={handlePauseInspection}
           >
-            Пауза
+            {t("mechanic.inspection.pauseInspection")}
           </Button>
           <Button
             variant="outline"
             className="text-[14px]"
             onClick={handleResumeInspection}
           >
-            Начать поездку
+            {t("mechanic.inspection.resumeInspection")}
           </Button>
         </div>
 
@@ -311,7 +313,7 @@ export const MechanicInUseModal = ({
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
         <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
-          Завершить осмотр
+          {t("mechanic.inspection.completeInspection")}
         </Button>
       </div>
 
@@ -343,12 +345,14 @@ const RatingModal = ({
   setComment,
   car,
   isLoading,
-}: RatingModalProps) => (
+}: RatingModalProps) => {
+  const t = useTranslations();
+  return (
   <PushScreen onClose={onClose} withOutStyles>
     <div className="bg-white px-8 py-10 pt-[140px] text-[#191919] flex flex-col justify-between h-full">
       <div>
         <h2 className="text-[20px] font-semibold mb-4">
-          Оцените состояние автомобиля
+          {t("mechanic.inspection.rateCarCondition")}
         </h2>
 
         <div className="flex gap-4 mb-4 justify-center">
@@ -380,8 +384,8 @@ const RatingModal = ({
           onChange={(e) => setComment(e.target.value)}
           placeholder={
             rating === 1
-              ? "Укажите обнаруженные дефекты (обязательно)"
-              : "Дополнительные замечания (необязательно)"
+              ? t("mechanic.inspection.specifyDefects")
+              : t("mechanic.inspection.additionalComments")
           }
           maxLength={255}
           className="w-full h-[200px] p-5 rounded-[30px] border border-[#E0E0E0] mb-4 bg-[#F9F9F9] outline-none"
@@ -395,8 +399,9 @@ const RatingModal = ({
         onClick={handleCompleteInspection}
         className="w-full"
       >
-        {isLoading ? <Loader /> : "Завершить осмотр"}
+        {isLoading ? <Loader /> : t("mechanic.inspection.completeInspection")}
       </Button>
     </div>
   </PushScreen>
-);
+  );
+};

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface PricingInfoCardProps {
   basePrice: number;
@@ -35,8 +36,9 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
   totalPrice,
   alreadyPayed,
 }) => {
+  const t = useTranslations();
   const formatPrice = (price: number) => {
-    return `${price.toLocaleString()} ₸`;
+    return `${price.toLocaleString()} ${t("trips.currency")}`;
   };
 
   return (
@@ -46,14 +48,14 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white">
             <DollarIcon />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">Стоимость</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t("trips.pricing.title")}</h2>
         </div>
       </div>
       <div className="px-6 py-4">
         <div className="space-y-3 mb-4">
           {basePrice > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Базовая стоимость</span>
+              <span className="text-gray-500 text-sm">{t("trips.pricing.basePrice")}</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(basePrice)}
               </span>
@@ -61,7 +63,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           )}
           {openFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Плата за открытие</span>
+              <span className="text-gray-500 text-sm">{t("trips.pricing.openFee")}</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(openFee)}
               </span>
@@ -69,7 +71,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           )}
           {deliveryFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Плата за доставку</span>
+              <span className="text-gray-500 text-sm">{t("trips.pricing.deliveryFee")}</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(deliveryFee)}
               </span>
@@ -77,7 +79,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           )}
           {waitingFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Плата за ожидание</span>
+              <span className="text-gray-500 text-sm">{t("trips.pricing.waitingFee")}</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(waitingFee)}
               </span>
@@ -85,7 +87,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           )}
           {overtimeFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Плата сверх тарифа</span>
+              <span className="text-gray-500 text-sm">{t("trips.pricing.overtimeFee")}</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(overtimeFee)}
               </span>
@@ -93,7 +95,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
           )}
           {distanceFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 text-sm">Плата за расстояние</span>
+              <span className="text-gray-500 text-sm">{t("trips.pricing.distanceFee")}</span>
               <span className="text-gray-900 font-medium">
                 {formatPrice(distanceFee)}
               </span>
@@ -103,13 +105,13 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
 
         <div className="border-t border-gray-200 pt-4 space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-gray-900 font-semibold text-lg">Итого</span>
+            <span className="text-gray-900 font-semibold text-lg">{t("trips.pricing.total")}</span>
             <span className="text-gray-900 font-bold text-xl">
               {formatPrice(totalPrice)}
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-gray-500 font-medium">Оплачено</span>
+            <span className="text-gray-500 font-medium">{t("trips.pricing.paid")}</span>
             <span className="text-black font-semibold">
               {formatPrice(alreadyPayed)}
             </span>

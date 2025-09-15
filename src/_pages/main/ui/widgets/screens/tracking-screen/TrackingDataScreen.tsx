@@ -6,6 +6,7 @@ import Image from "next/image";
 import { formatImage } from "@/shared/utils/formatImage";
 import { formatPhone } from "@/_pages/profile/ui/widgets/UserData";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
+import { useTranslations } from "next-intl";
 
 interface TrackingDataScreenProps {
   car: ICar;
@@ -17,10 +18,12 @@ const RenterPhoto = ({
   src,
   alt,
   label,
+  noPhotoText,
 }: {
   src?: string;
   alt: string;
   label: string;
+  noPhotoText: string;
 }) => (
   <div className="flex flex-col items-center justify-end space-y-2">
     {src ? (
@@ -34,7 +37,7 @@ const RenterPhoto = ({
     ) : (
       <div className="h-[200px] w-full p-8 bg-gray-200 rounded-lg border border-gray-200 flex flex-col items-center justify-center">
         <InfoIcon />
-        <p className="text-gray-500 text-xs">Нет фото</p>
+        <p className="text-gray-500 text-xs">{noPhotoText}</p>
       </div>
     )}
     <span className="text-sm text-gray-600 text-center">{label}</span>
@@ -45,14 +48,16 @@ export const TrackingDataScreen = ({
   car,
   onClose,
 }: TrackingDataScreenProps) => {
+  const t = useTranslations();
+  
   return (
     <PushScreen onClose={onClose} withCloseButton={true}>
       <div className="space-y-6">
         {/* Заголовок */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Данные слежки</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("widgets.screens.tracking.trackingData")}</h1>
           <p className="text-gray-600">
-            Информация о слежке за автомобилем {car.name}
+            {t("widgets.screens.tracking.trackingInfo")} {car.name}
           </p>
         </div>
 
@@ -64,20 +69,22 @@ export const TrackingDataScreen = ({
             <div className="flex justify-center items-end gap-6 w-full">
               <RenterPhoto
                 src={car.current_renter_details.rent_selfie_url}
-                alt="Селфи при аренде"
-                label="Селфи при аренде"
+                alt={t("widgets.screens.tracking.rentSelfie")}
+                label={t("widgets.screens.tracking.rentSelfie")}
+                noPhotoText={t("widgets.screens.tracking.noPhotoAvailable")}
               />
               <RenterPhoto
                 src={car.current_renter_details.selfie_url}
-                alt="Селфи профиля"
-                label="Селфи профиля"
+                alt={t("widgets.screens.tracking.profileSelfie")}
+                label={t("widgets.screens.tracking.profileSelfie")}
+                noPhotoText={t("widgets.screens.tracking.noPhotoAvailable")}
               />
             </div>
           ) : (
             <div className="bg-gray-100 rounded-lg p-8 flex flex-col items-center justify-center">
               <InfoIcon />
               <p className="text-gray-500 text-sm font-medium mt-2">
-                Фотографии арендатора недоступны
+                {t("widgets.screens.tracking.renterPhotosNotAvailable")}
               </p>
             </div>
           )}
@@ -86,16 +93,16 @@ export const TrackingDataScreen = ({
         {/* Данные арендатора (если есть) */}
         {car.current_renter_details && (
           <div className="bg-green-50 rounded-lg p-4 space-y-3">
-            <h2 className="font-semibold text-gray-900">Арендатор</h2>
+            <h2 className="font-semibold text-gray-900">{t("widgets.screens.tracking.renter")}</h2>
             <div className="space-y-2 text-sm">
               <div>
-                <span className="text-[#191919]">Имя:</span>
+                <span className="text-[#191919]">{t("widgets.screens.tracking.name")}</span>
                 <p className="font-medium text-[#191919]">
                   {car.current_renter_details.full_name}
                 </p>
               </div>
               <div>
-                <span className="text-[#191919]">Телефон:</span>
+                <span className="text-[#191919]">{t("widgets.screens.tracking.phone")}</span>
                 <p className="font-medium text-[#191919]">
                   {formatPhone(car.current_renter_details.phone_number)}
                 </p>
@@ -105,7 +112,7 @@ export const TrackingDataScreen = ({
         )}
 
         <Button variant="secondary" onClick={onClose} className="w-full">
-          Вернуться к карте
+          {t("widgets.screens.tracking.backToMap")}
         </Button>
       </div>
     </PushScreen>

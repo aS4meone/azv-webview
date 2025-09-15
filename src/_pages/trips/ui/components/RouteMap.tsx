@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useMap } from "@vis.gl/react-google-maps";
 import { RouteData } from "@/shared/models/types/history";
+import { useTranslations } from "next-intl";
 
 interface RouteMapProps {
   routeData: RouteData;
@@ -14,6 +15,7 @@ interface RouteMapProps {
 }
 
 export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, selectedDay: externalSelectedDay }: RouteMapProps) => {
+  const t = useTranslations();
   const map = useMap();
   const polylinesRef = useRef<google.maps.Polyline[]>([]);
   const markersRef = useRef<google.maps.Marker[]>([]);
@@ -66,7 +68,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
         const startMarker = new google.maps.Marker({
           position: { lat: startCoord.lat, lng: startCoord.lon },
           map: map,
-          title: `Точка А - Начало ${dayRoute.date}`,
+          title: `${t("trips.pointA")} - ${t("trips.start")} ${dayRoute.date}`,
           label: {
             text: "А",
             color: "#FFFFFF",
@@ -88,7 +90,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
           const endMarker = new google.maps.Marker({
             position: { lat: endCoord.lat, lng: endCoord.lon },
             map: map,
-            title: `Точка Б - Конец ${dayRoute.date}`,
+            title: `${t("trips.pointB")} - ${t("trips.end")} ${dayRoute.date}`,
             label: {
               text: "Б",
               color: "#FFFFFF",
@@ -158,7 +160,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
   if (!hasValidRoutes) {
     return (
       <div className="text-center py-8">
-        <p className="text-[#666666]">Нет данных о маршруте для отображения</p>
+        <p className="text-[#666666]">{t("myAuto.tripDetails.route.noRoute")}</p>
       </div>
     );
   }
@@ -178,7 +180,7 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
                   : "bg-[#F5F5F5] text-[#666666] hover:bg-[#E5E5E5]"
               }`}
             >
-              {new Date(dayRoute.date).toLocaleDateString("ru-RU", {
+              {new Date(dayRoute.date).toLocaleDateString(t("trips.dateFormat"), {
                 day: "2-digit",
                 month: "2-digit",
               })}
@@ -189,8 +191,8 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
 
       {/* Информация о выбранном дне */}
       <div className="text-sm text-[#666666]">
-        <p>Дата: {new Date(routeData.daily_routes[selectedDay].date).toLocaleDateString("ru-RU")}</p>
-        <p>Точек маршрута: {
+        <p>{t("trips.date")}: {new Date(routeData.daily_routes[selectedDay].date).toLocaleDateString(t("trips.dateFormat"))}</p>
+        <p>{t("trips.routePoints")}: {
           routeData.daily_routes[selectedDay].coordinates.filter(coord => 
             coord.lat !== 0.0 && coord.lon !== 0.0
           ).length
@@ -201,11 +203,11 @@ export const RouteMap = ({ routeData, startLat, startLng, endLat, endLng, select
       <div className="flex justify-center space-x-4 text-xs text-[#666666]">
         <div className="flex items-center space-x-1">
           <div className="w-3 h-3 rounded-full bg-black"></div>
-          <span>Точка А (начало)</span>
+          <span>{t("trips.pointA")} ({t("trips.start")})</span>
         </div>
         <div className="flex items-center space-x-1">
           <div className="w-3 h-3 rounded-full bg-[#2E7D32]"></div>
-          <span>Точка Б (конец)</span>
+          <span>{t("trips.pointB")} ({t("trips.end")})</span>
         </div>
       </div>
     </div>

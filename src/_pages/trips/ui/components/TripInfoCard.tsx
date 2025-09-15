@@ -1,5 +1,7 @@
 import React from "react";
 import { formatDate } from "@/shared/utils/formate-date";
+import { useTranslations } from "next-intl";
+import { useTranslateEnum } from "@/shared/utils/translateEnum";
 
 interface TripInfoCardProps {
   rentalType: string;
@@ -30,29 +32,19 @@ export const TripInfoCard: React.FC<TripInfoCardProps> = ({
   endTime,
   duration,
 }) => {
-  const getRentalTypeText = (type: string) => {
-    switch (type) {
-      case "minutes":
-        return "минутный";
-      case "hours":
-        return "часовой";
-      case "days":
-        return "дневной";
-      default:
-        return type;
-    }
-  };
+  const t = useTranslations();
+  const { translateRentalType } = useTranslateEnum();
 
   const getDurationText = (duration: number, rentalType: string) => {
     switch (rentalType) {
       case "minutes":
-        return duration === 1 ? "минуту" : duration < 5 ? "минуты" : "минут";
+        return duration === 1 ? t("myAuto.timeUnits.minutes") : t("myAuto.timeUnits.minutes");
       case "hours":
-        return duration === 1 ? "час" : duration < 5 ? "часа" : "часов";
+        return duration === 1 ? t("myAuto.timeUnits.hours") : t("myAuto.timeUnits.hours");
       case "days":
-        return duration === 1 ? "день" : duration < 5 ? "дня" : "дней";
+        return duration === 1 ? t("myAuto.timeUnits.days") : t("myAuto.timeUnits.days");
       default:
-        return "минут";
+        return t("myAuto.timeUnits.minutes");
     }
   };
 
@@ -64,46 +56,46 @@ export const TripInfoCard: React.FC<TripInfoCardProps> = ({
             <ClockIcon />
           </div>
           <h2 className="text-lg font-semibold text-gray-900">
-            Детали поездки
+            {t("myAuto.tripDetails.title")}
           </h2>
         </div>
       </div>
       <div className="px-6 py-4 space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-gray-500 text-sm font-medium">Тариф</span>
+          <span className="text-gray-500 text-sm font-medium">{t("myAuto.tripDetails.rentalType")}</span>
           <span className="text-gray-900 font-medium capitalize">
-            {getRentalTypeText(rentalType)}
+            {translateRentalType(rentalType)}
           </span>
         </div>
         <div className="space-y-3 pt-2">
           <div>
             <span className="text-gray-500 text-sm font-medium block mb-1">
-              Забронировано
+              {t("myAuto.tripDetails.reserved")}
             </span>
             <span className="text-gray-900 font-medium">
-              {formatDate(reservationTime)}
+              {formatDate(reservationTime, t("trips.dateFormat"))}
             </span>
           </div>
           <div>
             <span className="text-gray-500 text-sm font-medium block mb-1">
-              Начато
+              {t("myAuto.tripDetails.started")}
             </span>
             <span className="text-gray-900 font-medium">
-              {formatDate(startTime)}
+              {formatDate(startTime, t("trips.dateFormat"))}
             </span>
           </div>
           <div>
             <span className="text-gray-500 text-sm font-medium block mb-1">
-              Завершено
+              {t("myAuto.tripDetails.completed")}
             </span>
             <span className="text-gray-900 font-medium">
-              {formatDate(endTime)}
+              {formatDate(endTime, t("trips.dateFormat"))}
             </span>
           </div>
           {duration && (
             <div>
               <span className="text-gray-500 text-sm font-medium block mb-1">
-                Продолжительность
+                {t("myAuto.tripDetails.duration")}
               </span>
               <span className="text-gray-900 font-medium">
                 {duration} {getDurationText(duration, rentalType)}

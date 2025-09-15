@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,82 +27,61 @@ interface Section {
 }
 
 export const UserAgreementContent = () => {
+  const t = useTranslations("terms.userAgreement");
+
   const sections: Section[] = [
     {
-      title: "1. Общие положения",
-      content: [
-        "Настоящее Пользовательское соглашение (далее — «Соглашение») заключается между AZV Motors (далее — «Компания», «мы») и пользователем (далее — «Пользователь», «вы») наших услуг по аренде автомобилей.",
-        "Использование наших услуг означает полное согласие с условиями данного соглашения.",
-      ],
+      title: t("sections.generalProvisions.title"),
+      content: t("sections.generalProvisions.content").split('\n'),
       icon: <FileText className="w-5 h-5" />,
     },
     {
-      title: "2. Описание услуг",
-      content: [
-        "Мы предоставляем услуги по аренде автомобилей через наши мобильные и веб-приложения.",
-        "Наши услуги включают краткосрочную аренду автомобилей поминутно, почасово или посуточно.",
-      ],
+      title: t("sections.serviceDescription.title"),
+      content: t("sections.serviceDescription.content").split('\n'),
       icon: <Car className="w-5 h-5" />,
     },
     {
-      title: "3. Обязанности пользователя",
-      content: ["Пользователь обязуется соблюдать следующие требования:"],
+      title: t("sections.userObligations.title"),
+      content: [t("sections.userObligations.content")],
       icon: <Users className="w-5 h-5" />,
-      items: [
-        "Иметь действующее водительское удостоверение",
-        "Соблюдать правила дорожного движения",
-        "Поддерживать чистоту и исправное состояние автомобиля",
-        "Немедленно сообщать о любых повреждениях или проблемах",
-        "Своевременно возвращать автомобиль",
-      ],
+      items: t("sections.userObligations.items").split('\n'),
     },
     {
-      title: "4. Стоимость и оплата",
-      content: [
-        "Стоимость аренды рассчитывается на основе выбранного тарифа (поминутно/почасово/посуточно).",
-        "Дополнительные платежи могут применяться за несвоевременный возврат, повреждения или нарушения.",
-      ],
+      title: t("sections.costAndPayment.title"),
+      content: t("sections.costAndPayment.content").split('\n'),
       icon: <CreditCard className="w-5 h-5" />,
     },
     {
-      title: "5. Страхование и ответственность",
-      content: [
-        "Наши автомобили застрахованы в соответствии с местным законодательством.",
-        "Пользователи несут ответственность за ущерб, причиненный по неосторожности или в результате нарушения условий.",
-      ],
+      title: t("sections.insuranceAndLiability.title"),
+      content: t("sections.insuranceAndLiability.content").split('\n'),
       icon: <Shield className="w-5 h-5" />,
     },
   ];
 
   const requirements = [
     {
-      label: "Возраст",
-      value: "от 21 года",
+      label: t("requirements.age.label"),
+      value: t("requirements.age.value"),
       icon: <UserCheck className="w-4 h-4" />,
     },
     {
-      label: "Стаж вождения",
-      value: "от 2 лет",
+      label: t("requirements.experience.label"),
+      value: t("requirements.experience.value"),
       icon: <Car className="w-4 h-4" />,
     },
     {
-      label: "Документы",
-      value: "Паспорт + ВУ",
+      label: t("requirements.documents.label"),
+      value: t("requirements.documents.value"),
       icon: <FileText className="w-4 h-4" />,
     },
     {
-      label: "Нарушения",
-      value: "Отсутствие серьезных",
+      label: t("requirements.violations.label"),
+      value: t("requirements.violations.value"),
       icon: <CheckCircle className="w-4 h-4" />,
     },
   ];
 
-  const rules = [
-    "Использовать автомобиль только в пределах разрешенной территории",
-    "Не передавать управление третьим лицам",
-    "Не использовать автомобиль в коммерческих целях без согласования",
-    "Соблюдать правила парковки и стоянки",
-  ];
+  const rules = t("rules").split('\n');
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -113,18 +93,18 @@ export const UserAgreementContent = () => {
           </div>
         </div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Пользовательское соглашение
+          {t("mainTitle")}
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Условия использования сервиса аренды автомобилей AZV Motors
+          {t("description")}
         </p>
 
         <div className="flex flex-wrap justify-center gap-2">
           <Badge variant="secondary" className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
-            Действует с {new Date().toLocaleDateString("ru-RU")}
+            {t("effectiveFrom")} {new Date().toLocaleDateString("ru-RU")}
           </Badge>
-          <Badge variant="outline">Версия 3.0</Badge>
+          <Badge variant="outline">{t("version")}</Badge>
         </div>
       </div>
 
@@ -168,7 +148,7 @@ export const UserAgreementContent = () => {
             <div className="p-2 bg-gray-100 rounded-lg">
               <UserCheck className="w-5 h-5" />
             </div>
-            6. Требования к водителю
+            {t("requirements.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -196,7 +176,7 @@ export const UserAgreementContent = () => {
             <div className="p-2 bg-gray-100 rounded-lg">
               <AlertTriangle className="w-5 h-5" />
             </div>
-            7. Правила использования
+            {t("rules.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -223,16 +203,15 @@ export const UserAgreementContent = () => {
             </div>
             <div className="space-y-2">
               <p className="text-sm text-gray-600">
-                Принимая условия данного соглашения, вы подтверждаете, что
-                ознакомились со всеми пунктами и согласны их соблюдать.
+                {t("footer.agreementText")}
               </p>
               <p className="text-sm text-gray-600">
-                При возникновении вопросов обратитесь в службу поддержки.
+                {t("footer.supportText")}
               </p>
             </div>
             <Separator className="my-4" />
             <p className="text-xs text-gray-500">
-              © 2024 AZV Motors. Все права защищены.
+              {t("footer.copyright")}
             </p>
           </div>
         </CardContent>

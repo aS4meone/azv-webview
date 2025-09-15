@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface VehicleInfoCardProps {
   carDetails: {
@@ -27,6 +28,7 @@ const CarIcon = () => (
 export const VehicleInfoCard: React.FC<VehicleInfoCardProps> = ({
   carDetails,
 }) => {
+  const t = useTranslations();
   return (
     <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100">
@@ -34,20 +36,20 @@ export const VehicleInfoCard: React.FC<VehicleInfoCardProps> = ({
           <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-white">
             <CarIcon />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">Автомобиль</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t("trips.vehicle.title")}</h2>
         </div>
       </div>
       <div className="px-6 py-4 space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-gray-500 text-sm font-medium">Модель</span>
+          <span className="text-gray-500 text-sm font-medium">{t("trips.vehicle.model")}</span>
           <span className="text-gray-900 font-medium">{carDetails.name}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-500 text-sm font-medium">Год</span>
+          <span className="text-gray-500 text-sm font-medium">{t("trips.vehicle.year")}</span>
           <span className="text-gray-900 font-medium">{carDetails.year}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-500 text-sm font-medium">Двигатель</span>
+          <span className="text-gray-500 text-sm font-medium">{t("trips.vehicle.engine")}</span>
           <span className="text-gray-900 font-medium">
             {carDetails.engine_volume}L
           </span>

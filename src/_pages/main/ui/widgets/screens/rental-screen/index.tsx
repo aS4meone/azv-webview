@@ -4,6 +4,7 @@ import React from "react";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../../modals/ui";
 import { usePricingCalculator, RentalData } from "./hooks/usePricingCalculator";
 import { RentalTabContent } from "./components";
+import { useTranslations } from "next-intl";
 
 interface RentalPageProps {
   car: ICar;
@@ -18,10 +19,12 @@ export const RentalPage = ({
   isDelivery,
   deliveryAddress,
 }: RentalPageProps) => {
+  const t = useTranslations();
   const {
     activeTab,
     duration,
     calculateCost,
+    rentalConfig,
     handleTabChange,
     incrementDuration,
     decrementDuration,
@@ -49,7 +52,7 @@ export const RentalPage = ({
         {isDelivery && deliveryAddress && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h3 className="text-sm font-medium text-blue-800 mb-2">
-              Адрес доставки:
+              {t("widgets.screens.delivery.deliveryAddress")}:
             </h3>
             <p className="text-sm text-blue-700">{deliveryAddress}</p>
           </div>
@@ -58,9 +61,9 @@ export const RentalPage = ({
         {/* Rental Type Tabs */}
         <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsList variant="rounded">
-            <TabsTrigger value="minutes">Минуты</TabsTrigger>
-            <TabsTrigger value="hours">Часы</TabsTrigger>
-            <TabsTrigger value="days">Дни</TabsTrigger>
+            <TabsTrigger value="minutes">{t("widgets.screens.rental.minutes")}</TabsTrigger>
+            <TabsTrigger value="hours">{t("widgets.screens.rental.hours")}</TabsTrigger>
+            <TabsTrigger value="days">{t("widgets.screens.rental.days")}</TabsTrigger>
           </TabsList>
 
           {(["minutes", "hours", "days"] as const).map((rentalType) => (
@@ -71,6 +74,7 @@ export const RentalPage = ({
                 duration={duration}
                 totalCost={calculateCost(rentalType).totalCost}
                 costCalculation={calculateCost(rentalType)}
+                config={rentalConfig[rentalType]}
                 onIncrement={incrementDuration}
                 onDecrement={decrementDuration}
                 onDurationChange={setDurationDirect}
@@ -90,12 +94,11 @@ export const RentalPage = ({
             className="w-full"
             disabled={duration <= 0}
           >
-            {isDelivery ? "Заказать доставку" : "Забронировать"}
+            {isDelivery ? t("widgets.screens.rental.orderDelivery") : t("widgets.screens.rental.book")}
           </Button>
         </div>
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-800 text-sm">
-          <span className="font-medium">Внимание:</span> по истечении{" "}
-          <b>15 минут</b> после бронирования начинается платное ожидание.
+          <span className="font-medium">{t("widgets.screens.rental.attention")}</span> {t("widgets.screens.rental.waitingFee")}
         </div>
       </div>
     </article>

@@ -1,6 +1,7 @@
-import { CarStatus, ICar } from "@/shared/models/types/car";
+"use client";import { CarStatus, ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { useUserStore } from "@/shared/stores/userStore";
@@ -20,6 +21,7 @@ export const MechanicStartCheckModal = ({
   car,
   onClose,
 }: MechanicStartCheckModalProps) => {
+  const t = useTranslations();
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const delivering = car.status === CarStatus.delivering;
@@ -53,8 +55,8 @@ export const MechanicStartCheckModal = ({
           isOpen: true,
 
           onButtonClick: handleClose,
-          description: "Осмотр успешно принят в работу",
-          buttonText: "Отлично",
+          description: t("mechanic.inspection.acceptedInWork"),
+          buttonText: t("mechanic.common.excellent"),
           onClose: handleClose,
         });
       }
@@ -62,7 +64,7 @@ export const MechanicStartCheckModal = ({
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: "Попробовать снова",
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -89,8 +91,8 @@ export const MechanicStartCheckModal = ({
           onButtonClick: () => {
             handleClose();
           },
-          description: "Доставка успешно принята в работу",
-          buttonText: "Отлично",
+          description: t("mechanic.delivery.acceptedInWork"),
+          buttonText: t("mechanic.common.excellent"),
           onClose: () => {
             handleClose();
           },
@@ -100,7 +102,7 @@ export const MechanicStartCheckModal = ({
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: "Попробовать снова",
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -116,8 +118,8 @@ export const MechanicStartCheckModal = ({
         isOpen: true,
 
         onButtonClick: handleClose,
-        description: "Слежка начата",
-        buttonText: "Отлично",
+        description: t("mechanic.tracking.started"),
+        buttonText: t("mechanic.common.excellent"),
         onClose: handleClose,
       });
     } catch (error) {
@@ -126,8 +128,8 @@ export const MechanicStartCheckModal = ({
         type: "error",
         isOpen: true,
 
-        description: "Ошибка при начале слежки",
-        buttonText: "Попробовать снова",
+        description: t("mechanic.tracking.startError"),
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: handleClose,
         onClose: handleClose,
       });
@@ -166,7 +168,7 @@ export const MechanicStartCheckModal = ({
           <div className="space-y-3 flex flex-col gap-3">
             {car.status === CarStatus.pending && (
               <Button variant="outline" onClick={handleViewData}>
-                Посмотреть данные
+                {t("mechanic.tracking.viewData")}
               </Button>
             )}
 
@@ -184,7 +186,7 @@ export const MechanicStartCheckModal = ({
                   className="flex items-center justify-center gap-2"
                 >
                   <FaCar className="w-4 h-4" />
-                  Точка авто
+                  {t("mechanic.vehicle.carPoint")}
                 </Button>
                 <Button
                   variant="outline"
@@ -197,7 +199,7 @@ export const MechanicStartCheckModal = ({
                   className="flex items-center justify-center gap-2"
                 >
                   <FaMapMarkerAlt className="w-4 h-4" />
-                  Точка доставки
+                  {t("mechanic.vehicle.deliveryPoint")}
                 </Button>
               </>
 
@@ -216,10 +218,10 @@ export const MechanicStartCheckModal = ({
               }}
             >
               {delivering
-                ? "Начать доставку"
+                ? t("mechanic.delivery.startDelivery")
                 : tracking
-                  ? "Начать слежку"
-                  : "Принять осмотр"}
+                  ? t("mechanic.tracking.startTracking")
+                  : t("mechanic.inspection.acceptInspection")}
             </Button>
           </div>
         </div>

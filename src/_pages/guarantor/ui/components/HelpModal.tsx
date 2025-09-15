@@ -1,6 +1,7 @@
 import React from "react";
 import { HiX, HiQuestionMarkCircle } from "react-icons/hi";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { useTranslations } from "next-intl";
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -8,6 +9,8 @@ interface HelpModalProps {
 }
 
 export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
+  const t = useTranslations();
+  
   if (!isOpen) return null;
 
   return (
@@ -26,7 +29,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
               <HiQuestionMarkCircle className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-lg font-semibold text-[#191919]">
-              Что такое Гарант?
+              {t("guarantor.helpModal.title")}
             </h2>
           </div>
           <button
@@ -50,49 +53,39 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             <div>
               <h4 className="font-semibold text-[#191919] mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#191919]"></div>
-                Определение
+                {t("guarantor.helpModal.definition")}
               </h4>
               <p className="text-sm text-[#191919] leading-relaxed">
-                Гарант — лицо, которое в случае ДТП несёт материальную ответственность.
+                {t("guarantor.helpModal.definitionText")}
               </p>
             </div>
             
             <div>
               <h4 className="font-semibold text-[#191919] mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#191919]"></div>
-                Как это работает?
+                {t("guarantor.helpModal.howItWorks")}
               </h4>
               <ul className="text-sm text-[#191919] space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#191919] mt-1">•</span>
-                  <span>Гарант берет на себя материальную ответственность за ваши действия</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#191919] mt-1">•</span>
-                  <span>В случае ДТП или других обязательств гарант несет финансовую ответственность</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#191919] mt-1">•</span>
-                  <span>Гарант должен подписать соответствующие договоры</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#191919] mt-1">•</span>
-                  <span>Связь между вами и гарантом должна быть подтверждена обеими сторонами</span>
-                </li>
+                {t.raw("guarantor.helpModal.howItWorksItems").map((item: string, index: number) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-[#191919] mt-1">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-[#191919] mb-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#191919]"></div>
-                Вкладки
+                {t("guarantor.helpModal.tabs")}
               </h4>
               <div className="text-sm text-[#191919] space-y-3">
                 <div className="bg-[#F8F8F8] rounded-lg p-3">
-                  <strong className="text-[#191919]">Я Гарант:</strong> Здесь отображаются заявки от людей, которые просят вас стать их гарантом, а также список людей, за которых вы уже несете ответственность.
+                  <strong className="text-[#191919]">{t("guarantor.tabs.iAmGuarantor")}:</strong> {t("guarantor.helpModal.iAmGuarantorTab")}
                 </div>
                 <div className="bg-[#F8F8F8] rounded-lg p-3">
-                  <strong className="text-[#191919]">Мои Гаранты:</strong> Здесь вы можете добавить своих гарантов и просматривать их статус.
+                  <strong className="text-[#191919]">{t("guarantor.tabs.myGuarantors")}:</strong> {t("guarantor.helpModal.myGuarantorsTab")}
                 </div>
               </div>
             </div>
@@ -105,7 +98,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             className="w-full px-4 py-3 bg-[#191919] text-white rounded-xl hover:bg-[#333333] transition-all duration-300 font-semibold"
           >
-            Понятно
+            {t("guarantor.helpModal.understood")}
           </button>
         </div>
       </div>

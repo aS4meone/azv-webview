@@ -23,6 +23,7 @@ import MyCarsPage from "@/_pages/cars/my/page";
 import MechanicPendingPage from "@/_pages/mechanic/pending/page";
 import MechanicDeliveryPage from "@/_pages/mechanic/delivery/page";
 import MechanicInRentPage from "@/_pages/mechanic/in-rent/page";
+import { useTranslations } from "next-intl";
 
 enum ServiceButtonType {
   CHECK = "check",
@@ -33,6 +34,7 @@ enum ServiceButtonType {
 const FooterBtns = () => {
   const { user } = useUserStore();
   const { allMechanicVehicles, currentDeliveryVehicle } = useVehiclesStore();
+  const t = useTranslations();
 
   const [activeServiceButton, setActiveServiceButton] =
     useState<ServiceButtonType | null>(null);
@@ -48,38 +50,38 @@ const FooterBtns = () => {
     {
       key: "my_cars",
       component: <MyCarsPage onClose={() => setCurrentComponent(null)} />,
-      title: "Мои машины",
+      title: t("widgets.footerBtns.myCars"),
     },
     {
       key: "free_cars",
       component: <FreeCarsPage onClose={() => setCurrentComponent(null)} />,
-      title: "Свободно",
+      title: t("widgets.footerBtns.freeCars"),
     },
     {
       key: "freq_used_cars",
       component: <FreqUsedCarsPage onClose={() => setCurrentComponent(null)} />,
-      title: "Часто используемые",
+      title: t("widgets.footerBtns.freqUsedCars"),
     },
     {
       key: "mechanic_pending",
       component: (
         <MechanicPendingPage onClose={() => setCurrentComponent(null)} />
       ),
-      title: "Проверка",
+      title: t("widgets.footerBtns.mechanicPending"),
     },
     {
       key: "mechanic_delivery",
       component: (
         <MechanicDeliveryPage onClose={() => setCurrentComponent(null)} />
       ),
-      title: "Доставка",
+      title: t("widgets.footerBtns.mechanicDelivery"),
     },
     {
       key: "mechanic_in_rent",
       component: (
         <MechanicInRentPage onClose={() => setCurrentComponent(null)} />
       ),
-      title: "В аренде",
+      title: t("widgets.footerBtns.mechanicInRent"),
     },
   ];
 
@@ -194,14 +196,14 @@ const FooterBtns = () => {
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <UserIcon />
-            <span>Мои машины</span>
+            <span>{t("widgets.footerBtns.myCars")}</span>
           </Button>
           <Button
             onClick={() => setCurrentComponent("free_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <RoadIcon />
-            <span>Свободные машины</span>
+            <span>{t("widgets.footerBtns.freeCars")}</span>
           </Button>
         </div>
       );
@@ -213,17 +215,17 @@ const FooterBtns = () => {
           {renderServiceButton(
             ServiceButtonType.CHECK,
             <CheckIcon />,
-            "Проверка"
+            t("widgets.footerBtns.check")
           )}
           {renderServiceButton(
             ServiceButtonType.DELIVERING,
             <TruckIcon />,
-            "Доставка"
+            t("widgets.footerBtns.delivery")
           )}
           {renderServiceButton(
             ServiceButtonType.RENT,
             <ClockIcon />,
-            "В аренде"
+            t("widgets.footerBtns.rent")
           )}
         </div>
       );
@@ -241,14 +243,14 @@ const FooterBtns = () => {
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <UserIcon />
-            <span>Часто используемые</span>
+            <span>{t("widgets.footerBtns.freqUsedCars")}</span>
           </Button>
           <Button
             onClick={() => setCurrentComponent("free_cars")}
             className="flex items-center gap-2 justify-center border-[#E8E8E8] text-[#191919] font-medium text-[16px]"
           >
             <RoadIcon />
-            <span>Свободные машины</span>
+            <span>{t("widgets.footerBtns.freeCars")}</span>
           </Button>
         </div>
       );

@@ -1,8 +1,8 @@
-export const formatDate = (dateString: string) => {
+export const formatDate = (dateString: string, locale: string = "ru-RU") => {
   const serverDate = new Date(dateString);
   const localDate = new Date(serverDate.getTime());
 
-  return localDate.toLocaleDateString("ru-RU", {
+  return localDate.toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
     year: "numeric",

@@ -10,6 +10,7 @@ import { userApi } from "@/shared/api/routes/user";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { DocumentDetailsModal } from "./DocumentDetailsModal";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { useTranslations } from "next-intl";
 
 interface DocumentFiles {
   id_front?: File;
@@ -20,6 +21,7 @@ interface DocumentFiles {
 }
 
 export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
+  const t = useTranslations("profile");
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [files, setFiles] = useState<DocumentFiles>({});
@@ -68,12 +70,12 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Не удалось загрузить документы. Попробуйте еще раз";
+          : t("failedToUploadDocuments");
       setResponseModal({
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description: errorMessage,
-        buttonText: "Понятно",
+        buttonText: t("understood"),
         onButtonClick: () => {
           handleCloseResponseModal();
         },
@@ -107,9 +109,9 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       if (response.status === 200) {
         setResponseModal({
           type: "success",
-          title: "Успешно",
-          description: "Документы успешно загружены",
-          buttonText: "Хорошо",
+          title: t("success"),
+          description: t("documentsUploadedSuccessfully"),
+          buttonText: t("ok"),
           onButtonClick: () => {
             handleCloseResponseModal();
           },
@@ -117,9 +119,9 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       } else {
         setResponseModal({
           type: "error",
-          title: "Ошибка",
-          description: "Не удалось загрузить документы. Попробуйте еще раз",
-          buttonText: "Понятно",
+          title: t("error"),
+          description: t("failedToUploadDocuments"),
+          buttonText: t("understood"),
           onButtonClick: () => {
             handleCloseResponseModal();
           },
@@ -128,9 +130,9 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
     } catch (error) {
       setResponseModal({
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description: error.response.data.detail,
-        buttonText: "Понятно",
+        buttonText: t("understood"),
         onButtonClick: () => {
           handleCloseResponseModal();
         },
@@ -156,19 +158,19 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
   const uploadConfig: PhotoConfig[] = [
     {
       id: "id_front",
-      title: "Сфотографируйте лицевую сторону удостоверения личности",
+      title: t("photoInstructions.idFront"),
       multiple: { min: 1, max: 1 },
       stencil: { type: "rect", rect: { aspect: 1.58, widthPct: 86, borderRadiusPct: 3, offsetYPct: -2 } }
     },
     {
       id: "id_back",
-      title: "Сфотографируйте обратную сторону удостоверения личности",
+      title: t("photoInstructions.idBack"),
       multiple: { min: 1, max: 1 },
       stencil: { type: "rect", rect: { aspect: 1.58, widthPct: 86, borderRadiusPct: 3, offsetYPct: -2 } }
     },
     {
       id: "selfie_with_license",
-      title: "Сделайте селфи, держа водительское удостоверение рядом с лицом",
+      title: t("photoInstructions.selfieWithLicense"),
       isSelfy: true,
       multiple: { min: 1, max: 1 },
       stencil: {
@@ -179,13 +181,13 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
     },
     {
       id: "drivers_license",
-      title: "Сфотографируйте лицевую сторону водительского удостоверения",
+      title: t("photoInstructions.driversLicense"),
       multiple: { min: 1, max: 1 },
       stencil: { type: "rect", rect: { aspect: 1.58, widthPct: 86, borderRadiusPct: 3, offsetYPct: -2 } }
     },
     {
       id: "selfie",
-      title: "Сделайте селфи",
+      title: t("photoInstructions.selfie"),
       isSelfy: true,
       multiple: { min: 1, max: 1 },
       stencil: { type: "circle", circle: { diameterPct: 58, offsetYPct: -6 } }
@@ -195,7 +197,7 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
   return (
     <>
       <Button variant="secondary" onClick={() => setIsUploadOpen(true)}>
-        Заменить документы
+        {t("replaceDocumentsButton")}
       </Button>
       <UploadPhoto
         config={uploadConfig}

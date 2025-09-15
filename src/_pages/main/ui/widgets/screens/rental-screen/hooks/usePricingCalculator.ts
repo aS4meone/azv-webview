@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from "react";
 import { ICar } from "@/shared/models/types/car";
 import { RentalType } from "@/shared/models/dto/rent.dto";
+import { useTranslations } from "next-intl";
 
-interface RentalConfig {
+export interface RentalConfig {
   title: string;
   description: string;
   getDescription?: (car: ICar) => string;
@@ -35,6 +36,49 @@ const getRussianPlural = (
   return many;
 };
 
+// Функция для получения конфигурации аренды с переводами
+export const getRentalConfig = (t: any): Record<RentalType, RentalConfig> => ({
+  minutes: {
+    title: t("widgets.screens.rental.minutes"),
+    description: t("widgets.screens.rental.minutes"),
+    getDescription: (car: ICar) => {
+      const openingFee = car.open_price as number;
+      return `${t("widgets.screens.rental.minutes")} ${openingFee.toLocaleString()} ₸ ${t("widgets.screens.rental.minutes")}`;
+    },
+    unit: t("widgets.screens.rental.minutes"),
+    maxDuration: 120,
+    priceKey: "price_per_minute",
+    getUnitText: (duration: number) =>
+      getRussianPlural(duration, "минута", "минуты", "минут"),
+    hasOpeningFee: true,
+    openingFeeKey: "open_price",
+  },
+  hours: {
+    title: t("widgets.screens.rental.hours"),
+    description: "",
+    getDescription: (car: ICar) => {
+      const openingFee = car.open_price as number;
+      return `${t("widgets.screens.rental.hours")} ${openingFee.toLocaleString()} ₸ ${t("widgets.screens.rental.hours")}`;
+    },
+    unit: t("widgets.screens.rental.hours"),
+    maxDuration: 24,
+    priceKey: "price_per_hour",
+    getUnitText: (duration: number) =>
+      getRussianPlural(duration, "час", "часа", "часов"),
+    hasOpeningFee: false,
+  },
+  days: {
+    title: t("widgets.screens.rental.days"),
+    description: t("widgets.screens.rental.days"),
+    unit: t("widgets.screens.rental.days"),
+    maxDuration: 365,
+    priceKey: "price_per_day",
+    getUnitText: (duration: number) =>
+      getRussianPlural(duration, "день", "дня", "дней"),
+    hasOpeningFee: false,
+  },
+});
+
 // Функция для расчета скидки для дневного тарифа
 const calculateDaysDiscount = (
   duration: number
@@ -62,48 +106,6 @@ const calculateDaysDiscount = (
   };
 };
 
-export const RENTAL_CONFIG: Record<RentalType, RentalConfig> = {
-  minutes: {
-    title: "Поминутная аренда",
-    description: "При поминутной аренде взимается плата за открытие.",
-    getDescription: (car: ICar) => {
-      const openingFee = car.open_price as number;
-      return `При поминутной аренде взимается плата ${openingFee.toLocaleString()} ₸ за открытие.`;
-    },
-    unit: "в минуту",
-    maxDuration: 120,
-    priceKey: "price_per_minute",
-    getUnitText: (duration: number) =>
-      getRussianPlural(duration, "минута", "минуты", "минут"),
-    hasOpeningFee: true,
-    openingFeeKey: "open_price",
-  },
-  hours: {
-    title: "Почасовая аренда",
-    description: "",
-    getDescription: (car: ICar) => {
-      const openingFee = car.open_price as number;
-      return `Удобный тариф для коротких поездок и дел в городе. За открытие двери автомобиля взимается плата ${openingFee.toLocaleString()} ₸ за открытие.`;
-    },
-    unit: "в час",
-    maxDuration: 24,
-    priceKey: "price_per_hour",
-    getUnitText: (duration: number) =>
-      getRussianPlural(duration, "час", "часа", "часов"),
-    hasOpeningFee: false,
-  },
-  days: {
-    title: "Суточная аренда",
-    description: "Выгодный тариф для длительного использования автомобиля.",
-
-    unit: "в день",
-    maxDuration: 365,
-    priceKey: "price_per_day",
-    getUnitText: (duration: number) =>
-      getRussianPlural(duration, "день", "дня", "дней"),
-    hasOpeningFee: false,
-  },
-} as const;
 
 export interface RentalData {
   carId: number;
@@ -120,17 +122,19 @@ export interface CostCalculation {
 }
 
 export const usePricingCalculator = (car: ICar) => {
+  const t = useTranslations();
   const [activeTab, setActiveTab] = useState<RentalType>("minutes");
   const [duration, setDuration] = useState(1);
 
-  const currentConfig = RENTAL_CONFIG[activeTab];
+  const rentalConfig = useMemo(() => getRentalConfig(t), [t]);
+  const currentConfig = rentalConfig[activeTab];
 
   const calculateCost = useCallback(
     (
       rentalType: RentalType,
       currentDuration: number = duration
     ): CostCalculation => {
-      const config = RENTAL_CONFIG[rentalType];
+      const config = rentalConfig[rentalType];
       const pricePerUnit = car[config.priceKey] as number;
 
       // Для минут считаем только доплату за открытие, время считается отдельно
@@ -184,7 +188,7 @@ export const usePricingCalculator = (car: ICar) => {
         totalCost: baseCost,
       };
     },
-    [car, duration]
+    [car, duration, rentalConfig]
   );
 
   // Расчет стоимости для текущего активного таба
@@ -233,6 +237,7 @@ export const usePricingCalculator = (car: ICar) => {
     baseCost: costCalculation.baseCost,
     costCalculation,
     calculateCost,
+    rentalConfig,
     handleTabChange,
     incrementDuration,
     decrementDuration,

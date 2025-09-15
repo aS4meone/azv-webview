@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export const useCountdownTimer = (
   startTime: string | null,
@@ -6,6 +7,7 @@ export const useCountdownTimer = (
   rentalType: "hours" | "days",
   pricePerMinute: number
 ) => {
+  const t = useTranslations();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export const useCountdownTimer = (
   return {
     timeLeft: timeDisplay,
     isOvertime,
-    overtimeText: isOvertime ? "Штрафное время" : "Осталось времени",
+    overtimeText: isOvertime ? t("widgets.modals.rentalContent.penaltyTime") : t("widgets.modals.rentalContent.timeLeft"),
     overtimeMinutes,
     penaltyCost,
   };

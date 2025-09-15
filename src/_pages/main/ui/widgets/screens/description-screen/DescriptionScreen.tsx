@@ -2,6 +2,7 @@ import { ICar } from "@/shared/models/types/car";
 import React from "react";
 import PushScreen from "@/shared/ui/push-screen";
 import { Button } from "@/shared/ui";
+import { useTranslations } from "next-intl";
 
 interface DescriptionScreenProps {
   car: ICar;
@@ -9,15 +10,17 @@ interface DescriptionScreenProps {
 }
 
 export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
+  const t = useTranslations();
+  
   return (
     <PushScreen onClose={onClose} withCloseButton={true}>
       <div className="space-y-6">
         {/* Заголовок */}
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-gray-900">
-            Описание автомобиля
+            {t("widgets.screens.description.carDescription")}
           </h1>
-          <p className="text-gray-600">Информация о автомобиле {car.name}</p>
+          <p className="text-gray-600">{t("widgets.screens.description.carInfo")} {car.name}</p>
         </div>
 
         {car.description && (
@@ -27,7 +30,7 @@ export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
         )}
 
         <Button variant="secondary" onClick={onClose} className="w-full">
-          Вернуться к карте
+          {t("widgets.screens.description.backToMap")}
         </Button>
       </div>
     </PushScreen>

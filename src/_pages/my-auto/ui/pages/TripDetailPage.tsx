@@ -39,7 +39,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
       setTripDetails(data);
     } catch (err) {
       console.error("Error fetching trip details:", err);
-      setError("Failed to load trip details");
+      setError(t("myAuto.tripDetailsError"));
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ru-RU", {
+    return date.toLocaleDateString(t("myAuto.locale.dateFormat"), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -294,19 +294,19 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
         {loading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
-            <p className="mt-4 text-[#666666]">Загрузка деталей поездки...</p>
+            <p className="mt-4 text-[#666666]">{t("myAuto.loadingTripDetails")}</p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12">
             <div className="text-center">
               <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">
-                Ошибка загрузки
+                {t("myAuto.tripDetailsError")}
               </h3>
               <p className="text-[#666666] mb-4">
-                Не удалось загрузить детали поездки. Попробуйте еще раз.
+                {t("myAuto.tripDetailsErrorDescription")}
               </p>
               <Button onClick={fetchTripDetails} variant="primary">
-                Попробовать снова
+                {t("myAuto.retry")}
               </Button>
             </div>
           </div>
@@ -315,7 +315,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
             {/* Trip Info */}
             <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
               <h2 className="text-lg font-medium text-[#2D2D2D] mb-4">
-                Информация о поездке
+                {t("myAuto.tripInfo")}
               </h2>
               <div className="grid grid-cols-1 gap-4">
                 <div className="flex justify-between items-center py-2">
@@ -372,19 +372,19 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                 {tripDetails.route_map.route_data ? (
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-[#666666] font-medium">Длительность:</span>
+                      <span className="text-[#666666] font-medium">{t("myAuto.durationLabel")}</span>
                       <span className="text-[#2D2D2D]">
-                        {tripDetails.route_map.duration_over_24h ? "Более 24 часов" : "Менее 24 часов"}
+                        {tripDetails.route_map.duration_over_24h ? t("myAuto.over24Hours") : t("myAuto.under24Hours")}
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-[#666666] font-medium">Дней маршрута:</span>
+                      <span className="text-[#666666] font-medium">{t("myAuto.routeDays")}</span>
                       <span className="text-[#2D2D2D]">
                         {tripDetails.route_map.route_data.daily_routes.length}
                       </span>
                     </div>
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-[#666666] font-medium">Всего точек:</span>
+                      <span className="text-[#666666] font-medium">{t("myAuto.totalPoints")}</span>
                       <span className="text-[#2D2D2D]">
                         {tripDetails.route_map.route_data.total_coordinates}
                       </span>
@@ -475,7 +475,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                 <svg className="w-16 h-16 text-white/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
-                <p className="text-white text-sm font-medium">Фото недоступно</p>
+                <p className="text-white text-sm font-medium">{t("myAuto.photoNotAvailable")}</p>
               </div>
             ) : (
               <>
@@ -488,7 +488,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                   src={currentPhotoSet[currentPhotoIndex]?.startsWith('http') 
                     ? currentPhotoSet[currentPhotoIndex] 
                     : `https://api.azvmotors.kz/${currentPhotoSet[currentPhotoIndex]}`}
-                  alt={`Фото ${currentPhotoIndex + 1}`}
+                  alt={`${t("myAuto.photo")} ${currentPhotoIndex + 1}`}
                   className="max-h-full max-w-full object-contain"
                   onError={() => handleImageError(currentPhotoIndex)}
                   onLoad={() => handleImageLoad(currentPhotoIndex)}
@@ -538,7 +538,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
           {/* Instruction Text */}
           <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10">
             <p className="text-white/70 text-sm text-center">
-              Приближайте пальцами
+              {t("myAuto.pinchToZoom")}
             </p>
           </div>
         </div>

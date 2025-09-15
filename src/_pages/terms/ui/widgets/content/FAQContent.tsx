@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, HelpCircle, Search } from "lucide-react";
@@ -15,41 +16,39 @@ interface FAQItem {
 }
 
 export const FAQContent = () => {
+  const t = useTranslations("terms.faqs");
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const faqs: FAQItem[] = [
     {
-      question: "Закончился бензин?",
-      answer:
-        "Если в дороге у вас неожиданно закончился бензин, пожалуйста, свяжитесь с нашей службой поддержки. Мы оперативно направим к вам ближайшую мобильную команду с необходимым топливом, чтобы вы могли продолжить поездку как можно скорее.",
-      category: "Техническая поддержка",
+      question: t("questions.1.question"),
+      answer: t("questions.1.answer"),
+      category: "technicalSupport",
       popular: true,
     },
     {
-      question: "Почему не одобрили доступ в аккаунт?",
-      answer:
-        "К сожалению, на данный момент доступ к аккаунту не был одобрен. Это может быть связано с несоответствием одного или нескольких критериев безопасности или проверки данных. Мы понимаем, что это может вызывать неудобства, и всегда готовы рассмотреть ваш запрос повторно. Пожалуйста, проверьте, чтобы все документы были загружены корректно и соответствовали требованиям, и при необходимости свяжитесь с нашей службой поддержки — мы с удовольствием подскажем, что можно сделать для повторного рассмотрения заявки.",
-      category: "Документы",
+      question: t("questions.2.question"),
+      answer: t("questions.2.answer"),
+      category: "documents",
+      popular: false,
     },
     {
-      question: "Не удаётся открыть или закрыть автомобиль?",
-      answer:
-        "Пожалуйста, сначала убедитесь, что на вашем устройстве есть стабильное подключение к интернету, и попробуйте выполнить действие ещё раз. Если проблема сохраняется — свяжитесь с нашей службой поддержки. Мы оперативно проверим ситуацию и поможем вам как можно быстрее.",
-      category: "Техническая поддержка",
+      question: t("questions.3.question"),
+      answer: t("questions.3.answer"),
+      category: "technicalSupport",
       popular: true,
     },
     {
-      question: "Не получается завершить аренду?",
-      answer:
-        "Пожалуйста, убедитесь, что: автомобиль полностью закрыт, все окна и двери плотно закрыты, включен режим-парковки, у вас есть стабильное интернет-соединение. Если все условия выполнены, но аренду завершить не удаётся — не беспокойтесь. Свяжитесь с нашей службой поддержки, и мы поможем оперативно решить ситуацию.",
-      category: "Техническая поддержка",
+      question: t("questions.4.question"),
+      answer: t("questions.4.answer"),
+      category: "technicalSupport",
+      popular: false,
     },
     {
-      question: "Списались лишние деньги, что делать?",
-      answer:
-        "Понимаем ваше беспокойство по поводу списания дополнительных средств. Чтобы разобраться в ситуации, рекомендуем выполнить следующие шаги: 1. Проверьте выбранный тариф: Убедитесь, что списанная сумма соответствует условиям тарифа, который вы использовали. 2. Оцените время и пробег поездки: Сравните фактическое время аренды и пройденное расстояние с расчетами в приложении. 3. Проверьте наличие штрафов или дополнительных услуг: Возможны дополнительные списания за нарушения правил использования или за предоставленные дополнительные услуги. Если после этих проверок у вас остаются вопросы или вы считаете, что списание было необоснованным, рекомендуем обратиться в нашу службу поддержки.",
-      category: "Оплата",
+      question: t("questions.5.question"),
+      answer: t("questions.5.answer"),
+      category: "payment",
       popular: true,
     },
   ];
@@ -66,16 +65,16 @@ export const FAQContent = () => {
     <div className="space-y-8">
       <div className="text-center space-y-4">
         <h1 className="text-3xl font-bold text-black">
-          Часто задаваемые вопросы
+          {t("title")}
         </h1>
         <p className="text-black/60">
-          Найдите ответы на популярные вопросы о нашем сервисе
+          {t("content")}
         </p>
 
         <div className="relative max-w-md mx-auto">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black/40 w-4 h-4" />
           <Input
-            placeholder="Поиск по вопросам..."
+            placeholder={t("searchPlaceholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -90,7 +89,7 @@ export const FAQContent = () => {
             variant="secondary"
             className="text-sm bg-[#1D77FF]/10 text-[#1D77FF]"
           >
-            {category}
+            {t(`categories.${category}`)}
           </Badge>
         ))}
       </div>
@@ -111,14 +110,14 @@ export const FAQContent = () => {
                         variant="secondary"
                         className="text-xs bg-[#1D77FF] text-white"
                       >
-                        Популярный
+                        {t("popular")}
                       </Badge>
                     )}
                     <Badge
                       variant="outline"
                       className="text-xs border-[#1D77FF] text-[#1D77FF]"
                     >
-                      {faq.category}
+                      {t(`categories.${faq.category}`)}
                     </Badge>
                   </div>
                   <h3 className="font-semibold text-black text-lg">
@@ -161,10 +160,10 @@ export const FAQContent = () => {
         <div className="text-center py-12">
           <HelpCircle className="w-12 h-12 text-black/40 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-black mb-2">
-            Вопросы не найдены
+            {t("noQuestionsFound")}
           </h3>
           <p className="text-black/60">
-            Попробуйте изменить поисковый запрос или обратитесь в поддержку
+            {t("noQuestionsDescription")}
           </p>
         </div>
       )}

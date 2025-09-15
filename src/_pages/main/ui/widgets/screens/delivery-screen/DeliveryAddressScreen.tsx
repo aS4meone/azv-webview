@@ -19,6 +19,7 @@ import { checkDeliveryAvailability } from "@/shared/utils/polygon";
 import { ICar } from "@/shared/models/types/car";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
+import { useTranslations } from "next-intl";
 
 // Получаем настройки производительности для устройства
 
@@ -91,6 +92,7 @@ export const DeliveryAddressScreen = ({
   car,
 }: DeliveryAddressScreenProps) => {
   const { user } = useUserStore();
+  const t = useTranslations();
   // Состояние камеры карты
   const [cameraProps, setCameraProps] = useState<MapCameraProps>({
     center: { lat: 43.222, lng: 76.8512 },
@@ -134,10 +136,10 @@ export const DeliveryAddressScreen = ({
       logPerformance("Address geocoding", startTime);
     } catch (error) {
       console.error("Error getting address:", error);
-      setAddress("Ошибка определения адреса");
+      setAddress(t("widgets.screens.delivery.locationError"));
       setDeliveryStatus({
         isAvailable: false,
-        message: "Ошибка проверки зоны доставки",
+        message: t("widgets.screens.delivery.locationError"),
       });
     } finally {
       setIsLoading(false);
@@ -196,7 +198,7 @@ export const DeliveryAddressScreen = ({
 
           // Показываем сообщение об ошибке
           alert(
-            "Не удалось получить вашу локацию. Проверьте разрешения для доступа к геолокации."
+            t("widgets.screens.delivery.locationError")
           );
         },
         {
@@ -207,7 +209,7 @@ export const DeliveryAddressScreen = ({
       );
     } else {
       setIsGettingLocation(false);
-      alert("Геолокация не поддерживается вашим браузером");
+      alert(t("widgets.screens.delivery.geolocationNotSupported"));
     }
   }, [updateAddress]);
 
@@ -271,7 +273,7 @@ export const DeliveryAddressScreen = ({
             onClick={goToMyLocation}
             disabled={isGettingLocation}
             className="bg-white rounded-full p-3 shadow-lg border border-gray-200 hover:shadow-xl transition-shadow disabled:opacity-50"
-            title="Перейти к моей локации"
+            title={t("widgets.screens.delivery.goToMyLocation")}
           >
             {isGettingLocation ? (
               <div className="w-6 h-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500"></div>
@@ -323,7 +325,7 @@ export const DeliveryAddressScreen = ({
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            Адрес доставки:
+            {t("widgets.screens.delivery.deliveryAddress")}
           </h3>
           <div
             className={`bg-white rounded-lg p-3 min-h-[70px] flex items-center border ${
@@ -335,7 +337,7 @@ export const DeliveryAddressScreen = ({
             {isLoading ? (
               <div className="flex items-center space-x-2">
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500"></div>
-                <p className="text-sm text-gray-500">Определение адреса...</p>
+                <p className="text-sm text-gray-500">{t("widgets.screens.delivery.determiningAddress")}</p>
               </div>
             ) : (
               <div className="w-full">
@@ -412,11 +414,11 @@ export const DeliveryAddressScreen = ({
                 <span className={`text-sm font-medium ${
                   isOwner ? "text-green-800" : "text-blue-800"
                 }`}>
-                  Стоимость доставки
+                  {t("widgets.screens.delivery.deliveryCost")}
                 </span>
                 {isOwner && (
                   <span className="text-xs text-green-600">
-                    Скидка для владельца
+                    {t("widgets.screens.delivery.ownerDiscount")}
                   </span>
                 )}
               </div>
@@ -442,7 +444,7 @@ export const DeliveryAddressScreen = ({
           disabled={
             isLoading ||
             !address ||
-            address === "Ошибка определения адреса" ||
+            address === t("widgets.screens.delivery.locationError") ||
             !deliveryStatus.isAvailable
           }
           className={` ${
@@ -452,8 +454,8 @@ export const DeliveryAddressScreen = ({
           }`}
         >
           {!deliveryStatus.isAvailable
-            ? "Доставка недоступна"
-            : "Подтвердить адрес"}
+            ? t("widgets.screens.delivery.deliveryNotAvailable")
+            : t("widgets.screens.delivery.confirmAddress")}
         </Button>
       </div>
     </div>

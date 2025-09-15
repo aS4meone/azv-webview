@@ -1,5 +1,6 @@
-import { Button } from "@/shared/ui";
+"use client"; import { Button } from "@/shared/ui";
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
@@ -25,6 +26,7 @@ export const MechanicCarInWaitingModal = ({
   user,
   onClose,
 }: MechanicCarInWaitingModalProps) => {
+  const t = useTranslations();
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
@@ -49,9 +51,9 @@ export const MechanicCarInWaitingModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Осмотр успешно начат",
-          description: "Загрузите фотографии автомобиля перед началом осмотра",
-          buttonText: "Отлично",
+          title: t("mechanic.inspection.successfullyStarted"),
+          description: t("mechanic.inspection.uploadPhotosBeforeStart"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: async () => {
             await refreshUser();
             setShowUploadPhoto(true);
@@ -64,8 +66,8 @@ export const MechanicCarInWaitingModal = ({
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: "Попробовать снова",
-        onClose: () => {},
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => { },
       });
     }
   }
@@ -77,8 +79,8 @@ export const MechanicCarInWaitingModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          description: "Осмотр успешно отменен",
-          buttonText: "Отлично",
+          description: t("mechanic.inspection.successfullyCancelled"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: handleClose,
           onClose: handleClose,
         });
@@ -87,8 +89,8 @@ export const MechanicCarInWaitingModal = ({
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: "Попробовать снова",
-        onClose: () => {},
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => { },
       });
     }
   };
@@ -111,9 +113,9 @@ export const MechanicCarInWaitingModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Фотографии загружены",
-          description: "Фотографии успешно загружены, можно начинать осмотр",
-          buttonText: "Отлично",
+          title: t("mechanic.inspection.photosUploaded"),
+          description: t("mechanic.inspection.photosUploadedSuccessfully"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: handleClose,
           onClose: handleClose,
         });
@@ -123,9 +125,9 @@ export const MechanicCarInWaitingModal = ({
       showModal({
         type: "error",
         description:
-          error.response?.data?.detail || "Ошибка при загрузке фотографий",
-        buttonText: "Попробовать снова",
-        onClose: () => {},
+          error.response?.data?.detail || t("mechanic.inspection.photoUploadError"),
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => { },
       });
     }
   };
@@ -146,11 +148,11 @@ export const MechanicCarInWaitingModal = ({
 
       <CustomResponseModal
         isOpen={responseModal?.isOpen || false}
-        onClose={responseModal?.onClose || (() => {})}
+        onClose={responseModal?.onClose || (() => { })}
         title={responseModal?.title || ""}
         description={responseModal?.description || ""}
         buttonText={responseModal?.buttonText || ""}
-        onButtonClick={responseModal?.onButtonClick || (() => {})}
+        onButtonClick={responseModal?.onButtonClick || (() => { })}
       />
 
       {/* Таймер ожидания */}
@@ -171,11 +173,10 @@ export const MechanicCarInWaitingModal = ({
 
         <div>
           <h4 className="text-[20px] font-semibold text-[#191919]">
-            Подготовка к осмотру
+            {t("mechanic.inspection.preparationTitle")}
           </h4>
           <h4 className="text-[18px] text-[#191919]">
-            Сфотографируйте автомобиль перед началом осмотра, зафиксировав все
-            повреждения, дефекты и состояние салона.
+            {t("mechanic.inspection.preparationDescription")}
           </h4>
         </div>
 
@@ -183,15 +184,15 @@ export const MechanicCarInWaitingModal = ({
         <div className="space-y-3">
           {car.status === CarStatus.service && (
             <Button variant="outline" onClick={handleViewData}>
-              Посмотреть данные
+              {t("mechanic.inspection.viewData")}
             </Button>
           )}
 
           <Button variant="outline" onClick={handleCancelInspection}>
-            Отменить осмотр
+            {t("mechanic.inspection.cancelInspection")}
           </Button>
           <Button onClick={handleStartInspection} variant="secondary">
-            Начать осмотр
+            {t("mechanic.inspection.startInspection")}
           </Button>
         </div>
       </div>

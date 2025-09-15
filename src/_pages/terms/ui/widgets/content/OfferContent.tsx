@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,36 +15,38 @@ interface Section {
 }
 
 export const OfferContent = () => {
+  const t = useTranslations("terms.offer");
+  
   const sections: Section[] = [
     {
-      title: "1. Общие положения",
+      title: t("sections.generalProvisions.title"),
       content: [
-        "1.1. Настоящий документ является публичной офертой и содержит все существенные условия договора аренды автомобиля.",
-        "1.2. Акцептом настоящей оферты является регистрация Пользователя в приложении и подтверждение согласия с условиями.",
-        "1.3. После акцепта оферты Пользователь считается заключившим с Компанией договор аренды транспортного средства.",
+        t("sections.generalProvisions.item1"),
+        t("sections.generalProvisions.item2"),
+        t("sections.generalProvisions.item3"),
+        t("sections.generalProvisions.item4"),
+        t("sections.generalProvisions.item5"),
       ],
       icon: <FileText className="w-5 h-5" />,
     },
     {
-      title: "2. Предмет договора",
+      title: t("sections.contractSubject.title"),
       content: [
-        "2.1. Компания предоставляет Пользователю автомобиль во временное владение и пользование за плату.",
-        "2.2. Выбор автомобиля осуществляется Пользователем в приложении из доступных вариантов.",
-        "2.3. Срок аренды определяется Пользователем самостоятельно в момент бронирования автомобиля.",
+        t("sections.contractSubject.item1"),
+        t("sections.contractSubject.item2"),
+        t("sections.contractSubject.item3"),
+        t("sections.contractSubject.item4"),
       ],
       icon: <Car className="w-5 h-5" />,
     },
     {
-      title: "3. Права и обязанности сторон",
+      title: t("sections.rightsAndObligations.title"),
       content: [
-        "3.1. Пользователь обязуется:",
-        "- Использовать автомобиль бережно и по назначению",
-        "- Соблюдать правила дорожного движения",
-        "- Своевременно оплачивать услуги аренды",
-        "3.2. Компания обязуется:",
-        "- Предоставить технически исправный автомобиль",
-        "- Обеспечить страховое покрытие",
-        "- Оказывать техническую поддержку",
+        t("sections.rightsAndObligations.item1"),
+        t("sections.rightsAndObligations.item2"),
+        t("sections.rightsAndObligations.item3"),
+        t("sections.rightsAndObligations.item4"),
+        t("sections.rightsAndObligations.item5"),
       ],
       icon: <Users className="w-5 h-5" />,
     },
@@ -58,10 +61,9 @@ export const OfferContent = () => {
             <FileText className="w-8 h-8 text-[#1D77FF]" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-black">Публичная оферта</h1>
+        <h1 className="text-3xl font-bold text-black">{t("mainTitle")}</h1>
         <p className="text-black/60 max-w-2xl mx-auto">
-          Договор аренды автомобилей AZV Motors. Ознакомьтесь с условиями
-          предоставления услуг.
+          {t("description")}
         </p>
 
         <div className="flex flex-wrap justify-center gap-2">
@@ -70,10 +72,10 @@ export const OfferContent = () => {
             className="flex items-center gap-1 bg-[#1D77FF]/10 text-[#1D77FF]"
           >
             <Calendar className="w-3 h-3" />
-            Действует с {new Date().toLocaleDateString("ru-RU")}
+            {t("effectiveFrom")} {new Date().toLocaleDateString("ru-RU")}
           </Badge>
           <Badge variant="outline" className="border-[#1D77FF] text-[#1D77FF]">
-            Версия 2.1
+            {t("version")}
           </Badge>
         </div>
       </div>
@@ -125,23 +127,21 @@ export const OfferContent = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-black">
             <Shield className="w-5 h-5 text-[#1D77FF]" />
-            Дополнительные условия
+            {t("additionalTerms.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h4 className="font-medium text-black mb-2">Страхование</h4>
+              <h4 className="font-medium text-black mb-2">{t("additionalTerms.insurance.title")}</h4>
               <p className="text-sm text-black/80">
-                Все автомобили застрахованы по КАСКО и ОСАГО. Франшиза
-                составляет 50,000 ₸.
+                {t("additionalTerms.insurance.description")}
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-black mb-2">Техподдержка</h4>
+              <h4 className="font-medium text-black mb-2">{t("additionalTerms.techSupport.title")}</h4>
               <p className="text-sm text-black/80">
-                Круглосуточная поддержка доступна через приложение или по
-                телефону.
+                {t("additionalTerms.techSupport.description")}
               </p>
             </div>
           </div>
@@ -153,14 +153,14 @@ export const OfferContent = () => {
         <CardContent className="pt-6">
           <div className="text-center space-y-2">
             <p className="text-sm text-black/60">
-              Полный текст договора доступен для скачивания в формате PDF.
+              {t("footer.downloadText")}
             </p>
             <p className="text-sm text-black/60">
-              При возникновении вопросов обратитесь в службу поддержки.
+              {t("footer.supportText")}
             </p>
             <Separator className="my-4" />
             <p className="text-xs text-black/50">
-              © 2024 AZV Motors. Все права защищены.
+              {t("footer.copyright")}
             </p>
           </div>
         </CardContent>

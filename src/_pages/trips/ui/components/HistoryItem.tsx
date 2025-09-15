@@ -41,12 +41,12 @@ export const HistoryItem = ({
           {isFine ? (
             <>
               <span className="text-[#FF3B30]">{t("trips.fine")}</span>
-              <span className="text-[#191919]">{formatDate(date)}</span>
+              <span className="text-[#191919]">{formatDate(date, t("trips.dateFormat"))}</span>
             </>
           ) : (
             <>
               <span className="text-[#191919] font-semibold">{carModel}</span>
-              <span className="text-[#191919] ">{formatDate(date)}</span>
+              <span className="text-[#191919] ">{formatDate(date, t("trips.dateFormat"))}</span>
             </>
           )}
         </div>

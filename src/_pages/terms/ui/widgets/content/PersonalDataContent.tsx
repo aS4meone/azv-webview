@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useTranslations } from "next-intl";
 
 import {
   Card,
@@ -20,38 +21,40 @@ interface PolicySection {
 }
 
 export const PersonalDataContent = () => {
+  const t = useTranslations("terms.personal");
+
   const sections: PolicySection[] = [
     {
-      title: "Какие данные мы собираем",
+      title: t("sections.dataCollection.title"),
       items: [
-        "Имя, фамилия и отчество",
-        "Паспортные данные",
-        "Водительское удостоверение",
-        "Контактный телефон и email",
-        "История поездок и платежей",
+        t("sections.dataCollection.item1"),
+        t("sections.dataCollection.item2"),
+        t("sections.dataCollection.item3"),
+        t("sections.dataCollection.item4"),
+        t("sections.dataCollection.item5"),
       ],
       icon: <Database className="w-5 h-5" />,
       color: "[#1D77FF]",
     },
     {
-      title: "Как мы используем ваши данные",
+      title: t("sections.dataUsage.title"),
       items: [
-        "Идентификация пользователя",
-        "Оформление договора аренды",
-        "Обеспечение безопасности сделок",
-        "Улучшение качества сервиса",
-        "Информирование о статусе аренды",
+        t("sections.dataUsage.item1"),
+        t("sections.dataUsage.item2"),
+        t("sections.dataUsage.item3"),
+        t("sections.dataUsage.item4"),
+        t("sections.dataUsage.item5"),
       ],
       icon: <UserCheck className="w-5 h-5" />,
       color: "[#1D77FF]",
     },
     {
-      title: "Защита данных",
+      title: t("sections.dataProtection.title"),
       items: [
-        "Шифрование при передаче данных",
-        "Ограниченный доступ сотрудников",
-        "Регулярное обновление систем безопасности",
-        "Мониторинг подозрительной активности",
+        t("sections.dataProtection.item1"),
+        t("sections.dataProtection.item2"),
+        t("sections.dataProtection.item3"),
+        t("sections.dataProtection.item4"),
       ],
       icon: <Lock className="w-5 h-5" />,
       color: "[#1D77FF]",
@@ -67,12 +70,10 @@ export const PersonalDataContent = () => {
           </div>
         </div>
         <h1 className="text-2xl font-bold text-black">
-          Политика конфиденциальности
+          {t("mainTitle")}
         </h1>
         <p className="text-black/60 max-w-2xl mx-auto">
-          Мы ценим ваше доверие и заботимся о защите ваших персональных данных.
-          Ниже представлена информация о том, как мы собираем, используем и
-          защищаем ваши данные.
+          {t("description")}
         </p>
       </div>
 
@@ -103,38 +104,37 @@ export const PersonalDataContent = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-black">
             <Eye className="w-5 h-5 text-[#1D77FF]" />
-            Ваши права
+            {t("rights.title")}
           </CardTitle>
           <CardDescription className="text-black/70">
-            Мы уважаем ваши права на конфиденциальность
+            {t("rights.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium text-black">Право на доступ</h4>
+              <h4 className="font-medium text-black">{t("rights.access.title")}</h4>
               <p className="text-sm text-black/70">
-                Вы можете запросить информацию о том, какие данные мы храним о
-                вас
+                {t("rights.access.description")}
               </p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium text-black">Право на исправление</h4>
+              <h4 className="font-medium text-black">{t("rights.correction.title")}</h4>
               <p className="text-sm text-black/70">
-                Вы можете попросить исправить неточные или неполные данные
+                {t("rights.correction.description")}
               </p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium text-black">Право на удаление</h4>
+              <h4 className="font-medium text-black">{t("rights.deletion.title")}</h4>
               <p className="text-sm text-black/70">
-                Вы можете запросить удаление ваших персональных данных
+                {t("rights.deletion.description")}
               </p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-medium text-black">Обращение в поддержку</h4>
+              <h4 className="font-medium text-black">{t("rights.support.title")}</h4>
               <p className="text-sm text-black/70 flex items-center gap-1">
                 <Phone className="w-4 h-4 text-[#1D77FF]" />
-                Свяжитесь с нами для реализации ваших прав
+                {t("rights.support.description")}
               </p>
             </div>
           </div>
@@ -146,7 +146,7 @@ export const PersonalDataContent = () => {
           variant="outline"
           className="text-sm border-[#1D77FF] text-[#1D77FF]"
         >
-          Последнее обновление: {new Date().toLocaleDateString("ru-RU")}
+          {t("lastUpdated")} {new Date().toLocaleDateString("ru-RU")}
         </Badge>
       </div>
     </div>

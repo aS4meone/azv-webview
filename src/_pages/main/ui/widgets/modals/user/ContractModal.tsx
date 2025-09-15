@@ -7,6 +7,7 @@ import { Page, pdfjs, Document } from "react-pdf";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { Button } from "@/shared/ui";
 import { cn } from "@/shared/utils/cn";
+import { useTranslations } from "next-intl";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -25,6 +26,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   onReject,
   title,
 }) => {
+  const t = useTranslations();
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState(400);
   const [pageHeight, setPageHeight] = useState(400);
@@ -165,12 +167,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
             </div>
             <div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Ошибка загрузки договора
+                {t("widgets.modals.contract.contractLoadError")}
               </h3>
               <p className="text-gray-600 text-sm leading-relaxed">
                 {isMobile
-                  ? "Не удалось загрузить документ. Попробуйте открыть его в браузере."
-                  : "Возможно, документ временно недоступен. Попробуйте позже или скачайте файл."}
+                  ? t("widgets.modals.contract.contractLoadErrorDescription")
+                  : t("widgets.modals.contract.contractLoadErrorDescription")}
               </p>
             </div>
             <div className="space-y-3">
@@ -191,7 +193,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                   />
                 </svg>
-                {isMobile ? "Открыть в браузере" : "Открыть в новой вкладке"}
+                {t("widgets.modals.contract.openInBrowser")}
               </button>
               <button
                 onClick={handleDownloadPDF}
@@ -210,7 +212,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                Скачать PDF
+                {t("widgets.modals.contract.downloadPDF")}
               </button>
             </div>
           </div>
@@ -228,7 +230,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
-            {title || "Договор аренды"}
+            {title || t("widgets.modals.contract.title")}
           </h2>
         </div>
 
@@ -270,21 +272,21 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    <span className="text-lg">Загрузка договора...</span>
+                    <span className="text-lg">{t("widgets.modals.contract.loadingContract")}</span>
                   </div>
                   <p className="text-gray-500 text-sm text-center max-w-xs">
-                    Документ договора аренды транспортного средства
+                    {t("widgets.modals.contract.documentDescription")}
                   </p>
                   {isMobile && (
                     <div className="mt-4 space-y-2 text-center">
                       <p className="text-xs text-gray-500">
-                        Если загрузка занимает много времени:
+                        {t("widgets.modals.contract.ifLoadingTakesLong")}
                       </p>
                       <button
                         onClick={handleOpenInBrowser}
                         className="text-[#1D77FF] text-xs underline"
                       >
-                        Открыть в браузере
+                        {t("widgets.modals.contract.openInBrowser")}
                       </button>
                     </div>
                   )}
@@ -321,7 +323,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 className="w-4 h-4 text-[#1D77FF] bg-gray-100 border-gray-300 rounded focus:ring-[#1D77FF] focus:ring-2"
               />
               <label htmlFor="agree" className="text-sm text-gray-700">
-                Я согласен с условиями договора
+                {t("widgets.modals.contract.agreeToTerms")}
               </label>
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
@@ -330,7 +332,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 onClick={onReject}
                 className="flex-1 sm:flex-none px-4 py-2"
               >
-                Отклонить
+                {t("widgets.modals.contract.reject")}
               </Button>
               <Button
                 onClick={handleAccept}
@@ -341,13 +343,13 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     "opacity-50 cursor-not-allowed"
                 )}
               >
-                Принять
+                {t("widgets.modals.contract.accept")}
               </Button>
             </div>
           </div>
           {!hasScrolledToEnd && (
             <p className="text-xs text-gray-500 mt-2">
-              Для принятия договора необходимо прочитать весь документ
+              {t("widgets.modals.contract.readToEnd")}
             </p>
           )}
         </div>

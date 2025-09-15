@@ -16,6 +16,7 @@ import {
   USER_UPLOAD,
 } from "@/shared/contexts/PhotoUploadContext";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
+import { useTranslations } from "next-intl";
 
 interface UserCarInWaitingModalProps {
   user: IUser;
@@ -26,6 +27,7 @@ export const UserCarInWaitingModal = ({
   user,
   onClose,
 }: UserCarInWaitingModalProps) => {
+  const t = useTranslations();
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
@@ -50,8 +52,8 @@ export const UserCarInWaitingModal = ({
           isOpen: true,
           onClose: handleClose,
           type: "success",
-          description: "Загрузите фотографии перед началом аренды",
-          buttonText: "Отлично",
+          description: t("widgets.modals.user.carInWaiting.uploadPhotosBeforeRent"),
+          buttonText: t("widgets.modals.user.carInWaiting.tryAgain"),
           onButtonClick: async () => {
             await refreshUser();
             setShowUploadPhoto(true);
@@ -63,9 +65,9 @@ export const UserCarInWaitingModal = ({
         isOpen: true,
         onClose: handleClose,
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description: error.response.data.detail,
-        buttonText: "Попробвать сново",
+        buttonText: t("widgets.modals.user.carInWaiting.tryAgain"),
         onButtonClick: handleClose,
       });
     }
@@ -83,8 +85,8 @@ export const UserCarInWaitingModal = ({
             setResponseModal(null);
           },
           type: "success",
-          description: "Аренда успешно отменена",
-          buttonText: "Отлично",
+          description: t("widgets.modals.user.carInWaiting.rentalCancelledSuccessfully"),
+          buttonText: t("widgets.modals.user.carInWaiting.tryAgain"),
           onButtonClick: async () => {
             await refreshUser();
             onClose();
@@ -101,9 +103,9 @@ export const UserCarInWaitingModal = ({
           setResponseModal(null);
         },
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description: error.response.data.detail,
-        buttonText: "Попробвать сново",
+        buttonText: t("widgets.modals.user.carInWaiting.tryAgain"),
         onButtonClick: async () => {
           await refreshUser();
           onClose();
@@ -129,8 +131,8 @@ export const UserCarInWaitingModal = ({
         isOpen: true,
         onClose: handleClose,
         type: "success",
-        description: "Фотографии успешно загружены",
-        buttonText: "Отлично",
+        description: t("widgets.modals.user.carInWaiting.photosUploadedSuccessfully"),
+        buttonText: t("widgets.modals.user.carInWaiting.tryAgain"),
         onButtonClick: handleClose,
       });
     }
@@ -156,8 +158,8 @@ export const UserCarInWaitingModal = ({
           setResponseModal(null);
         },
         type: "success",
-        description: "Фотографии успешно загружены",
-        buttonText: "Отлично",
+        description: t("widgets.modals.user.carInWaiting.photosUploadedSuccessfully"),
+        buttonText: t("widgets.modals.user.carInWaiting.tryAgain"),
         onButtonClick: async () => {
           await refreshUser();
           onClose();
@@ -205,28 +207,27 @@ export const UserCarInWaitingModal = ({
 
         <div>
           <h4 className="text-[20px] font-semibold text-[#191919]">
-            Осмотрите автомобиль
+            {t("widgets.modals.carInWaiting.inspectCar")}
           </h4>
           <h4 className="text-[18px] text-[#191919]">
-            Сфотографируйте авто перед началом аренды, зафиксировав все
-            повреждения, дефекты и состояние салона.
+            {t("widgets.modals.carInWaiting.inspectCarDescription")}
           </h4>
         </div>
 
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button variant="outline" onClick={handleCancelRental}>
-            Отменить аренду
+            {t("widgets.modals.carInWaiting.cancelRental")}
           </Button>
           <Button onClick={handleRent} variant="secondary">
-            Открыть авто
+            {t("widgets.modals.carInWaiting.openCar")}
           </Button>
         </div>
 
         <div className=" flex flex-row gap-2">
           <InfoIcon />
           <p className="text-[14px] text-[#191919]">
-            Открытие авто подтверждает акт выдачи.
+            {t("widgets.modals.carInWaiting.openCarConfirms")}
           </p>
         </div>
       </div>

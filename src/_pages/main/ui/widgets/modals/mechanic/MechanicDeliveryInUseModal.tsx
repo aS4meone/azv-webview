@@ -1,6 +1,6 @@
-import { Button } from "@/shared/ui";
+"use client";import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
-import { CarInfoHeader, CarControlsSlider } from "../ui";
+import { useTranslations } from "next-intl";import { CarInfoHeader, CarControlsSlider } from "../ui";
 import { FaCar, FaMapMarkerAlt } from "react-icons/fa";
 
 import {
@@ -31,6 +31,7 @@ export const MechanicDeliveryInUseModal = ({
   onClose,
   notRentedCar,
 }: MechanicDeliveryInUseModalProps) => {
+  const t = useTranslations();
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const { fetchCurrentDeliveryVehicle, forceClearCacheAndRefresh } =
@@ -129,8 +130,8 @@ export const MechanicDeliveryInUseModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            description: "Доставка успешно завершена",
-            buttonText: "Отлично",
+            description: t("mechanic.delivery.successfullyCompleted"),
+            buttonText: t("mechanic.common.excellent"),
             onButtonClick: handleClose,
             onClose: handleClose,
           });
@@ -141,8 +142,8 @@ export const MechanicDeliveryInUseModal = ({
       showModal({
         type: "error",
         description:
-          error?.response?.data?.detail || "Ошибка при завершении доставки",
-        buttonText: "Попробовать снова",
+          error?.response?.data?.detail || t("mechanic.delivery.completionError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -175,13 +176,13 @@ export const MechanicDeliveryInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
             ?.data?.detail
-          : "Ошибка при попытке приостановить доставку";
+          : t("mechanic.delivery.pauseError");
 
       showModal({
         type: "error",
         description:
-          errorMessage || "Ошибка при попытке приостановить доставку",
-        buttonText: "Попробовать снова",
+          errorMessage || t("mechanic.delivery.pauseError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -200,12 +201,12 @@ export const MechanicDeliveryInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
             ?.data?.detail
-          : "Ошибка при попытке возобновить доставку";
+          : t("mechanic.delivery.resumeError");
 
       showModal({
         type: "error",
-        description: errorMessage || "Ошибка при попытке возобновить доставку",
-        buttonText: "Попробовать снова",
+        description: errorMessage || t("mechanic.delivery.resumeError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -224,13 +225,13 @@ export const MechanicDeliveryInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
             ?.data?.detail
-          : "Ошибка при попытке заблокировать автомобиль";
+          : t("mechanic.common.lockError");
 
       showModal({
         type: "error",
         description:
-          errorMessage || "Ошибка при попытке заблокировать автомобиль",
-        buttonText: "Попробовать снова",
+          errorMessage || t("mechanic.common.lockError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -249,13 +250,13 @@ export const MechanicDeliveryInUseModal = ({
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
             ?.data?.detail
-          : "Ошибка при попытке разблокировать автомобиль";
+          : t("mechanic.common.unlockError");
 
       showModal({
         type: "error",
         description:
-          errorMessage || "Ошибка при попытке разблокировать автомобиль",
-        buttonText: "Попробовать снова",
+          errorMessage || t("mechanic.common.unlockError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -301,14 +302,14 @@ export const MechanicDeliveryInUseModal = ({
             className="text-[14px]"
             onClick={handlePauseDelivery}
           >
-            Пауза
+            {t("mechanic.delivery.pauseDelivery")}
           </Button>
           <Button
             variant="outline"
             className="text-[14px]"
             onClick={handleResumeDelivery}
           >
-            Начать поездку
+            {t("mechanic.delivery.resumeDelivery")}
           </Button>
         </div>
 
@@ -316,7 +317,7 @@ export const MechanicDeliveryInUseModal = ({
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
         <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
-          Завершить доставку
+          {t("mechanic.delivery.completeDelivery")}
         </Button>
 
         {/* Кнопка для просмотра в 2GIS */}
@@ -333,7 +334,7 @@ export const MechanicDeliveryInUseModal = ({
               className="flex items-center justify-center gap-2"
             >
               <FaCar className="w-4 h-4" />
-              Точка авто
+              {t("mechanic.vehicle.carPoint")}
             </Button>
             <Button
               variant="outline"
@@ -346,7 +347,7 @@ export const MechanicDeliveryInUseModal = ({
               className="flex items-center justify-center gap-2"
             >
               <FaMapMarkerAlt className="w-4 h-4" />
-              Точка доставки
+              {t("mechanic.vehicle.deliveryPoint")}
             </Button>
           </>
 

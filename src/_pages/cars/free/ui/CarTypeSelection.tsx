@@ -2,6 +2,7 @@
 import React from "react";
 import { CarBodyType } from "@/shared/models/types/car";
 import { ICar } from "@/shared/models/types/car";
+import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
 interface CarTypeSelectionProps {
   cars: ICar[];
@@ -9,22 +10,24 @@ interface CarTypeSelectionProps {
   onBackAction: () => void;
 }
 
-const getBodyTypeLabel = (bodyType: string): string => {
+const getBodyTypeLabel = (bodyType: string, t: (key: string) => string): string => {
   const labels: Record<string, string> = {
-    [CarBodyType.SEDAN]: "Седан",
-    [CarBodyType.SUV]: "Внедорожник", 
-    [CarBodyType.CROSSOVER]: "Кроссовер",
-    [CarBodyType.COUPE]: "Купе",
-    [CarBodyType.HATCHBACK]: "Хэтчбек",
-    [CarBodyType.CONVERTIBLE]: "Кабриолет",
-    [CarBodyType.WAGON]: "Универсал",
-    [CarBodyType.MINIBUS]: "Микроавтобус",
-    [CarBodyType.ELECTRIC]: "Электромобиль",
+    [CarBodyType.SEDAN]: t('cars.bodyTypes.sedan'),
+    [CarBodyType.SUV]: t('cars.bodyTypes.suv'), 
+    [CarBodyType.CROSSOVER]: t('cars.bodyTypes.crossover'),
+    [CarBodyType.COUPE]: t('cars.bodyTypes.coupe'),
+    [CarBodyType.HATCHBACK]: t('cars.bodyTypes.hatchback'),
+    [CarBodyType.CONVERTIBLE]: t('cars.bodyTypes.convertible'),
+    [CarBodyType.WAGON]: t('cars.bodyTypes.wagon'),
+    [CarBodyType.MINIBUS]: t('cars.bodyTypes.minibus'),
+    [CarBodyType.ELECTRIC]: t('cars.bodyTypes.electric'),
   };
   return labels[bodyType] || bodyType;
 };
 
 export const CarTypeSelection = ({ cars, onTypeSelectAction, onBackAction }: CarTypeSelectionProps) => {
+  const { t } = useClientTranslations();
+  
   // Подсчитываем количество машин по типам кузова
   const getCarCounts = () => {
     const counts: Record<string, number> = {};
@@ -51,7 +54,7 @@ export const CarTypeSelection = ({ cars, onTypeSelectAction, onBackAction }: Car
   const typeList = allBodyTypes.map(bodyType => ({
     bodyType,
     count: carCounts[bodyType] || 0,
-    label: getBodyTypeLabel(bodyType)
+    label: getBodyTypeLabel(bodyType, t)
   }));
 
   return (
@@ -67,7 +70,7 @@ export const CarTypeSelection = ({ cars, onTypeSelectAction, onBackAction }: Car
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-xl font-semibold text-gray-900">Тип кузова</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{t('cars.bodyType')}</h1>
         </div>
       </div>
 

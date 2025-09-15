@@ -1,6 +1,7 @@
 "use client";
 import React, {useEffect, useRef, useState} from "react";
 import {Button} from "@/shared/ui";
+import {useTranslations} from "next-intl";
 
 import {FORTE_CONFIG, formatAmount} from "@/shared/config/forte";
 
@@ -15,6 +16,7 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
                                                              onCancel,
                                                              isLoading,
                                                            }) => {
+  const t = useTranslations("wallet");
   const [customAmount, setCustomAmount] = useState("");
   const [selectedPresetAmount, setSelectedPresetAmount] = useState<
     number | null
@@ -78,13 +80,13 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
           <div className="flex items-center gap-3 mb-6">
             <div className="text-2xl">💳</div>
             <h2 className="text-xl font-bold text-gray-900">
-              Пополнение баланса
+              {t("topUpBalance")}
             </h2>
           </div>
 
           {/* Предустановленные суммы */}
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-3">Быстрый выбор:</p>
+            <p className="text-sm text-gray-600 mb-3">{t("quickSelection")}</p>
             <div className="grid grid-cols-2 gap-3">
               {presetAmounts.map((amount) => (
                 <button
@@ -107,13 +109,13 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
 
           {/* Кастомная сумма */}
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-3">Или введите свою сумму:</p>
+            <p className="text-sm text-gray-600 mb-3">{t("orEnterYourAmount")}</p>
             <div className="relative">
               <input
                 type="text"
                 value={customAmount}
                 onChange={(e) => handleCustomAmountChange(e.target.value)}
-                placeholder="Введите сумму"
+                placeholder={t("enterAmount")}
                 className={`w-full text-base bg-gray-50 text-gray-900 outline-none border-2 
                      focus:bg-white placeholder:text-gray-400 p-4 rounded-2xl pr-12
                      transition-all duration-300 shadow-inner focus:shadow-lg
@@ -130,7 +132,7 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
             </div>
             {customAmount && !isValidAmount() && (
               <p className="text-red-500 text-xs mt-2">
-                Сумма должна быть от 1,000 до 1,000,000 тенге
+                {t("amountValidationError")}
               </p>
             )}
           </div>
@@ -139,7 +141,7 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
           {getCurrentAmount() > 0 && isValidAmount() && (
             <div className="mb-6 p-4 bg-gray-50 rounded-xl">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">К пополнению:</span>
+                <span className="text-gray-600">{t("amountToTopUp")}</span>
                 <span className="font-bold text-lg text-gray-900">
                 {formatAmount(getCurrentAmount())}
               </span>
@@ -162,7 +164,7 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
                 disabled={isLoading}
                 className="flex-1"
               >
-                Отмена
+                {t("cancel")}
               </Button>
               <Button
                 variant="secondary"
@@ -175,7 +177,7 @@ const AmountInputModal: React.FC<AmountInputModalProps> = ({
                     <div
                       className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
                   )}
-                  <span>{isLoading ? "Загрузка..." : "Продолжить"}</span>
+                  <span>{isLoading ? t("loading") : t("continue")}</span>
                 </div>
               </Button>
             </div>

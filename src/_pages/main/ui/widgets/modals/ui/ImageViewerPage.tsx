@@ -12,6 +12,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { formatImage } from "@/shared/utils/formatImage";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
+import { useTranslations } from "next-intl";
 
 interface ImageViewerPageProps {
   car: ICar;
@@ -23,6 +24,7 @@ export const ImageViewerPage = ({
   car,
   initialSlide = 0,
 }: ImageViewerPageProps) => {
+  const t = useTranslations();
   const [activeSlide, setActiveSlide] = useState(initialSlide);
   const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>(
     {}
@@ -117,7 +119,7 @@ export const ImageViewerPage = ({
                   <div className="w-full h-full bg-gray-800 flex flex-col items-center justify-center">
                     <InfoIcon />
                     <p className="text-white text-sm font-medium mt-2">
-                      Фото недоступно
+                      {t("widgets.modals.ui.carImageCarousel.photoNotAvailable")}
                     </p>
                   </div>
                 ) : (
@@ -167,7 +169,7 @@ export const ImageViewerPage = ({
       {!isZoomed && (
         <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10">
           <p className="text-white/70 text-sm text-center">
-            Приближайте пальцами
+            {t("widgets.modals.ui.imageViewer.pinchToZoom")}
           </p>
         </div>
       )}

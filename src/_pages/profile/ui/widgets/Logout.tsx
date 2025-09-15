@@ -74,7 +74,7 @@ const Logout = () => {
             isOpen: true,
             type: "error",
             title: t("logout"),
-            description: "Вы уверены, что хотите выйти из аккаунта?",
+            description: t("logoutConfirm"),
             buttonText: t("logout"),
             onButtonClick: handleLogout,
           });
@@ -84,7 +84,7 @@ const Logout = () => {
         className="w-full bg-[#F4F4F4] border-0 flex items-center justify-center gap-2 py-6 disabled:opacity-50"
       >
         <LogoutIcon color="black" />
-        <span>{isLoggingOut ? "Выход..." : t("logout")}</span>
+        <span>{isLoggingOut ? t("loggingOut") : t("logout")}</span>
       </Button>
     </>
   );

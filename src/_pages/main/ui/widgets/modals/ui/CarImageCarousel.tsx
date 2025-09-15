@@ -10,6 +10,7 @@ import { formatImage } from "@/shared/utils/formatImage";
 import InfoIcon from "@/shared/icons/ui/InfoIcon";
 import { ImageViewerPage } from "./ImageViewerPage";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
+import { useTranslations } from "next-intl";
 
 interface CarImageCarouselProps {
   car: ICar;
@@ -22,6 +23,7 @@ export const CarImageCarousel = ({
   height = "h-64",
   rounded = false,
 }: CarImageCarouselProps) => {
+  const t = useTranslations();
   const [activeSlide, setActiveSlide] = useState(0);
   const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>(
     {}
@@ -77,7 +79,7 @@ export const CarImageCarousel = ({
       >
         <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center">
           <InfoIcon />
-          <p className="text-gray-500 text-sm font-medium">Фото недоступно</p>
+          <p className="text-gray-500 text-sm font-medium">{t("widgets.modals.ui.carImageCarousel.photoNotAvailable")}</p>
         </div>
       </div>
     );
@@ -159,7 +161,7 @@ export const CarImageCarousel = ({
                 <div className="w-full h-full bg-gray-200 flex flex-col items-center justify-center">
                   <InfoIcon />
                   <p className="text-gray-500 text-sm font-medium">
-                    Фото недоступно
+                    {t("widgets.modals.ui.carImageCarousel.photoNotAvailable")}
                   </p>
                 </div>
               ) : (

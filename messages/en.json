@@ -1,25 +1,359 @@
 {
   "error": "Error",
   "terms": {
+    "title": "Terms and Policy",
     "faqs": {
       "title": "Frequently Asked Questions",
-      "content": "Here you can find answers to common questions about our service..."
+      "content": "Here you can find answers to common questions about our service...",
+      "searchPlaceholder": "Search questions...",
+      "noQuestionsFound": "No questions found",
+      "noQuestionsDescription": "Try changing your search query or contact support",
+      "popular": "Popular",
+      "categories": {
+        "technicalSupport": "Technical Support",
+        "documents": "Documents",
+        "payment": "Payment"
+      },
+      "questions": {
+        "1": {
+          "question": "Ran out of gas?",
+          "answer": "If you unexpectedly run out of gas on the road, please contact our support service. We will promptly send the nearest mobile team with the necessary fuel so you can continue your trip as soon as possible."
+        },
+        "2": {
+          "question": "Why wasn't account access approved?",
+          "answer": "Unfortunately, account access has not been approved at this time. This may be due to non-compliance with one or more security criteria or data verification. We understand this may cause inconvenience and are always ready to reconsider your request. Please ensure all documents are uploaded correctly and meet the requirements, and if necessary, contact our support service - we will be happy to advise what can be done for re-consideration of the application."
+        },
+        "3": {
+          "question": "Can't open or close the car?",
+          "answer": "Please first make sure you have a stable internet connection on your device and try the action again. If the problem persists - contact our support service. We will promptly check the situation and help you as quickly as possible."
+        },
+        "4": {
+          "question": "Can't complete the rental?",
+          "answer": "Please make sure that: the car is completely closed, all windows and doors are tightly closed, parking mode is enabled, you have a stable internet connection. If all conditions are met but you can't complete the rental - don't worry. Contact our support service and we will help resolve the situation promptly."
+        },
+        "5": {
+          "question": "Extra money was charged, what to do?",
+          "answer": "We understand your concern about additional charges. To understand the situation, we recommend taking the following steps: 1. Check the selected tariff: Make sure the charged amount corresponds to the terms of the tariff you used. 2. Evaluate trip time and mileage: Compare actual rental time and distance traveled with calculations in the app. 3. Check for fines or additional services: There may be additional charges for violations of usage rules or for additional services provided. If after these checks you still have questions or believe the charge was unjustified, we recommend contacting our support service."
+        }
+      }
     },
     "about": {
       "title": "About the App",
-      "content": "Our app provides a convenient way to rent cars..."
+      "content": "Our app provides a convenient way to rent cars...",
+      "badge": "About AZV Motors Company",
+      "mainTitle": "Modern Car Rental Service",
+      "description": "AZV Motors is a modern car rental service that makes the rental process as simple and convenient as possible. We offer a wide selection of cars and flexible rental conditions.",
+      "stats": {
+        "satisfiedClients": "10,000+",
+        "satisfiedClientsLabel": "Satisfied Clients",
+        "carsInFleet": "500+",
+        "carsInFleetLabel": "Cars in Fleet"
+      },
+      "features": {
+        "title": "Why Choose Us",
+        "description": "We offer the best rental conditions and high quality service",
+        "quickRental": {
+          "title": "Quick Rental",
+          "description": "Rental registration takes only a few minutes through the app"
+        },
+        "flexibleRates": {
+          "title": "Flexible Rates",
+          "description": "Choose a convenient tariff: per minute, per hour or per day"
+        },
+        "support24_7": {
+          "title": "24/7 Support",
+          "description": "Our support service is always ready to help"
+        }
+      },
+      "mission": {
+        "title": "Our Mission",
+        "description": "To make car rental accessible and convenient for everyone, providing quality service and modern technological solutions. We strive to ensure that every trip with us is comfortable, safe and affordable."
+      },
+      "values": {
+        "security": {
+          "title": "Security",
+          "description": "All cars undergo regular maintenance"
+        },
+        "customerOriented": {
+          "title": "Customer-Oriented",
+          "description": "We are always ready to help and solve any issues"
+        },
+        "quality": {
+          "title": "Quality",
+          "description": "High service standards and modern fleet"
+        }
+      }
     },
     "offer": {
       "title": "User Agreement",
-      "content": "This agreement outlines the terms and conditions of using our service..."
+      "content": "This agreement outlines the terms and conditions of using our service...",
+      "mainTitle": "Public Offer",
+      "description": "AZV Motors car rental agreement. Familiarize yourself with the terms of service provision.",
+      "effectiveFrom": "Effective from",
+      "version": "Version 2.1",
+      "sections": {
+        "generalProvisions": {
+          "title": "1. General Provisions",
+          "item1": "1.1. This document is a public offer and contains all essential terms of the car rental agreement.",
+          "item2": "1.2. Acceptance of this offer is the User's registration in the application and confirmation of agreement with the terms.",
+          "item3": "1.3. After acceptance of the offer, the User is considered to have concluded a vehicle rental agreement with the Company.",
+          "item4": "1.4. This offer is valid until withdrawn by the Company.",
+          "item5": "1.5. The Company reserves the right to change the terms of the offer with notification to Users."
+        },
+        "contractSubject": {
+          "title": "2. Subject of the Agreement",
+          "item1": "2.1. The Company provides the User with a car for temporary possession and use for a fee.",
+          "item2": "2.2. Car selection is made by the User in the application from available options.",
+          "item3": "2.3. The rental period is determined by the User independently at the time of booking the car.",
+          "item4": "2.4. The car is provided in good technical condition, fueled."
+        },
+        "rightsAndObligations": {
+          "title": "3. Rights and Obligations of the Parties",
+          "item1": "3.1. The User undertakes to use the car carefully and for its intended purpose.",
+          "item2": "3.2. The User undertakes to comply with traffic rules.",
+          "item3": "3.3. The User undertakes to pay rental services on time.",
+          "item4": "3.4. The Company undertakes to provide a technically sound car.",
+          "item5": "3.5. The Company undertakes to provide insurance coverage and technical support."
+        }
+      },
+      "additionalTerms": {
+        "title": "Additional Terms",
+        "insurance": {
+          "title": "Insurance",
+          "description": "All cars are insured under CASCO and OSAGO. The deductible is 50,000 ₸."
+        },
+        "techSupport": {
+          "title": "Tech Support",
+          "description": "24/7 support is available through the app or by phone."
+        }
+      },
+      "footer": {
+        "downloadText": "The full text of the agreement is available for download in PDF format.",
+        "supportText": "If you have any questions, contact the support service.",
+        "copyright": "© 2024 AZV Motors. All rights reserved."
+      }
     },
     "personal": {
       "title": "Personal Data Policy",
-      "content": "We take your privacy seriously. This policy explains how we handle your personal data..."
+      "content": "We take your privacy seriously. This policy explains how we handle your personal data...",
+      "mainTitle": "Privacy Policy",
+      "description": "We value your trust and care about protecting your personal data. Below is information about how we collect, use and protect your data.",
+      "sections": {
+        "dataCollection": {
+          "title": "What Data We Collect",
+          "item1": "First name, last name and patronymic",
+          "item2": "Passport data",
+          "item3": "Driver's license",
+          "item4": "Contact phone and email",
+          "item5": "Trip and payment history"
+        },
+        "dataUsage": {
+          "title": "How We Use Your Data",
+          "item1": "User identification",
+          "item2": "Rental agreement processing",
+          "item3": "Transaction security",
+          "item4": "Service quality improvement",
+          "item5": "Rental status notifications"
+        },
+        "dataProtection": {
+          "title": "Data Protection",
+          "item1": "Data encryption during transmission",
+          "item2": "Limited employee access",
+          "item3": "Regular security system updates",
+          "item4": "Suspicious activity monitoring"
+        }
+      },
+      "rights": {
+        "title": "Your Rights",
+        "description": "We respect your privacy rights",
+        "access": {
+          "title": "Right to Access",
+          "description": "You can request information about what data we store about you"
+        },
+        "correction": {
+          "title": "Right to Correction",
+          "description": "You can ask to correct inaccurate or incomplete data"
+        },
+        "deletion": {
+          "title": "Right to Deletion",
+          "description": "You can request deletion of your personal data"
+        },
+        "support": {
+          "title": "Contact Support",
+          "description": "Contact us to exercise your rights"
+        }
+      },
+      "lastUpdated": "Last updated:"
     },
     "payment": {
       "title": "Online Payment Terms",
-      "content": "Learn about our secure payment methods and processing..."
+      "content": "Learn about our secure payment methods and processing...",
+      "loadingDocument": "Loading document...",
+      "documentDescription": "Online payment terms document",
+      "ifLoadingTakesLong": "If loading takes a long time:",
+      "openInBrowser": "Open in browser",
+      "downloadPDF": "Download PDF",
+      "error": {
+        "title": "PDF Loading Error",
+        "mobileDescription": "Failed to load document. Try opening it in browser.",
+        "desktopDescription": "The document may be temporarily unavailable. Try again later or download the file.",
+        "openInNewTab": "Open in new tab"
+      }
+    },
+    "tariff": {
+      "minute": {
+        "title": "Per-Minute Tariff",
+        "description": "Perfect for short city trips",
+        "popular": true,
+        "features": [
+          "Minimum rental time: from 1 minute"
+        ]
+      },
+      "hour": {
+        "title": "Hourly Tariff",
+        "description": "Optimal for long trips",
+        "popular": false,
+        "features": [
+          "Minimum rental time: 1 hour",
+          "Fuel not included in price"
+        ]
+      },
+      "day": {
+        "title": "Daily Tariff",
+        "description": "Best choice for long trips",
+        "popular": false,
+        "features": [
+          "Minimum rental time: 1 day",
+          "Fuel not included in price"
+        ]
+      },
+      "notSelected": {
+        "title": "Tariff Not Selected",
+        "description": "Please select a tariff"
+      },
+      "included": {
+        "title": "What's Included in the Tariff",
+        "description": "Everything you need for a comfortable trip is already included in the price"
+      },
+      "requirements": {
+        "title": "Rental Requirements",
+        "description": "Make sure you meet all requirements",
+        "documents": "Valid passport and driver's license",
+        "deposit": "Deposit depends on car class"
+      },
+      "comparison": {
+        "title": "Tariff Comparison",
+        "description": "Choose the most suitable tariff for your needs",
+        "popular": "Popular",
+        "forShortTrips": "For short trips",
+        "optimalChoice": "Optimal choice",
+        "forLongTrips": "For long trips"
+      },
+      "additionalInfo": {
+        "title": "Additional Information",
+        "insurance": {
+          "title": "Insurance",
+          "ogpoIncluded": "OSAGO included",
+          "roadsideAssistance": "24/7 roadside assistance"
+        },
+        "additionalServices": {
+          "title": "Additional Services",
+          "techSupport24_7": "24/7 tech support",
+          "fuelIncluded": "Fuel at our expense (per-minute tariff only)",
+          "parkingZones": "Parking in special zones"
+        }
+      },
+      "pricingCalculator": {
+        "title": "Estimated Cost",
+        "description": "Calculate the approximate cost of your trip",
+        "thirtyMinutes": "30 minutes",
+        "threeHours": "3 hours",
+        "oneDay": "1 day",
+        "shortTrip": "Short trip",
+        "mediumTrip": "Medium trip",
+        "longTrip": "Long trip"
+      }
+    },
+    "userAgreement": {
+      "title": "User Agreement",
+      "mainTitle": "User Agreement",
+      "description": "Terms of use for AZV Motors car rental service",
+      "effectiveFrom": "Effective from",
+      "version": "Version 3.0",
+      "sections": {
+        "generalProvisions": {
+          "title": "1. General Provisions",
+          "items": [
+            "This User Agreement (hereinafter - \"Agreement\") is concluded between AZV Motors (hereinafter - \"Company\", \"we\") and the user (hereinafter - \"User\", \"you\") of our car rental services.",
+            "Use of our services means full agreement with the terms of this agreement."
+          ]
+        },
+        "serviceDescription": {
+          "title": "2. Service Description",
+          "items": [
+            "We provide car rental services through our mobile and web applications.",
+            "Our services include short-term car rental by minute, hour or day."
+          ]
+        },
+        "userObligations": {
+          "title": "3. User Obligations",
+          "description": "The User undertakes to comply with the following requirements:",
+          "items": [
+            "Have a valid driver's license",
+            "Comply with traffic rules",
+            "Maintain cleanliness and proper condition of the car",
+            "Immediately report any damage or problems",
+            "Return the car on time"
+          ]
+        },
+        "costAndPayment": {
+          "title": "4. Cost and Payment",
+          "items": [
+            "Rental cost is calculated based on the selected tariff (per minute/hour/day).",
+            "Additional payments may apply for late return, damage or violations."
+          ]
+        },
+        "insuranceAndLiability": {
+          "title": "5. Insurance and Liability",
+          "items": [
+            "Our cars are insured in accordance with local legislation.",
+            "Users are responsible for damage caused by negligence or violation of terms."
+          ]
+        }
+      },
+      "requirements": {
+        "title": "6. Driver Requirements",
+        "age": {
+          "label": "Age",
+          "value": "from 21 years"
+        },
+        "drivingExperience": {
+          "label": "Driving Experience",
+          "value": "from 2 years"
+        },
+        "documents": {
+          "label": "Documents",
+          "value": "Passport + DL"
+        },
+        "violations": {
+          "label": "Violations",
+          "value": "No serious ones"
+        }
+      },
+      "rules": {
+        "title": "7. Usage Rules",
+        "items": [
+          "Use the car only within the permitted territory",
+          "Do not transfer control to third parties",
+          "Do not use the car for commercial purposes without agreement",
+          "Comply with parking and standing rules"
+        ]
+      },
+      "footer": {
+        "agreementText": "By accepting the terms of this agreement, you confirm that you have read all points and agree to comply with them.",
+        "supportText": "If you have any questions, contact the support service.",
+        "copyright": "© 2024 AZV Motors. All rights reserved."
+      }
     }
   },
   "faqs": "FAQs",
@@ -33,6 +367,10 @@
   "ambulance": "Ambulance",
   "technicalSupport": "Technical Support Number:",
   "ourTelegram": "Our Telegram:",
+  "email": "Email",
+  "telegram": "Telegram",
+  "copy": "Copy",
+  "copied": "Copied!",
   "wallet": {
     "title": "Wallet",
     "currentBalance": "Current Balance",
@@ -41,7 +379,40 @@
     "addCard": "Add Card",
     "topUp": "Top Up",
     "promocodes": "Promocodes",
-    "activate": "Activate"
+    "activate": "Activate",
+    "availableForUse": "Available for use",
+    "enterPromoCode": "Enter promo code",
+    "activating": "Activating...",
+    "processing": "Processing...",
+    "balanceReplenished": "Balance replenished",
+    "balanceSuccessfullyReplenished": "Balance successfully replenished by",
+    "excellent": "Excellent",
+    "attention": "Attention",
+    "paymentSuccessful": "Payment successful",
+    "understood": "Understood",
+    "paymentError": "Payment error",
+    "failedToCompletePayment": "Failed to complete payment. Please try again.",
+    "waitingForConfirmation": "Waiting for confirmation",
+    "paymentProcessing": "Payment is being processed",
+    "error": "Error",
+    "failedToInitiatePayment": "Failed to initiate payment. Check your internet connection.",
+    "promoCodeActivated": "Promo code activated",
+    "promoCodeSuccessfullyApplied": "successfully applied!",
+    "discount": "Discount:",
+    "failedToActivatePromoCode": "Failed to activate promo code",
+    "topUpBalance": "Top up balance",
+    "quickSelection": "Quick selection:",
+    "orEnterYourAmount": "Or enter your amount:",
+    "enterAmount": "Enter amount",
+    "amountValidationError": "Amount must be from 1,000 to 1,000,000 tenge",
+    "amountToTopUp": "To top up:",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "continue": "Continue",
+    "paymentDescription": "AZV Motors balance top-up",
+    "paymentId": "ID:",
+    "resultWillBeKnown": "Result will be known within a few minutes.",
+    "ifBalanceNotUpdated": "If balance is not updated, contact support."
   },
   "profile": {
     "title": "My Profile",
@@ -53,12 +424,75 @@
       "idCard": "ID Card",
       "selfieWithLicense": "Selfie with Driver's License",
       "driverLicense": "Driver's License",
+      "selfie": "Selfie",
       "validUntil": "Valid until",
       "notUploaded": "Not uploaded"
     },
     "replaceDocuments": "Replace Documents",
     "deleteAccount": "Delete Account",
-    "logout": "Logout"
+    "logout": "Logout",
+    "actionCompleted": "Action completed",
+    "accountDeleted": "Account deleted",
+    "areYouSure": "Are you sure?",
+    "areYouSureDeleteAccount": "Are you sure you want to delete your account?",
+    "yesDelete": "Yes, delete",
+    "logoutConfirm": "Are you sure you want to log out?",
+    "loggingOut": "Logging out...",
+    "documentsUnderReview": "Documents under review",
+    "documentsRequired": "Documents required",
+    "uploaded": "Uploaded",
+    "validUntilDate": "Valid until",
+    "notSpecified": "not specified",
+    "notUploaded": "Not uploaded",
+    "documentData": "Document data",
+    "fullNamePlaceholder": "Ivanov Ivan Ivanovich",
+    "birthDate": "Birth date",
+    "iin": "IIN",
+    "iinPlaceholder": "XXXXXXXXXXXX",
+    "idCardExpiry": "ID card expiry date",
+    "driversLicenseExpiry": "Driver's license expiry date",
+    "submit": "Submit",
+    "replaceDocumentsButton": "Replace documents",
+    "success": "Success",
+    "documentsUploadedSuccessfully": "Documents uploaded successfully",
+    "ok": "OK",
+    "understood": "Understood",
+    "failedToUploadDocuments": "Failed to upload documents. Please try again",
+    "validation": {
+      "fullNameMinLength": "Full name must contain at least 2 characters",
+      "fullNameMaxLength": "Full name cannot be longer than 100 characters",
+      "fullNameRequired": "Enter full name (first and last name)",
+      "iinLength": "IIN must contain 12 digits",
+      "iinMismatch": "IIN does not match the specified birth date",
+      "invalidIin": "Invalid IIN",
+      "invalidIinChecksum": "Invalid IIN checksum",
+      "ageRequirement": "Age must be at least 18 years",
+      "futureDateRequired": "Date must be in the future"
+    },
+    "photoInstructions": {
+      "idFront": "Take a photo of the front side of your ID card",
+      "idBack": "Take a photo of the back side of your ID card",
+      "selfieWithLicense": "Take a selfie holding your driver's license next to your face",
+      "driversLicense": "Take a photo of the front side of your driver's license",
+      "selfie": "Take a selfie"
+    }
+  },
+  "uploadPhoto": {
+    "error": "Error",
+    "failedToTakePhotos": "Failed to take photos",
+    "cameraError": "Camera error",
+    "understood": "Understood",
+    "minPhotosRequired": "Minimum number of photos:",
+    "maxPhotosExceeded": "Maximum number of photos:",
+    "onlyOnePhotoAllowed": "Only one photo can be uploaded",
+    "fileSizeExceeded": "Each file size must not exceed 10MB",
+    "minMaxPhotos": "Minimum {min}, maximum {max}.",
+    "photosReady": "{count} photos ready",
+    "photosTaken": "{count} photos taken",
+    "takePhoto": "Take photo",
+    "takeSelfie": "Take selfie",
+    "submit": "Submit",
+    "stencilInstruction": "Position the document/face within the frame"
   },
   "onboarding": {
     "slides": [
@@ -91,11 +525,21 @@
       "seconds": "sec",
       "sendCode": "Send Code"
     },
-    "next": "Next"
+    "next": "Next",
+    "registrationRequired": "New users must provide first and last name",
+    "registration": "Registration",
+    "newUserText": "If you are a new user, please complete",
+    "registrationPage": {
+      "title": "Registration",
+      "description": "Enter your details to create an account",
+      "firstNamePlaceholder": "First Name",
+      "lastNamePlaceholder": "Last Name"
+    }
   },
   "main": {
     "drawer": {
       "menu": {
+        "profile": "Profile",
         "tripsAndPayments": "Trips and Fines",
         "wallet": "Wallet",
         "myAuto": "My Cars",
@@ -115,6 +559,31 @@
     "errorTitle": "Failed to load cars",
     "errorDescription": "Something went wrong while loading your cars. Please try again.",
     "retry": "Try again",
+    "loadingUser": "Loading user...",
+    "availableMinutes": "Available minutes:",
+    "yourTrip": "YOUR TRIP",
+    "loadingTripDetails": "Loading trip details...",
+    "tripDetailsError": "Loading error",
+    "tripDetailsErrorDescription": "Failed to load trip details. Please try again.",
+    "tripInfo": "Trip information",
+    "durationLabel": "Duration:",
+    "over24Hours": "Over 24 hours",
+    "under24Hours": "Under 24 hours",
+    "routeDays": "Route days:",
+    "totalPoints": "Total points:",
+    "photoNotAvailable": "Photo not available",
+    "photo": "Photo",
+    "pinchToZoom": "Pinch to zoom",
+    "selectDayForRoute": "Select day to view route",
+    "tripRoute": "Trip route",
+    "selectDay": "Select day",
+    "date": "Date:",
+    "routePoints": "Route points:",
+    "singleDayRoute": "Single day route",
+    "routePointsCount": "route points",
+    "noRouteData": "No route data available for display",
+    "pointA": "Point A (start)",
+    "pointB": "Point B (end)",
     "carDetails": {
       "title": "Car Details",
       "monthlyEarnings": "Monthly Earnings",
@@ -133,6 +602,9 @@
       "rentalType": "Rental Type",
       "startTime": "Start Time",
       "endTime": "End Time",
+      "reserved": "Reserved",
+      "started": "Started",
+      "completed": "Completed",
       "photos": {
         "clientBefore": "Photos from client before trip",
         "clientAfter": "Photos from client after trip",
@@ -142,6 +614,11 @@
       "route": {
         "title": "Route Map",
         "noRoute": "No route data available"
+      },
+      "location": {
+        "title": "Location",
+        "startLocation": "Start Location",
+        "endLocation": "End Location"
       }
     },
     "rentalTypes": {
@@ -153,6 +630,10 @@
       "minutes": "min",
       "hours": "h",
       "days": "d"
+    },
+    "locale": {
+      "dateFormat": "en-US",
+      "timeFormat": "en-US"
     }
   },
   "messages": {
@@ -164,7 +645,14 @@
     "loading": "Loading messages...",
     "errorTitle": "Failed to load messages",
     "errorDescription": "Something went wrong while loading your messages. Please try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "newMessagesCount": "new messages",
+    "timeFormatting": {
+      "justNow": "just now",
+      "minutesAgo": "m ago",
+      "hoursAgo": "h ago",
+      "daysAgo": "d ago"
+    }
   },
   "contract": {
     "title": "Vehicle Rental Agreement",
@@ -174,14 +662,177 @@
     "accept": "Accept Terms",
     "reject": "Reject"
   },
+  "guarantor": {
+    "accessDenied": "Access Denied",
+    "mechanicNotAllowed": "Guarantor function is not available for mechanics",
+    "loading": "Loading...",
+    "loadingError": "Error loading data. Please try again later.",
+    "acceptError": "Error accepting request. Please try again later.",
+    "rejectError": "Error rejecting request. Please try again later.",
+    "tabs": {
+      "iAmGuarantor": "I am Guarantor",
+      "myGuarantors": "My Guarantors"
+    },
+    "incomingRequests": {
+      "title": "New Requests",
+      "myClients": "People I am responsible for",
+      "noClients": "No clients",
+      "noClientsDescription": "People you guarantee will be displayed here",
+      "accept": "Accept",
+      "reject": "Reject",
+      "reason": "Reason:",
+      "notSpecified": "Not specified",
+      "contractSigned": "Contract signed",
+      "contractNotSigned": "Contract not signed",
+      "subleaseSigned": "Sublease signed",
+      "subleaseNotSigned": "Sublease not signed",
+      "signContract": "Sign contract",
+      "signSublease": "Sign sublease"
+    },
+    "myGuarantors": {
+      "add": "Add",
+      "pending": "Pending",
+      "accepted": "Accepted requests",
+      "rejected": "Rejected",
+      "noAcceptedRequests": "No accepted requests",
+      "noAcceptedRequestsDescription": "Requests accepted by your guarantors will be displayed here",
+      "sent": "Sent:",
+      "added": "Added:",
+      "rejectedAt": "Rejected:",
+      "notSpecified": "Not specified",
+      "reason": "Reason:",
+      "rejectionReason": "Rejection reason:",
+      "addGuarantor": "Add guarantor",
+      "phoneNumber": "Phone number *",
+      "reasonOptional": "Reason (optional)",
+      "reasonPlaceholder": "Specify the reason for inviting a guarantor...",
+      "cancel": "Cancel",
+      "invite": "Invite",
+      "sending": "Sending...",
+      "success": "Success!",
+      "guarantorAddedSuccessfully": "Guarantor successfully added",
+      "error": "Error",
+      "phoneValidationError": "Please enter a valid phone number (10 digits)",
+      "addGuarantorError": "Error adding guarantor. Please try again later."
+    },
+    "rejectModal": {
+      "title": "Reject request",
+      "reasonLabel": "Rejection reason (optional)",
+      "reasonPlaceholder": "Specify the reason for rejection...",
+      "cancel": "Cancel",
+      "reject": "Reject"
+    },
+    "helpModal": {
+      "title": "What is a Guarantor?",
+      "definition": "Definition",
+      "definitionText": "A guarantor is a person who bears financial responsibility in case of an accident.",
+      "howItWorks": "How does it work?",
+      "howItWorksItems": [
+        "The guarantor takes financial responsibility for your actions",
+        "In case of an accident or other obligations, the guarantor bears financial responsibility",
+        "The guarantor must sign the relevant contracts",
+        "The relationship between you and the guarantor must be confirmed by both parties"
+      ],
+      "tabs": "Tabs",
+      "iAmGuarantorTab": "I am Guarantor: Here you can see requests from people asking you to be their guarantor, as well as a list of people you are already responsible for.",
+      "myGuarantorsTab": "My Guarantors: Here you can add your guarantors and view their status.",
+      "understood": "Understood"
+    },
+    "contractModal": {
+      "guarantorContract": "Guarantor contract",
+      "subleaseContract": "Sublease contract",
+      "guarantorDescription": "This contract defines your obligations as a guarantor to the client.",
+      "subleaseDescription": "This contract defines the terms of vehicle sublease.",
+      "contractTerms": "Contract terms:",
+      "readToEnd": "To sign the contract, you must read the entire document to the end",
+      "agreeToTerms": "By clicking \"Sign\", you agree to the terms of this contract.",
+      "documentTitle": "Contract document:",
+      "openInNewTab": "Open in new tab",
+      "loadingContract": "Loading contract...",
+      "contractLoadError": "Contract loading error",
+      "contractLoadErrorDescription": "Failed to load document. Try opening it in browser.",
+      "openInBrowser": "Open in browser",
+      "contractLoadErrorAlt": "Failed to load document. Try opening it in a new tab.",
+      "agreeCheckbox": "I have read the entire contract and agree to the terms",
+      "cancel": "Cancel",
+      "signing": "Signing...",
+      "signContract": "Sign contract",
+      "readToSign": "Read the entire contract to sign",
+      "confirmAgreement": "Confirm agreement with contract terms"
+    },
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired",
+      "unknown": "Unknown"
+    }
+  },
   "trips": {
     "title": "History",
     "tabs": {
       "trips": "Trips",
       "fines": "Fines"
     },
+    "tripsAndFines": "Trips and Fines",
     "fine": "Fine",
-    "currency": "₸"
+    "currency": "₸",
+    "noTrips": {
+      "title": "No trips",
+      "description": "You don't have any trips in your history yet"
+    },
+    "noFines": {
+      "title": "No fines",
+      "description": "You don't have any fines"
+    },
+    "vehicle": {
+      "title": "Vehicle Information",
+      "model": "Model",
+      "year": "Year",
+      "engine": "Engine"
+    },
+    "pricing": {
+      "title": "Pricing",
+      "basePrice": "Base Price",
+      "openFee": "Opening Fee",
+      "deliveryFee": "Delivery Fee",
+      "waitingFee": "Waiting Fee",
+      "overtimeFee": "Overtime Fee",
+      "distanceFee": "Distance Fee",
+      "total": "Total",
+      "paid": "Paid"
+    },
+    "actionHistory": {
+      "title": "Action History",
+      "action": "action",
+      "actions": "actions",
+      "loadingError": "Failed to load rental history details",
+      "notFound": "Trip details not found"
+    },
+    "selectDay": "Select Day",
+    "selectDayForRoute": "Select day to view route",
+    "dateFormat": "en-US",
+    "date": "Date",
+    "routePoints": "Route Points",
+    "singleDayRoute": "Single Day Route",
+    "pointA": "Point A",
+    "pointB": "Point B",
+    "start": "Start",
+    "end": "End",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
   },
   "modal": {
     "success": {
@@ -192,7 +843,448 @@
     "error": {
       "title": "Error completing rental.",
       "description": "Check that all doors are closed,\nand try again.",
-      "button": "Try again"
+      "button": "Try again",
+      "tryAgain": "Try again",
+      "registration": "Registration"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "select": "Select language",
+    "ru": "Русский",
+    "en": "English",
+    "kz": "Қазақша"
+  },
+  "mechanic": {
+    "inspection": {
+      "successfullyStarted": "Inspection successfully started",
+      "uploadPhotosBeforeStart": "Upload photos of the vehicle before starting inspection",
+      "successfullyCancelled": "Inspection successfully cancelled",
+      "photosUploaded": "Photos uploaded",
+      "photosUploadedSuccessfully": "Photos successfully uploaded, you can start inspection",
+      "photoUploadError": "Error uploading photos",
+      "preparationTitle": "Preparation for inspection",
+      "preparationDescription": "Take photos of the vehicle before starting inspection, documenting all damage, defects and interior condition.",
+      "viewData": "View data",
+      "cancelInspection": "Cancel inspection",
+      "startInspection": "Start inspection",
+      "pauseInspection": "Pause",
+      "resumeInspection": "Start trip",
+      "completeInspection": "Complete inspection",
+      "successfullyCompleted": "Inspection successfully completed",
+      "completionError": "Error occurred while completing inspection",
+      "pauseError": "Error trying to pause inspection",
+      "resumeError": "Error trying to resume inspection",
+      "acceptedInWork": "Inspection successfully accepted for work",
+      "acceptInspection": "Accept inspection",
+      "rateCarCondition": "Rate vehicle condition",
+      "specifyDefects": "Specify detected defects (required)",
+      "additionalComments": "Additional comments (optional)"
+    },
+    "delivery": {
+      "successfullyStarted": "Delivery successfully started",
+      "uploadPhotosBeforeStart": "Upload photos of the vehicle before starting delivery",
+      "photosUploaded": "Photos uploaded",
+      "photosUploadedSuccessfully": "Photos successfully uploaded, you can start delivery",
+      "photoUploadError": "Error uploading photos",
+      "preparationTitle": "Preparation for delivery",
+      "preparationDescription": "Take photos of the vehicle before starting delivery, documenting all damage, defects and interior condition.",
+      "startDelivery": "Start delivery",
+      "pauseDelivery": "Pause",
+      "resumeDelivery": "Start trip",
+      "completeDelivery": "Complete delivery",
+      "successfullyCompleted": "Delivery successfully completed",
+      "completionError": "Error completing delivery",
+      "pauseError": "Error trying to pause delivery",
+      "resumeError": "Error trying to resume delivery",
+      "acceptedInWork": "Delivery successfully accepted for work"
+    },
+    "tracking": {
+      "started": "Tracking started",
+      "completed": "Tracking completed",
+      "successfullyCompleted": "Tracking successfully completed",
+      "startError": "Error starting tracking",
+      "completionError": "Error completing tracking",
+      "active": "Tracking active",
+      "description": "Tracking vehicle location and condition",
+      "viewData": "View data",
+      "completeTracking": "Complete tracking",
+      "startTracking": "Start tracking"
+    },
+    "vehicle": {
+      "carPoint": "Vehicle point",
+      "deliveryPoint": "Delivery point",
+      "isFree": "Vehicle is free",
+      "close": "Close"
+    },
+    "common": {
+      "excellent": "Excellent",
+      "lockError": "Error trying to lock vehicle",
+      "unlockError": "Error trying to unlock vehicle"
+    }
+  },
+  "widgets": {
+    "footerBtns": {
+      "myCars": "My Cars",
+      "freeCars": "Free Cars",
+      "freqUsedCars": "Frequently Used",
+      "mechanicPending": "Inspection",
+      "mechanicDelivery": "Delivery",
+      "mechanicInRent": "In Rent",
+      "check": "Inspection",
+      "delivery": "Delivery",
+      "rent": "In Rent"
+    },
+    "modals": {
+       "contract": {
+         "title": "Rental Agreement",
+         "loadingContract": "Loading contract...",
+         "contractLoadError": "Contract loading error",
+         "contractLoadErrorDescription": "Failed to load document. Try opening it in browser.",
+         "openInBrowser": "Open in browser",
+         "downloadPDF": "Download PDF",
+         "agreeToTerms": "I agree to the terms of the contract",
+         "reject": "Reject",
+         "accept": "Accept",
+         "readToEnd": "To accept the contract, you must read the entire document",
+         "documentDescription": "Vehicle rental agreement document",
+         "ifLoadingTakesLong": "If loading takes a long time:"
+       },
+      "user": {
+        "carInWaiting": {
+          "inspectCar": "Inspect the car",
+          "inspectCarDescription": "Take photos of the car before starting the rental, recording all damage, defects and interior condition.",
+          "cancelRental": "Cancel rental",
+          "openCar": "Open car",
+          "openCarConfirms": "Opening the car confirms the handover act.",
+          "uploadPhotosBeforeRent": "Upload photos before starting rental",
+          "photosUploadedSuccessfully": "Photos uploaded successfully",
+          "rentalCancelledSuccessfully": "Rental cancelled successfully",
+          "tryAgain": "Try again"
+        },
+        "delivery": {
+          "driverFound": "Driver found",
+          "driverFoundDescription": "Driver accepted your order and is preparing to leave",
+          "carInTransit": "Car in transit",
+          "carInTransitDescription": "Driver has already left and is heading to you",
+          "searchingDriver": "Searching for driver",
+          "searchingDriverDescription": "We are looking for the nearest available driver for your order",
+          "delivery": "Delivery",
+          "deliveryDescription": "Checking for available drivers in your area",
+          "cancelDelivery": "Cancel delivery",
+          "deliveryCancelled": "Delivery cancelled",
+          "deliveryCancelledError": "Delivery cancellation error"
+        },
+        "startCar": {
+          "successfullyBooked": "Successfully booked",
+          "deliverySuccessfullyOrdered": "Delivery successfully ordered",
+          "topUpBalance": "Top up balance",
+          "tryAgain": "Try again",
+          "bookCar": "Book car",
+          "orderDelivery": "Order delivery",
+          "removeFromRent": "Remove from rent",
+          "deliveryAddress": "Delivery address:",
+          "attention": "Attention:",
+          "waitingFee": "after 15 minutes after booking, paid waiting begins."
+        },
+        "inUse": {
+          "pause": "Pause",
+          "startTrip": "Start trip",
+          "completeRental": "Complete rental",
+          "moreDetails": "More details",
+          "leaveReview": "Leave a review",
+          "commentRequired": "Comment (required for 1 star rating)",
+          "commentOptional": "Comment (optional)",
+          "tariff": "Tariff",
+          "rentalTime": "Rental time",
+          "rentalSuccessfullyCompleted": "Rental successfully completed",
+          "errorCompletingRental": "Error completing rental",
+          "errorPausing": "Error trying to pause",
+          "errorStartingTrip": "Error trying to start trip",
+          "errorLocking": "Error trying to lock car",
+          "errorUnlocking": "Error trying to unlock car",
+          "unknownRentalType": "Unknown rental type"
+        },
+        "rentalContent": {
+          "tariff": "Tariff",
+          "timeOutsideTariff": "Time outside tariff"
+        }
+      },
+      "mechanic": {
+        "carIsFree": {
+          "isFree": "Car is free",
+          "close": "Close"
+        },
+        "carInWaiting": {
+          "preparationTitle": "Preparation for inspection",
+          "preparationDescription": "Take photos of the car before starting inspection, recording all damage, defects and interior condition.",
+          "viewData": "View data",
+          "cancelInspection": "Cancel inspection",
+          "startInspection": "Start inspection"
+        },
+        "carInWaitingDeliver": {
+          "preparationTitle": "Preparation for delivery",
+          "preparationDescription": "Take photos of the car before starting delivery, recording all damage, defects and interior condition.",
+          "startDelivery": "Start delivery"
+        },
+        "startCheck": {
+          "viewData": "View data",
+          "carPoint": "Car point",
+          "deliveryPoint": "Delivery point",
+          "acceptInspection": "Accept inspection",
+          "startDelivery": "Start delivery",
+          "startTracking": "Start tracking"
+        },
+        "tracking": {
+          "active": "Tracking active",
+          "description": "Tracking car location and status",
+          "viewData": "View data",
+          "completeTracking": "Complete tracking",
+          "completed": "Tracking completed",
+          "successfullyCompleted": "Tracking successfully completed",
+          "startError": "Error starting tracking",
+          "completionError": "Error completing tracking"
+        }
+      },
+      "ui": {
+        "carImageCarousel": {
+          "photoNotAvailable": "Photo not available"
+        },
+        "imageViewer": {
+          "pinchToZoom": "Pinch to zoom"
+        },
+        "carControlsSlider": {
+          "lock": "Lock",
+          "unlock": "Unlock"
+        }
+      },
+      "rentalContent": {
+        "tariff": "Tariff",
+        "timeOutsideTariff": "Time outside tariff",
+        "rentalTime": "Rental time",
+        "timeLeft": "Time left",
+        "penaltyTime": "Penalty time",
+        "moreDetails": "More details",
+        "completeRental": "Complete rental",
+        "leaveReview": "Leave a review",
+        "rateCarCondition": "Rate vehicle condition",
+        "specifyDefects": "Specify detected defects (required)",
+        "additionalComments": "Additional comments (optional)",
+        "commentRequired": "Comment (required for 1 star rating)",
+        "commentOptional": "Comment (optional)",
+        "complete": "Complete",
+        "unknownRentalType": "Unknown rental type"
+      },
+      "delivery": {
+        "driverFound": "Driver found",
+        "driverFoundDescription": "Driver accepted your order and is preparing to leave",
+        "carInTransit": "Car in transit",
+        "carInTransitDescription": "Driver has already left and is heading to you",
+        "searchingDriver": "Searching for driver",
+        "searchingDriverDescription": "We are looking for the nearest available driver for your order",
+        "delivery": "Delivery",
+        "deliveryDescription": "Checking for available drivers in your area",
+        "cancelDelivery": "Cancel delivery",
+        "deliveryCancelled": "Delivery cancelled",
+        "deliveryCancelledError": "Delivery cancellation error"
+      },
+      "startCar": {
+        "successfullyBooked": "Successfully booked",
+        "deliverySuccessfullyOrdered": "Delivery successfully ordered",
+        "topUpBalance": "Top up balance",
+        "tryAgain": "Try again",
+        "bookCar": "Book car",
+        "orderDelivery": "Order delivery",
+        "removeFromRent": "Remove from rent",
+        "deliveryAddress": "Delivery address:",
+        "attention": "Attention:",
+        "waitingFee": "after 15 minutes after booking, paid waiting begins."
+      },
+      "carInWaiting": {
+        "inspectCar": "Inspect the car",
+        "inspectCarDescription": "Take photos of the car before starting the rental, recording all damage, defects and interior condition.",
+        "cancelRental": "Cancel rental",
+        "openCar": "Open car",
+        "openCarConfirms": "Opening the car confirms the handover act.",
+        "uploadPhotosBeforeRent": "Upload photos before starting rental",
+        "photosUploadedSuccessfully": "Photos uploaded successfully",
+        "rentalCancelledSuccessfully": "Rental cancelled successfully",
+        "tryAgain": "Try again"
+      }
+    },
+    "screens": {
+      "rental": {
+        "minutes": "Minutes",
+        "hours": "Hours",
+        "days": "Days",
+        "cost": "Cost",
+        "tariff": "Tariff",
+        "total": "Total:",
+        "savings": "Savings",
+        "aboutTariff": "About tariff",
+        "rentalAgreement": "Rental agreement",
+        "book": "Book",
+        "orderDelivery": "Order delivery",
+        "attention": "Attention:",
+        "waitingFee": "after 15 minutes after booking, paid waiting begins.",
+        "longTermDiscounts": "Long-term rental discounts",
+        "from3Days": "From 3 days:",
+        "discount5": "5% discount",
+        "from7Days": "From 7 days:",
+        "discount10": "10% discount",
+        "from30Days": "From 30 days:",
+        "discount15": "15% discount"
+      },
+      "delivery": {
+        "deliveryAddress": "Delivery address:",
+        "determiningAddress": "Determining address...",
+        "goToMyLocation": "Go to my location",
+        "deliveryCost": "Delivery cost",
+        "ownerDiscount": "Owner discount",
+        "confirmAddress": "Confirm address",
+        "deliveryNotAvailable": "Delivery not available",
+        "locationError": "Could not get your location. Check permissions for geolocation access.",
+        "geolocationNotSupported": "Geolocation is not supported by your browser"
+      },
+      "description": {
+        "carDescription": "Car description",
+        "carInfo": "Car information",
+        "backToMap": "Back to map"
+      },
+      "tracking": {
+        "trackingData": "Tracking data",
+        "trackingInfo": "Car tracking information",
+        "renter": "Renter",
+        "name": "Name:",
+        "phone": "Phone:",
+        "rentSelfie": "Rental selfie",
+        "profileSelfie": "Profile selfie",
+        "noPhoto": "No photo",
+        "renterPhotosNotAvailable": "Renter photos not available",
+        "backToMap": "Back to map",
+        "noPhotoAvailable": "No photo"
+      }
+    },
+    "timers": {
+      "waiting": {
+        "freeWaiting": "Free waiting",
+        "paidWaiting": "Paid waiting"
+      },
+      "mechanic": {
+        "timer": "Timer",
+        "timeExpired": "Time expired"
+      }
+    }
+  },
+  "search": {
+    "placeholder": "Search...",
+    "loading": "Loading...",
+    "noResults": "No results found"
+  },
+  "cars": {
+    "loading": "Loading...",
+    "nothingFound": "Nothing found",
+    "bodyType": "Body Type",
+    "noAvailableCars": "No available cars",
+    "carsCount": "cars",
+    "year": "year",
+    "electric": "Electric",
+    "bodyTypes": {
+      "sedan": "Sedan",
+      "suv": "SUV",
+      "crossover": "Crossover",
+      "coupe": "Coupe",
+      "hatchback": "Hatchback",
+      "convertible": "Convertible",
+      "wagon": "Wagon",
+      "minibus": "Minibus",
+      "electric": "Electric"
+    },
+    "statuses": {
+      "FREE": "Free",
+      "IN_USE": "In Use",
+      "SERVICE": "In Service",
+      "OWNER": "With Owner",
+      "PENDING": "Pending",
+      "FAILURE": "Faulty",
+      "RESERVED": "Reserved",
+      "DELIVERING": "Delivering",
+      "TRACKING": "In Transit"
+    }
+  },
+  "entities": {
+    "carCard": {
+      "minutes": "min",
+      "availabilityForRental": "Availability for rental",
+      "availabilityDescription": "Your car must be available for rental for at least 15 days per month (21,600 minutes)",
+      "currentTime": "Current time:"
+    }
+  },
+  "enums": {
+    "userRole": {
+      "admin": "Administrator",
+      "user": "User",
+      "rejected": "Rejected",
+      "first": "New User",
+      "pending": "Pending",
+      "mechanic": "Mechanic",
+      "garant": "Guarantor"
+    },
+    "rentalType": {
+      "minutes": "Minute",
+      "hours": "Hour",
+      "days": "Day"
+    },
+    "rentalStatus": {
+      "reserved": "Reserved",
+      "in_use": "In Use",
+      "completed": "Completed",
+      "delivering": "Delivering",
+      "delivering_in_progress": "Delivery in Progress",
+      "delivery_reserved": "Delivery Reserved",
+      "cancelled": "Cancelled"
+    },
+    "carBodyType": {
+      "sedan": "Sedan",
+      "suv": "SUV",
+      "crossover": "Crossover",
+      "coupe": "Coupe",
+      "hatchback": "Hatchback",
+      "convertible": "Convertible",
+      "wagon": "Wagon",
+      "minibus": "Minibus"
+    },
+    "guarantorRequestStatus": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "expired": "Expired"
+    },
+    "verificationStatus": {
+      "not_verified": "Not Verified",
+      "verified": "Verified",
+      "rejected": "Rejected by Admin"
+    },
+    "autoClass": {
+      "A": "Class A (up to 25M)",
+      "B": "Class B (up to 40M)",
+      "C": "Class C (40M+)"
+    },
+    "actionType": {
+      "open_vehicle": "Open Vehicle",
+      "close_vehicle": "Close Vehicle",
+      "give_key": "Give Key",
+      "take_key": "Take Key"
+    },
+    "actionTypeLabels": {
+      "open_vehicle": "Vehicle opened",
+      "close_vehicle": "Vehicle closed",
+      "give_key": "Key given",
+      "take_key": "Key taken"
+    },
+    "userPromoStatus": {
+      "activated": "Activated",
+      "used": "Used"
     }
   }
 }

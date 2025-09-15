@@ -19,6 +19,7 @@ import { MessagesPage } from "@/_pages/messages";
 import { MyAutoPage } from "@/_pages/my-auto";
 import { GuarantorPage } from "@/_pages/guarantor";
 import { UserRole } from "@/shared/models/types/user";
+import { LanguageSelector } from "@/shared/ui/language-selector";
 
 type ComponentKeys =
   | "trips"
@@ -197,12 +198,15 @@ const Drawer = () => {
         )}
       >
         <div className="mt-16">
-          <button
-            onClick={() => setIsDrawerOpen(false)}
-            className="flex justify-between w-full px-8 mb-10"
-          >
-            <div></div> <MenuIcon color="white" />
-          </button>
+          <div className="flex justify-between items-center w-full px-8 mb-10">
+            <div></div>
+            <div className="flex items-center gap-4">
+              <LanguageSelector className="bg-gray-800 hover:bg-gray-700" />
+              <button onClick={() => setIsDrawerOpen(false)}>
+                <MenuIcon color="white" />
+              </button>
+            </div>
+          </div>
           <button
             onClick={() => handleItemClick("profile")}
             className="flex items-center justify-between p-8"

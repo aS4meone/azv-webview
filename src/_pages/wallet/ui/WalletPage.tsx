@@ -39,7 +39,7 @@ const PromoCodeModal = ({
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="Введите промокод"
+              placeholder={t("enterPromoCode")}
               className="w-full text-base bg-gray-50 text-gray-900 outline-none border-2 border-transparent
                      focus:border-gray-800 focus:bg-white placeholder:text-gray-400 p-4 rounded-2xl
                      transition-all duration-300 shadow-inner focus:shadow-lg"
@@ -69,7 +69,7 @@ const PromoCodeModal = ({
               {isLoading && (
                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
               )}
-              <span>{isLoading ? "Активируем..." : t("activate")}</span>
+              <span>{isLoading ? t("activating") : t("activate")}</span>
             </div>
           </Button>
         </div>
@@ -112,7 +112,7 @@ const WalletPage = () => {
       initiatePayment({
         amount: amount,
         currency: FORTE_CONFIG.DEFAULT_CURRENCY,
-        description: "Пополнение баланса AZV Motors",
+        description: t("paymentDescription"),
         trackingId: trackingId,
         onSuccess: async (result) => {
           console.log("Payment successful:", result);
@@ -130,10 +130,10 @@ const WalletPage = () => {
 
             setResponseModal({
               isOpen: true,
-              title: "Баланс пополнен",
+              title: t("balanceReplenished"),
               type: "success",
-              description: `Баланс успешно пополнен на ${formatAmount(amount)}`,
-              buttonText: "Отлично",
+              description: `${t("balanceSuccessfullyReplenished")} ${formatAmount(amount)}`,
+              buttonText: t("excellent"),
             });
           } catch (error) {
             console.error(
@@ -151,12 +151,12 @@ const WalletPage = () => {
 
             setResponseModal({
               isOpen: true,
-              title: "Внимание",
+              title: t("attention"),
               type: "success",
-              description: `Оплата прошла успешно (ID: ${trackingId.slice(
+              description: `${t("paymentSuccessful")} (${t("paymentId")} ${trackingId.slice(
                 -8
-              )}). Если баланс не обновился, обратитесь в поддержку.`,
-              buttonText: "Понятно",
+              )}). ${t("ifBalanceNotUpdated")}`,
+              buttonText: t("understood"),
             });
           }
         },
@@ -166,10 +166,10 @@ const WalletPage = () => {
 
           setResponseModal({
             isOpen: true,
-            title: "Ошибка оплаты",
+            title: t("paymentError"),
             type: "error",
-            description: "Не удалось завершить оплату. Попробуйте еще раз.",
-            buttonText: "Понятно",
+            description: t("failedToCompletePayment"),
+            buttonText: t("understood"),
           });
         },
         onClose: (status) => {
@@ -194,12 +194,12 @@ const WalletPage = () => {
 
             setResponseModal({
               isOpen: true,
-              title: "Ожидание подтверждения",
+              title: t("waitingForConfirmation"),
               type: "success",
-              description: `Платеж обрабатывается (ID: ${trackingId.slice(
+              description: `${t("paymentProcessing")} (${t("paymentId")} ${trackingId.slice(
                 -8
-              )}). Результат будет известен в течение нескольких минут.`,
-              buttonText: "Понятно",
+              )}). ${t("resultWillBeKnown")}`,
+              buttonText: t("understood"),
             });
           }
         },
@@ -210,11 +210,10 @@ const WalletPage = () => {
 
       setResponseModal({
         isOpen: true,
-        title: "Ошибка",
+        title: t("error"),
         type: "error",
-        description:
-          "Не удалось инициировать платеж. Проверьте подключение к интернету.",
-        buttonText: "Понятно",
+        description: t("failedToInitiatePayment"),
+        buttonText: t("understood"),
       });
     }
   };
@@ -239,9 +238,9 @@ const WalletPage = () => {
       setResponseModal({
         isOpen: true,
         type: "success",
-        title: "Промокод активирован",
-        description: `Промокод "${promoCode}" успешно применен!\nСкидка: ${response.data.discount_percent}%`,
-        buttonText: "Отлично",
+        title: t("promoCodeActivated"),
+        description: `Промокод "${promoCode}" ${t("promoCodeSuccessfullyApplied")}\n${t("discount")} ${response.data.discount_percent}%`,
+        buttonText: t("excellent"),
       });
     } catch (error: unknown) {
       console.error("Error applying promo code:", error);
@@ -261,14 +260,14 @@ const WalletPage = () => {
         "detail" in error.response.data &&
         typeof error.response.data.detail === "string"
           ? error.response.data.detail
-          : "Не удалось активировать промокод";
+          : t("failedToActivatePromoCode");
 
       setResponseModal({
         isOpen: true,
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description: errorMessage,
-        buttonText: "Понятно",
+        buttonText: t("understood"),
       });
     } finally {
       setIsLoading(false);
@@ -315,7 +314,7 @@ const WalletPage = () => {
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
               {formatBalance(balance)} ₸
             </h1>
-            <p className="text-xs text-white/50">Доступно для использования</p>
+            <p className="text-xs text-white/50">{t("availableForUse")}</p>
           </div>
         </div>
       </section>
@@ -339,7 +338,7 @@ const WalletPage = () => {
               )}
             </div>
             <span className="font-semibold text-lg text-white">
-              {isTopUpLoading ? "Обрабатывается..." : t("topUp")}
+              {isTopUpLoading ? t("processing") : t("topUp")}
             </span>
           </div>
         </Button>

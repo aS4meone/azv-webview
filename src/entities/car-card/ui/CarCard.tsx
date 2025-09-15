@@ -2,6 +2,7 @@ import { CarStatus, ICar } from "@/shared/models/types/car";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
+import { useTranslations } from "next-intl";
 
 interface CarCardProps {
   car: ICar;
@@ -10,6 +11,7 @@ interface CarCardProps {
 
 const CarCard = ({ car, onCarClick }: CarCardProps) => {
   const router = useRouter();
+  const t = useTranslations("cars.statuses");
 
   const handleClick = () => {
     router.push(
@@ -38,16 +40,18 @@ const CarCard = ({ car, onCarClick }: CarCardProps) => {
 export default CarCard;
 
 const CarStatusBadge = ({ status }: { status: CarStatus }) => {
+  const t = useTranslations("cars.statuses");
+  
   const statuses = {
-    [CarStatus.free]: "Свободен",
-    [CarStatus.inUse]: "В аренде",
-    [CarStatus.service]: "В сервисе",
-    [CarStatus.owner]: "У Владелеца",
-    [CarStatus.pending]: "В ожидании",
-    [CarStatus.failure]: "Неисправен",
-    [CarStatus.reserved]: "Зарезервирован",
-    [CarStatus.delivering]: "В доставке",
-    [CarStatus.tracking]: "В пути",
+    [CarStatus.free]: t("FREE"),
+    [CarStatus.inUse]: t("IN_USE"),
+    [CarStatus.service]: t("SERVICE"),
+    [CarStatus.owner]: t("OWNER"),
+    [CarStatus.pending]: t("PENDING"),
+    [CarStatus.failure]: t("FAILURE"),
+    [CarStatus.reserved]: t("RESERVED"),
+    [CarStatus.delivering]: t("DELIVERING"),
+    [CarStatus.tracking]: t("TRACKING"),
   };
 
   const color = {

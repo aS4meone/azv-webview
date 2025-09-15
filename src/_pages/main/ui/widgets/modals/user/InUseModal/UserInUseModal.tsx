@@ -1,5 +1,7 @@
+"use client";
 import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { CarInfoHeader, CarControlsSlider } from "../../ui";
 import {
   ResponseBottomModalProps,
@@ -17,7 +19,7 @@ import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
 import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { ICar } from "@/shared/models/types/car";
-import { RENTAL_CONFIG } from "../../../screens/rental-screen/hooks/usePricingCalculator";
+import { getRentalConfig } from "../../../screens/rental-screen/hooks/usePricingCalculator";
 import { MinutesRentalContent } from "./components/MinutesRentalContent";
 import { HoursRentalContent } from "./components/HoursRentalContent";
 import { DaysRentalContent } from "./components/DaysRentalContent";
@@ -30,6 +32,7 @@ interface UserInUseModalProps {
 }
 
 export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
+  const t = useTranslations();
   const { refreshUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -110,7 +113,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке поставить на паузу";
+          : t("widgets.modals.user.inUse.errorPausing");
 
       setResponseModal({
         isOpen: true,
@@ -119,9 +122,9 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
           await refreshUser();
         },
         type: "error",
-        title: "Ошибка",
-        description: errorMessage || "Ошибка при попытке поставить на паузу",
-        buttonText: "Попробовать снова",
+        title: t("error"),
+        description: errorMessage || t("widgets.modals.user.inUse.errorPausing"),
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: async () => {
           setResponseModal(null);
           await refreshUser();
@@ -139,7 +142,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке начать поездку";
+          : t("widgets.modals.user.inUse.errorStartingTrip");
 
       setResponseModal({
         isOpen: true,
@@ -148,9 +151,9 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
           await refreshUser();
         },
         type: "error",
-        title: "Ошибка",
-        description: errorMessage || "Ошибка при попытке начать поездку",
-        buttonText: "Попробовать снова",
+        title: t("error"),
+        description: errorMessage || t("widgets.modals.user.inUse.errorStartingTrip"),
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: async () => {
           setResponseModal(null);
         },
@@ -177,8 +180,8 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
             onClose();
           },
           type: "success",
-          description: "Аренда успешно завершена",
-          buttonText: "Отлично",
+          description: t("widgets.modals.user.inUse.rentalSuccessfullyCompleted"),
+          buttonText: t("widgets.modals.user.inUse.tryAgain"),
           onButtonClick: async () => {
             setResponseModal(null);
             await refreshUser();
@@ -192,15 +195,15 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Произошла ошибка при завершении аренды";
+          : t("widgets.modals.user.inUse.errorCompletingRental");
 
       setResponseModal({
         isOpen: true,
         onClose: () => {},
         type: "error",
-        title: "Ошибка",
-        description: errorMessage || "Произошла ошибка при завершении аренды",
-        buttonText: "Попробовать снова",
+        title: t("error"),
+        description: errorMessage || t("widgets.modals.user.inUse.errorCompletingRental"),
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: () => {},
       });
     }
@@ -215,16 +218,16 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке заблокировать автомобиль";
+          : t("widgets.modals.user.inUse.errorLocking");
 
       setResponseModal({
         isOpen: true,
         onClose: () => {},
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description:
-          errorMessage || "Ошибка при попытке заблокировать автомобиль",
-        buttonText: "Попробовать снова",
+          errorMessage || t("widgets.modals.user.inUse.errorLocking"),
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: () => {},
       });
     }
@@ -239,16 +242,16 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         error instanceof Error && "response" in error
           ? (error as { response?: { data?: { detail?: string } } }).response
               ?.data?.detail
-          : "Ошибка при попытке разблокировать автомобиль";
+          : t("widgets.modals.user.inUse.errorUnlocking");
 
       setResponseModal({
         isOpen: true,
         onClose: () => {},
         type: "error",
-        title: "Ошибка",
+        title: t("error"),
         description:
-          errorMessage || "Ошибка при попытке разблокировать автомобиль",
-        buttonText: "Попробовать снова",
+          errorMessage || t("widgets.modals.user.inUse.errorUnlocking"),
+        buttonText: t("modal.error.tryAgain"),
         onButtonClick: () => {},
       });
     }
@@ -266,7 +269,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         return (
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-gray-600">
-              Неизвестный тип аренды: {rentalType}
+              {t("widgets.modals.rentalContent.unknownRentalType")}: {rentalType}
             </p>
           </div>
         );
@@ -331,7 +334,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
             renderRentalTypeContent()
           ) : (
             <div className="text-center flex items-center justify-start gap-2">
-              <span>Подробнее</span> <ArrowRightIcon />
+              <span>{t("widgets.modals.rentalContent.moreDetails")}</span> <ArrowRightIcon />
             </div>
           )}
         </button>
@@ -344,14 +347,14 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
             className="text-[14px]"
             onClick={handlePause}
           >
-            Пауза
+            {t("widgets.modals.user.inUse.pause")}
           </Button>
           <Button
             variant="outline"
             className="text-[14px]"
             onClick={handleStartTrip}
           >
-            Начать поездку
+            {t("widgets.modals.user.inUse.startTrip")}
           </Button>
         </div>
 
@@ -359,7 +362,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
         <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
-          Завершить аренду
+          {t("widgets.modals.rentalContent.completeRental")}
         </Button>
       </div>
     </div>
@@ -388,11 +391,14 @@ const RatingModal = ({
   car,
   user,
   isLoading,
-}: RatingModalProps) => (
+}: RatingModalProps) => {
+  const t = useTranslations();
+  const rentalConfig = getRentalConfig(t);
+  return (
   <PushScreen onClose={onClose} withOutStyles>
     <div className="bg-white px-8 py-10 pt-[140px] text-[#191919] flex flex-col justify-between h-full">
       <div>
-        <h2 className="text-[20px] font-semibold mb-4">Оставьте отзыв</h2>
+        <h2 className="text-[20px] font-semibold mb-4">{t("widgets.modals.rentalContent.leaveReview")}</h2>
         <div className="flex gap-2 mb-4">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -412,27 +418,27 @@ const RatingModal = ({
           onChange={(e) => setComment(e.target.value)}
           placeholder={
             rating === 1
-              ? "Комментарий (обязательно при оценке 1 звезда)"
-              : "Комментарий (необязательно)"
+              ? t("widgets.modals.rentalContent.commentRequired")
+              : t("widgets.modals.rentalContent.commentOptional")
           }
           maxLength={255}
           className="w-full h-[200px] p-5 rounded-[30px] border border-[#E0E0E0]  mb-4 bg-[#F9F9F9] outline-none"
         />
         <CarInfoHeader car={car} showPlateNumber={false} />
         <div className="flex justify-between items-center border-t border-[#E0E0E0] mt-2 pt-2">
-          <p className="text-[16px] text-[#191919]">Тариф</p>
+          <p className="text-[16px] text-[#191919]">{t("widgets.modals.rentalContent.tariff")}</p>
           <p className="text-[16px] text-[#191919]">
             {user.current_rental!.rental_details.rental_type === "minutes"
               ? `${car.price_per_minute} ₸/мин`
               : user.current_rental!.rental_details.rental_type === "hours"
               ? `${
                   user.current_rental!.rental_details.duration
-                } ${RENTAL_CONFIG[
+                } ${rentalConfig[
                   user.current_rental!.rental_details.rental_type as RentalType
                 ].getUnitText(user.current_rental!.rental_details.duration!)}`
               : `${
                   user.current_rental!.rental_details.duration
-                } ${RENTAL_CONFIG[
+                } ${rentalConfig[
                   user.current_rental!.rental_details.rental_type as RentalType
                 ].getUnitText(user.current_rental!.rental_details.duration!)}`}
           </p>
@@ -444,11 +450,12 @@ const RatingModal = ({
         onClick={handleEndRental}
         className="w-full"
       >
-        {isLoading ? <Loader /> : "Завершить"}
+        {isLoading ? <Loader /> : t("widgets.modals.rentalContent.complete")}
       </Button>
     </div>
   </PushScreen>
-);
+  );
+};
 
 const StartIcon = ({
   fill = "none",

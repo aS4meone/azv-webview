@@ -4,6 +4,7 @@ import { Input, Button } from "@/shared/ui";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import Loader from "@/shared/ui/loader";
+import { useTranslations } from "next-intl";
 
 type DocumentDetailsData = Omit<
   UploadDocumentsDto,
@@ -25,6 +26,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   initialData,
   isLoading = false,
 }) => {
+  const t = useTranslations("profile");
   const [formData, setFormData] =
     React.useState<DocumentDetailsData>(initialData);
   const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
@@ -56,15 +58,15 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
 
   const validateFullName = (name: string) => {
     if (name.length < 2) {
-      return "ФИО должно содержать минимум 2 символа";
+      return t("validation.fullNameMinLength");
     }
     if (name.length > 100) {
-      return "ФИО не может быть длиннее 100 символов";
+      return t("validation.fullNameMaxLength");
     }
     // Check for at least two words with proper capitalization
     const words = name.trim().split(/\s+/);
     if (words.length < 2) {
-      return "Введите полное ФИО (имя и фамилию)";
+      return t("validation.fullNameRequired");
     }
 
     return "";
@@ -73,7 +75,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   const validateIIN = useCallback(
     (iin: string) => {
       if (!/^\d{12}$/.test(iin)) {
-        return "ИИН должен содержать 12 цифр";
+        return t("validation.iinLength");
       }
 
       // Validate birth date from IIN with form birth date
@@ -92,7 +94,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
           birthMonth !== iinMonth ||
           birthDay !== iinDay
         ) {
-          return "ИИН не соответствует указанной дате рождения";
+          return t("validation.iinMismatch");
         }
       }
 
@@ -106,15 +108,15 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       const lastDigit = parseInt(iin[11]);
 
       if (control === 10) {
-        return "Неверный ИИН";
+        return t("validation.invalidIin");
       }
       if (control !== lastDigit) {
-        return "Неверная контрольная сумма ИИН";
+        return t("validation.invalidIinChecksum");
       }
 
       return "";
     },
-    [formData.birth_date]
+    [formData.birth_date, t]
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -150,7 +152,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     // Validate birth date
     if (name === "birth_date" && value) {
       if (!validateAge(value)) {
-        newErrors.birth_date = "Возраст должен быть не менее 18 лет";
+        newErrors.birth_date = t("validation.ageRequirement");
       }
       // Revalidate IIN when birth date changes
       if (formData.iin.length === 12) {
@@ -167,7 +169,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       value
     ) {
       if (!validateFutureDate(value)) {
-        newErrors[name] = "Дата должна быть в будущем";
+        newErrors[name] = t("validation.futureDateRequired");
       }
     }
 
@@ -184,7 +186,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     const iinError =
       formData.iin.length === 12
         ? validateIIN(formData.iin)
-        : "ИИН должен содержать 12 цифр";
+        : t("validation.iinLength");
 
     return (
       !nameError &&
@@ -197,7 +199,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       validateFutureDate(formData.drivers_license_expiry) &&
       Object.keys(errors).length === 0
     );
-  }, [formData, errors, validateIIN]);
+  }, [formData, errors, validateIIN, t]);
 
   const getMaxDate = (years: number) => {
     const date = new Date();
@@ -224,11 +226,11 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
           onClose={onClose}
           direction="bottom"
           withHeader={true}
-          title="Данные документов"
+          title={t("documentData")}
         >
           <form onSubmit={handleSubmit} className="space-y-4 pt-8">
             <Input
-              label="ФИО"
+              label={t("fullName")}
               name="full_name"
               value={formData.full_name}
               onChange={handleChange}
@@ -236,10 +238,10 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
               minLength={2}
               maxLength={100}
               error={errors.full_name}
-              placeholder="Иванов Иван Иванович"
+              placeholder={t("fullNamePlaceholder")}
             />
             <Input
-              label="Дата рождения"
+              label={t("birthDate")}
               name="birth_date"
               type="date"
               value={formData.birth_date}
@@ -250,7 +252,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
               error={errors.birth_date}
             />
             <Input
-              label="ИИН"
+              label={t("iin")}
               name="iin"
               value={formData.iin}
               onChange={handleChange}
@@ -259,10 +261,10 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
               maxLength={12}
               pattern="[0-9]{12}"
               error={errors.iin}
-              placeholder="XXXXXXXXXXXX"
+              placeholder={t("iinPlaceholder")}
             />
             <Input
-              label="Срок действия удостоверения личности"
+              label={t("idCardExpiry")}
               name="id_card_expiry"
               type="date"
               value={formData.id_card_expiry}
@@ -273,7 +275,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
               error={errors.id_card_expiry}
             />
             <Input
-              label="Срок действия водительского удостоверения"
+              label={t("driversLicenseExpiry")}
               name="drivers_license_expiry"
               type="date"
               value={formData.drivers_license_expiry}
@@ -291,7 +293,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                   className="w-full"
                   disabled={isLoading}
                 >
-                  {isLoading ? <Loader color="#fff" /> : "Отправить"}
+                  {isLoading ? <Loader color="#fff" /> : t("submit")}
                 </Button>
               </div>
             )}

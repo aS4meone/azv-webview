@@ -26,17 +26,17 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
+    if (diffMinutes < 1) return t("timeFormatting.justNow");
+    if (diffMinutes < 60) return `${diffMinutes} ${t("timeFormatting.minutesAgo")}`;
+    if (diffHours < 24) return `${diffHours} ${t("timeFormatting.hoursAgo")}`;
+    if (diffDays < 7) return `${diffDays} ${t("timeFormatting.daysAgo")}`;
+    
+    // For dates older than 7 days, use locale-specific formatting
     if (locale === "ru") {
-      if (diffMinutes < 1) return "только что";
-      if (diffMinutes < 60) return `${diffMinutes} мин назад`;
-      if (diffHours < 24) return `${diffHours} ч назад`;
-      if (diffDays < 7) return `${diffDays} дн назад`;
       return localDate.toLocaleDateString("ru-RU");
+    } else if (locale === "kz") {
+      return localDate.toLocaleDateString("kz-KZ");
     } else {
-      if (diffMinutes < 1) return "just now";
-      if (diffMinutes < 60) return `${diffMinutes}m ago`;
-      if (diffHours < 24) return `${diffHours}h ago`;
-      if (diffDays < 7) return `${diffDays}d ago`;
       return localDate.toLocaleDateString("en-US");
     }
   };

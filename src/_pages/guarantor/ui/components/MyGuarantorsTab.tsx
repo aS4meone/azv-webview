@@ -4,6 +4,7 @@ import { ContractType, GuarantorFormData, GuarantorFormInputs } from "@/shared/m
 import { HiUserPlus, HiUsers, HiDocumentText, HiPlus, HiClock, HiCheckCircle, HiXCircle, HiExclamationTriangle } from "react-icons/hi2";
 import { HiX } from "react-icons/hi";
 import { PhoneInput } from "@/_pages/auth/ui/widgets/PhoneInput";
+import { useTranslations } from "next-intl";
 
 interface MyGuarantorsTabProps {
   guarantors: SimpleGuarantor[];
@@ -18,6 +19,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
   onAddGuarantor,
   onViewContract,
 }) => {
+  const t = useTranslations();
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState<GuarantorFormInputs>({
     phone_number: "",
@@ -32,7 +34,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
     // Проверяем, что номер телефона содержит только цифры и имеет правильную длину
     const phoneDigits = formData.phone_number.replace(/\D/g, "");
     if (phoneDigits.length !== 10) {
-      setError("Пожалуйста, введите корректный номер телефона (10 цифр)");
+      setError(t("guarantor.myGuarantors.phoneValidationError"));
       return;
     }
     
@@ -70,11 +72,11 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         }, 2000);
       } else {
         // Если API вернул ошибку, показываем её
-        setError(response.error || "Ошибка при добавлении гаранта. Попробуйте позже.");
+        setError(response.error || t("guarantor.myGuarantors.addGuarantorError"));
       }
     } catch (error: any) {
       console.error("Error adding guarantor:", error);
-      setError(error?.response?.data?.detail || "Ошибка при добавлении гаранта. Попробуйте позже.");
+      setError(error?.response?.data?.detail || t("guarantor.myGuarantors.addGuarantorError"));
     } finally {
       setLoading(false);
     }
@@ -110,7 +112,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
     switch (status) {
       case GuarantorRequestStatus.PENDING:
         return {
-          text: "Ожидание",
+          text: t("guarantor.status.pending"),
           color: "text-amber-600",
           bgColor: "bg-amber-50",
           borderColor: "border-amber-200",
@@ -118,7 +120,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         };
       case GuarantorRequestStatus.ACCEPTED:
         return {
-          text: "Принято",
+          text: t("guarantor.status.accepted"),
           color: "text-green-600",
           bgColor: "bg-green-50",
           borderColor: "border-green-200",
@@ -126,7 +128,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         };
       case GuarantorRequestStatus.REJECTED:
         return {
-          text: "Отклонено",
+          text: t("guarantor.status.rejected"),
           color: "text-red-600",
           bgColor: "bg-red-50",
           borderColor: "border-red-200",
@@ -134,7 +136,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         };
       case GuarantorRequestStatus.EXPIRED:
         return {
-          text: "Истекло",
+          text: t("guarantor.status.expired"),
           color: "text-gray-600",
           bgColor: "bg-gray-50",
           borderColor: "border-gray-200",
@@ -142,7 +144,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
         };
       default:
         return {
-          text: "Неизвестно",
+          text: t("guarantor.status.unknown"),
           color: "text-gray-600",
           bgColor: "bg-gray-50",
           borderColor: "border-gray-200",
@@ -160,7 +162,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
           className="w-full px-6 py-3 bg-[#191919] text-white font-semibold rounded-xl hover:bg-[#333333] transition-all duration-300  flex items-center justify-center gap-2"
         >
           <HiPlus className="w-5 h-5" />
-          Добавить
+          {t("guarantor.myGuarantors.add")}
         </button>
       </div>
 
@@ -172,7 +174,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               <HiClock className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-base font-semibold text-[#191919]">
-              В ожидании
+              {t("guarantor.myGuarantors.pending")}
               <span className="ml-2 px-2 py-1 bg-amber-500 text-white text-xs font-medium rounded-full">
                 {requests.filter(req => req.status === GuarantorRequestStatus.PENDING).length}
               </span>
@@ -200,7 +202,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                           <h3 className="font-semibold text-[#191919] text-lg truncate">
                             {request.guarantor_first_name && request.guarantor_last_name 
                               ? `${request.guarantor_first_name} ${request.guarantor_last_name}`
-                              : request.guarantor_first_name || request.guarantor_last_name || "Не указано"
+                              : request.guarantor_first_name || request.guarantor_last_name || t("guarantor.myGuarantors.notSpecified")
                             }
                           </h3>
                           <p className="text-sm text-[#191919] truncate">
@@ -212,7 +214,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                     <div className="flex items-center justify-between mt-3 w-full">
                       <div className="flex flex-col space-y-2 flex-shrink-0 w-full">
                         <p className="text-xs text-[#191919] justify-center items-center">
-                          Отправлено: {new Date(request.created_at).toLocaleDateString("ru-RU")}
+                          {t("guarantor.myGuarantors.sent")} {new Date(request.created_at).toLocaleDateString("ru-RU")}
                         </p>
                         <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
                           <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
@@ -222,7 +224,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                         </div>
                         {request.reason && (
                           <p className="text-xs text-[#191919] bg-gray-100 rounded-lg p-2">
-                            <strong>Причина:</strong> {request.reason}
+                            <strong>{t("guarantor.myGuarantors.reason")}</strong> {request.reason}
                           </p>
                         )}
                       </div>
@@ -241,7 +243,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
             <HiCheckCircle className="w-5 h-5 text-white" />
           </div>
           <h2 className="text-base font-semibold text-[#191919]">
-            Принятые заявки
+            {t("guarantor.myGuarantors.accepted")}
             {guarantors.length > 0 && (
               <span className="ml-2 px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
                 {guarantors.length}
@@ -254,9 +256,9 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#F5F5F5] flex items-center justify-center">
               <HiCheckCircle className="w-10 h-10 text-[#191919]" />
             </div>
-            <p className="text-[#191919] text-base font-medium">Нет принятых заявок</p>
+            <p className="text-[#191919] text-base font-medium">{t("guarantor.myGuarantors.noAcceptedRequests")}</p>
             <p className="text-[#191919] text-sm mt-1">
-              Здесь будут отображаться заявки, которые приняли ваши гаранты
+              {t("guarantor.myGuarantors.noAcceptedRequestsDescription")}
             </p>
           </div>
         ) : (
@@ -290,7 +292,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                   
                   <div className="flex flex-col space-y-2 flex-shrink-0 w-full ">
                   <p className="text-xs text-[#191919] justify-center items-center ">
-                      Добавлен: {new Date(guarantor.created_at).toLocaleDateString("ru-RU")}
+                      {t("guarantor.myGuarantors.added")} {new Date(guarantor.created_at).toLocaleDateString("ru-RU")}
                     </p>
                     <span
                       className={`text-xs px-2 py-1 rounded-full justify-center items-center font-medium flex items-center gap-1 whitespace-nowrap ${
@@ -300,7 +302,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                       }`}
                     >
                       <HiDocumentText className="w-3 h-3" />
-                      {guarantor.contract_signed ? "Договор подписан" : "Договор не подписан"}
+                      {guarantor.contract_signed ? t("guarantor.incomingRequests.contractSigned") : t("guarantor.incomingRequests.contractNotSigned")}
                     </span>
                     <span
                       className={`text-xs px-2 py-1 rounded-full justify-center items-center font-medium flex items-center gap-1 whitespace-nowrap ${
@@ -310,7 +312,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                       }`}
                     >
                       <HiDocumentText className="w-3 h-3" />
-                      {guarantor.sublease_contract_signed ? "Субаренда подписана" : "Субаренда не подписана"}
+                      {guarantor.sublease_contract_signed ? t("guarantor.incomingRequests.subleaseSigned") : t("guarantor.incomingRequests.subleaseNotSigned")}
                     </span>
                     
                   </div>
@@ -329,7 +331,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               <HiXCircle className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-base font-semibold text-[#191919]">
-              Отклоненные
+              {t("guarantor.myGuarantors.rejected")}
               <span className="ml-2 px-2 py-1 bg-red-500 text-white text-xs font-medium rounded-full">
                 {requests.filter(req => req.status === GuarantorRequestStatus.REJECTED).length}
               </span>
@@ -357,7 +359,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                           <h3 className="font-semibold text-[#191919] text-lg truncate">
                             {request.guarantor_first_name && request.guarantor_last_name 
                               ? `${request.guarantor_first_name} ${request.guarantor_last_name}`
-                              : request.guarantor_first_name || request.guarantor_last_name || "Не указано"
+                              : request.guarantor_first_name || request.guarantor_last_name || t("guarantor.myGuarantors.notSpecified")
                             }
                           </h3>
                           <p className="text-sm text-[#191919] truncate">
@@ -369,7 +371,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                     <div className="flex items-center justify-between mt-3 w-full">
                       <div className="flex flex-col space-y-2 flex-shrink-0 w-full">
                         <p className="text-xs text-[#191919] justify-center items-center">
-                          Отклонено: {request.responded_at ? new Date(request.responded_at).toLocaleDateString("ru-RU") : "Не указано"}
+                          {t("guarantor.myGuarantors.rejectedAt")} {request.responded_at ? new Date(request.responded_at).toLocaleDateString("ru-RU") : t("guarantor.myGuarantors.notSpecified")}
                         </p>
                         <div className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${statusInfo.bgColor} ${statusInfo.borderColor}`}>
                           <StatusIcon className={`w-4 h-4 ${statusInfo.color}`} />
@@ -379,12 +381,12 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                         </div>
                         {request.reason && (
                           <p className="text-xs text-[#191919] bg-gray-100 rounded-lg p-2">
-                            <strong>Причина:</strong> {request.reason}
+                            <strong>{t("guarantor.myGuarantors.reason")}</strong> {request.reason}
                           </p>
                         )}
                         {request.admin_notes && (
                           <p className="text-xs text-[#191919] bg-red-50 rounded-lg p-2">
-                            <strong>Причина отклонения:</strong> {request.admin_notes}
+                            <strong>{t("guarantor.myGuarantors.rejectionReason")}</strong> {request.admin_notes}
                           </p>
                         )}
                       </div>
@@ -406,7 +408,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                   <HiUserPlus className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-base font-semibold text-white">
-                  Добавить гаранта
+                  {t("guarantor.myGuarantors.addGuarantor")}
                 </h3>
               </div>
               <button
@@ -430,8 +432,8 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                     </svg>
                   </div>
                   <div>
-                    <p className="text-green-400 font-medium">Успешно!</p>
-                    <p className="text-green-300 text-sm">Гарант успешно добавлен</p>
+                    <p className="text-green-400 font-medium">{t("guarantor.myGuarantors.success")}</p>
+                    <p className="text-green-300 text-sm">{t("guarantor.myGuarantors.guarantorAddedSuccessfully")}</p>
                   </div>
                 </div>
               </div>
@@ -445,7 +447,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                     <HiX className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <p className="text-red-400 font-medium">Ошибка</p>
+                    <p className="text-red-400 font-medium">{t("guarantor.myGuarantors.error")}</p>
                     <p className="text-red-300 text-sm">{error}</p>
                   </div>
                 </div>
@@ -455,7 +457,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Номер телефона *
+                  {t("guarantor.myGuarantors.phoneNumber")}
                 </label>
                 <PhoneInput
                   phone={formData.phone_number}
@@ -465,14 +467,14 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
               
               <div>
                 <label className="block text-sm font-medium text-white mb-2">
-                  Причина (необязательно)
+                  {t("guarantor.myGuarantors.reasonOptional")}
                 </label>
                 <textarea
                   value={formData.reason}
                   onChange={(e) => handleInputChange("reason", e.target.value)}
                   className="w-full px-4 py-3 bg-[#292929] border border-[#404040] rounded-xl focus:ring-2 focus:ring-white/20 focus:border-white/40 transition-all duration-300 resize-none text-white placeholder:text-white/50"
                   rows={3}
-                  placeholder="Укажите причину приглашения гаранта..."
+                  placeholder={t("guarantor.myGuarantors.reasonPlaceholder")}
                 />
               </div>
             </div>
@@ -487,7 +489,7 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                   loading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
-                Отмена
+                {t("guarantor.myGuarantors.cancel")}
               </button>
               <button
                 type="button"
@@ -500,17 +502,17 @@ export const MyGuarantorsTab: React.FC<MyGuarantorsTabProps> = ({
                 {loading ? (
                   <div className="flex items-center justify-center gap-2">
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                    Отправка...
+                    {t("guarantor.myGuarantors.sending")}
                   </div>
                 ) : success ? (
                   <div className="flex items-center justify-center gap-2">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Успешно!
+                    {t("guarantor.myGuarantors.success")}
                   </div>
                 ) : (
-                  "Пригласить"
+                  t("guarantor.myGuarantors.invite")
                 )}
               </button>
             </div>

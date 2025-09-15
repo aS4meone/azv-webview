@@ -1,6 +1,8 @@
+"use client";
 import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { CarInfoHeader } from "../ui";
 import { ResponseBottomModalProps } from "@/shared/ui/modal";
 import { rentApi } from "@/shared/api/routes/rent";
@@ -14,6 +16,7 @@ interface UserDeliveryModalProps {
 }
 
 export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
+  const t = useTranslations();
   const { refreshUser, user } = useUserStore();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
@@ -81,8 +84,8 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
         setResponseModal({
           isOpen: true,
           type: "success",
-          description: "Доставка отменена",
-          buttonText: "Понятно",
+          description: t("widgets.modals.user.delivery.deliveryCancelled"),
+          buttonText: t("widgets.modals.user.delivery.tryAgain"),
           onClose: async () => {
             await refreshUser();
             onClose();
@@ -99,8 +102,8 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
       setResponseModal({
         isOpen: true,
         type: "error",
-        description: error.response?.data?.detail || "Ошибка отмены доставки",
-        buttonText: "Попробовать снова",
+        description: error.response?.data?.detail || t("widgets.modals.user.delivery.deliveryCancelledError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: handleResponseModalClose,
         onButtonClick: handleResponseModalClose,
       });
@@ -111,28 +114,27 @@ export const UserDeliveryModal = ({ car, onClose }: UserDeliveryModalProps) => {
     switch (rentalStatus) {
       case RentalStatus.DELIVERY_RESERVED:
         return {
-          title: "Водитель найден",
-          description: "Водитель принял ваш заказ и готовится к выезду",
-          buttonText: "Отменить доставку",
+          title: t("widgets.modals.user.delivery.driverFound"),
+          description: t("widgets.modals.user.delivery.driverFoundDescription"),
+          buttonText: t("widgets.modals.user.delivery.cancelDelivery"),
         };
       case RentalStatus.DELIVERY_IN_PROGRESS:
         return {
-          title: "Машина в пути",
-          description: "Водитель уже выехал и направляется к вам",
-          buttonText: "Отменить доставку",
+          title: t("widgets.modals.user.delivery.carInTransit"),
+          description: t("widgets.modals.user.delivery.carInTransitDescription"),
+          buttonText: t("widgets.modals.user.delivery.cancelDelivery"),
         };
       case RentalStatus.DELIVERING:
         return {
-          title: "Поиск водителя",
-          description:
-            "Мы ищем ближайшего свободного водителя для вашего заказа",
-          buttonText: "Отменить доставку",
+          title: t("widgets.modals.user.delivery.searchingDriver"),
+          description: t("widgets.modals.user.delivery.searchingDriverDescription"),
+          buttonText: t("widgets.modals.user.delivery.cancelDelivery"),
         };
       default:
         return {
-          title: "Доставка",
-          description: "Проверяем наличие свободных водителей в вашем районе",
-          buttonText: "Отменить доставку",
+          title: t("widgets.modals.user.delivery.delivery"),
+          description: t("widgets.modals.user.delivery.deliveryDescription"),
+          buttonText: t("widgets.modals.user.delivery.cancelDelivery"),
         };
     }
   };

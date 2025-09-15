@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,35 +29,35 @@ interface StatCard {
 }
 
 export const AboutContent = () => {
+  const t = useTranslations("terms.about");
+  
   const features: FeatureCard[] = [
     {
-      title: "Быстрая аренда",
-      description:
-        "Оформление аренды занимает всего несколько минут через приложение",
+      title: t("features.quickRental.title"),
+      description: t("features.quickRental.description"),
       icon: <Zap className="w-6 h-6" />,
     },
     {
-      title: "Гибкие тарифы",
-      description:
-        "Выбирайте удобный тариф: поминутный, почасовой или посуточный",
+      title: t("features.flexibleRates.title"),
+      description: t("features.flexibleRates.description"),
       icon: <DollarSign className="w-6 h-6" />,
     },
     {
-      title: "Поддержка 24/7",
-      description: "Наша служба поддержки всегда готова помочь",
+      title: t("features.support24_7.title"),
+      description: t("features.support24_7.description"),
       icon: <Phone className="w-6 h-6" />,
     },
   ];
 
   const stats: StatCard[] = [
     {
-      value: "10,000+",
-      label: "Довольных клиентов",
+      value: t("stats.satisfiedClients"),
+      label: t("stats.satisfiedClientsLabel"),
       icon: <Users className="w-5 h-5" />,
     },
     {
-      value: "500+",
-      label: "Автомобилей в парке",
+      value: t("stats.carsInFleet"),
+      label: t("stats.carsInFleetLabel"),
       icon: <MapPin className="w-5 h-5" />,
     },
   ];
@@ -67,16 +68,14 @@ export const AboutContent = () => {
       <div className="text-center space-y-6">
         <div className="flex justify-center">
           <Badge className="text-sm px-4 py-2 bg-[#1D77FF] text-white">
-            О компании AZV Motors
+            {t("badge")}
           </Badge>
         </div>
         <h1 className="text-4xl font-bold text-black">
-          Современный сервис аренды автомобилей
+          {t("mainTitle")}
         </h1>
         <p className="text-xl text-black/60 max-w-3xl mx-auto leading-relaxed">
-          AZV Motors - это современный сервис аренды автомобилей, который делает
-          процесс аренды максимально простым и удобным. Мы предлагаем широкий
-          выбор автомобилей и гибкие условия аренды.
+          {t("description")}
         </p>
       </div>
 
@@ -103,10 +102,10 @@ export const AboutContent = () => {
       <div>
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-black mb-4">
-            Почему выбирают нас
+            {t("features.title")}
           </h2>
           <p className="text-black/60">
-            Мы предлагаем лучшие условия аренды и высокое качество сервиса
+            {t("features.description")}
           </p>
         </div>
 
@@ -135,15 +134,12 @@ export const AboutContent = () => {
         <CardHeader>
           <div className="flex items-center gap-2">
             <Target className="w-6 h-6 text-[#1D77FF]" />
-            <CardTitle className="text-black">Наша миссия</CardTitle>
+            <CardTitle className="text-black">{t("mission.title")}</CardTitle>
           </div>
         </CardHeader>
         <CardContent>
           <p className="text-black text-lg leading-relaxed">
-            Сделать аренду автомобилей доступной и удобной для каждого,
-            предоставляя качественный сервис и современные технологические
-            решения. Мы стремимся к тому, чтобы каждая поездка с нами была
-            комфортной, безопасной и доступной по цене.
+            {t("mission.description")}
           </p>
         </CardContent>
       </Card>
@@ -155,9 +151,9 @@ export const AboutContent = () => {
             <div className="p-3 bg-[#1D77FF]/10 rounded-full w-fit mx-auto mb-4">
               <Shield className="w-6 h-6 text-[#1D77FF]" />
             </div>
-            <h3 className="font-semibold text-black mb-2">Безопасность</h3>
+            <h3 className="font-semibold text-black mb-2">{t("values.security.title")}</h3>
             <p className="text-black/60 text-sm">
-              Все автомобили проходят регулярное техническое обслуживание
+              {t("values.security.description")}
             </p>
           </CardContent>
         </Card>
@@ -168,10 +164,10 @@ export const AboutContent = () => {
               <Users className="w-6 h-6 text-[#1D77FF]" />
             </div>
             <h3 className="font-semibold text-black mb-2">
-              Клиентоориентированность
+              {t("values.customerOriented.title")}
             </h3>
             <p className="text-black/60 text-sm">
-              Мы всегда готовы помочь и решить любые вопросы
+              {t("values.customerOriented.description")}
             </p>
           </CardContent>
         </Card>
@@ -181,9 +177,9 @@ export const AboutContent = () => {
             <div className="p-3 bg-[#1D77FF]/10 rounded-full w-fit mx-auto mb-4">
               <Award className="w-6 h-6 text-[#1D77FF]" />
             </div>
-            <h3 className="font-semibold text-black mb-2">Качество</h3>
+            <h3 className="font-semibold text-black mb-2">{t("values.quality.title")}</h3>
             <p className="text-black/60 text-sm">
-              Высокие стандарты обслуживания и современный автопарк
+              {t("values.quality.description")}
             </p>
           </CardContent>
         </Card>

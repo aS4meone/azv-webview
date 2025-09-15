@@ -183,7 +183,7 @@ const MessagesPage = () => {
           {t("title")}
         </h1>
         {messages.length > 0 && unreadCount > 0 && (
-          <p className="text-sm text-gray-500">{unreadCount} новых сообщений</p>
+          <p className="text-sm text-gray-500">{unreadCount} {t("newMessagesCount")}</p>
         )}
       </header>
 

@@ -87,12 +87,12 @@ const AuthPage = () => {
       setIsLoading(false);
     } else {
       // Проверяем, является ли ошибка связанной с новым пользователем
-      if (res.error && res.error.includes("обязательно указать имя и фамилию")) {
+      if (res.error && res.error.includes(t("auth.registrationRequired"))) {
         showModal({
           type: "error",
-          title: "Ошибка",
-          description: "Для новых пользователей обязательно указать имя и фамилию",
-          buttonText: "Регистрация",
+          title: t("error"),
+          description: t("auth.registrationRequired"),
+          buttonText: t("auth.registration"),
           onButtonClick: () => {
             router.push(ROUTES.REGISTRATION);
           }
@@ -163,14 +163,14 @@ const AuthPage = () => {
           {activeStep === 0 && (
             <div className="mt-2 text-center">
               <p className="text-white/70 text-[16px] mb-3">
-                Если вы новый пользователь, то пройдите
+                {t("auth.newUserText")}
               </p>
               <Button
                 variant="secondary"
                 onClick={() => router.push(ROUTES.REGISTRATION)}
                 className="w-full"
               >
-                Регистрация
+                {t("auth.registration")}
               </Button>
             </div>
           )}
@@ -183,7 +183,7 @@ const AuthPage = () => {
         onClose={() => setIsContractModalOpen(false)}
         onAccept={handleContractAccept}
         onReject={handleContractReject}
-        title={"Договор аренды"}
+        title={t("contract.title")}
       />
     </article>
   );

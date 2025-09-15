@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IncomingRequest, SimpleClient } from "@/shared/models/types/guarantor";
 import { ContractType } from "@/shared/models/types/guarantor-page";
 import { HiClipboardDocumentList, HiUsers, HiCheckCircle, HiXCircle, HiDocumentText, HiExclamationTriangle } from "react-icons/hi2";
+import { useTranslations } from "next-intl";
 
 interface IncomingRequestsTabProps {
   requests: IncomingRequest[];
@@ -18,6 +19,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
   onReject,
   onViewContract,
 }) => {
+  const t = useTranslations();
   const [rejectReason, setRejectReason] = useState<string>("");
   const [showRejectModal, setShowRejectModal] = useState<number | null>(null);
 
@@ -37,7 +39,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
               <HiClipboardDocumentList className="w-5 h-5 text-white" />
             </div>
             <h2 className="text-lg font-semibold text-[#191919]">
-              Новые заявки
+              {t("guarantor.incomingRequests.title")}
               {requests.length > 0 && (
                 <span className="ml-2 px-2 py-1 bg-[#191919] text-white text-xs font-medium rounded-full">
                   {requests.length}
@@ -60,7 +62,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[#191919] text-lg truncate">
-                        {request.requestor_name || "Не указано"}
+                        {request.requestor_name || t("guarantor.incomingRequests.notSpecified")}
                       </h3>
                       <p className="text-sm text-[#191919] truncate">
                         {request.requestor_phone}
@@ -72,7 +74,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                   <div className="mt-3">
                     <div className="bg-[#F8F8F8] rounded-lg p-3">
                       <p className="text-sm text-[#191919]">
-                        <span className="font-medium">Причина:</span> {request.reason}
+                        <span className="font-medium">{t("guarantor.incomingRequests.reason")}</span> {request.reason}
                       </p>
                     </div>
                   </div>
@@ -87,14 +89,14 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                       className="px-3 py-3 bg-[#2E7D32] text-white text-xs font-semibold rounded-lg hover:bg-[#4CAF50] transition-all duration-300  flex items-center justify-center gap-1 whitespace-nowrap"
                     >
                       <HiCheckCircle className="w-3 h-3" />
-                      Принять
+                      {t("guarantor.incomingRequests.accept")}
                     </button>
                     <button
                       onClick={() => setShowRejectModal(request.id)}
                       className="px-3 py-3 bg-[#D32F2F] text-white text-xs font-semibold rounded-lg hover:bg-[#F44336] transition-all duration-300  flex items-center justify-center gap-1 whitespace-nowrap"
                     >
                       <HiXCircle className="w-3 h-3" />
-                      Отклонить
+                      {t("guarantor.incomingRequests.reject")}
                     </button>
                   </div>
                 </div>
@@ -111,7 +113,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
             <HiUsers className="w-4 h-4 text-white" />
           </div>
           <h2 className="text-base font-semibold text-[#191919]">
-            Люди, за которых я несу ответственность
+            {t("guarantor.incomingRequests.myClients")}
             {clients.length > 0 && (
               <span className="ml-2 px-2 py-1 bg-[#191919] text-white text-xs font-medium rounded-full">
                 {clients.length}
@@ -124,8 +126,8 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[#191919] flex items-center justify-center">
               <HiUsers className="w-12 h-12 text-white" />
             </div>
-            <p className="text-[#191919] text-lg font-semibold mb-2">Нет клиентов</p>
-            <p className="text-[#191919] text-sm">Здесь будут отображаться люди, за которых вы ручаетесь</p>
+            <p className="text-[#191919] text-lg font-semibold mb-2">{t("guarantor.incomingRequests.noClients")}</p>
+            <p className="text-[#191919] text-sm">{t("guarantor.incomingRequests.noClientsDescription")}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -145,7 +147,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                       <h3 className="font-semibold text-[#191919] text-lg truncate">
                         {client.first_name && client.last_name 
                           ? `${client.first_name} ${client.last_name}`
-                          : client.first_name || client.last_name || "Не указано"
+                          : client.first_name || client.last_name || t("guarantor.incomingRequests.notSpecified")
                         }
                       </h3>
                       <p className="text-sm text-[#191919] truncate">
@@ -165,7 +167,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                       }`}
                     >
                       <HiDocumentText className="w-3 h-3" />
-                      {client.contract_signed ? "Договор подписан" : "Договор не подписан"}
+                      {client.contract_signed ? t("guarantor.incomingRequests.contractSigned") : t("guarantor.incomingRequests.contractNotSigned")}
                     </span>
                     <span
                       className={`text-xs px-2 py-1 rounded-full font-medium flex items-center justify-center gap-1 whitespace-nowrap ${
@@ -175,14 +177,14 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                       }`}
                     >
                       <HiDocumentText className="w-3 h-3" />
-                      {client.sublease_contract_signed ? "Субаренда подписана" : "Субаренда не подписана"}
+                      {client.sublease_contract_signed ? t("guarantor.incomingRequests.subleaseSigned") : t("guarantor.incomingRequests.subleaseNotSigned")}
                     </span>
                     {!client.contract_signed && (
                       <button
                         onClick={() => onViewContract("guarantor", client.id)}
                         className="px-3 py-2 bg-[#191919] text-white text-xs font-semibold rounded-lg hover:bg-[#333333] transition-all duration-300  whitespace-nowrap"
                       >
-                        Подписать договор
+                        {t("guarantor.incomingRequests.signContract")}
                       </button>
                     )}
                     {client.contract_signed && !client.sublease_contract_signed && (
@@ -190,7 +192,7 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                         onClick={() => onViewContract("sublease", client.id)}
                         className="px-3 py-2 bg-[#2196F3] text-white text-xs font-semibold rounded-lg hover:bg-[#1976D2] transition-all duration-300  whitespace-nowrap"
                       >
-                        Подписать субаренду
+                        {t("guarantor.incomingRequests.signSublease")}
                       </button>
                     )}
                   </div>
@@ -210,19 +212,19 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                 <HiExclamationTriangle className="w-5 h-5 text-white" />
               </div>
               <h3 className="text-base font-semibold text-[#191919]">
-                Отклонить заявку
+                {t("guarantor.rejectModal.title")}
               </h3>
             </div>
             <div className="mb-6">
               <label className="block text-sm font-medium text-[#191919] mb-2">
-                Причина отклонения (необязательно)
+                {t("guarantor.rejectModal.reasonLabel")}
               </label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 className="w-full px-4 py-3 border border-[#E5E5E5] rounded-xl focus:ring-2 focus:ring-[#191919]/20 focus:border-[#191919] transition-all duration-300 resize-none"
                 rows={3}
-                placeholder="Укажите причину отклонения..."
+                placeholder={t("guarantor.rejectModal.reasonPlaceholder")}
               />
             </div>
             <div className="flex space-x-3">
@@ -233,13 +235,13 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                 }}
                 className="flex-1 px-4 py-3 border border-[#E5E5E5] text-[#191919] rounded-xl hover:bg-[#F8F8F8] transition-all duration-300 font-medium"
               >
-                Отмена
+                {t("guarantor.rejectModal.cancel")}
               </button>
               <button
                 onClick={() => handleReject(showRejectModal)}
                 className="flex-1 px-4 py-3 bg-[#D32F2F] text-white rounded-xl hover:bg-[#F44336] transition-all duration-300 font-semibold "
               >
-                Отклонить
+                {t("guarantor.rejectModal.reject")}
               </button>
             </div>
           </div>

@@ -4,6 +4,7 @@ import { HiXMark, HiDocumentText, HiExclamationTriangle } from "react-icons/hi2"
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { Button } from "@/shared/ui";
 import { Document, Page, pdfjs } from "react-pdf";
+import { useTranslations } from "next-intl";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
@@ -24,6 +25,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   contractUrl,
   onSign,
 }) => {
+  const t = useTranslations();
   const [loading, setLoading] = useState(false);
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
@@ -75,14 +77,14 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 
   const getContractTitle = () => {
     return contractType === "guarantor" 
-      ? "Договор гаранта" 
-      : "Договор субаренды";
+      ? t("guarantor.contractModal.guarantorContract")
+      : t("guarantor.contractModal.subleaseContract");
   };
 
   const getContractDescription = () => {
     return contractType === "guarantor"
-      ? "Этот договор определяет ваши обязательства как гаранта перед клиентом."
-      : "Этот договор определяет условия субаренды автомобиля.";
+      ? t("guarantor.contractModal.guarantorDescription")
+      : t("guarantor.contractModal.subleaseDescription");
   };
 
   return (
@@ -120,10 +122,10 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   <HiExclamationTriangle className="w-10 h-10 text-red-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Ошибка загрузки договора
+                  {t("guarantor.contractModal.contractLoadError")}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Не удалось загрузить документ. Попробуйте открыть его в браузере.
+                  {t("guarantor.contractModal.contractLoadErrorDescription")}
                 </p>
                 <a
                   href={contractUrl}
@@ -131,24 +133,24 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   rel="noopener noreferrer"
                   className="inline-flex items-center px-4 py-2 bg-[#191919] text-white rounded-lg hover:bg-[#333333] transition-colors"
                 >
-                  Открыть в браузере
+                  {t("guarantor.contractModal.openInBrowser")}
                 </a>
               </div>
             ) : (
               <div className="space-y-6">
                 <div className="bg-[#F8F8F8] rounded-xl p-6">
-                  <h4 className="font-semibold text-[#191919] mb-4">Условия договора:</h4>
+                  <h4 className="font-semibold text-[#191919] mb-4">{t("guarantor.contractModal.contractTerms")}</h4>
                   <div className="text-sm text-[#191919] leading-relaxed space-y-4">
                     <p>
                       {getContractDescription()}
                     </p>
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                       <p className="text-sm text-gray-600 text-center">
-                        Для подписания договора необходимо прочитать весь документ до конца
+                        {t("guarantor.contractModal.readToEnd")}
                       </p>
                     </div>
                     <p>
-                      Нажимая "Подписать", вы соглашаетесь с условиями данного договора.
+                      {t("guarantor.contractModal.agreeToTerms")}
                     </p>
                   </div>
                 </div>
@@ -157,7 +159,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   <div className="border border-[#E5E5E5] rounded-xl p-4 bg-white">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-sm font-medium text-[#191919]">
-                        Документ договора:
+                        {t("guarantor.contractModal.documentTitle")}
                       </span>
                       <a
                         href={contractUrl}
@@ -165,7 +167,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                         rel="noopener noreferrer"
                         className="text-[#191919] hover:text-[#333333] text-sm font-medium transition-colors duration-200"
                       >
-                        Открыть в новой вкладке
+                        {t("guarantor.contractModal.openInNewTab")}
                       </a>
                     </div>
                     
@@ -173,9 +175,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                       {pdfError ? (
                         <div className="flex flex-col items-center justify-center gap-4 py-12">
                           <HiExclamationTriangle className="w-12 h-12 text-red-500" />
-                          <p className="text-red-600 font-medium">Ошибка загрузки договора</p>
+                          <p className="text-red-600 font-medium">{t("guarantor.contractModal.contractLoadError")}</p>
                           <p className="text-gray-500 text-sm text-center">
-                            Не удалось загрузить документ. Попробуйте открыть его в новой вкладке.
+                            {t("guarantor.contractModal.contractLoadErrorAlt")}
                           </p>
                         </div>
                       ) : (
@@ -186,7 +188,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                           loading={
                             <div className="flex flex-col items-center justify-center gap-4 py-12">
                               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#191919]"></div>
-                              <p className="text-gray-600">Загрузка договора...</p>
+                              <p className="text-gray-600">{t("guarantor.contractModal.loadingContract")}</p>
                             </div>
                           }
                         >
@@ -225,7 +227,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 className="w-4 h-4 text-[#191919] bg-gray-100 border-gray-300 rounded focus:ring-[#191919] focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <label htmlFor="agree" className={`text-sm ${!hasScrolledToBottom ? 'text-gray-400' : 'text-gray-700'}`}>
-                Я прочитал весь договор и согласен с условиями
+                {t("guarantor.contractModal.agreeCheckbox")}
               </label>
             </div>
             <div className="flex gap-2 w-full sm:w-auto">
@@ -234,25 +236,25 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 onClick={onClose}
                 className="flex-1 sm:flex-none px-4 py-2"
               >
-                Отмена
+                {t("guarantor.contractModal.cancel")}
               </Button>
               <Button
                 onClick={handleSign}
                 disabled={loading || !hasScrolledToBottom || !isAgreed}
                 className="flex-1 sm:flex-none px-4 py-2"
               >
-                {loading ? "Подписание..." : "Подписать договор"}
+                {loading ? t("guarantor.contractModal.signing") : t("guarantor.contractModal.signContract")}
               </Button>
             </div>
           </div>
           {!hasScrolledToBottom && (
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Прочитайте весь договор для подписания
+              {t("guarantor.contractModal.readToSign")}
             </p>
           )}
           {hasScrolledToBottom && !isAgreed && (
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Подтвердите согласие с условиями договора
+              {t("guarantor.contractModal.confirmAgreement")}
             </p>
           )}
         </div>

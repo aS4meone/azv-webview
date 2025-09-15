@@ -1,6 +1,6 @@
-import { Button } from "@/shared/ui";
+"use client";import { Button } from "@/shared/ui";
 import React, { useState } from "react";
-import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
+import { useTranslations } from "next-intl";import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
@@ -27,6 +27,7 @@ export const MechaniCarInWaitingDeliverModal = ({
   notHaveCar,
   onClose,
 }: MechaniCarInWaitingDeliverModalProps) => {
+  const t = useTranslations();
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
@@ -62,9 +63,9 @@ export const MechaniCarInWaitingDeliverModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Доставка успешно начата",
-          description: "Загрузите фотографии автомобиля перед началом доставки",
-          buttonText: "Отлично",
+          title: t("mechanic.delivery.successfullyStarted"),
+          description: t("mechanic.delivery.uploadPhotosBeforeStart"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: async () => {
             await refreshUser();
             setShowUploadPhoto(true);
@@ -81,7 +82,7 @@ export const MechaniCarInWaitingDeliverModal = ({
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: "Попробовать снова",
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -105,9 +106,9 @@ export const MechaniCarInWaitingDeliverModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: "Фотографии загружены",
-          description: "Фотографии успешно загружены, можно начинать доставку",
-          buttonText: "Отлично",
+          title: t("mechanic.delivery.photosUploaded"),
+          description: t("mechanic.delivery.photosUploadedSuccessfully"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: handleClose,
           onClose: handleClose,
         });
@@ -117,8 +118,8 @@ export const MechaniCarInWaitingDeliverModal = ({
       showModal({
         type: "error",
         description:
-          error.response?.data?.detail || "Ошибка при загрузке фотографий",
-        buttonText: "Попробовать снова",
+          error.response?.data?.detail || t("mechanic.delivery.photoUploadError"),
+        buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -165,18 +166,17 @@ export const MechaniCarInWaitingDeliverModal = ({
 
         <div>
           <h4 className="text-[20px] font-semibold text-[#191919]">
-            Подготовка к доставке
+            {t("mechanic.delivery.preparationTitle")}
           </h4>
           <h4 className="text-[18px] text-[#191919]">
-            Сфотографируйте автомобиль перед началом доставки, зафиксировав все
-            повреждения, дефекты и состояние салона.
+            {t("mechanic.delivery.preparationDescription")}
           </h4>
         </div>
 
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button onClick={handleStartDelivery} variant="secondary">
-            Начать доставку
+            {t("mechanic.delivery.startDelivery")}
           </Button>
         </div>
       </div>

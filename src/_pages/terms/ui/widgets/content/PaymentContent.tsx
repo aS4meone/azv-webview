@@ -4,10 +4,12 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { useState, useRef, useEffect } from "react";
 import { Page, pdfjs, Document } from "react-pdf";
+import { useTranslations } from "next-intl";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export const PaymentContent = () => {
+  const t = useTranslations("terms.payment");
   const [numPages, setNumPages] = useState<number>(0);
   const [pageWidth, setPageWidth] = useState(700);
   const [, setIsLoading] = useState(true);
@@ -91,12 +93,12 @@ export const PaymentContent = () => {
           </div>
           <div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              Ошибка загрузки PDF
+              {t("error.title")}
             </h3>
             <p className="text-gray-600 text-sm leading-relaxed">
               {isMobile
-                ? "Не удалось загрузить документ. Попробуйте открыть его в браузере."
-                : "Возможно, документ временно недоступен. Попробуйте позже или скачайте файл."}
+                ? t("error.mobileMessage")
+                : t("error.desktopMessage")}
             </p>
           </div>
           <div className="space-y-3">
@@ -117,7 +119,7 @@ export const PaymentContent = () => {
                   d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                 />
               </svg>
-              {isMobile ? "Открыть в браузере" : "Открыть в новой вкладке"}
+              {isMobile ? t("buttons.openInBrowser") : t("buttons.openInNewTab")}
             </button>
             <button
               onClick={handleDownloadPDF}
@@ -136,7 +138,7 @@ export const PaymentContent = () => {
                   d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              Скачать PDF
+              {t("buttons.downloadPdf")}
             </button>
           </div>
         </div>
@@ -180,21 +182,21 @@ export const PaymentContent = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span className="text-lg">Загрузка документа...</span>
+                  <span className="text-lg">{t("loading.title")}</span>
                 </div>
                 <p className="text-gray-500 text-sm text-center max-w-xs">
-                  Документ об условиях онлайн оплаты
+                  {t("loading.description")}
                 </p>
                 {isMobile && (
                   <div className="mt-4 space-y-2 text-center">
                     <p className="text-xs text-gray-500">
-                      Если загрузка занимает много времени:
+                      {t("loading.slowLoadingText")}
                     </p>
                     <button
                       onClick={handleOpenInBrowser}
                       className="text-[#1D77FF] text-xs underline"
                     >
-                      Открыть в браузере
+                      {t("buttons.openInBrowser")}
                     </button>
                   </div>
                 )}

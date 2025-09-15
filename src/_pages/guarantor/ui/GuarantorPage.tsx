@@ -14,9 +14,11 @@ import {
 } from "./components";
 import { ContractType } from "@/shared/models/types/guarantor-page";
 import { HiX, HiQuestionMarkCircle } from "react-icons/hi";
+import { useTranslations } from "next-intl";
 
 export const GuarantorPage: React.FC = () => {
   const { user } = useUserStore();
+  const t = useTranslations();
   const [activeTab, setActiveTab] = useState<"incoming" | "my_guarantors">("incoming");
   const [incomingRequests, setIncomingRequests] = useState<IncomingRequest[]>([]);
   const [myGuarantors, setMyGuarantors] = useState<SimpleGuarantor[]>([]);
@@ -36,10 +38,10 @@ export const GuarantorPage: React.FC = () => {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <h1 className="text-xl font-semibold text-gray-700 mb-2">
-            Доступ запрещен
+            {t("guarantor.accessDenied")}
           </h1>
           <p className="text-gray-500">
-            Функция "Гарант" недоступна для механиков
+            {t("guarantor.mechanicNotAllowed")}
           </p>
         </div>
       </div>
@@ -80,7 +82,7 @@ export const GuarantorPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error loading guarantor data:", error);
-      setError(error?.response?.data?.detail || "Ошибка загрузки данных. Попробуйте позже.");
+      setError(error?.response?.data?.detail || t("guarantor.loadingError"));
     } finally {
       setLoading(false);
     }
@@ -104,7 +106,7 @@ export const GuarantorPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error accepting request:", error);
-      setError(error?.response?.data?.detail || "Ошибка при принятии заявки. Попробуйте позже.");
+      setError(error?.response?.data?.detail || t("guarantor.acceptError"));
     }
   };
 
@@ -118,7 +120,7 @@ export const GuarantorPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error rejecting request:", error);
-      setError(error?.response?.data?.detail || "Ошибка при отклонении заявки. Попробуйте позже.");
+      setError(error?.response?.data?.detail || t("guarantor.rejectError"));
     }
   };
 
@@ -210,7 +212,7 @@ export const GuarantorPage: React.FC = () => {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">Загрузка...</p>
+          <p className="text-gray-500">{t("guarantor.loading")}</p>
         </div>
       </div>
     );
@@ -224,7 +226,7 @@ export const GuarantorPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               
-              <h1 className="text-xl font-semibold text-[#191919]">Гарант</h1>
+              <h1 className="text-xl font-semibold text-[#191919]">{t("main.drawer.menu.guarantor")}</h1>
             </div>
             <button
               onClick={() => setShowHelpModal(true)}
@@ -249,7 +251,7 @@ export const GuarantorPage: React.FC = () => {
               <HiX className="w-4 h-4 text-white" />
             </div>
             <div>
-              <p className="text-red-800 font-medium">Ошибка</p>
+              <p className="text-red-800 font-medium">{t("error")}</p>
               <p className="text-red-600 text-sm">{error}</p>
             </div>
             <button

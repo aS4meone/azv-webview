@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { FaCar, FaMapMarkerAlt } from "react-icons/fa";
 import { IoChevronUp } from "react-icons/io5";
+import { useTranslations } from "next-intl";
 
 import { openIn2GIS } from "@/shared/utils/urlUtils";
 
 const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
   const { showModal, hideModal } = useModal();
+  const t = useTranslations();
 
   const handleOpenModal = () => {
     showModal({
@@ -71,7 +73,7 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
               className="flex items-center gap-2"
             >
               <FaCar className="w-3.5 h-3.5" />
-              <span className="text-sm font-medium">Точка авто</span>
+              <span className="text-sm font-medium">{t("widgets.modals.mechanic.startCheck.carPoint")}</span>
             </Button>
             <Button
               variant="outline"
@@ -85,7 +87,7 @@ const FooterDeliveryCar = ({ user, car }: { user: IUser; car: ICar }) => {
               className="flex items-center gap-2"
             >
               <FaMapMarkerAlt className="w-3.5 h-3.5" />
-              <span className="text-sm font-medium">Точка доставки</span>
+              <span className="text-sm font-medium">{t("widgets.modals.mechanic.startCheck.deliveryPoint")}</span>
             </Button>
           </div>
         )}

@@ -46,8 +46,8 @@ const DeleteAccount = () => {
     if (res.status === 200) {
       setResponseModal({
         type: "success",
-        title: "Действие выполнено",
-        description: "Аккаунт удален",
+        title: t2("actionCompleted"),
+        description: t2("accountDeleted"),
         buttonText: t("modal.success.button"),
         isOpen: true,
         onButtonClick: handleLogoutAndRedirect,
@@ -88,14 +88,14 @@ const DeleteAccount = () => {
       <Button
         variant="danger"
         onClick={() => {
-          setResponseModal({
-            type: "error",
-            title: "Вы уверены?",
-            description: "Вы уверены, что хотите удалить аккаунт?",
-            buttonText: "Да, удалить",
-            isOpen: true,
-            onButtonClick: handleDelete,
-          });
+        setResponseModal({
+          type: "error",
+          title: t2("areYouSure"),
+          description: t2("areYouSureDeleteAccount"),
+          buttonText: t2("yesDelete"),
+          isOpen: true,
+          onButtonClick: handleDelete,
+        });
         }}
         className="w-full flex items-center justify-center gap-2 py-6 bg-transparent"
       >

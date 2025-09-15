@@ -3,9 +3,11 @@ import { OwnedCarCard } from "@/entities/car-card";
 import React, { useEffect, useState, useRef } from "react";
 import { useUserStore } from "@/shared/stores/userStore";
 import { MyCar } from "@/shared/models/types/my-auto";
+import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
 const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
   const { fetchUser, user, isLoading } = useUserStore();
+  const { t } = useClientTranslations();
   const [openTooltipIndex, setOpenTooltipIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +57,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
         <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
         {isLoading ? (
           <div className="text-center py-4 text-[#191919] text-[16px]">
-            Загрузка...
+            {t('cars.loading')}
           </div>
         ) : ownedCars.length > 0 ? (
           ownedCars.map((car, index) => (
@@ -70,7 +72,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
           ))
         ) : (
           <div className="text-center py-4 text-[#191919] text-[16px]">
-            Ничего не найдено
+            {t('cars.nothingFound')}
           </div>
         )}
       </div>

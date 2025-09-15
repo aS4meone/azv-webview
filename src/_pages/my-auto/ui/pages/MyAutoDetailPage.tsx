@@ -55,7 +55,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
       setTripsData(data);
     } catch (err) {
       console.error("Error fetching trips:", err);
-      setError("Failed to load trips");
+      setError(t("myAuto.carDetails.errorTitle"));
     } finally {
       setLoading(false);
     }
@@ -106,7 +106,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("ru-RU", {
+    return date.toLocaleDateString(t("myAuto.locale.dateFormat"), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -132,15 +132,15 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
     if (isMultiDay) {
       // Show days if trip spans multiple days
       return {
-        date: startDate.toLocaleDateString("ru-RU", {
+        date: startDate.toLocaleDateString(t("myAuto.locale.dateFormat"), {
           day: "2-digit",
           month: "2-digit",
           year: "numeric"
         }),
-        time: `${startDate.toLocaleTimeString("ru-RU", {
+        time: `${startDate.toLocaleTimeString(t("myAuto.locale.timeFormat"), {
           hour: "2-digit",
           minute: "2-digit"
-        })} - ${endDate.toLocaleTimeString("ru-RU", {
+        })} - ${endDate.toLocaleTimeString(t("myAuto.locale.timeFormat"), {
           hour: "2-digit",
           minute: "2-digit"
         })}`
@@ -148,15 +148,15 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
     } else {
       // Show only time if same day
       return {
-        date: startDate.toLocaleDateString("ru-RU", {
+        date: startDate.toLocaleDateString(t("myAuto.locale.dateFormat"), {
           day: "2-digit",
           month: "2-digit",
           year: "numeric"
         }),
-        time: `${startDate.toLocaleTimeString("ru-RU", {
+        time: `${startDate.toLocaleTimeString(t("myAuto.locale.timeFormat"), {
           hour: "2-digit",
           minute: "2-digit"
-        })} - ${endDate.toLocaleTimeString("ru-RU", {
+        })} - ${endDate.toLocaleTimeString(t("myAuto.locale.timeFormat"), {
           hour: "2-digit",
           minute: "2-digit"
         })}`
@@ -300,7 +300,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
             {/* Month Selector with Earnings and Minutes */}
             <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
               <h3 className="text-lg font-medium text-[#2D2D2D] mb-4">
-                {new Date(currentYear, currentMonth - 1).toLocaleDateString("ru-RU", { 
+                {new Date(currentYear, currentMonth - 1).toLocaleDateString(t("myAuto.locale.dateFormat"), { 
                   month: "long", 
                   year: "numeric" 
                 })}
@@ -324,7 +324,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                       >
                         <div className="text-center w-full h-full flex flex-col justify-center p-3">
                           <div className="font-bold text-sm mb-2 uppercase">
-                            {new Date(month.year, month.month - 1).toLocaleDateString("ru-RU", { 
+                            {new Date(month.year, month.month - 1).toLocaleDateString(t("myAuto.locale.dateFormat"), { 
                               month: "short", 
                               year: "2-digit" 
                             })}
@@ -339,7 +339,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                               ? 'bg-[#2E7D32] text-white' 
                               : 'bg-[#D32F2F] text-white'
                           }`}>
-                            {monthMinutes} мин
+                            {monthMinutes} {t("myAuto.timeUnits.minutes")}
                           </div>
                         </div>
                       </button>
@@ -391,7 +391,7 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                             <div className="flex items-center gap-2 mb-2">
                               {isOwnerTrip && (
                                 <div className="text-sm px-4 py-2 rounded-lg font-bold border-2 border-black bg-[#F5F5F5] text-black">
-                                  ВАША ПОЕЗДКА
+                                  {t("myAuto.yourTrip")}
                                 </div>
                               )}
                             </div>

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { TermsContent } from "@/_pages/terms/ui/widgets/TermsContent";
 import { ICar } from "@/shared/models/types/car";
+import { useTranslations } from "next-intl";
 
 interface AdditionalInfoProps {
   rentalType: RentalType;
@@ -12,6 +13,7 @@ interface AdditionalInfoProps {
 }
 
 export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
+  const t = useTranslations();
   const [showTariff, setShowTariff] = useState(false);
   const [showAgreement, setShowAgreement] = useState(false);
 
@@ -62,7 +64,7 @@ export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
           isOpen={showTariff}
           onClose={() => setShowTariff(false)}
           direction="bottom"
-          title="О тарифе"
+          title={t("widgets.screens.rental.aboutTariff")}
           className="pt-20"
         >
           <TermsContent contentKey="tariff" rentalType={rentalType} car={car} />
@@ -72,7 +74,7 @@ export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
           isOpen={showAgreement}
           onClose={() => setShowAgreement(false)}
           direction="bottom"
-          title="Договор аренды"
+          title={t("widgets.screens.rental.rentalAgreement")}
           className="pt-20"
         >
           <TermsContent contentKey="agreement" />

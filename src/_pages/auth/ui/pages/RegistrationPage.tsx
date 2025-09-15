@@ -35,8 +35,8 @@ const RegistrationPage = () => {
 
   const stepText = [
     {
-      title: "Регистрация",
-      description: "Укажите ваши данные для создания аккаунта",
+      title: t("auth.registrationPage.title"),
+      description: t("auth.registrationPage.description"),
     },
     {
       title: t("auth.otp.title"),
@@ -120,7 +120,7 @@ const RegistrationPage = () => {
                 <div className="w-full bg-[#292929] rounded-[20px] h-[60px] text-white">
                   <input
                     className="w-full outline-none bg-transparent p-4 text-[16px] text-white placeholder:text-white/30 rounded-[20px]"
-                    placeholder="Имя"
+                    placeholder={t("auth.registrationPage.firstNamePlaceholder")}
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                   />
@@ -128,7 +128,7 @@ const RegistrationPage = () => {
                 <div className="w-full bg-[#292929] rounded-[20px] h-[60px] text-white">
                   <input
                     className="w-full outline-none bg-transparent p-4 text-[16px] text-white placeholder:text-white/30 rounded-[20px]"
-                    placeholder="Фамилия"
+                    placeholder={t("auth.registrationPage.lastNamePlaceholder")}
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                   />
@@ -179,7 +179,7 @@ const RegistrationPage = () => {
         onClose={() => setIsContractModalOpen(false)}
         onAccept={handleContractAccept}
         onReject={handleContractReject}
-        title={"Договор аренды"}
+        title={t("contract.title")}
       />
     </article>
   );

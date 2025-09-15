@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getAddressFromCoordinates } from "@/shared/utils/googleMaps";
+import { useTranslations } from "next-intl";
 
 interface LocationInfoCardProps {
   startLatitude: number;
@@ -28,6 +29,7 @@ export const LocationInfoCard: React.FC<LocationInfoCardProps> = ({
   endLatitude,
   endLongitude,
 }) => {
+  const t = useTranslations();
   const [startAddress, setStartAddress] = useState<string>("");
   const [endAddress, setEndAddress] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -65,14 +67,14 @@ export const LocationInfoCard: React.FC<LocationInfoCardProps> = ({
             <MapPinIcon />
           </div>
           <h2 className="text-lg font-semibold text-gray-900">
-            Местоположение
+            {t("myAuto.tripDetails.location.title")}
           </h2>
         </div>
       </div>
       <div className="px-6 py-4 space-y-4">
         <div>
           <span className="text-gray-500 text-sm font-medium block mb-2">
-            Место начала
+            {t("myAuto.tripDetails.location.startLocation")}
           </span>
           {loading ? (
             <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>
@@ -82,7 +84,7 @@ export const LocationInfoCard: React.FC<LocationInfoCardProps> = ({
         </div>
         <div className=" border-gray-200">
           <span className="text-gray-500 text-sm font-medium block mb-2">
-            Место окончания
+            {t("myAuto.tripDetails.location.endLocation")}
           </span>
           {loading ? (
             <div className="animate-pulse bg-gray-200 h-4 rounded w-3/4"></div>

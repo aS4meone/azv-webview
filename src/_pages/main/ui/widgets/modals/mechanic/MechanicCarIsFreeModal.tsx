@@ -1,6 +1,7 @@
 import { ICar } from "@/shared/models/types/car";
 import { Button } from "@/shared/ui";
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { ResponseBottomModalProps } from "@/shared/ui/modal";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
@@ -14,6 +15,7 @@ export const MechanicCarIsFreeModal = ({
   car,
   onClose,
 }: MechanicCarIsFreeModalProps) => {
+  const t = useTranslations();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
 
@@ -43,12 +45,12 @@ export const MechanicCarIsFreeModal = ({
         {/* Car Specs */}
         <CarSpecs car={car} />
 
-        <div className=" text-[#191919]">Машина свободна</div>
+        <div className=" text-[#191919]">{t("mechanic.vehicle.isFree")}</div>
 
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button variant="secondary" onClick={handleClose}>
-            Закрыть
+            {t("mechanic.vehicle.close")}
           </Button>
         </div>
       </div>

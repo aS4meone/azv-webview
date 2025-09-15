@@ -43,7 +43,7 @@ export const MyAutoPage = () => {
       }
     } catch (err) {
       console.error("Error fetching cars:", err);
-      setError("Failed to load cars");
+      setError(t("myAuto.errorTitle"));
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ export const MyAutoPage = () => {
         <div className="min-h-screen bg-[#F7F7F7] flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Загрузка пользователя...</p>
+            <p className="mt-4 text-gray-600">{t("myAuto.loadingUser")}</p>
           </div>
         </div>
       );
@@ -196,7 +196,7 @@ export const MyAutoPage = () => {
                       {car.plate_number}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-[#888888]">Доступно минут:</span>
+                      <span className="text-xs text-[#888888]">{t("myAuto.availableMinutes")}</span>
                       <span className={`text-sm font-medium ${
                         car.available_minutes >= 21600 ? 'text-[#2E7D32]' : 'text-[#D32F2F]'
                       }`}>
@@ -213,7 +213,7 @@ export const MyAutoPage = () => {
                       }`}
                     >
                       <span className="text-sm">{car.available_minutes}</span>
-                      <span className="text-[10px]">мин</span>
+                      <span className="text-[10px]">{t("myAuto.timeUnits.minutes")}</span>
                     </div>
                   </div>
                 </div>

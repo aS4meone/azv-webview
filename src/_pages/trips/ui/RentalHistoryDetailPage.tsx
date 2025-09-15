@@ -8,8 +8,10 @@ import { TripInfoCard } from "./components/TripInfoCard";
 import { LocationInfoCard } from "./components/LocationInfoCard";
 import { PricingInfoCard } from "./components/PricingInfoCard";
 import { FullScreenMapModal } from "./components/FullScreenMapModal";
+import { useTranslations } from "next-intl";
 
 const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
+  const t = useTranslations();
   const [historyDetail, setHistoryDetail] = useState<IHistoryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
         const response = await historyApi.getHistoryOfRent(historyId);
         setHistoryDetail(response.data);
       } catch (err) {
-        setError("Не удалось загрузить детали истории аренды");
+        setError(t("trips.actionHistory.loadingError"));
         console.error("Error fetching history detail:", err);
       } finally {
         setLoading(false);
@@ -36,18 +38,12 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
   }, [historyId]);
 
   const formatActionType = (actionType: string) => {
-    const actionTypes: { [key: string]: string } = {
-      take_key: "Ключ забран",
-      give_key: "Ключ выдан",
-      close_vehicle: "Автомобиль закрыт",
-      open_vehicle: "Автомобиль открыт",
-    };
-    return actionTypes[actionType] || actionType;
+    return t(`enums.actionTypeLabels.${actionType}` as any) || actionType;
   };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toLocaleString("ru-RU", {
+    return date.toLocaleString(t("trips.dateFormat"), {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -84,7 +80,7 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
             </svg>
           </div>
           <p className="text-gray-600 text-lg">
-            {error || "Детали поездки не найдены"}
+            {error || t("trips.actionHistory.notFound")}
           </p>
         </div>
       </div>
@@ -135,11 +131,11 @@ const RentalHistoryDetailPage = ({ historyId }: { historyId: number }) => {
           >
             <div>
               <h3 className="text-lg font-semibold text-gray-900">
-                История действий
+                {t("trips.actionHistory.title")}
               </h3>
               <p className="text-sm text-gray-500">
                 {detail.action_history.length}{" "}
-                {detail.action_history.length === 1 ? "действие" : "действий"}
+                {detail.action_history.length === 1 ? t("trips.actionHistory.action") : t("trips.actionHistory.actions")}
               </p>
             </div>
             <svg

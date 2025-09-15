@@ -3,6 +3,7 @@ import React from "react";
 import { ICar, CarBodyType } from "@/shared/models/types/car";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
+import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
 interface FilteredCarsListProps {
   cars: ICar[];
@@ -11,32 +12,32 @@ interface FilteredCarsListProps {
   onBackAction: () => void;
 }
 
-const getBodyTypeLabel = (bodyType: string): string => {
+const getBodyTypeLabel = (bodyType: string, t: (key: string) => string): string => {
   const labels: Record<string, string> = {
-    [CarBodyType.SEDAN]: "Седан",
-    [CarBodyType.SUV]: "Внедорожник", 
-    [CarBodyType.CROSSOVER]: "Кроссовер",
-    [CarBodyType.COUPE]: "Купе",
-    [CarBodyType.HATCHBACK]: "Хэтчбек",
-    [CarBodyType.CONVERTIBLE]: "Кабриолет",
-    [CarBodyType.WAGON]: "Универсал",
-    [CarBodyType.MINIBUS]: "Микроавтобус",
-    [CarBodyType.ELECTRIC]: "Электромобиль",
+    [CarBodyType.SEDAN]: t('cars.bodyTypes.sedan'),
+    [CarBodyType.SUV]: t('cars.bodyTypes.suv'), 
+    [CarBodyType.CROSSOVER]: t('cars.bodyTypes.crossover'),
+    [CarBodyType.COUPE]: t('cars.bodyTypes.coupe'),
+    [CarBodyType.HATCHBACK]: t('cars.bodyTypes.hatchback'),
+    [CarBodyType.CONVERTIBLE]: t('cars.bodyTypes.convertible'),
+    [CarBodyType.WAGON]: t('cars.bodyTypes.wagon'),
+    [CarBodyType.MINIBUS]: t('cars.bodyTypes.minibus'),
+    [CarBodyType.ELECTRIC]: t('cars.bodyTypes.electric'),
   };
   return labels[bodyType] || bodyType;
 };
 
-const CarStatusBadge = ({ status }: { status: string }) => {
+const CarStatusBadge = ({ status, t }: { status: string; t: (key: string) => string }) => {
   const statuses: Record<string, string> = {
-    "FREE": "Свободен",
-    "IN_USE": "В аренде",
-    "SERVICE": "В сервисе",
-    "OWNER": "У Владелеца",
-    "PENDING": "В ожидании",
-    "FAILURE": "Неисправен",
-    "RESERVED": "Зарезервирован",
-    "DELIVERING": "В доставке",
-    "TRACKING": "В пути",
+    "FREE": t('cars.statuses.FREE'),
+    "IN_USE": t('cars.statuses.IN_USE'),
+    "SERVICE": t('cars.statuses.SERVICE'),
+    "OWNER": t('cars.statuses.OWNER'),
+    "PENDING": t('cars.statuses.PENDING'),
+    "FAILURE": t('cars.statuses.FAILURE'),
+    "RESERVED": t('cars.statuses.RESERVED'),
+    "DELIVERING": t('cars.statuses.DELIVERING'),
+    "TRACKING": t('cars.statuses.TRACKING'),
   };
 
   const color: Record<string, string> = {
@@ -61,7 +62,7 @@ const CarStatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-const CarCard = ({ car, onCarClickAction }: { car: ICar; onCarClickAction: (car: ICar) => void }) => {
+const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (car: ICar) => void; t: (key: string) => string }) => {
   const router = useRouter();
   
   const handleClick = () => {
@@ -106,14 +107,14 @@ const CarCard = ({ car, onCarClickAction }: { car: ICar; onCarClickAction: (car:
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-lg font-medium text-gray-900 truncate">{car.name}</h3>
-            <CarStatusBadge status={car.status} />
+            <CarStatusBadge status={car.status} t={t} />
           </div>
           
           <p className="text-sm text-gray-600 mb-2">{car.plate_number}</p>
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>{car.year} год</span>
-            <span>{car.engine_volume === 0 ? 'Электро' : `${car.engine_volume}л`}</span>
+            <span>{car.year} {t('cars.year')}</span>
+            <span>{car.engine_volume === 0 ? t('cars.electric') : `${car.engine_volume}л`}</span>
           </div>
           
         </div>
@@ -123,7 +124,8 @@ const CarCard = ({ car, onCarClickAction }: { car: ICar; onCarClickAction: (car:
 };
 
 export const FilteredCarsList = ({ cars, selectedBodyType, onCarClickAction, onBackAction }: FilteredCarsListProps) => {
-  const bodyTypeLabel = getBodyTypeLabel(selectedBodyType);
+  const { t } = useClientTranslations();
+  const bodyTypeLabel = getBodyTypeLabel(selectedBodyType, t);
 
   return (
     <div className="bg-white h-full">
@@ -140,7 +142,7 @@ export const FilteredCarsList = ({ cars, selectedBodyType, onCarClickAction, onB
           </button>
           <h1 className="text-xl font-semibold text-gray-900">{bodyTypeLabel}</h1>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{cars.length} автомобилей</p>
+        <p className="text-sm text-gray-500 mt-1">{cars.length} {t('cars.carsCount')}</p>
       </div>
 
       {/* Cars List */}
@@ -148,11 +150,11 @@ export const FilteredCarsList = ({ cars, selectedBodyType, onCarClickAction, onB
         <div className="space-y-3">
           {cars.length > 0 ? (
             cars.map((car) => (
-              <CarCard key={car.id} car={car} onCarClickAction={onCarClickAction} />
+              <CarCard key={car.id} car={car} onCarClickAction={onCarClickAction} t={t} />
             ))
           ) : (
             <div className="text-center py-8">
-              <p className="text-gray-500">Нет доступных автомобилей</p>
+              <p className="text-gray-500">{t('cars.noAvailableCars')}</p>
             </div>
           )}
         </div>

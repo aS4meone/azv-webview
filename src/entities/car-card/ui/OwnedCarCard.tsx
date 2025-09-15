@@ -2,6 +2,7 @@ import { MyCar } from "@/shared/models/types/my-auto";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
+import { useTranslations } from "next-intl";
 
 interface OwnedCarCardProps {
   car: MyCar;
@@ -15,6 +16,7 @@ interface OwnedCarCardProps {
 const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onTooltipHover, navigateToMap = true }: OwnedCarCardProps) => {
   const router = useRouter();
   const [touchHandled, setTouchHandled] = useState(false);
+  const t = useTranslations("entities.carCard");
 
   const handleClick = () => {
     if (navigateToMap) {
@@ -113,7 +115,7 @@ const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onToo
             onClick={handleTimerClick}
           >
             <span className="text-sm">{car.available_minutes}</span>
-            <span className="text-[10px]">мин</span>
+            <span className="text-[10px]">{t("minutes")}</span>
           </div>
           
           {/* Tooltip */}
@@ -125,12 +127,12 @@ const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onToo
               onClick={(e) => e.stopPropagation()}
             >
               <div className="text-center">
-                <p className="font-medium mb-1">Доступность для аренды</p>
+                <p className="font-medium mb-1">{t("availabilityForRental")}</p>
                 <p className="text-gray-300">
-                  Ваша машина должна быть доступна для аренды минимум 15 дней в месяц (21,600 минут)
+                  {t("availabilityDescription")}
                 </p>
                 <p className="text-gray-300 mt-1">
-                  Текущее время: {car.available_minutes} минут
+                  {t("currentTime")} {car.available_minutes} {t("minutes")}
                 </p>
               </div>
               {/* Arrow */}

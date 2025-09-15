@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -37,63 +38,65 @@ interface TariffContentProps {
 }
 
 export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
+  const t = useTranslations("terms.tariff");
+
   const getTariffInfo = () => {
     switch (rentalType) {
       case "minutes":
         return {
-          title: "Поминутный тариф",
+          title: t("tariffs.minutes.title"),
           basePrice: `${car.price_per_minute} ₸/минута`,
-          description: "Идеально для коротких поездок по городу",
+          description: t("tariffs.minutes.description"),
           icon: <Timer className="w-6 h-6" />,
           popular: true,
           features: [
             {
-              text: "Минимальное время аренды: от 1 минуты",
+              text: t("tariffs.minutes.features.minRental"),
               icon: <Clock className="w-4 h-4" />,
             },
           ],
         };
       case "hours":
         return {
-          title: "Почасовой тариф",
+          title: t("tariffs.hours.title"),
           basePrice: `${car.price_per_hour} ₸/час`,
-          description: "Оптимально для длительных поездок",
+          description: t("tariffs.hours.description"),
           icon: <Clock className="w-6 h-6" />,
           popular: false,
           features: [
             {
-              text: "Минимальное время аренды: 1 час",
+              text: t("tariffs.hours.features.minRental"),
               icon: <Clock className="w-4 h-4" />,
             },
             {
-              text: "Бензин не включен в стоимость",
+              text: t("tariffs.hours.features.fuelNotIncluded"),
               icon: <Fuel className="w-4 h-4" />,
             },
           ],
         };
       case "days":
         return {
-          title: "Дневной тариф",
+          title: t("tariffs.days.title"),
           basePrice: `${car.price_per_day} ₸/день`,
-          description: "Лучший выбор для длительных поездок",
+          description: t("tariffs.days.description"),
           icon: <Calendar className="w-6 h-6" />,
           popular: false,
           features: [
             {
-              text: "Минимальное время аренды: 1 день",
+              text: t("tariffs.days.features.minRental"),
               icon: <Calendar className="w-4 h-4" />,
             },
             {
-              text: "Бензин не включен в стоимость",
+              text: t("tariffs.days.features.fuelNotIncluded"),
               icon: <Fuel className="w-4 h-4" />,
             },
           ],
         };
       default:
         return {
-          title: "Тариф не выбран",
+          title: t("tariffs.default.title"),
           basePrice: "",
-          description: "Пожалуйста, выберите тариф",
+          description: t("tariffs.default.description"),
           icon: <Timer className="w-6 h-6" />,
           popular: false,
           features: [],
@@ -105,11 +108,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
 
   const requirements = [
     {
-      text: "Действующий паспорт и водительское удостоверение",
+      text: t("requirements.documents"),
       icon: <FileText className="w-4 h-4" />,
     },
     {
-      text: "Депозит зависит от класса автомобиля",
+      text: t("requirements.deposit"),
       icon: <CreditCard className="w-4 h-4" />,
     },
   ];
@@ -132,7 +135,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
             {tariffInfo.popular && (
               <Badge className="bg-[#1D77FF] flex items-center gap-1">
                 <Star className="w-3 h-3" />
-                Популярный
+                {t("popular")}
               </Badge>
             )}
           </div>
@@ -149,10 +152,10 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-[#1D77FF]" />
-            Что включено в тариф
+            {t("included.title")}
           </CardTitle>
           <CardDescription className="text-black/60">
-            Все необходимое для комфортной поездки уже включено в стоимость
+            {t("included.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -177,10 +180,10 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="w-5 h-5 text-[#1D77FF]" />
-            Требования для аренды
+            {t("requirements.title")}
           </CardTitle>
           <CardDescription className="text-black/60">
-            Убедитесь, что вы соответствуете всем требованиям
+            {t("requirements.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -203,9 +206,9 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
       {/* Comparison */}
       <Card>
         <CardHeader>
-          <CardTitle>Сравнение тарифов</CardTitle>
+          <CardTitle>{t("comparison.title")}</CardTitle>
           <CardDescription className="text-black/60">
-            Выберите наиболее подходящий тариф для ваших потребностей
+            {t("comparison.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -219,14 +222,14 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
             >
               <div className="text-center space-y-2 relative">
                 <Badge className="absolute -top-2 -right-2 bg-[#1D77FF]">
-                  Популярный
+                  {t("popular")}
                 </Badge>
                 <Timer className="w-6 h-6 mx-auto text-[#1D77FF]" />
-                <h3 className="font-semibold">Поминутный</h3>
+                <h3 className="font-semibold">{t("tariffs.minutes.title")}</h3>
                 <p className="text-2xl font-bold text-[#1D77FF]">
                   {car.price_per_minute} ₸/мин
                 </p>
-                <p className="text-sm text-black/60">Для коротких поездок</p>
+                <p className="text-sm text-black/60">{t("comparison.shortTrips")}</p>
               </div>
             </div>
 
@@ -237,11 +240,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
             >
               <div className="text-center space-y-2">
                 <Clock className="w-6 h-6 mx-auto text-[#1D77FF]" />
-                <h3 className="font-semibold">Почасовой</h3>
+                <h3 className="font-semibold">{t("tariffs.hours.title")}</h3>
                 <p className="text-2xl font-bold text-[#1D77FF]">
                   {car.price_per_hour} ₸/час
                 </p>
-                <p className="text-sm text-black/60">Оптимальный выбор</p>
+                <p className="text-sm text-black/60">{t("comparison.optimalChoice")}</p>
               </div>
             </div>
 
@@ -252,11 +255,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
             >
               <div className="text-center space-y-2">
                 <Calendar className="w-6 h-6 mx-auto text-[#1D77FF]" />
-                <h3 className="font-semibold">Дневной</h3>
+                <h3 className="font-semibold">{t("tariffs.days.title")}</h3>
                 <p className="text-2xl font-bold text-[#1D77FF]">
                   {car.price_per_day} ₸/день
                 </p>
-                <p className="text-sm text-black/60">Для длительных поездок</p>
+                <p className="text-sm text-black/60">{t("comparison.longTrips")}</p>
               </div>
             </div>
           </div>
@@ -268,42 +271,42 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-black">
             <Shield className="w-5 h-5 text-[#1D77FF]" />
-            Дополнительная информация
+            {t("additionalInfo.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
-              <h4 className="font-semibold text-black">Страхование</h4>
+              <h4 className="font-semibold text-black">{t("additionalInfo.insurance.title")}</h4>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <CheckCircle className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>ОГПО включены</span>
+                  <span>{t("additionalInfo.insurance.osago")}</span>
                 </li>
 
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <CheckCircle className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>Помощь на дороге 24/7</span>
+                  <span>{t("additionalInfo.insurance.roadsideAssistance")}</span>
                 </li>
               </ul>
             </div>
 
             <div className="space-y-3">
               <h4 className="font-semibold text-black">
-                Дополнительные услуги
+                {t("additionalInfo.services.title")}
               </h4>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <Phone className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>Техподдержка 24/7</span>
+                  <span>{t("additionalInfo.services.techSupport")}</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <Fuel className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>Заправка за наш счет (только поминутный тариф)</span>
+                  <span>{t("additionalInfo.services.fuelRefill")}</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-black/70">
                   <MapPin className="w-4 h-4 text-[#1D77FF] mt-0.5 flex-shrink-0" />
-                  <span>Парковка в специальных зонах</span>
+                  <span>{t("additionalInfo.services.parking")}</span>
                 </li>
               </ul>
             </div>
@@ -314,15 +317,15 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
       {/* Pricing Calculator */}
       <Card>
         <CardHeader>
-          <CardTitle>Примерная стоимость</CardTitle>
+          <CardTitle>{t("pricing.title")}</CardTitle>
           <CardDescription className="text-black/60">
-            Рассчитайте приблизительную стоимость вашей поездки
+            {t("pricing.description")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-[#1D77FF]/5 rounded-lg">
-              <h4 className="font-semibold text-black mb-2">30 минут</h4>
+              <h4 className="font-semibold text-black mb-2">{t("pricing.duration.thirtyMinutes")}</h4>
               <p className="text-2xl font-bold text-[#1D77FF]">
                 {rentalType === "minutes"
                   ? car.price_per_minute * 30
@@ -331,11 +334,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                   : Math.round(car.price_per_day / 48)}{" "}
                 ₸
               </p>
-              <p className="text-sm text-black/70">Короткая поездка</p>
+              <p className="text-sm text-black/70">{t("pricing.tripType.short")}</p>
             </div>
 
             <div className="text-center p-4 bg-[#1D77FF]/5 rounded-lg">
-              <h4 className="font-semibold text-black mb-2">3 часа</h4>
+              <h4 className="font-semibold text-black mb-2">{t("pricing.duration.threeHours")}</h4>
               <p className="text-2xl font-bold text-[#1D77FF]">
                 {rentalType === "minutes"
                   ? car.price_per_minute * 180
@@ -344,11 +347,11 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                   : Math.round(car.price_per_day / 8)}{" "}
                 ₸
               </p>
-              <p className="text-sm text-black/70">Средняя поездка</p>
+              <p className="text-sm text-black/70">{t("pricing.tripType.medium")}</p>
             </div>
 
             <div className="text-center p-4 bg-[#1D77FF]/5 rounded-lg">
-              <h4 className="font-semibold text-black mb-2">1 день</h4>
+              <h4 className="font-semibold text-black mb-2">{t("pricing.duration.oneDay")}</h4>
               <p className="text-2xl font-bold text-[#1D77FF]">
                 {rentalType === "minutes"
                   ? car.price_per_minute * 1440
@@ -357,7 +360,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                   : car.price_per_day}{" "}
                 ₸
               </p>
-              <p className="text-sm text-black/70">Длительная поездка</p>
+              <p className="text-sm text-black/70">{t("pricing.tripType.long")}</p>
             </div>
           </div>
         </CardContent>

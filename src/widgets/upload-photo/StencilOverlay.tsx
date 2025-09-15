@@ -1,6 +1,7 @@
 // ===== StencilOverlay.tsx =====
 import React from "react";
 import { StencilConfig } from "./types/stencil"; // путь поправьте под ваш проект
+import { useTranslations } from "next-intl";
 
 type Props = {
   stencil?: StencilConfig;
@@ -8,6 +9,7 @@ type Props = {
 };
 
 export const StencilOverlay: React.FC<Props> = ({ stencil, visible }) => {
+  const t = useTranslations("uploadPhoto");
   if (!visible || !stencil) return null;
 
   const rect = stencil.rect ?? {};
@@ -62,7 +64,7 @@ export const StencilOverlay: React.FC<Props> = ({ stencil, visible }) => {
 
       {/* подсказка */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-white/95 text-sm px-4">
-        Сориентируйте документ/лицо внутри рамки
+        {t("stencilInstruction")}
       </div>
     </div>
   );
