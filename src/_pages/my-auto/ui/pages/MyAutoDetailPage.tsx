@@ -236,11 +236,11 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
             {car.photos && car.photos.length > 0 && (
               <div className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4">
                 <div className="relative">
-                  <div className="h-64 w-full overflow-hidden rounded-lg bg-gray-100">
+                  <div className="h-64 w-full overflow-hidden rounded-lg bg-gray-100 image-container">
                     <img
                       src={`https://api.azvmotors.kz${car.photos[currentPhotoIndex]}`}
                       alt={car.name}
-                      className="h-full w-full object-cover"
+                      className="car-image"
                     />
                   </div>
                   

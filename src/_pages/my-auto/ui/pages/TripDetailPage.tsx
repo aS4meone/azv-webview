@@ -465,7 +465,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
 
           {/* Image Viewer */}
           <div 
-            className="h-full w-full flex items-center justify-center"
+            className="h-full w-full flex items-center justify-center image-container"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}

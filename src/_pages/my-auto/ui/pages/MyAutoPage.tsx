@@ -178,11 +178,11 @@ export const MyAutoPage = () => {
                 <div className="flex items-center gap-4">
                   {/* Car Photo */}
                   {car.photos && car.photos.length > 0 && (
-                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 image-container">
                       <img
                         src={`https://api.azvmotors.kz${car.photos[0]}`}
                         alt={car.name}
-                        className="w-full h-full object-cover"
+                        className="car-image"
                       />
                     </div>
                   )}

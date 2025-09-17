@@ -113,7 +113,7 @@ export const ImageViewerPage = ({
         >
           {photos.map((photo, index) => (
             <SwiperSlide key={index} className="h-full relative">
-              <div className="swiper-zoom-container h-full w-full flex items-center justify-center">
+              <div className="swiper-zoom-container h-full w-full flex items-center justify-center image-container">
                 {imageErrors[index] ? (
                   // Показываем заглушку если изображение не загрузилось
                   <div className="w-full h-full bg-gray-800 flex flex-col items-center justify-center">

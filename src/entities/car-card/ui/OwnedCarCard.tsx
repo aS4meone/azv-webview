@@ -82,11 +82,11 @@ const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onToo
       <div className="flex items-center gap-3">
         {/* Car Photo */}
         {firstPhoto && (
-          <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+          <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 image-container">
             <img
               src={`https://api.azvmotors.kz${firstPhoto}`}
               alt={car.name}
-              className="w-full h-full object-cover"
+              className="car-image"
             />
           </div>
         )}

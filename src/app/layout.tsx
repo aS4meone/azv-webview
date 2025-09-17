@@ -67,16 +67,16 @@ export default async function RootLayout({
       >
         <ResponseModalProvider>
           <ModalProvider>
-            <PhotoUploadProvider>
-              <NextIntlClientProvider locale={locale} messages={messages}>
-                <LanguageProvider initialLocale={locale}>
-                  <AuthProvider>
+            <NextIntlClientProvider locale={locale as "ru" | "en" | "kz"} messages={messages}>
+              <LanguageProvider initialLocale={locale as "ru" | "en" | "kz"}>
+                <AuthProvider>
+                  <PhotoUploadProvider>
                     {children}
                     <ModalPortal />
-                  </AuthProvider>
-                </LanguageProvider>
-              </NextIntlClientProvider>
-            </PhotoUploadProvider>
+                  </PhotoUploadProvider>
+                </AuthProvider>
+              </LanguageProvider>
+            </NextIntlClientProvider>
           </ModalProvider>
         </ResponseModalProvider>
       </body>

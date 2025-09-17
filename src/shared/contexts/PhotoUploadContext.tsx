@@ -58,10 +58,12 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
       const serviceUpload = localStorage.getItem(SERVICE_UPLOAD);
       const deliveryUpload = localStorage.getItem(DELIVERY_UPLOAD);
 
-      setIsUserUploadRequired(userUpload === "false");
-      setIsOwnerUploadRequired(ownerUpload === "false");
-      setIsServiceUploadRequired(serviceUpload === "false");
-      setIsDeliveryUploadRequired(deliveryUpload === "false");
+      // Если значение "true" - загрузка завершена (не требуется)
+      // Если значение "false" или null - загрузка требуется
+      setIsUserUploadRequired(userUpload !== "true");
+      setIsOwnerUploadRequired(ownerUpload !== "true");
+      setIsServiceUploadRequired(serviceUpload !== "true");
+      setIsDeliveryUploadRequired(deliveryUpload !== "true");
     };
 
     checkUploadRequirements();
@@ -83,6 +85,8 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
       case DELIVERY_UPLOAD:
         setIsDeliveryUploadRequired(false);
         break;
+      default:
+        console.warn(`Unknown upload type: ${uploadType}`);
     }
   };
 
@@ -102,6 +106,8 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
       case DELIVERY_UPLOAD:
         setIsDeliveryUploadRequired(required);
         break;
+      default:
+        console.warn(`Unknown upload type: ${uploadType}`);
     }
   };
 

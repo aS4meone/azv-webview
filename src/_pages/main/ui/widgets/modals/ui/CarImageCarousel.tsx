@@ -151,7 +151,7 @@ export const CarImageCarousel = ({
         {photos.map((photo, index) => (
           <SwiperSlide key={index} className="h-full relative">
             <div
-              className="h-full w-full cursor-pointer"
+              className="h-full w-full cursor-pointer image-container"
               onClick={() => {
                 handleImageClick(index);
               }}
@@ -176,7 +176,7 @@ export const CarImageCarousel = ({
                     src={formatImage(photo)}
                     alt={`${car.name} - фото ${index + 1}`}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     onError={() => handleImageError(index)}
                     onLoad={() => handleImageLoad(index)}
                     onLoadStart={() => handleImageLoadStart(index)}

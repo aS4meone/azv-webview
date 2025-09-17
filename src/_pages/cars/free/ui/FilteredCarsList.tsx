@@ -88,11 +88,11 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
     >
       <div className="flex gap-4">
         {/* Car Image */}
-        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 image-container">
           {car.photos && car.photos.length > 0 ? (
             <img
               src={getImageUrl(car.photos[0])}
-              className="w-full h-full object-cover"
+              className="car-image"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-200">
