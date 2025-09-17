@@ -32,6 +32,8 @@ interface IdCard {
 export interface IUser {
   id: number;
   phone_number: string;
+  first_name: string | null;
+  last_name: string | null;
   full_name: string | null;
   role: UserRole;
   wallet_balance: number;

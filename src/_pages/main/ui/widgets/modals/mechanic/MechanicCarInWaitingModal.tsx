@@ -1,11 +1,13 @@
-"use client"; import { Button } from "@/shared/ui";
+"use client";
+
+import { Button } from "@/shared/ui";
 import React, { useState } from "react";
 import { useTranslations } from "next-intl";
 import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
-import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import {
   baseConfig,
   SERVICE_UPLOAD,

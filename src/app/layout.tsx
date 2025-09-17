@@ -3,7 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/features/auth/provider/AuthContext";
 
-import { getLocale } from "next-intl/server";
+import { getLocale, getMessages } from "next-intl/server";
 import { NextIntlClientProvider } from "next-intl";
 import {
   ModalProvider,
@@ -40,6 +40,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const locale = await getLocale();
+  const messages = await getMessages();
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -67,7 +68,7 @@ export default async function RootLayout({
         <ResponseModalProvider>
           <ModalProvider>
             <PhotoUploadProvider>
-              <NextIntlClientProvider>
+              <NextIntlClientProvider locale={locale} messages={messages}>
                 <LanguageProvider initialLocale={locale}>
                   <AuthProvider>
                     {children}

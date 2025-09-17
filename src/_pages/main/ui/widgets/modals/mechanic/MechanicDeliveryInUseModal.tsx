@@ -1,4 +1,6 @@
-"use client";import { Button } from "@/shared/ui";
+"use client";
+
+import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";import { CarInfoHeader, CarControlsSlider } from "../ui";
 import { FaCar, FaMapMarkerAlt } from "react-icons/fa";
@@ -13,7 +15,7 @@ import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { IUser } from "@/shared/models/types/user";
-import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";

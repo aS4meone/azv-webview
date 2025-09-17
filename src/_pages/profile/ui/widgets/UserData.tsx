@@ -8,10 +8,18 @@ export const UserData = ({ user }: { user: IUser }) => {
     <div className="space-y-4">
       <div>
         <label className="block text-[14px] text-[#454545] mb-1">
-          {t("fullName")}
+          {t("firstName")}
         </label>
         <div className="text-[16px] text-[#191919]">
-          {user.full_name || "-"}
+          {user.first_name || "-"}
+        </div>
+      </div>
+      <div>
+        <label className="block text-[14px] text-[#454545] mb-1">
+          {t("lastName")}
+        </label>
+        <div className="text-[16px] text-[#191919]">
+          {user.last_name || "-"}
         </div>
       </div>
       <div>

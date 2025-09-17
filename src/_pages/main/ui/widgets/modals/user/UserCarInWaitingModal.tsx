@@ -7,7 +7,7 @@ import InfoIcon from "@/shared/icons/ui/InfoIcon";
 import { IUser } from "@/shared/models/types/user";
 import { WaitingTimer } from "../../timers/WaitingTimer";
 import { useUserStore } from "@/shared/stores/userStore";
-import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import {
   baseConfig,
   OWNER_UPLOAD,

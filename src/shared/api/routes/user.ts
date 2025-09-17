@@ -6,6 +6,7 @@ export const userRoutes = {
   deleteUser: "/auth/delete_account/",
   addMoney: "/rent/add_money",
   fcmToken: "/push/save-token",
+  updateName: "/auth/user/name",
 };
 
 export const userApi = {
@@ -42,6 +43,10 @@ export const userApi = {
   },
   fcmToken: async (data: { token: string }) => {
     const response = await axiosInstance.post(userRoutes.fcmToken, data);
+    return response;
+  },
+  updateName: async (data: { first_name?: string; last_name?: string }) => {
+    const response = await axiosInstance.patch(userRoutes.updateName, data);
     return response;
   },
 };

@@ -1,13 +1,14 @@
+"use client";
+
 import React, { useState } from "react";
-import { createPortal } from "react-dom";
 import { CameraIcon, GoodIcon, BadIcon } from "@/shared/icons";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";
 import { Button } from "@/shared/ui";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import Loader from "@/shared/ui/loader";
 import { FlutterCamera } from "@/shared/utils/flutter-camera";
-import {StencilConfig} from "@/shared/models/types/stencil";
-import {StencilOverlay} from "@/widgets/upload-photo/StencilOverlay";
+import { StencilConfig } from "@/shared/models/types/stencil";
+import { StencilOverlay } from "@/widgets/upload-photo/StencilOverlay";
 import { useTranslations } from "next-intl";
 
 export interface PhotoConfig {
@@ -88,12 +89,12 @@ const ProgressIndicator: React.FC<{ progress: number }> = ({ progress }) => {
 };
 
 export const UploadPhoto: React.FC<UploadPhotoProps> = ({
-                                                          config,
-                                                          onPhotoUpload,
-                                                          isOpen = false,
-                                                          onClose,
-                                                          isLoading = false,
-                                                        }) => {
+  config,
+  onPhotoUpload,
+  isOpen = false,
+  onClose,
+  isLoading = false,
+}) => {
   const t = useTranslations("uploadPhoto");
   const { showModal } = useResponseModal();
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>(
@@ -320,11 +321,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                 className="block w-full"
               >
                 <div
-                  className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${
-                    loadingStates[photo.id] && progressStates[photo.id] > 0
+                  className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${loadingStates[photo.id] && progressStates[photo.id] > 0
                       ? "bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200"
                       : "bg-[#F5F5F5]"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {loadingStates[photo.id] ? (
@@ -361,11 +361,10 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
               // Fallback на HTML input (только если React Native недоступен)
               <label className="block w-full">
                 <div
-                  className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${
-                    loadingStates[photo.id] && progressStates[photo.id] > 0
+                  className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${loadingStates[photo.id] && progressStates[photo.id] > 0
                       ? "bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200"
                       : "bg-[#F5F5F5]"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     {loadingStates[photo.id] ? (
@@ -428,7 +427,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   const modalContent = (
     <CustomPushScreen
       isOpen={true}
-      onClose={onClose || (() => {})}
+      onClose={onClose || (() => { })}
       direction="bottom"
       withHeader={true}
       withCloseButton={false}
@@ -453,8 +452,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     </CustomPushScreen>
   );
 
-  // Рендерим через Portal в корень DOM
-  return typeof window !== "undefined"
-    ? createPortal(modalContent, document.body)
-    : null;
+  // Рендерим напрямую, без Portal, чтобы сохранить контекст NextIntlClientProvider
+  return modalContent;
 };

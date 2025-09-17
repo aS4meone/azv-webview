@@ -1,6 +1,7 @@
 import { IUser, UserRole } from "@/shared/models/types/user";
 
 import { UserData } from "./UserData";
+import { EditName } from "./EditName";
 import UserDocumentsData from "./documents/UserDocumentsData";
 
 const GetUserData = ({
@@ -18,7 +19,7 @@ const GetUserData = ({
     </div>
   ) : (
     <div className="flex-1 space-y-6 overflow-y-auto">
-      <UserData user={user} />
+      <EditName user={user} />
 
       {user.role === UserRole.USER ||
         ((user.role === UserRole.PENDING || user.role === UserRole.FIRST) && (

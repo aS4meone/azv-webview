@@ -5,6 +5,7 @@
     "faqs": {
       "title": "Frequently Asked Questions",
       "content": "Here you can find answers to common questions about our service...",
+      "description": "Find answers to the most popular questions about our car rental service",
       "searchPlaceholder": "Search questions...",
       "noQuestionsFound": "No questions found",
       "noQuestionsDescription": "Try changing your search query or contact support",
@@ -188,6 +189,7 @@
     "payment": {
       "title": "Online Payment Terms",
       "content": "Learn about our secure payment methods and processing...",
+      "description": "Information about secure payment methods and payment processing conditions",
       "loadingDocument": "Loading document...",
       "documentDescription": "Online payment terms document",
       "ifLoadingTakesLong": "If loading takes a long time:",
@@ -417,7 +419,17 @@
   "profile": {
     "title": "My Profile",
     "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
     "phoneNumber": "Phone Number",
+    "personalInfo": "Personal Information",
+    "editPersonalInfo": "Edit Personal Information",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "enterFirstName": "Enter first name",
+    "enterLastName": "Enter last name",
     "documentsAndData": "Documents and Data",
     "uploadDocumentsRequired": "Documents upload required",
     "documents": {
@@ -548,7 +560,16 @@
         "support": "Support",
         "termsAndPolicy": "Terms and Policy"
       },
-      "logout": "Logout"
+      "logout": "Logout",
+      "roles": {
+        "user": "User",
+        "admin": "Administrator",
+        "mechanic": "Mechanic",
+        "pending": "Pending",
+        "first": "New User",
+        "rejected": "Rejected",
+        "GARANT": "Guarantor"
+      }
     }
   },
   "myAuto": {

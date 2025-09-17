@@ -15,7 +15,7 @@ import { IUser } from "@/shared/models/types/user";
 import { RentalType } from "@/shared/models/dto/rent.dto";
 import { ArrowRightIcon } from "@/shared/icons";
 import { cn } from "@/shared/utils/cn";
-import { UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { ICar } from "@/shared/models/types/car";

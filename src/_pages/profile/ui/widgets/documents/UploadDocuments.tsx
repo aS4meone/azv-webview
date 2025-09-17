@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import {
   Button,
@@ -5,7 +7,8 @@ import {
   ResponseBottomModalContentProps,
 } from "@/shared/ui";
 
-import { PhotoConfig, UploadPhoto } from "@/widgets/upload-photo/UploadPhoto";
+import { PhotoConfig } from "@/widgets/upload-photo/UploadPhoto";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import { userApi } from "@/shared/api/routes/user";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { DocumentDetailsModal } from "./DocumentDetailsModal";

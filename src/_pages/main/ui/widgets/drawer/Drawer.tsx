@@ -214,8 +214,16 @@ const Drawer = () => {
             <div className="flex items-center space-x-3">
               <div>
                 <h2 className="text-lg font-semibold text-white">
-                  {t("main.drawer.menu.profile")}
+                  {user?.first_name && user?.last_name 
+                    ? `${user.first_name} ${user.last_name}`
+                    : t("main.drawer.menu.profile")
+                  }
                 </h2>
+                {user?.first_name && user?.last_name && (
+                  <p className="text-sm text-gray-300">
+                    {t("main.drawer.menu.profile")}
+                  </p>
+                )}
               </div>
             </div>
             <div className="text-white hover:bg-gray-800">

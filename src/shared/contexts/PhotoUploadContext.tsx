@@ -6,7 +6,8 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { UploadPhoto, PhotoConfig } from "@/widgets/upload-photo/UploadPhoto";
+import { PhotoConfig } from "@/widgets/upload-photo/UploadPhoto";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import { rentApi } from "@/shared/api/routes/rent";
 import { mechanicApi } from "@/shared/api/routes/mechanic";
 import { useResponseModal } from "@/shared/ui/modal/ResponseModalContext";

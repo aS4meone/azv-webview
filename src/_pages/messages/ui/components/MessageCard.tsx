@@ -53,7 +53,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
         "p-4 rounded-2xl border transition-all duration-200 hover:shadow-md cursor-pointer",
         message.isRead
           ? "bg-white border-gray-200"
-          : "bg-blue-50 border-blue-200 shadow-sm"
+          : "bg-gray-100 border-gray-300 shadow-sm"
       )}
       onClick={handleMarkAsRead}
     >
@@ -63,7 +63,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
             <h3
               className={cn(
                 "text-base font-medium truncate",
-                message.isRead ? "text-gray-900" : "text-blue-900"
+                message.isRead ? "text-gray-900" : "text-gray-800"
               )}
             >
               {message.title}
@@ -71,7 +71,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
             {!message.isRead && (
               <Badge
                 variant="secondary"
-                className="bg-blue-500 text-white text-xs"
+                className="bg-gray-800 text-white text-xs"
               >
                 {t("new")}
               </Badge>
@@ -81,7 +81,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
           <p
             className={cn(
               "text-sm leading-5 mb-3",
-              message.isRead ? "text-gray-600" : "text-blue-700"
+              message.isRead ? "text-gray-600" : "text-gray-700"
             )}
           >
             {message.description}
@@ -91,7 +91,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
             <span
               className={cn(
                 "text-xs",
-                message.isRead ? "text-gray-400" : "text-blue-500"
+                message.isRead ? "text-gray-400" : "text-gray-600"
               )}
             >
               {formatTime(message.time)}
@@ -99,7 +99,7 @@ const MessageCard: React.FC<MessageCardProps> = ({ message, onMarkAsRead }) => {
 
             {!message.isRead && (
               <button
-                className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                className="text-xs text-gray-700 hover:text-gray-900 font-medium transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkAsRead();
