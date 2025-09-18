@@ -131,34 +131,20 @@ export const ResponseBottomModalContent = ({
           ) : (
             <motion.svg
               xmlns="http://www.w3.org/2000/svg"
-              width="50"
-              height="50"
-              viewBox="0 0 50 50"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
               fill="none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.3 }}
             >
               <motion.path
-                d="M25 50C38.8071 50 50 38.8071 50 25C50 11.1929 38.8071 0 25 0C11.1929 0 0 11.1929 0 25C0 38.8071 11.1929 50 25 50Z"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              />
-              <motion.path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M28.219 12.4297L27.2727 31.6401C27.2097 32.9196 26.2499 33.9719 24.9999 33.9719C23.7499 33.9719 22.7901 32.921 22.7271 31.6401L21.7808 12.4297C21.6084 8.91088 28.3916 8.91201 28.219 12.4297Z"
-                fill="white"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              />
-              <motion.path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M25.0002 35.6641C26.255 35.6641 27.2727 36.6818 27.2727 37.9368C27.2727 39.1919 26.255 40.2096 25.0002 40.2096C23.7451 40.2096 22.7274 39.1919 22.7274 37.9368C22.7274 36.6818 23.7451 35.6641 25.0002 35.6641Z"
-                fill="white"
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM15 9l-6 6M9 9l6 6"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}

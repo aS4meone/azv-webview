@@ -150,12 +150,24 @@ export const MechanicInUseModal = ({
   };
 
   const handleCompleteInspection = async () => {
+    // Предотвращаем повторные вызовы во время загрузки
+    if (isEndLoading) {
+      return;
+    }
+    
     try {
       setIsEndLoading(true);
       const res = await mechanicApi.completeCheckCar({
         rating,
         comment,
       });
+      
+      // Проверяем, что это не дублирующийся запрос
+      if (res.data === "DUPLICATE_PREVENTED") {
+        setIsEndLoading(false);
+        return; // Просто выходим, не показываем никаких модальных окон
+      }
+      
       if (res.status === 200) {
         setIsEndLoading(false);
         setShowRatingModal(false);
@@ -167,20 +179,47 @@ export const MechanicInUseModal = ({
           onButtonClick: handleClose,
           onClose: handleClose,
         });
+      } else {
+        // Если статус не 200, обрабатываем как ошибку
+        setIsEndLoading(false);
+        let errorMessage = t("mechanic.inspection.completionError");
+        
+        // Пытаемся извлечь сообщение об ошибке из ответа
+        if (res.data?.detail) {
+          errorMessage = res.data.detail;
+        }
+        
+        showModal({
+          type: "error",
+          description: errorMessage,
+          buttonText: t("modal.error.tryAgain"),
+          onClose: () => {},
+          onButtonClick: () => {
+            // Позволяем пользователю попробовать снова завершить осмотр
+            handleCompleteInspection();
+          },
+        });
       }
     } catch (error: unknown) {
       setIsEndLoading(false);
-      const errorMessage =
-        error instanceof Error && "response" in error
-          ? (error as { response?: { data?: { detail?: string } } }).response
-              ?.data?.detail
-          : t("mechanic.inspection.completionError");
+      let errorMessage = t("mechanic.inspection.completionError");
+      
+      if (error instanceof Error && "response" in error) {
+        const response = (error as { response?: { data?: { detail?: string } } }).response;
+        if (response?.data?.detail) {
+          errorMessage = response.data.detail;
+        }
+      }
 
       showModal({
         type: "error",
-        description: errorMessage || t("mechanic.inspection.completionError"),
+        description: errorMessage,
         buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
+        onButtonClick: () => {
+          // Позволяем пользователю попробовать снова завершить осмотр
+          handleCompleteInspection();
+        },
       });
     }
   };
@@ -252,6 +291,7 @@ export const MechanicInUseModal = ({
         description={responseModal?.description || ""}
         buttonText={responseModal?.buttonText || ""}
         onButtonClick={responseModal?.onButtonClick || (() => {})}
+        type={responseModal?.type || "success"}
       />
 
       <VehicleActionSuccessModal

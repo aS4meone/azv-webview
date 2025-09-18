@@ -162,12 +162,27 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   };
 
   const handleEndRental = async () => {
+    // Предотвращаем повторные вызовы во время загрузки
+    if (isEndLoading) {
+      return;
+    }
+    
     try {
       setIsEndLoading(true);
       const res = await rentApi.completeRent({
         rating,
         comment,
       });
+      
+      
+      // Проверяем, что это не дублирующийся запрос
+      if (res.data === "DUPLICATE_PREVENTED") {
+        setIsEndLoading(false);
+        setShowRatingModal(false);
+        return; // Просто выходим, не показываем никаких модальных окон
+      }
+      
+      // Проверяем, что статус именно 200 (успех)
       if (res.status === 200) {
         setIsEndLoading(false);
         setShowRatingModal(false);
@@ -181,30 +196,63 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
           },
           type: "success",
           description: t("widgets.modals.user.inUse.rentalSuccessfullyCompleted"),
-          buttonText: t("widgets.modals.user.inUse.tryAgain"),
+          buttonText: t("common.excellent"),
           onButtonClick: async () => {
             setResponseModal(null);
             await refreshUser();
             onClose();
           },
         });
+      } else {
+        // Если статус не 200, обрабатываем как ошибку
+        setIsEndLoading(false);
+        let errorMessage = t("widgets.modals.user.inUse.errorCompletingRental");
+        
+        // Пытаемся извлечь сообщение об ошибке из ответа
+        if (res.data?.detail) {
+          errorMessage = res.data.detail;
+        }
+        
+        setResponseModal({
+          isOpen: true,
+          onClose: () => {
+            setResponseModal(null);
+          },
+          type: "error",
+          title: t("error"),
+          description: errorMessage,
+          buttonText: t("modal.error.tryAgain"),
+          onButtonClick: () => {
+            setResponseModal(null);
+            handleEndRental();
+          },
+        });
       }
     } catch (error: unknown) {
       setIsEndLoading(false);
-      const errorMessage =
-        error instanceof Error && "response" in error
-          ? (error as { response?: { data?: { detail?: string } } }).response
-              ?.data?.detail
-          : t("widgets.modals.user.inUse.errorCompletingRental");
+      let errorMessage = t("widgets.modals.user.inUse.errorCompletingRental");
+      
+      if (error instanceof Error && "response" in error) {
+        const response = (error as { response?: { data?: { detail?: string } } }).response;
+        if (response?.data?.detail) {
+          errorMessage = response.data.detail;
+        }
+      }
 
       setResponseModal({
         isOpen: true,
-        onClose: () => {},
+        onClose: () => {
+          setResponseModal(null);
+        },
         type: "error",
         title: t("error"),
-        description: errorMessage || t("widgets.modals.user.inUse.errorCompletingRental"),
+        description: errorMessage,
         buttonText: t("modal.error.tryAgain"),
-        onButtonClick: () => {},
+        onButtonClick: () => {
+          setResponseModal(null);
+          // Позволяем пользователю попробовать снова завершить аренду
+          handleEndRental();
+        },
       });
     }
   };
@@ -282,12 +330,13 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         <CarInfoHeader car={car} />
       </div>
       <CustomResponseModal
-        onButtonClick={handleClose}
+        onButtonClick={responseModal?.onButtonClick || handleClose}
         isOpen={!!responseModal}
-        onClose={handleClose}
+        onClose={responseModal?.onClose || handleClose}
         title={responseModal?.title || ""}
         description={responseModal?.description || ""}
         buttonText={responseModal?.buttonText || ""}
+        type={responseModal?.type || "success"}
       />
       <VehicleActionSuccessModal
         isOpen={isSuccessOpen}
