@@ -22,3 +22,4 @@ export interface UploadPhotoClientProps {
 export const UploadPhotoClient: React.FC<UploadPhotoClientProps> = (props) => {
   return <UploadPhoto {...props} />;
 };
+

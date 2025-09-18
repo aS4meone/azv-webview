@@ -32,7 +32,7 @@ const RenterPhoto = ({
         alt={alt}
         width={100}
         height={100}
-        className={`rounded-lg h-[200px] w-full border border-gray-200 object-contain`}
+        className={`rounded-lg h-[200px] w-full border border-gray-200 object-cover`}
       />
     ) : (
       <div className="h-[200px] w-full p-8 bg-gray-200 rounded-lg border border-gray-200 flex flex-col items-center justify-center">

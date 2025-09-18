@@ -430,6 +430,7 @@
     "saving": "Saving...",
     "enterFirstName": "Enter first name",
     "enterLastName": "Enter last name",
+    "readOnly": "Read Only",
     "documentsAndData": "Documents and Data",
     "uploadDocumentsRequired": "Documents upload required",
     "documents": {

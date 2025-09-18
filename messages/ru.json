@@ -430,6 +430,7 @@
     "saving": "Сохранение...",
     "enterFirstName": "Введите имя",
     "enterLastName": "Введите фамилию",
+    "readOnly": "Только для чтения",
     "documentsAndData": "Документы и подтверждение личности",
     "uploadDocumentsRequired": "Загрузка документов обязательна для использования сервиса",
     "documents": {

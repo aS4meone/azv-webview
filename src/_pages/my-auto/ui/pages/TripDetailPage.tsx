@@ -203,7 +203,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
             <img
               src={fullPhotoUrl}
               alt={`${title} ${currentIndex + 1}`}
-              className="h-full w-auto object-contain"
+              className="h-full w-auto object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = "/images/placeholder.jpg";
@@ -489,7 +489,7 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                     ? currentPhotoSet[currentPhotoIndex] 
                     : `https://api.azvmotors.kz/${currentPhotoSet[currentPhotoIndex]}`}
                   alt={`${t("myAuto.photo")} ${currentPhotoIndex + 1}`}
-                  className="max-h-full max-w-full object-contain"
+                  className="max-h-full max-w-full object-cover"
                   onError={() => handleImageError(currentPhotoIndex)}
                   onLoad={() => handleImageLoad(currentPhotoIndex)}
                   onLoadStart={() => handleImageLoadStart(currentPhotoIndex)}

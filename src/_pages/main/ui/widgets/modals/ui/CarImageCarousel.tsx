@@ -176,7 +176,7 @@ export const CarImageCarousel = ({
                     src={formatImage(photo)}
                     alt={`${car.name} - фото ${index + 1}`}
                     fill
-                    className="object-contain"
+                    className="object-cover"
                     onError={() => handleImageError(index)}
                     onLoad={() => handleImageLoad(index)}
                     onLoadStart={() => handleImageLoadStart(index)}

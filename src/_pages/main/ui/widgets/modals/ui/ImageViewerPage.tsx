@@ -134,7 +134,7 @@ export const ImageViewerPage = ({
                       src={formatImage(photo)}
                       alt={`${car.name} - фото ${index + 1}`}
                       fill
-                      className="object-contain select-none swiper-zoom-target"
+                      className="object-cover select-none swiper-zoom-target"
                       onError={() => handleImageError(index)}
                       onLoad={() => handleImageLoad(index)}
                       onLoadStart={() => handleImageLoadStart(index)}

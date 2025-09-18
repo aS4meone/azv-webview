@@ -432,6 +432,7 @@
     "saving": "Сақталуда...",
     "enterFirstName": "Атыңызды енгізіңіз",
     "enterLastName": "Тегіңізді енгізіңіз",
+    "readOnly": "Тек оқу үшін",
     "documentsAndData": "Құжаттар және жеке басын растау",
     "uploadDocumentsRequired": "Қызметті пайдалану үшін құжаттарды жүктеу міндетті",
     "documents": {
