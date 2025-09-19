@@ -6,6 +6,7 @@ interface VehicleInfoCardProps {
     name: string;
     year: number;
     engine_volume: number;
+    body_type?: string;
   };
 }
 
@@ -51,7 +52,7 @@ export const VehicleInfoCard: React.FC<VehicleInfoCardProps> = ({
         <div className="flex justify-between items-center">
           <span className="text-gray-500 text-sm font-medium">{t("trips.vehicle.engine")}</span>
           <span className="text-gray-900 font-medium">
-            {carDetails.engine_volume}L
+            {carDetails.body_type === "ELECTRIC" ? t("cars.electric") : `${carDetails.engine_volume}L`}
           </span>
         </div>
       </div>

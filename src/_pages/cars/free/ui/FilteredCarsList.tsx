@@ -114,7 +114,7 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
           
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span>{car.year} {t('cars.year')}</span>
-            <span>{car.engine_volume === 0 ? t('cars.electric') : `${car.engine_volume}л`}</span>
+            <span>{car.body_type === "ELECTRIC" ? t('cars.electric') : `${car.engine_volume}л`}</span>
           </div>
           
         </div>

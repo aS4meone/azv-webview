@@ -196,7 +196,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
           },
           type: "success",
           description: t("widgets.modals.user.inUse.rentalSuccessfullyCompleted"),
-          buttonText: t("common.excellent"),
+          buttonText: t("mechanic.common.excellent"),
           onButtonClick: async () => {
             setResponseModal(null);
             await refreshUser();

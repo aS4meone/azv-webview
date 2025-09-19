@@ -18,6 +18,8 @@ export * from "./ui/SearchIcon";
 export * from "./ui/FuelIcon";
 export * from "./ui/DriveTypeIcon";
 export * from "./ui/EngineVolumeIcon";
+export * from "./ui/LightningIcon";
+export * from "./ui/BatteryIcon";
 export * from "./ui/CheckIcon";
 export * from "./ui/TruckIcon";
 export * from "./ui/ClockIcon";

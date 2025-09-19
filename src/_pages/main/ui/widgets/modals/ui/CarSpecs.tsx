@@ -1,5 +1,5 @@
 import { ICar } from "@/shared/models/types/car";
-import { DriveTypeIcon, EngineVolumeIcon, FuelIcon } from "@/shared/icons";
+import { DriveTypeIcon, EngineVolumeIcon, FuelIcon, LightningIcon, BatteryIcon } from "@/shared/icons";
 import React from "react";
 
 interface CarSpecsProps {
@@ -20,11 +20,17 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
         return "";
     }
   };
+
+  const isElectric = car.body_type === "ELECTRIC";
+
   const specs = [
-    { icon: <FuelIcon />, value: `${car.fuel_level || 0}л` },
+    { 
+      icon: isElectric ? <BatteryIcon /> : <FuelIcon />, 
+      value: isElectric ? `${car.fuel_level || 0}%` : `${car.fuel_level || 0}л` 
+    },
     {
-      icon: <EngineVolumeIcon />,
-      value: car.engine_volume ? car.engine_volume.toFixed(1) : "0.0",
+      icon: isElectric ? <LightningIcon /> : <EngineVolumeIcon />,
+      value: isElectric ? "Электро" : (car.engine_volume ? car.engine_volume.toFixed(1) : "0.0"),
     },
     {
       icon: <DriveTypeIcon type={car.drive_type || 0} />,
