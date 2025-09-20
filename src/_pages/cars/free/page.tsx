@@ -33,8 +33,31 @@ const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
 
   const getFilteredCars = (): ICar[] => {
     if (selectedBodyType === CarBodyType.ELECTRIC) {
-      // Показываем все электромобили (engine_volume === 0.0)
-      return allVehicles.filter(car => car.engine_volume === 0.0);
+      // Показываем все электромобили (engine_volume === 0.0 или body_type === 'ELECTRIC')
+      const electricCars = allVehicles.filter(car => 
+        car.engine_volume === 0.0 || 
+        car.body_type === 'ELECTRIC' ||
+        car.body_type === CarBodyType.ELECTRIC
+      );
+      
+      // Отладочная информация
+      console.log('=== Electric Cars Debug ===');
+      console.log('All vehicles count:', allVehicles.length);
+      console.log('Electric cars count:', electricCars.length);
+      console.log('Selected body type:', selectedBodyType);
+      allVehicles.forEach((car, index) => {
+        if (car.engine_volume === 0.0 || car.body_type === 'ELECTRIC' || car.body_type === CarBodyType.ELECTRIC) {
+          console.log(`Electric car ${index}:`, {
+            id: car.id,
+            name: car.name,
+            engine_volume: car.engine_volume,
+            body_type: car.body_type
+          });
+        }
+      });
+      console.log('========================');
+      
+      return electricCars;
     } else {
       // Показываем машины по типу кузова
       return allVehicles.filter(car => car.body_type === selectedBodyType);

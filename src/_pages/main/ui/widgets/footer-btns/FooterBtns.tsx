@@ -24,6 +24,7 @@ import MechanicPendingPage from "@/_pages/mechanic/pending/page";
 import MechanicDeliveryPage from "@/_pages/mechanic/delivery/page";
 import MechanicInRentPage from "@/_pages/mechanic/in-rent/page";
 import { useTranslations } from "next-intl";
+import { NotificationDot } from "@/shared/ui";
 
 enum ServiceButtonType {
   CHECK = "check",
@@ -45,6 +46,25 @@ const FooterBtns = () => {
     typeof window !== "undefined"
       ? localStorage.getItem("tracking_car_id")
       : null;
+
+  // Подсчитываем количество машин со статусом pending
+  const getPendingCarsCount = (): number => {
+    if (!allMechanicVehicles || allMechanicVehicles.length === 0) {
+      return 0;
+    }
+    return allMechanicVehicles.filter(car => car.status === CarStatus.pending).length;
+  };
+
+  // Подсчитываем количество машин со статусом delivering
+  const getDeliveringCarsCount = (): number => {
+    if (!allMechanicVehicles || allMechanicVehicles.length === 0) {
+      return 0;
+    }
+    return allMechanicVehicles.filter(car => car.status === CarStatus.delivering).length;
+  };
+
+  const pendingCarsCount = getPendingCarsCount();
+  const deliveringCarsCount = getDeliveringCarsCount();
 
   const components = [
     {
@@ -137,7 +157,8 @@ const FooterBtns = () => {
   const renderServiceButton = (
     buttonType: ServiceButtonType,
     icon: React.ReactNode,
-    label: string
+    label: string,
+    showNotification: boolean = false
   ) => {
     const isActive = activeServiceButton === buttonType;
 
@@ -153,6 +174,7 @@ const FooterBtns = () => {
           transition-all duration-[350ms] ease-[cubic-bezier(0.34,1.56,0.64,1)]
           hover:shadow-lg active:scale-95 service-button
           ${isActive ? "w-[170px] px-4" : "w-[55px] px-2"}
+          relative
         `}
         style={{
           touchAction: "manipulation",
@@ -183,6 +205,13 @@ const FooterBtns = () => {
         >
           {label}
         </span>
+        {showNotification && (
+          <NotificationDot
+            show={true}
+            className="absolute top-1 right-2"
+            size="md"
+          />
+        )}
       </button>
     );
   };
@@ -215,12 +244,14 @@ const FooterBtns = () => {
           {renderServiceButton(
             ServiceButtonType.CHECK,
             <CheckIcon />,
-            t("widgets.footerBtns.check")
+            t("widgets.footerBtns.check"),
+            pendingCarsCount > 0
           )}
           {renderServiceButton(
             ServiceButtonType.DELIVERING,
             <TruckIcon />,
-            t("widgets.footerBtns.delivery")
+            t("widgets.footerBtns.delivery"),
+            deliveringCarsCount > 0
           )}
           {renderServiceButton(
             ServiceButtonType.RENT,

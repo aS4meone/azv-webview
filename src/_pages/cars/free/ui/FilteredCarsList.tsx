@@ -88,10 +88,10 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
     >
       {/* Car Image - Full Width */}
       {car.photos && car.photos.length > 0 ? (
-        <div className="w-full h-48 bg-gray-100 image-container">
+        <div className="w-full h-48 bg-gray-100 image-container flex items-center justify-center">
           <img
             src={getImageUrl(car.photos[0])}
-            className="car-card-full-width"
+            className="free-cars-image"
             alt={car.name}
           />
         </div>

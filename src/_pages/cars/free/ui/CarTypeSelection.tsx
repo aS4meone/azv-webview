@@ -33,7 +33,12 @@ export const CarTypeSelection = ({ cars, onTypeSelectAction, onBackAction }: Car
     const counts: Record<string, number> = {};
     
     cars.forEach(car => {
-      if (car.engine_volume === 0.0) {
+      // Проверяем, является ли машина электромобилем
+      const isElectric = car.engine_volume === 0.0 || 
+                        car.body_type === 'ELECTRIC' || 
+                        car.body_type === CarBodyType.ELECTRIC;
+      
+      if (isElectric) {
         // Электромобили
         counts[CarBodyType.ELECTRIC] = (counts[CarBodyType.ELECTRIC] || 0) + 1;
       } else {

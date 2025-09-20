@@ -173,21 +173,21 @@ export const MyAutoPage = () => {
               <div 
                 key={car.id} 
                 onClick={() => handleCarSelect(car)}
-                className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow-sm border border-[#E5E5E5] p-4 cursor-pointer hover:shadow-md transition-shadow"
               >
-                {/* Car Photo - Full Width */}
-                {car.photos && car.photos.length > 0 && (
-                  <div className="w-full h-48 image-container">
-                    <img
-                      src={`https://api.azvmotors.kz${car.photos[0]}`}
-                      alt={car.name}
-                      className="car-card-full-width"
-                    />
-                  </div>
-                )}
-                
-                {/* Car Info */}
-                <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {/* Car Photo - Left Side */}
+                  {car.photos && car.photos.length > 0 && (
+                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 image-container flex items-center justify-center bg-gray-100">
+                      <img
+                        src={`https://api.azvmotors.kz${car.photos[0]}`}
+                        alt={car.name}
+                        className="my-cars-image"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Car Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-semibold text-[#2D2D2D] mb-1">
                       {car.name}

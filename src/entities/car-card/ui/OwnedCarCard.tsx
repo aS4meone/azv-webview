@@ -81,11 +81,11 @@ const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onToo
     >
       {/* Car Photo - Full Width */}
       {firstPhoto && (
-        <div className="w-full h-48 image-container">
+        <div className="w-full h-48 image-container flex items-center justify-center bg-gray-100">
           <img
             src={`https://api.azvmotors.kz${firstPhoto}`}
             alt={car.name}
-            className="car-card-full-width"
+            className="owned-car-image"
           />
         </div>
       )}
