@@ -1,4 +1,5 @@
 import axiosInstance from "../axios";
+import { IncomingRequest } from "../models/types/guarantor";
 
 export const guarantorRoutes = {
   invite: "/guarantor/invite",
@@ -49,14 +50,7 @@ export interface SimpleClient {
   created_at: string;
 }
 
-export interface IncomingRequest {
-  id: number;
-  requestor_id: number;
-  requestor_name: string;
-  requestor_phone: string;
-  reason?: string;
-  created_at: string;
-}
+// IncomingRequest interface is imported from @/shared/models/types/guarantor
 
 export enum GuarantorRequestStatus {
   PENDING = "pending",

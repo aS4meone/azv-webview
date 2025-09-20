@@ -57,12 +57,15 @@ export const IncomingRequestsTab: React.FC<IncomingRequestsTabProps> = ({
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-[#191919] flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-bold text-sm">
-                        {request.requestor_name?.charAt(0) || "?"}
+                        {(request.requestor_first_name || request.requestor_last_name)?.charAt(0) || "?"}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-[#191919] text-lg truncate">
-                        {request.requestor_name || t("guarantor.incomingRequests.notSpecified")}
+                        {request.requestor_first_name && request.requestor_last_name 
+                          ? `${request.requestor_first_name} ${request.requestor_last_name}`
+                          : request.requestor_first_name || request.requestor_last_name || t("guarantor.incomingRequests.notSpecified")
+                        }
                       </h3>
                       <p className="text-sm text-[#191919] truncate">
                         {request.requestor_phone}

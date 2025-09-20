@@ -31,6 +31,13 @@ export const GuarantorPage: React.FC = () => {
   const [contractUrl, setContractUrl] = useState<string>("");
   const [guarantorRelationshipId, setGuarantorRelationshipId] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  
+  // Состояние для предзагрузки договоров
+  const [preloadedContracts, setPreloadedContracts] = useState<{
+    guarantor?: string;
+    sublease?: string;
+  }>({});
+  const [isPreloadingContracts, setIsPreloadingContracts] = useState(false);
 
   // Проверяем, что пользователь не механик
   if (user?.role === UserRole.MECHANIC) {
@@ -52,6 +59,42 @@ export const GuarantorPage: React.FC = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Функция для предзагрузки договоров
+  const preloadContracts = async () => {
+    if (isPreloadingContracts) return;
+    
+    setIsPreloadingContracts(true);
+    try {
+      console.log("🔄 Начинаем предзагрузку договоров...");
+      
+      // Предзагружаем оба договора параллельно
+      const [guarantorResponse, subleaseResponse] = await Promise.allSettled([
+        guarantorApi.getGuarantorContract(),
+        guarantorApi.getSubleaseContract()
+      ]);
+
+      const newPreloadedContracts: { guarantor?: string; sublease?: string } = {};
+
+      if (guarantorResponse.status === 'fulfilled' && guarantorResponse.value.data) {
+        newPreloadedContracts.guarantor = guarantorResponse.value.data.file_url;
+        console.log("✅ Договор гаранта предзагружен");
+      }
+
+      if (subleaseResponse.status === 'fulfilled' && subleaseResponse.value.data) {
+        newPreloadedContracts.sublease = subleaseResponse.value.data.file_url;
+        console.log("✅ Договор субаренды предзагружен");
+      }
+
+      setPreloadedContracts(newPreloadedContracts);
+      console.log("🎉 Предзагрузка договоров завершена:", newPreloadedContracts);
+      
+    } catch (error) {
+      console.error("❌ Ошибка при предзагрузке договоров:", error);
+    } finally {
+      setIsPreloadingContracts(false);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -95,13 +138,26 @@ export const GuarantorPage: React.FC = () => {
       if (response.data) {
         // Обновляем список входящих заявок
         await loadData();
-        // Загружаем договор гаранта
-        const contractResponse = await guarantorApi.getGuarantorContract();
-        if (contractResponse.data) {
-          setContractUrl(contractResponse.data.file_url);
+        
+        // Запускаем предзагрузку договоров
+        await preloadContracts();
+        
+        // Используем предзагруженный договор или загружаем заново
+        const contractUrl = preloadedContracts.guarantor;
+        if (contractUrl) {
+          setContractUrl(contractUrl);
           setContractType("guarantor");
           setGuarantorRelationshipId(response.data.guarantor_relationship_id);
           setShowContractModal(true);
+        } else {
+          // Fallback: загружаем договор гаранта напрямую
+          const contractResponse = await guarantorApi.getGuarantorContract();
+          if (contractResponse.data) {
+            setContractUrl(contractResponse.data.file_url);
+            setContractType("guarantor");
+            setGuarantorRelationshipId(response.data.guarantor_relationship_id);
+            setShowContractModal(true);
+          }
         }
       }
     } catch (error: any) {
@@ -165,17 +221,25 @@ export const GuarantorPage: React.FC = () => {
         if (contractType === "guarantor") {
           console.log("✅ Договор гаранта подписан, открываем договор субаренды...");
           
-          // Получаем договор субаренды
-          const subleaseResponse = await guarantorApi.getSubleaseContract();
-          if (subleaseResponse.data) {
-            setContractUrl(subleaseResponse.data.file_url);
+          // Используем предзагруженный договор субаренды
+          const subleaseUrl = preloadedContracts.sublease;
+          if (subleaseUrl) {
+            setContractUrl(subleaseUrl);
             setContractType("sublease");
             setGuarantorRelationshipId(guarantorRelationshipId);
-            // Не закрываем модальное окно, а переключаем на договор субаренды
-            console.log("📄 Открываем договор субаренды");
+            console.log("📄 Открываем предзагруженный договор субаренды");
           } else {
-            console.error("❌ Ошибка получения договора субаренды:", subleaseResponse.error);
-            setShowContractModal(false);
+            // Fallback: загружаем договор субаренды напрямую
+            const subleaseResponse = await guarantorApi.getSubleaseContract();
+            if (subleaseResponse.data) {
+              setContractUrl(subleaseResponse.data.file_url);
+              setContractType("sublease");
+              setGuarantorRelationshipId(guarantorRelationshipId);
+              console.log("📄 Открываем договор субаренды");
+            } else {
+              console.error("❌ Ошибка получения договора субаренды:", subleaseResponse.error);
+              setShowContractModal(false);
+            }
           }
         } else {
           // Если подписан договор субаренды, закрываем модальное окно
@@ -189,18 +253,37 @@ export const GuarantorPage: React.FC = () => {
 
   const handleViewContract = async (contractType: ContractType, relationshipId: number) => {
     try {
-      let response;
-      if (contractType === "guarantor") {
-        response = await guarantorApi.getGuarantorContract();
-      } else {
-        response = await guarantorApi.getSubleaseContract();
+      // Запускаем предзагрузку если еще не загружены договоры
+      if (Object.keys(preloadedContracts).length === 0) {
+        await preloadContracts();
       }
       
-      if (response.data) {
-        setContractUrl(response.data.file_url);
+      // Используем предзагруженный договор
+      const contractUrl = contractType === "guarantor" 
+        ? preloadedContracts.guarantor 
+        : preloadedContracts.sublease;
+        
+      if (contractUrl) {
+        setContractUrl(contractUrl);
         setContractType(contractType);
         setGuarantorRelationshipId(relationshipId);
         setShowContractModal(true);
+        console.log(`📄 Открываем предзагруженный договор: ${contractType}`);
+      } else {
+        // Fallback: загружаем договор напрямую
+        let response;
+        if (contractType === "guarantor") {
+          response = await guarantorApi.getGuarantorContract();
+        } else {
+          response = await guarantorApi.getSubleaseContract();
+        }
+        
+        if (response.data) {
+          setContractUrl(response.data.file_url);
+          setContractType(contractType);
+          setGuarantorRelationshipId(relationshipId);
+          setShowContractModal(true);
+        }
       }
     } catch (error) {
       console.error("Error loading contract:", error);
@@ -304,6 +387,7 @@ export const GuarantorPage: React.FC = () => {
         contractType={contractType}
         contractUrl={contractUrl}
         onSign={handleSignContract}
+        isPreloading={isPreloadingContracts}
       />
     </div>
   );

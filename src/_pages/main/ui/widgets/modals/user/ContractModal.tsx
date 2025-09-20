@@ -225,7 +225,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
     <CustomPushScreen isOpen={isOpen} onClose={onClose}>
       <div
         ref={containerRef}
-        className="relative w-full h-screen flex flex-col bg-white"
+        className="relative w-full flex flex-col bg-white"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
@@ -313,8 +313,14 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         </div>
 
         <div className="p-4 bg-white border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1">
+          {!hasScrolledToEnd && (
+            <p className="text-xs text-gray-500 my-3">
+              {t("widgets.modals.contract.readToEnd")}
+            </p>
+          )}
+          <div className="flex flex-col gap-4">
+            {/* Checkbox section */}
+            <div className="flex items-center gap-3">
               <input
                 type="checkbox"
                 id="agree"
@@ -326,32 +332,33 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 {t("widgets.modals.contract.agreeToTerms")}
               </label>
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                onClick={onReject}
-                className="flex-1 sm:flex-none px-4 py-2"
-              >
-                {t("widgets.modals.contract.reject")}
-              </Button>
-              <Button
-                onClick={handleAccept}
-                disabled={!agreed || !hasScrolledToEnd}
-                className={cn(
-                  "flex-1 sm:flex-none px-4 py-2",
-                  (!agreed || !hasScrolledToEnd) &&
+
+            {/* Buttons section with improved tablet layout */}
+            <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-3 sm:gap-2 md:gap-3 lg:gap-2">
+              {/* Mobile: stacked buttons, Tablet: side by side, Desktop: side by side */}
+              <div className="flex gap-2 w-full sm:w-auto md:w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={onReject}
+                  className="flex-1 sm:flex-none md:flex-1 lg:flex-none px-4 py-2 text-sm sm:text-sm md:text-base lg:text-sm"
+                >
+                  {t("widgets.modals.contract.reject")}
+                </Button>
+                <Button
+                  onClick={handleAccept}
+                  disabled={!agreed || !hasScrolledToEnd}
+                  className={cn(
+                    "flex-1 sm:flex-none md:flex-1 lg:flex-none px-4 py-2 text-sm sm:text-sm md:text-base lg:text-sm",
+                    (!agreed || !hasScrolledToEnd) &&
                     "opacity-50 cursor-not-allowed"
-                )}
-              >
-                {t("widgets.modals.contract.accept")}
-              </Button>
+                  )}
+                >
+                  {t("widgets.modals.contract.accept")}
+                </Button>
+              </div>
             </div>
           </div>
-          {!hasScrolledToEnd && (
-            <p className="text-xs text-gray-500 mt-2">
-              {t("widgets.modals.contract.readToEnd")}
-            </p>
-          )}
+
         </div>
       </div>
     </CustomPushScreen>

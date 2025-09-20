@@ -8,7 +8,10 @@ import { useTranslations } from "next-intl";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Инициализация PDF worker
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+}
 
 interface ContractModalProps {
   isOpen: boolean;
@@ -16,6 +19,7 @@ interface ContractModalProps {
   contractType: ContractType;
   contractUrl: string;
   onSign: (contractType: ContractType) => void;
+  isPreloading?: boolean;
 }
 
 export const ContractModal: React.FC<ContractModalProps> = ({
@@ -24,6 +28,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   contractType,
   contractUrl,
   onSign,
+  isPreloading = false,
 }) => {
   const t = useTranslations();
   const [loading, setLoading] = useState(false);
@@ -161,14 +166,22 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                       <span className="text-sm font-medium text-[#191919]">
                         {t("guarantor.contractModal.documentTitle")}
                       </span>
-                      <a
-                        href={contractUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#191919] hover:text-[#333333] text-sm font-medium transition-colors duration-200"
-                      >
-                        {t("guarantor.contractModal.openInNewTab")}
-                      </a>
+                      <div className="flex items-center gap-3">
+                        {isPreloading && (
+                          <div className="flex items-center gap-2 text-xs text-blue-600">
+                            <div className="animate-spin rounded-full h-3 w-3 border-b border-blue-600"></div>
+                            <span>Предзагрузка...</span>
+                          </div>
+                        )}
+                        <a
+                          href={contractUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#191919] hover:text-[#333333] text-sm font-medium transition-colors duration-200"
+                        >
+                          {t("guarantor.contractModal.openInNewTab")}
+                        </a>
+                      </div>
                     </div>
                     
                     <div className="flex flex-col items-center justify-center py-4">
@@ -196,10 +209,20 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                             <div key={`page_${index + 1}`} className="mb-4 shadow-lg">
                               <Page
                                 pageNumber={index + 1}
-                                width={Math.min(800, window.innerWidth - 100)}
+                                width={Math.min(800, typeof window !== 'undefined' ? window.innerWidth - 100 : 700)}
                                 className="border border-gray-200 rounded-lg"
-                                renderTextLayer={true}
-                                renderAnnotationLayer={true}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                loading={
+                                  <div className="flex items-center justify-center h-96 bg-gray-50 rounded-lg">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#191919]"></div>
+                                  </div>
+                                }
+                                error={
+                                  <div className="flex items-center justify-center h-96 bg-red-50 rounded-lg">
+                                    <p className="text-red-600 text-sm">Ошибка загрузки страницы {index + 1}</p>
+                                  </div>
+                                }
                               />
                             </div>
                           ))}
@@ -216,8 +239,20 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 
         {/* Footer */}
         <div className="p-4 bg-white border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1">
+          {!hasScrolledToBottom && (
+            <p className="text-xs text-gray-500 my-3 text-center">
+              {t("guarantor.contractModal.readToSign")}
+            </p>
+          )}
+          {hasScrolledToBottom && !isAgreed && (
+            <p className="text-xs text-gray-500 my-3 text-center">
+              {t("guarantor.contractModal.confirmAgreement")}
+            </p>
+          )}
+          
+          <div className="flex flex-col gap-4">
+            {/* Checkbox section */}
+            <div className="flex items-center gap-3">
               <input
                 type="checkbox"
                 id="agree"
@@ -230,33 +265,29 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 {t("guarantor.contractModal.agreeCheckbox")}
               </label>
             </div>
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                onClick={onClose}
-                className="flex-1 sm:flex-none px-4 py-2"
-              >
-                {t("guarantor.contractModal.cancel")}
-              </Button>
-              <Button
-                onClick={handleSign}
-                disabled={loading || !hasScrolledToBottom || !isAgreed}
-                className="flex-1 sm:flex-none px-4 py-2"
-              >
-                {loading ? t("guarantor.contractModal.signing") : t("guarantor.contractModal.signContract")}
-              </Button>
+            
+            {/* Buttons section with improved tablet layout */}
+            <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row gap-3 sm:gap-2 md:gap-3 lg:gap-2">
+              <div className="flex gap-2 w-full sm:w-auto md:w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1 sm:flex-none md:flex-1 lg:flex-none px-4 py-2 text-sm sm:text-sm md:text-base lg:text-sm"
+                >
+                  {t("guarantor.contractModal.cancel")}
+                </Button>
+                <Button
+                  onClick={handleSign}
+                  disabled={loading || !hasScrolledToBottom || !isAgreed}
+                  className={`flex-1 sm:flex-none md:flex-1 lg:flex-none px-4 py-2 text-sm sm:text-sm md:text-base lg:text-sm ${
+                    (loading || !hasScrolledToBottom || !isAgreed) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {loading ? t("guarantor.contractModal.signing") : t("guarantor.contractModal.signContract")}
+                </Button>
+              </div>
             </div>
           </div>
-          {!hasScrolledToBottom && (
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              {t("guarantor.contractModal.readToSign")}
-            </p>
-          )}
-          {hasScrolledToBottom && !isAgreed && (
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              {t("guarantor.contractModal.confirmAgreement")}
-            </p>
-          )}
         </div>
       </div>
     </CustomPushScreen>

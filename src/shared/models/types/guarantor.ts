@@ -21,7 +21,8 @@ export interface SimpleClient {
 export interface IncomingRequest {
   id: number;
   requestor_id: number;
-  requestor_name: string;
+  requestor_first_name: string;
+  requestor_last_name: string;
   requestor_phone: string;
   reason?: string;
   created_at: string;

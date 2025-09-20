@@ -20,6 +20,7 @@ import { MyAutoPage } from "@/_pages/my-auto";
 import { GuarantorPage } from "@/_pages/guarantor";
 import { UserRole } from "@/shared/models/types/user";
 import { LanguageSelector } from "@/shared/ui/language-selector";
+import { Badge } from "@/shared/ui/badge";
 
 type ComponentKeys =
   | "trips"
@@ -236,10 +237,13 @@ const Drawer = () => {
               {itemsToShow.map((item) => (
                 <button
                   key={item.translationKey}
-                  className="flex items-center space-x-3 w-full text-left py-4 px-8 text-white active:bg-gray-800 transition-colors"
+                  className="flex items-center space-x-2 w-full text-left py-4 px-8 text-white active:bg-gray-800 transition-colors"
                   onClick={() => handleItemClick(item.key)}
                 >
-                  {t(item.translationKey)}
+                  <span>{t(item.translationKey)}</span>
+                  {item.key === "messages" && user?.unread_message && user.unread_message > 0 && (
+                    <Badge count={user.unread_message} />
+                  )}
                 </button>
               ))}
             </nav>

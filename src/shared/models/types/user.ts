@@ -40,4 +40,5 @@ export interface IUser {
   current_rental: ICurrentRental | null;
   documents: Documents;
   owned_cars: ICar[];
+  unread_message: number;
 }
