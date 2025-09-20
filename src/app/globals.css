@@ -286,7 +286,7 @@ body {
 .image-container img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -297,12 +297,19 @@ img {
   object-fit: contain;
 }
 
-/* Specific fixes for car images */
+/* Specific fixes for car images - full width cards */
 .car-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
+}
+
+/* Full width car card images */
+.car-card-full-width {
+  width: 100%;
+  height: auto; /* Fixed height for consistency */
+  object-fit: cover;
 }
 
 /* Photo upload preview styles */

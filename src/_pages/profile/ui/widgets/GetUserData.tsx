@@ -22,7 +22,7 @@ const GetUserData = ({
       <EditName user={user} />
 
       {user.role === UserRole.USER ||
-        ((user.role === UserRole.PENDING || user.role === UserRole.FIRST) && (
+        ((user.role === UserRole.PENDING || user.role === UserRole.CLIENT) && (
           <UserDocumentsData user={user} getUser={getUser} />
         ))}
     </div>

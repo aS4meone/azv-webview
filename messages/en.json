@@ -567,7 +567,7 @@
         "admin": "Administrator",
         "mechanic": "Mechanic",
         "pending": "Pending",
-        "first": "New User",
+        "client": "Client",
         "rejected": "Rejected",
         "GARANT": "Guarantor"
       }
@@ -1247,7 +1247,7 @@
       "admin": "Administrator",
       "user": "User",
       "rejected": "Rejected",
-      "first": "New User",
+      "client": "Client",
       "pending": "Pending",
       "mechanic": "Mechanic",
       "garant": "Guarantor"

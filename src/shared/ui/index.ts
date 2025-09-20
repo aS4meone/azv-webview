@@ -5,4 +5,5 @@ export * from "./progress-indicator";
 export * from "./push-screen";
 export * from "./tabs";
 export * from "./badge";
+export * from "./notification-dot";
 export { Input } from "./input/Input";

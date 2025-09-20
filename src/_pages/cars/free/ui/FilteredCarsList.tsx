@@ -83,28 +83,28 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
 
   return (
     <div
-      className="bg-white border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+      className="bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors"
       onClick={handleClick}
     >
-      <div className="flex gap-4">
-        {/* Car Image */}
-        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 image-container">
-          {car.photos && car.photos.length > 0 ? (
-            <img
-              src={getImageUrl(car.photos[0])}
-              className="car-image"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-200">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-          )}
+      {/* Car Image - Full Width */}
+      {car.photos && car.photos.length > 0 ? (
+        <div className="w-full h-48 bg-gray-100 image-container">
+          <img
+            src={getImageUrl(car.photos[0])}
+            className="car-card-full-width"
+            alt={car.name}
+          />
         </div>
+      ) : (
+        <div className="w-full h-48 flex items-center justify-center bg-gray-200">
+          <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+      )}
 
-        {/* Car Info */}
-        <div className="flex-1 min-w-0">
+      {/* Car Info */}
+      <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h3 className="text-lg font-medium text-gray-900 truncate">{car.name}</h3>
             <CarStatusBadge status={car.status} t={t} />
@@ -116,10 +116,8 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
             <span>{car.year} {t('cars.year')}</span>
             <span>{car.body_type === "ELECTRIC" ? t('cars.electric') : `${car.engine_volume}л`}</span>
           </div>
-          
         </div>
       </div>
-    </div>
   );
 };
 

@@ -13,7 +13,7 @@ export const handleCarInteraction = ({
   hideModal: () => void;
 }) => {
   switch (user.role) {
-    case UserRole.FIRST:
+    case UserRole.CLIENT:
       return userRoleInteraction({ user, notRentedCar, hideModal });
 
     case UserRole.PENDING:

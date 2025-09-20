@@ -10,6 +10,7 @@ interface UserStore {
   setUser: (user: IUser | null) => void;
   refreshUser: () => void;
   clearUser: () => void;
+  updateUnreadMessageCount: (count: number) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -80,4 +81,15 @@ export const useUserStore = create<UserStore>((set, get) => ({
   },
   setUser: (user) => set({ user }),
   clearUser: () => set({ user: null, error: null }),
+  updateUnreadMessageCount: (count: number) => {
+    const state = get();
+    if (state.user) {
+      set({
+        user: {
+          ...state.user,
+          unread_message: count,
+        },
+      });
+    }
+  },
 }));

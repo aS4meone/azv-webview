@@ -21,6 +21,7 @@ import { GuarantorPage } from "@/_pages/guarantor";
 import { UserRole } from "@/shared/models/types/user";
 import { LanguageSelector } from "@/shared/ui/language-selector";
 import { Badge } from "@/shared/ui/badge";
+import { NotificationDot } from "@/shared/ui/notification-dot";
 
 type ComponentKeys =
   | "trips"
@@ -110,7 +111,7 @@ const Drawer = () => {
             key: "terms" as ComponentKeys,
           },
         ]
-      : user?.role === UserRole.FIRST
+      : user?.role === UserRole.CLIENT
       ? [
           {
             translationKey: "main.drawer.menu.tripsAndPayments",
@@ -176,14 +177,21 @@ const Drawer = () => {
 
   return (
     <>
-      <Button
-        variant="icon"
-        className="fixed top-10 left-4 z-20 h-14 w-14 rounded-full bg-white shadow-lg ring-1 ring-black/5 hover:bg-gray-50
-                   pointer-events-auto touch-manipulation"
-        onClick={() => setIsDrawerOpen(true)}
-      >
-        <MenuIcon />
-      </Button>
+      <div className="fixed top-10 left-4 z-20">
+        <Button
+          variant="icon"
+          className="h-14 w-14 rounded-full bg-white shadow-lg ring-1 ring-black/5 hover:bg-gray-50
+                     pointer-events-auto touch-manipulation relative"
+          onClick={() => setIsDrawerOpen(true)}
+        >
+          <MenuIcon />
+          <NotificationDot 
+            show={!!(user?.unread_message && user.unread_message > 0)} 
+            className="top-2 right-2"
+            size="md"
+          />
+        </Button>
+      </div>
 
       {isDrawerOpen && (
         <div

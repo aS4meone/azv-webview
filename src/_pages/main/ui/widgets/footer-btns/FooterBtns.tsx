@@ -234,7 +234,7 @@ const FooterBtns = () => {
     if (
       user.role === UserRole.USER ||
       user.role === UserRole.PENDING ||
-      user.role === UserRole.FIRST
+      user.role === UserRole.CLIENT
     ) {
       return (
         <div className="flex flex-col gap-2">

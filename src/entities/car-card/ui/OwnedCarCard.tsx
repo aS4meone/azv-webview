@@ -76,29 +76,27 @@ const OwnedCarCard = ({ car, onCarClick, index = 0, isTooltipOpen = false, onToo
 
   return (
     <div
-      className="bg-[#F7F7F7] border-[#E8E8E8] rounded-[10px] p-4 cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+      className="bg-[#F7F7F7] border-[#E8E8E8] rounded-[10px] overflow-hidden cursor-pointer hover:bg-[#F0F0F0] transition-colors"
       onClick={handleClick}
     >
-      <div className="flex items-center gap-3">
-        {/* Car Photo */}
-        {firstPhoto && (
-          <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 image-container">
-            <img
-              src={`https://api.azvmotors.kz${firstPhoto}`}
-              alt={car.name}
-              className="car-image"
-            />
-          </div>
-        )}
-        
-        {/* Car Info */}
+      {/* Car Photo - Full Width */}
+      {firstPhoto && (
+        <div className="w-full h-48 image-container">
+          <img
+            src={`https://api.azvmotors.kz${firstPhoto}`}
+            alt={car.name}
+            className="car-card-full-width"
+          />
+        </div>
+      )}
+      
+      {/* Car Info */}
+      <div className="p-4 flex items-center justify-between">
         <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-center mb-1">
-            <p className="text-[#191919] text-[16px] font-medium truncate">
-              {car.name}
-            </p>
-          </div>
-          <p className="text-[#191919] text-[12px] text-gray-600 mb-2">
+          <p className="text-[#191919] text-[16px] font-medium truncate mb-1">
+            {car.name}
+          </p>
+          <p className="text-[#191919] text-[12px] text-gray-600">
             {car.plate_number}
           </p>
         </div>

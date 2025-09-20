@@ -7,10 +7,12 @@ import {
   notificationApi,
   INotification,
 } from "@/shared/api/routes/notifications";
+import { useUserStore } from "@/shared/stores/userStore";
 import MessageCard from "./components/MessageCard";
 
 const MessagesPage = () => {
   const t = useTranslations("messages");
+  const { updateUnreadMessageCount } = useUserStore();
 
   // Состояние для сообщений
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -49,6 +51,8 @@ const MessagesPage = () => {
           );
           setMessages(mappedMessages);
           setUnreadCount(result.data.unread_count);
+          // Обновляем глобальное состояние пользователя
+          updateUnreadMessageCount(result.data.unread_count);
         }
       } finally {
         setLoading(false);
@@ -76,7 +80,10 @@ const MessagesPage = () => {
       );
 
       // Обновляем счетчик непрочитанных
-      setUnreadCount((prev) => Math.max(0, prev - 1));
+      const newUnreadCount = Math.max(0, unreadCount - 1);
+      setUnreadCount(newUnreadCount);
+      // Обновляем глобальное состояние пользователя
+      updateUnreadMessageCount(newUnreadCount);
     } catch (err) {
       console.error("Error marking message as read:", err);
     }

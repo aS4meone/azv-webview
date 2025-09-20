@@ -5,7 +5,7 @@ export enum UserRole {
   ADMIN = "admin",
   USER = "user",
   REJECTED = "rejected",
-  FIRST = "first",
+  CLIENT = "client",
   PENDING = "pending",
   MECHANIC = "mechanic",
 }
