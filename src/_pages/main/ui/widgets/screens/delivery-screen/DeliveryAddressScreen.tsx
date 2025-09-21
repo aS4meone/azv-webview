@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { Button } from "@/shared/ui";
+import { Button, AddressInput } from "@/shared/ui";
 import { BaseMap, CenterMarker, ZOOM_CONSTRAINTS } from "@/shared/ui/map";
 import { useMap } from "@vis.gl/react-google-maps";
 import { getAddressFromCoordinates } from "@/shared/utils/googleMaps";
@@ -173,6 +173,23 @@ export const DeliveryAddressScreen = ({
     [debouncedUpdateAddress]
   );
 
+  const handleAddressSelect = useCallback(
+    (selectedAddress: string, lat: number, lng: number) => {
+      console.log("Address selected:", { selectedAddress, lat, lng });
+      setAddress(selectedAddress);
+      setCameraProps((prev) => ({
+        ...prev,
+        center: { lat, lng },
+      }));
+      
+      // Проверяем доступность доставки для выбранного адреса
+      const deliveryCheck = checkDeliveryAvailability(lat, lng);
+      setDeliveryStatus(deliveryCheck);
+      
+    },
+    []
+  );
+
   const goToMyLocation = useCallback(() => {
     setIsGettingLocation(true);
 
@@ -249,6 +266,27 @@ export const DeliveryAddressScreen = ({
 
   return (
     <div className="bg-white h-full flex flex-col relative">
+      {/* Header with address input */}
+      <div className="p-4 mt-10 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {t("widgets.screens.delivery.selectDeliveryAddress")}
+          </h2>
+        </div>
+        
+        {/* Address input - always visible */}
+        <div>
+          <AddressInput
+            onAddressSelect={handleAddressSelect}
+            placeholder={t("widgets.screens.delivery.enterAddressPlaceholder")}
+            disabled={isLoading}
+          />
+          <p className="text-xs text-gray-500 mt-2 text-center">
+            {t("widgets.screens.delivery.orSelectOnMapHint")}
+          </p>
+        </div>
+      </div>
+
       <div className="flex-1 relative">
         <BaseMap
           cameraProps={cameraProps}

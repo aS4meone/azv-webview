@@ -1166,7 +1166,10 @@
         "confirmAddress": "Confirm address",
         "deliveryNotAvailable": "Delivery not available",
         "locationError": "Could not get your location. Check permissions for geolocation access.",
-        "geolocationNotSupported": "Geolocation is not supported by your browser"
+        "geolocationNotSupported": "Geolocation is not supported by your browser",
+        "selectDeliveryAddress": "Select delivery address",
+        "enterAddressPlaceholder": "Enter address in Almaty",
+        "orSelectOnMapHint": "Or select a point on the map below"
       },
       "description": {
         "carDescription": "Car description",

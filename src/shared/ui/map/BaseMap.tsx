@@ -264,7 +264,7 @@ export const BaseMap = ({
     >
       <APIProvider
         apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-        libraries={['marker']}
+        libraries={['marker', 'places']}
         onLoad={() => console.log("Google Maps API loaded")}
         onError={(error) => console.error("Google Maps API error:", error)}
       >

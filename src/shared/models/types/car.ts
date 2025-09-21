@@ -24,6 +24,13 @@ export enum CarBodyType {
   ELECTRIC = "ELECTRIC", // Для электромобилей
 }
 
+export enum TransmissionType {
+  MANUAL = "manual",
+  AUTOMATIC = "automatic",
+  CVT = "cvt",
+  SEMI_AUTOMATIC = "semi_automatic",
+}
+
 import { UniqueIdentifier } from "./unique-identifier";
 
 export interface IDeliveryCoordinates {
@@ -45,6 +52,7 @@ export interface ICar extends UniqueIdentifier {
   engine_volume: number;
   year: number;
   drive_type: number;
+  transmission_type: string | null;
   body_type: string;
   photos: string[];
   owner_id: number;

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ContractType } from "@/shared/models/types/guarantor-page";
 import { HiXMark, HiDocumentText, HiExclamationTriangle } from "react-icons/hi2";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
-import { Button } from "@/shared/ui";
+import { Button, FastScrollbar } from "@/shared/ui";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useTranslations } from "next-intl";
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -115,10 +115,11 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         </div>
 
         {/* Content */}
-        <div
-          ref={scrollRef}
+        <FastScrollbar
+          scrollContainerRef={scrollRef}
           onScroll={handleScroll}
-          className="w-full overflow-auto px-4 flex-1"
+          className="w-full flex-1"
+          scrollContainerClassName="h-full px-4"
         >
           <div className="max-w-4xl mx-auto py-6 pb-0">
             {pdfError ? (
@@ -235,7 +236,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
               </div>
             )}
           </div>
-        </div>
+        </FastScrollbar>
 
         {/* Footer */}
         <div className="p-4 bg-white border-t border-gray-200">

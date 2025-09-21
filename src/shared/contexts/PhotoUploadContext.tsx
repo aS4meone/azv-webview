@@ -27,6 +27,11 @@ interface PhotoUploadContextType {
   isDeliveryUploadRequired: boolean;
   setUploadCompleted: (uploadType: string) => void;
   setUploadRequired: (uploadType: string, required: boolean) => void;
+  showUserUploadModal: () => void;
+  showOwnerUploadModal: () => void;
+  showServiceUploadModal: () => void;
+  showDeliveryUploadModal: () => void;
+  isInitialized: boolean;
 }
 
 const PhotoUploadMgrContext = createContext<PhotoUploadContextType | undefined>(
@@ -37,15 +42,16 @@ interface PhotoUploadProviderProps {
   children: ReactNode;
 }
 
-export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
+export const PhotoUploadProvider = ({
   children,
-}) => {
+}: PhotoUploadProviderProps) => {
   const [isUserUploadRequired, setIsUserUploadRequired] = useState(false);
   const [isOwnerUploadRequired, setIsOwnerUploadRequired] = useState(false);
   const [isServiceUploadRequired, setIsServiceUploadRequired] = useState(false);
   const [isDeliveryUploadRequired, setIsDeliveryUploadRequired] =
     useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { hideModal } = useModal();
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
@@ -60,10 +66,13 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
 
       // Если значение "true" - загрузка завершена (не требуется)
       // Если значение "false" или null - загрузка требуется
-      setIsUserUploadRequired(userUpload !== "true");
-      setIsOwnerUploadRequired(ownerUpload !== "true");
-      setIsServiceUploadRequired(serviceUpload !== "true");
-      setIsDeliveryUploadRequired(deliveryUpload !== "true");
+      // НО НЕ ПОКАЗЫВАЕМ модалки автоматически при первом запуске
+      setIsUserUploadRequired(false); // Не показываем автоматически
+      setIsOwnerUploadRequired(false); // Не показываем автоматически
+      setIsServiceUploadRequired(false); // Не показываем автоматически
+      setIsDeliveryUploadRequired(false); // Не показываем автоматически
+      
+      setIsInitialized(true);
     };
 
     checkUploadRequirements();
@@ -108,6 +117,35 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
         break;
       default:
         console.warn(`Unknown upload type: ${uploadType}`);
+    }
+  };
+
+  // Методы для программного показа модалок
+  const showUserUploadModal = () => {
+    const userUpload = localStorage.getItem(USER_UPLOAD);
+    if (userUpload !== "true") {
+      setIsUserUploadRequired(true);
+    }
+  };
+
+  const showOwnerUploadModal = () => {
+    const ownerUpload = localStorage.getItem(OWNER_UPLOAD);
+    if (ownerUpload !== "true") {
+      setIsOwnerUploadRequired(true);
+    }
+  };
+
+  const showServiceUploadModal = () => {
+    const serviceUpload = localStorage.getItem(SERVICE_UPLOAD);
+    if (serviceUpload !== "true") {
+      setIsServiceUploadRequired(true);
+    }
+  };
+
+  const showDeliveryUploadModal = () => {
+    const deliveryUpload = localStorage.getItem(DELIVERY_UPLOAD);
+    if (deliveryUpload !== "true") {
+      setIsDeliveryUploadRequired(true);
     }
   };
 
@@ -260,6 +298,11 @@ export const PhotoUploadProvider: React.FC<PhotoUploadProviderProps> = ({
     isDeliveryUploadRequired,
     setUploadCompleted,
     setUploadRequired,
+    showUserUploadModal,
+    showOwnerUploadModal,
+    showServiceUploadModal,
+    showDeliveryUploadModal,
+    isInitialized,
   };
 
   return (

@@ -1170,7 +1170,10 @@
         "confirmAddress": "Мекенжайды растау",
         "deliveryNotAvailable": "Жеткізу қол жетімді емес",
         "locationError": "Сіздің орныңызды алу мүмкін болмады. Геолокацияға қол жеткізу рұқсаттарын тексеріңіз.",
-        "geolocationNotSupported": "Геолокация сіздің браузеріңізде қолдау көрсетілмейді"
+        "geolocationNotSupported": "Геолокация сіздің браузеріңізде қолдау көрсетілмейді",
+        "selectDeliveryAddress": "Жеткізу мекенжайын таңдаңыз",
+        "enterAddressPlaceholder": "Алматыдағы мекенжайды енгізіңіз",
+        "orSelectOnMapHint": "Немесе төмендегі картадан нүкте таңдаңыз"
       },
       "description": {
         "carDescription": "Көлік сипаттамасы",

@@ -186,7 +186,7 @@ const Drawer = () => {
         >
           <MenuIcon />
           <NotificationDot 
-            show={!!(user?.unread_message && user.unread_message > 0)} 
+            show={!!(user?.unread_message > 0)} 
             className="top-2 right-2"
             size="md"
           />
@@ -249,7 +249,7 @@ const Drawer = () => {
                   onClick={() => handleItemClick(item.key)}
                 >
                   <span>{t(item.translationKey)}</span>
-                  {item.key === "messages" && user?.unread_message && user.unread_message > 0 && (
+                  {item.key === "messages" && user?.unread_message > 0 && (
                     <Badge count={user.unread_message} />
                   )}
                 </button>

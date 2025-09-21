@@ -1168,7 +1168,10 @@
         "confirmAddress": "Подтвердить адрес",
         "deliveryNotAvailable": "Доставка недоступна",
         "locationError": "Не удалось получить вашу локацию. Проверьте разрешения для доступа к геолокации.",
-        "geolocationNotSupported": "Геолокация не поддерживается вашим браузером"
+        "geolocationNotSupported": "Геолокация не поддерживается вашим браузером",
+        "selectDeliveryAddress": "Выберите адрес доставки",
+        "enterAddressPlaceholder": "Введите адрес в Алматы",
+        "orSelectOnMapHint": "Или выберите точку на карте ниже"
       },
       "description": {
         "carDescription": "Описание автомобиля",

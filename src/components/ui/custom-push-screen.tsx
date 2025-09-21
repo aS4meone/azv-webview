@@ -116,7 +116,7 @@ export function CustomPushScreen({
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
             {withCloseButton && (
-              <div className="absolute right-4 top-10 z-10 pt-6">
+              <div className="absolute right-4 top-10 z-10 pt-2">
                 <Button onClick={onClose} variant="icon" className="shadow-sm">
                   <svg
                     width="24"

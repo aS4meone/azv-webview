@@ -1,5 +1,5 @@
-import { ICar } from "@/shared/models/types/car";
-import { DriveTypeIcon, EngineVolumeIcon, FuelIcon, LightningIcon, BatteryIcon } from "@/shared/icons";
+import { ICar, TransmissionType } from "@/shared/models/types/car";
+import { DriveTypeIcon, EngineVolumeIcon, FuelIcon, LightningIcon, BatteryIcon, TransmissionIconPNG } from "@/shared/icons";
 import React from "react";
 
 interface CarSpecsProps {
@@ -21,6 +21,21 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
     }
   };
 
+  const returnTransmissionType = () => {
+    switch (car.transmission_type) {
+      case "manual":
+        return "МКПП";
+      case "automatic":
+        return "АКПП";
+      case "cvt":
+        return "CVT";
+      case "semi_automatic":
+        return "РКПП";
+      default:
+        return "АКПП"; // По умолчанию АКПП
+    }
+  };
+
   const isElectric = car.body_type === "ELECTRIC";
 
   const specs = [
@@ -36,11 +51,16 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
       icon: <DriveTypeIcon type={car.drive_type || 0} />,
       value: returnDriveType(),
     },
+    {
+      icon: <TransmissionIconPNG type={car.transmission_type} />,
+      value: returnTransmissionType(),
+    },
+    { value: `КЛАСС: ${car.auto_class || "A"}` }, // Класс авто
     { value: car.year ? car.year.toString() : "0" },
   ];
 
   return (
-    <div className={`flex items-center gap-4 overflow-x-auto ${className}`}>
+    <div className={`flex items-center gap-4 overflow-x-auto flex-wrap ${className}`}>
       {specs.map((spec, index) => (
         <div
           key={index}

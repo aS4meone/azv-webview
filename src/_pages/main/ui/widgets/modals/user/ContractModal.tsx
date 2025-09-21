@@ -5,7 +5,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Page, pdfjs, Document } from "react-pdf";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
-import { Button } from "@/shared/ui";
+import { Button, FastScrollbar } from "@/shared/ui";
 import { cn } from "@/shared/utils/cn";
 import { useTranslations } from "next-intl";
 
@@ -235,10 +235,11 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         </div>
 
         {/* PDF Content */}
-        <div
-          ref={scrollContainerRef}
+        <FastScrollbar
+          scrollContainerRef={scrollContainerRef}
           onScroll={handleScroll}
-          className="w-full overflow-auto px-4"
+          className="w-full"
+          scrollContainerClassName="h-full px-4"
         >
           <div
             style={{ maxHeight: 550 }}
@@ -310,7 +311,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
               ))}
             </Document>
           </div>
-        </div>
+        </FastScrollbar>
 
         <div className="p-4 bg-white border-t border-gray-200">
           {!hasScrolledToEnd && (

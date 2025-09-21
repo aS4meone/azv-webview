@@ -19,10 +19,8 @@ const ResponseModalContext = createContext<
   ResponseModalContextType | undefined
 >(undefined);
 
-export const ResponseModalProvider = ({
+export const ResponseModalProvider: React.FC<{ children: ReactNode }> = ({
   children,
-}: {
-  children: ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalConfig, setModalConfig] = useState<{
