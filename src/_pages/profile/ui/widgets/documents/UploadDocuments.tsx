@@ -39,9 +39,14 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
       | "drivers_license"
       | "selfie"
       | "selfie_with_license"
-    >
+    > & {
+      first_name?: string;
+      last_name?: string;
+    }
   >({
     full_name: "",
+    first_name: "",
+    last_name: "",
     birth_date: "",
     iin: "",
     id_card_expiry: "",
@@ -150,6 +155,8 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
     setFiles({});
     setData({
       full_name: "",
+      first_name: "",
+      last_name: "",
       birth_date: "",
       iin: "",
       id_card_expiry: "",

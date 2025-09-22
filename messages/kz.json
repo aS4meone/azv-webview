@@ -482,7 +482,11 @@
       "invalidIin": "Жарамсыз ЖСН",
       "invalidIinChecksum": "Жарамсыз ЖСН тексеру қосындысы",
       "ageRequirement": "Жас кемінде 18 жас болуы керек",
-      "futureDateRequired": "Күн болашақта болуы керек"
+      "futureDateRequired": "Күн болашақта болуы керек",
+      "firstNameMinLength": "Аты кемінде 2 таңбадан тұруы керек",
+      "firstNameMaxLength": "Аты 50 таңбадан аспауы керек",
+      "lastNameMinLength": "Тегі кемінде 2 таңбадан тұруы керек",
+      "lastNameMaxLength": "Тегі 50 таңбадан аспауы керек"
     },
     "photoInstructions": {
       "idFront": "Жеке басын куәландыратын құжаттың алдыңғы жағын суретке түсіріңіз",
@@ -490,7 +494,12 @@
       "selfieWithLicense": "Жүргізуші куәлігіңізді бетіңіздің жанында ұстап селфи жасаңыз",
       "driversLicense": "Жүргізуші куәлігіңіздің алдыңғы жағын суретке түсіріңіз",
       "selfie": "Селфи жасаңыз"
-    }
+    },
+    "loadingUserData": "Пайдаланушы деректерін жүктеу...",
+    "personalDataSection": "Жеке деректер",
+    "personalDataDescription": "Пайдаланушы туралы негізгі ақпарат",
+    "documentExpirySection": "Құжаттардың жарамдылық мерзімдері",
+    "documentExpiryDescription": "Құжаттардың мерзімі аяқталу күндері"
   },
   "uploadPhoto": {
     "error": "Қате",
@@ -507,7 +516,12 @@
     "takePhoto": "Суретке түсіру",
     "takeSelfie": "Селфи жасау",
     "submit": "Жіберу",
-    "stencilInstruction": "Құжатты/бетті рамка ішінде орналастырыңыз"
+    "stencilInstruction": "Құжатты/бетті рамка ішінде орналастырыңыз",
+    "processingPhoto": "Суретті өңдеу",
+    "completing": "Аяқталуда...",
+    "pleaseWait": "Күтіңіз",
+    "uploadDocuments": "Құжаттарды жүктеу",
+    "takeRequiredDocuments": "Қажетті құжаттарды суретке түсіріңіз"
   },
   "onboarding": {
     "slides": [

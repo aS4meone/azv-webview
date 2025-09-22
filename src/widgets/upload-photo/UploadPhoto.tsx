@@ -32,7 +32,7 @@ interface UploadPhotoProps {
 }
 
 // Компонент индикатора прогресса
-const ProgressIndicator: React.FC<{ progress: number }> = ({ progress }) => {
+const ProgressIndicator: React.FC<{ progress: number; t: (key: string) => string }> = ({ progress, t }) => {
   return (
     <div className="flex items-center gap-3 min-w-[140px]">
       <div className="relative w-14 h-14 drop-shadow-lg">
@@ -78,10 +78,10 @@ const ProgressIndicator: React.FC<{ progress: number }> = ({ progress }) => {
       </div>
       <div className="flex flex-col">
         <span className="text-[16px] font-semibold text-[#059669]">
-          Обработка фото
+          {t("processingPhoto")}
         </span>
         <span className="text-[13px] text-[#6B7280]">
-          {progress === 100 ? "Завершение..." : "Пожалуйста, ждите"}
+          {progress === 100 ? t("completing") : t("pleaseWait")}
         </span>
       </div>
     </div>
@@ -263,87 +263,89 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   });
 
   const content = (
-    <div className="flex flex-col gap-10 pt-16 pb-24 min-h-screen">
-      <div className="absolute right-4 top-6 z-10">
-        <Button onClick={wrappedOnClose} variant="icon">
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M18 6L6 18"
-              stroke="black"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M6 6L18 18"
-              stroke="black"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Button>
+    <div className="bg-white min-h-full">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-6 py-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            
+            <div>
+              <h2 className="text-xl font-bold text-[#191919]">{t("uploadDocuments")}</h2>
+              <p className="text-sm text-[#666666] mt-1">{t("takeRequiredDocuments")}</p>
+            </div>
+          </div>
+          <Button onClick={wrappedOnClose} variant="icon" className="shadow-sm">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18 6L6 18"
+                stroke="black"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M6 6L18 18"
+                stroke="black"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-col gap-8 ">
-        {config.map((photo) => (
-          <div key={photo.id} className="flex flex-col gap-2">
-            <div className="flex items-start gap-2">
+
+      {/* Photo upload sections */}
+      <div className="py-6 space-y-4">
+        {config.map((photo, index) => (
+          <div key={photo.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+            <div className="space-y-4">
+              {/* Title */}
               <div>
-                {selectedFiles[photo.id]?.length > 0 ? (
-                  <GoodIcon className="w-6 h-6" width={32} height={32} />
-                ) : (
-                  <BadIcon className="w-6 h-6" width={32} height={32} />
-                )}
-              </div>
-              <div className="flex flex-col gap-1">
-                <h3 className="text-[17px] leading-[22px] font-normal text-[#000000]">
+                <h3 className="text-base font-semibold text-[#191919] mb-1">
                   {photo.title}
                 </h3>
                 {photo.multiple && (
-                  <p className="text-[17px] leading-[22px] font-normal text-[#000000]">
+                  <p className="text-sm text-[#666666]">
                     {t("minMaxPhotos", { min: photo.multiple.min, max: photo.multiple.max })}
                   </p>
                 )}
               </div>
-            </div>
 
-            {isFlutterAvailable ? (
-              // React Native камера доступна - используем везде
-              <button
-                onClick={() => handleFlutterPhotoSelect(photo.id, photo)}
-                disabled={loadingStates[photo.id] || isLoading}
-                className="block w-full"
-              >
-                <div
-                  className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${loadingStates[photo.id] && progressStates[photo.id] > 0
-                      ? "bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200"
-                      : "bg-[#F5F5F5]"
-                    }`}
+              {/* Upload button */}
+              {isFlutterAvailable ? (
+                <button
+                  onClick={() => handleFlutterPhotoSelect(photo.id, photo)}
+                  disabled={loadingStates[photo.id] || isLoading}
+                  className="block w-full group"
                 >
-                  <div className="flex items-center gap-2">
-                    {loadingStates[photo.id] ? (
-                      progressStates[photo.id] > 0 ? (
-                        <ProgressIndicator
-                          progress={progressStates[photo.id]}
-                        />
+                  <div
+                    className={`w-full h-16 flex items-center justify-center rounded-xl border-2 transition-all duration-200 ${
+                      loadingStates[photo.id] && progressStates[photo.id] > 0
+                        ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+                        : selectedFiles[photo.id]?.length > 0
+                          ? "bg-green-50 border-green-200 group-hover:bg-green-100"
+                          : "bg-gray-50 border-gray-200 group-hover:bg-gray-100 group-hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {loadingStates[photo.id] ? (
+                        progressStates[photo.id] > 0 ? (
+                          <ProgressIndicator
+                            progress={progressStates[photo.id]}
+                            t={t}
+                          />
+                        ) : (
+                          <Loader color="#191919" />
+                        )
                       ) : (
-                        <Loader color="#191919" />
-                      )
-                    ) : (
-                      <>
-                        <CameraIcon
-                          className="w-5 h-5"
-                          width={24}
-                          height={24}
-                          color="#191919"
-                        />
-                        <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
+                        <span className="text-sm font-medium text-[#191919]">
                           {selectedFiles[photo.id]?.length > 0
                             ? t("photosReady", { count: selectedFiles[photo.id].length })
                             : photo.multiple
@@ -352,38 +354,33 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                                 ? t("takeSelfie")
                                 : t("takePhoto")}
                         </span>
-                      </>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              </button>
-            ) : (
-              // Fallback на HTML input (только если React Native недоступен)
-              <label className="block w-full">
-                <div
-                  className={`w-full h-[56px] flex items-center justify-center rounded-[20px] ${loadingStates[photo.id] && progressStates[photo.id] > 0
-                      ? "bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200"
-                      : "bg-[#F5F5F5]"
+                </button>
+              ) : (
+                <label className="block w-full group">
+                  <div
+                    className={`w-full h-16 flex items-center justify-center rounded-xl border-2 transition-all duration-200 ${
+                      loadingStates[photo.id] && progressStates[photo.id] > 0
+                        ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-200"
+                        : selectedFiles[photo.id]?.length > 0
+                          ? "bg-green-50 border-green-200 group-hover:bg-green-100"
+                          : "bg-gray-50 border-gray-200 group-hover:bg-gray-100 group-hover:border-gray-300"
                     }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {loadingStates[photo.id] ? (
-                      progressStates[photo.id] > 0 ? (
-                        <ProgressIndicator
-                          progress={progressStates[photo.id]}
-                        />
+                  >
+                    <div className="flex items-center gap-3">
+                      {loadingStates[photo.id] ? (
+                        progressStates[photo.id] > 0 ? (
+                          <ProgressIndicator
+                            progress={progressStates[photo.id]}
+                            t={t}
+                          />
+                        ) : (
+                          <Loader color="#191919" />
+                        )
                       ) : (
-                        <Loader color="#191919" />
-                      )
-                    ) : (
-                      <>
-                        <CameraIcon
-                          className="w-5 h-5"
-                          width={24}
-                          height={24}
-                          color="#191919"
-                        />
-                        <span className="text-[17px] leading-[22px] font-normal text-[#191919]">
+                        <span className="text-sm font-medium text-[#191919]">
                           {selectedFiles[photo.id]
                             ? t("photosTaken", { count: selectedFiles[photo.id].length })
                             : photo.multiple
@@ -392,31 +389,45 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
                                 ? t("takeSelfie")
                                 : t("takePhoto")}
                         </span>
-                      </>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple={!!photo.multiple}
-                  className="hidden"
-                  onChange={(e) => handlePhotoSelect(photo.id, e)}
-                  capture={
-                    photo.cameraType === "front"
-                      ? "user"
-                      : photo.cameraType === "back"
-                        ? "environment"
-                        : photo.isSelfy
-                          ? "user"
-                          : undefined
-                  }
-                />
-              </label>
-            )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple={!!photo.multiple}
+                    className="hidden"
+                    onChange={(e) => handlePhotoSelect(photo.id, e)}
+                    capture={
+                      photo.cameraType === "front"
+                        ? "user"
+                        : photo.cameraType === "back"
+                          ? "environment"
+                          : photo.isSelfy
+                            ? "user"
+                            : undefined
+                    }
+                  />
+                </label>
+              )}
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Bottom submit button */}
+      {allPhotosUploaded && (
+        <div className="bg-white pt-4 pb-6 px-6 mb-10">
+          <Button
+            variant="secondary"
+            onClick={handleSubmit}
+            className="w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader color="#fff" /> : t("submit")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -435,18 +446,6 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     >
       <div className="flex flex-col bg-white h-full">
         {content}
-        {allPhotosUploaded && (
-          <div className="sticky bottom-0  pt-4 pb-8">
-            <Button
-              variant="secondary"
-              onClick={handleSubmit}
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? <Loader color="#fff" /> : t("submit")}
-            </Button>
-          </div>
-        )}
       </div>
       <StencilOverlay stencil={activeStencil} visible={!!activeStencil} />
     </CustomPushScreen>

@@ -480,7 +480,11 @@
       "invalidIin": "Invalid IIN",
       "invalidIinChecksum": "Invalid IIN checksum",
       "ageRequirement": "Age must be at least 18 years",
-      "futureDateRequired": "Date must be in the future"
+      "futureDateRequired": "Date must be in the future",
+      "firstNameMinLength": "First name must contain at least 2 characters",
+      "firstNameMaxLength": "First name must contain at most 50 characters",
+      "lastNameMinLength": "Last name must contain at least 2 characters",
+      "lastNameMaxLength": "Last name must contain at most 50 characters"
     },
     "photoInstructions": {
       "idFront": "Take a photo of the front side of your ID card",
@@ -488,7 +492,12 @@
       "selfieWithLicense": "Take a selfie holding your driver's license next to your face",
       "driversLicense": "Take a photo of the front side of your driver's license",
       "selfie": "Take a selfie"
-    }
+    },
+    "loadingUserData": "Loading user data...",
+    "personalDataSection": "Personal Data",
+    "personalDataDescription": "Basic user information",
+    "documentExpirySection": "Document Expiry Dates",
+    "documentExpiryDescription": "Document expiration dates"
   },
   "uploadPhoto": {
     "error": "Error",
@@ -505,7 +514,12 @@
     "takePhoto": "Take photo",
     "takeSelfie": "Take selfie",
     "submit": "Submit",
-    "stencilInstruction": "Position the document/face within the frame"
+    "stencilInstruction": "Position the document/face within the frame",
+    "processingPhoto": "Processing photo",
+    "completing": "Completing...",
+    "pleaseWait": "Please wait",
+    "uploadDocuments": "Upload Documents",
+    "takeRequiredDocuments": "Take photos of required documents"
   },
   "onboarding": {
     "slides": [
