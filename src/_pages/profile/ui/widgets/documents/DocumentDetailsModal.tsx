@@ -58,8 +58,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       ...prev,
       first_name: user.first_name || "",
       last_name: user.last_name || "",
-      birth_date: user.documents?.id_card?.expiry || prev.birth_date,
-      iin: prev.iin, // IIN might not be in user data
+      // birth_date и iin не загружаем из user, оставляем как есть
       id_card_expiry: user.documents?.id_card?.expiry || prev.id_card_expiry,
       drivers_license_expiry: user.documents?.drivers_license?.expiry || prev.drivers_license_expiry,
     }));
@@ -129,8 +128,13 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.target.focus({ preventScroll: false });
+    // Проверяем, что target имеет метод focus (настоящий DOM элемент)
+    if (e.target && typeof e.target.focus === 'function') {
+      e.target.focus({ preventScroll: false });
+    }
     const { name, value } = e.target;
+    
+    console.log("DocumentDetailsModal handleChange:", { name, value, type: e.target.type });
 
     const newErrors = { ...errors };
     delete newErrors[name];
@@ -161,35 +165,37 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       }
     }
 
-    // Validate birth date
+    // Validate birth date (only basic validation)
     if (name === "birth_date" && value) {
-      if (!validateAge(value)) {
-        newErrors.birth_date = t("validation.ageRequirement");
-      }
-      // Revalidate IIN when birth date changes
-      if (formData.iin.length === 12) {
-        const iinError = validateIIN(formData.iin);
-        if (iinError) {
-          newErrors.iin = iinError;
-        }
+      const birthDate = new Date(value);
+      const today = new Date();
+      if (birthDate > today) {
+        newErrors.birth_date = t("validation.birthDateFuture");
       }
     }
 
-    // Validate document expiry dates
+    // Validate document expiry dates (only basic validation)
     if (
       (name === "id_card_expiry" || name === "drivers_license_expiry") &&
       value
     ) {
-      if (!validateFutureDate(value)) {
-        newErrors[name] = t("validation.futureDateRequired");
+      const expiryDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (expiryDate < today) {
+        newErrors[name] = t("validation.expiryDatePast");
       }
     }
 
     setErrors(newErrors);
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: value,
+      };
+      console.log("DocumentDetailsModal setFormData:", { name, value, newData });
+      return newData;
+    });
   };
 
   const handleClearField = (fieldName: keyof DocumentDetailsData) => {
@@ -205,7 +211,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   };
 
   const isFormValid = React.useMemo(() => {
-    // Check if all required fields are filled
+    // Check if all required fields are filled (basic validation only)
     const hasFirstName = (formData.first_name || "").trim().length >= 2;
     const hasLastName = (formData.last_name || "").trim().length >= 2;
     const hasBirthDate = !!formData.birth_date;
@@ -231,11 +237,12 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       hasIdExpiry,
       hasLicenseExpiry,
       isValid,
-      formData
+      formData,
+      errors
     });
 
     return isValid;
-  }, [formData]);
+  }, [formData, errors]);
 
   const getMaxDate = (years: number) => {
     const date = new Date();
@@ -313,17 +320,23 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <DatePicker
-                      label={t("birthDate")}
-                      name="birth_date"
-                      value={formData.birth_date || ""}
-                      onChange={handleChange}
-                      error={errors.birth_date}
-                      placeholder="Выберите дату рождения"
-                      required
-                      max={getMaxBirthDate()}
-                      min={getMinBirthDate()}
-                    />
+                    <div>
+                      <DatePicker
+                        label={t("birthDate")}
+                        name="birth_date"
+                        value={formData.birth_date || ""}
+                        onChange={handleChange}
+                        error={errors.birth_date}
+                        placeholder="Выберите дату рождения"
+                        required
+                        max={getMaxBirthDate()}
+                        min={getMinBirthDate()}
+                      />
+                      {/* Debug info for DatePicker */}
+                      <div className="text-xs text-gray-500 mt-1">
+                        DatePicker value: "{formData.birth_date}" | Error: "{errors.birth_date}"
+                      </div>
+                    </div>
                     <Input
                       label={t("iin")}
                       name="iin"
@@ -355,38 +368,90 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                   </div>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <DatePicker
-                    label={t("idCardExpiry")}
-                    name="id_card_expiry"
-                    value={formData.id_card_expiry || ""}
-                    onChange={handleChange}
-                    error={errors.id_card_expiry}
-                    placeholder="Выберите дату истечения"
-                    required
-                    min={new Date().toISOString().split("T")[0]}
-                    max={getMaxDate(10)}
-                  />
-                  <DatePicker
-                    label={t("driversLicenseExpiry")}
-                    name="drivers_license_expiry"
-                    value={formData.drivers_license_expiry || ""}
-                    onChange={handleChange}
-                    error={errors.drivers_license_expiry}
-                    placeholder="Выберите дату истечения"
-                    required
-                    min={new Date().toISOString().split("T")[0]}
-                    max={getMaxDate(10)}
-                  />
+                  <div>
+                    <DatePicker
+                      label={t("idCardExpiry")}
+                      name="id_card_expiry"
+                      value={formData.id_card_expiry || ""}
+                      onChange={handleChange}
+                      error={errors.id_card_expiry}
+                      placeholder="Выберите дату истечения"
+                      required
+                      min={new Date().toISOString().split("T")[0]}
+                      max={getMaxDate(10)}
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      ID Card DatePicker: "{formData.id_card_expiry}"
+                    </div>
+                  </div>
+                  <div>
+                    <DatePicker
+                      label={t("driversLicenseExpiry")}
+                      name="drivers_license_expiry"
+                      value={formData.drivers_license_expiry || ""}
+                      onChange={handleChange}
+                      error={errors.drivers_license_expiry}
+                      placeholder="Выберите дату истечения"
+                      required
+                      min={new Date().toISOString().split("T")[0]}
+                      max={getMaxDate(10)}
+                    />
+                    <div className="text-xs text-gray-500 mt-1">
+                      License DatePicker: "{formData.drivers_license_expiry}"
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* Debug information */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
+                <h4 className="text-sm font-semibold text-gray-800 mb-2">Отладочная информация:</h4>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <div>Имя: "{formData.first_name}" (длина: {formData.first_name?.length || 0})</div>
+                  <div>Фамилия: "{formData.last_name}" (длина: {formData.last_name?.length || 0})</div>
+                  <div>Дата рождения: "{formData.birth_date}"</div>
+                  <div>ИИН: "{formData.iin}" (длина: {formData.iin?.length || 0})</div>
+                  <div>Срок удостоверения: "{formData.id_card_expiry}"</div>
+                  <div>Срок водительского: "{formData.drivers_license_expiry}"</div>
+                  <div className="mt-2 font-semibold">Валидация: {isFormValid ? "✅ Валидна" : "❌ Невалидна"}</div>
+                </div>
+              </div>
+
+              {!isFormValid && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                  <h4 className="text-sm font-semibold text-red-800 mb-2">Не заполнены обязательные поля:</h4>
+                  <ul className="text-sm text-red-700 space-y-1">
+                    {(!formData.first_name || formData.first_name.trim().length < 2) && (
+                      <li>• Имя (минимум 2 символа)</li>
+                    )}
+                    {(!formData.last_name || formData.last_name.trim().length < 2) && (
+                      <li>• Фамилия (минимум 2 символа)</li>
+                    )}
+                    {!formData.birth_date && (
+                      <li>• Дата рождения</li>
+                    )}
+                    {(!formData.iin || formData.iin.length !== 12) && (
+                      <li>• ИИН (12 цифр)</li>
+                    )}
+                    {!formData.id_card_expiry && (
+                      <li>• Срок действия удостоверения личности</li>
+                    )}
+                    {!formData.drivers_license_expiry && (
+                      <li>• Срок действия водительского удостоверения</li>
+                    )}
+                  </ul>
+                </div>
+              )}
 
               {/* Bottom submit button */}
               <div className="bg-white pt-4 pb-6">
                 <Button
                   variant="secondary"
                   onClick={handleSubmit}
-                  className="w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 opacity-50 cursor-not-allowed"
-                  disabled={true}
+                  className={`w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 ${
+                    !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={!isFormValid || isLoading}
                 >
                   {isLoading ? <Loader color="#fff" /> : t("submit")}
                 </Button>

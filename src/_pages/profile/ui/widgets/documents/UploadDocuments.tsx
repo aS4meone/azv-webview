@@ -14,6 +14,7 @@ import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { DocumentDetailsModal } from "./DocumentDetailsModal";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { useTranslations } from "next-intl";
+import { useErrorTranslator } from "@/shared/utils/errorTranslator";
 
 interface DocumentFiles {
   id_front?: File;
@@ -25,6 +26,7 @@ interface DocumentFiles {
 
 export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
   const t = useTranslations("profile");
+  const errorTranslator = useErrorTranslator();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [files, setFiles] = useState<DocumentFiles>({});
@@ -136,10 +138,11 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
         });
       }
     } catch (error) {
+      const errorMessage = errorTranslator.translateApiError(error?.response?.data || error);
       setResponseModal({
         type: "error",
         title: t("error"),
-        description: error.response.data.detail,
+        description: errorMessage,
         buttonText: t("understood"),
         onButtonClick: () => {
           handleCloseResponseModal();

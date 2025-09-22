@@ -486,6 +486,79 @@
       "lastNameMinLength": "Last name must contain at least 2 characters",
       "lastNameMaxLength": "Last name must contain at most 50 characters"
     },
+    "apiErrors": {
+      "validation": {
+        "iinDigitsOnly": "IIN must contain only digits. Example: 900515123456",
+        "dateFormat": "Date must be in YYYY-MM-DD format. Example: 1990-05-15",
+        "birthDateFuture": "Birth date cannot be in the future. Use YYYY-MM-DD format",
+        "birthDateTooOld": "Invalid birth date. Year must be greater than 1900",
+        "ageRequirement": "Age must be at least 18 years",
+        "expiryDatePast": "Document expiry date must be in the future. Example: 2030-12-31",
+        "expiryDateFormat": "Date must be in YYYY-MM-DD format. Example: 2030-12-31",
+        "firstNameLength": "first_name must be 1..50 chars",
+        "lastNameLength": "last_name must be 1..50 chars",
+        "phoneDigitsOnly": "Phone number must contain only digits.",
+        "smsCodeInvalid": "Invalid SMS code or code expired",
+        "userNotFound": "User not found or inactive",
+        "credentialsInvalid": "Could not validate credentials",
+        "nothingToUpdate": "Nothing to update",
+        "profileUpdateFailed": "Failed to update profile",
+        "unsupportedLocale": "Unsupported locale"
+      },
+      "fileUpload": {
+        "invalidFileType": "File {filename} is not an image. Only JPEG and PNG are allowed.",
+        "photoCountInvalid": "You must provide between {min} and {max} files for '{field_name}'",
+        "photoTypeInvalid": "File {filename} in '{field_name}' is not JPEG or PNG",
+        "uploadError": "An error occurred while uploading documents and data"
+      },
+      "rental": {
+        "rentalNotFound": "Rental history not found",
+        "carNotFound": "Car not found or not available",
+        "carNotAvailable": "Car not found or not available",
+        "durationRequiredHours": "Duration is required for hourly rental.",
+        "durationRequiredDays": "Duration is required for daily rental.",
+        "noActiveRental": "No active rental to cancel",
+        "noActiveDelivery": "No active delivery order to cancel",
+        "carNotFoundDelivery": "Car not found",
+        "rentalNotReserved": "Rental is not in reserved status",
+        "notYourCar": "Not your car",
+        "vehicleStatusError": "Vehicle status error",
+        "bookingNotFound": "Booking not found or already cancelled",
+        "carNotFoundBooking": "Car not found",
+        "durationRequiredHoursBooking": "Duration is required for hourly rental",
+        "durationRequiredDaysBooking": "Duration is required for daily rental"
+      },
+      "mechanic": {
+        "carsDataError": "Error fetching cars data: {error}",
+        "searchError": "Car search error: {error}",
+        "carNotAvailable": "Car not found or not available for inspection",
+        "noActiveInspection": "No active inspection to start",
+        "carNotFound": "Car not found",
+        "noActiveBooking": "No active booking to cancel",
+        "cancelError": "Error cancelling inspection: {error}",
+        "noActiveInspectionInUse": "No active inspection (IN_USE)",
+        "photoUploadBeforeError": "Error uploading photos before inspection",
+        "photoUploadAfterError": "Error uploading photos after inspection",
+        "noActiveInspectionComplete": "No active inspection to complete",
+        "completeError": "Error completing inspection: {error}"
+      },
+      "owner": {
+        "invalidMonth": "Month must be between 1 and 12"
+      },
+      "gps": {
+        "vehiclesDataError": "Error fetching vehicles data: {error}",
+        "searchError": "Car search error: {error}",
+        "noRentals": "You haven't rented any cars yet",
+        "allCarsBusy": "All your frequently used cars are currently busy"
+      },
+      "guarantor": {
+        "userNotFound": "User not found"
+      },
+      "general": {
+        "internalServerError": "Internal Server Error",
+        "insufficientBalance": "Please top up your account: minimum {amount}₸ required for booking."
+      }
+    },
     "photoInstructions": {
       "idFront": "Take a photo of the front side of your ID card",
       "idBack": "Take a photo of the back side of your ID card",

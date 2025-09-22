@@ -484,7 +484,82 @@
       "firstNameMinLength": "Имя должно содержать минимум 2 символа",
       "firstNameMaxLength": "Имя должно содержать максимум 50 символов",
       "lastNameMinLength": "Фамилия должна содержать минимум 2 символа",
-      "lastNameMaxLength": "Фамилия должна содержать максимум 50 символов"
+      "lastNameMaxLength": "Фамилия должна содержать максимум 50 символов",
+      "birthDateFuture": "Дата рождения не может быть в будущем",
+      "expiryDatePast": "Дата истечения не может быть в прошлом"
+    },
+    "apiErrors": {
+      "validation": {
+        "iinDigitsOnly": "ИИН должен содержать только цифры. Пример: 900515123456",
+        "dateFormat": "Дата должна быть в формате YYYY-MM-DD. Пример: 1990-05-15",
+        "birthDateFuture": "Дата рождения не может быть в будущем. Используйте формат YYYY-MM-DD",
+        "birthDateTooOld": "Некорректная дата рождения. Год должен быть больше 1900",
+        "ageRequirement": "Возраст должен быть не менее 18 лет",
+        "expiryDatePast": "Дата окончания документа должна быть в будущем. Пример: 2030-12-31",
+        "expiryDateFormat": "Дата должна быть в формате YYYY-MM-DD. Пример: 2030-12-31",
+        "firstNameLength": "first_name must be 1..50 chars",
+        "lastNameLength": "last_name must be 1..50 chars",
+        "phoneDigitsOnly": "Phone number must contain only digits.",
+        "smsCodeInvalid": "Invalid SMS code or code expired",
+        "userNotFound": "User not found or inactive",
+        "credentialsInvalid": "Could not validate credentials",
+        "nothingToUpdate": "Nothing to update",
+        "profileUpdateFailed": "Failed to update profile",
+        "unsupportedLocale": "Unsupported locale"
+      },
+      "fileUpload": {
+        "invalidFileType": "File {filename} is not an image. Only JPEG and PNG are allowed.",
+        "photoCountInvalid": "You must provide between {min} and {max} files for '{field_name}'",
+        "photoTypeInvalid": "File {filename} in '{field_name}' is not JPEG or PNG",
+        "uploadError": "An error occurred while uploading documents and data"
+      },
+      "rental": {
+        "rentalNotFound": "Rental history not found",
+        "carNotFound": "Car not found or not available",
+        "carNotAvailable": "Машина не найдена или не доступна",
+        "durationRequiredHours": "Duration обязателен для аренды по часам.",
+        "durationRequiredDays": "Duration обязателен для посуточной аренды.",
+        "noActiveRental": "Нет активной брони для отмены",
+        "noActiveDelivery": "Нет активного заказа доставки для отмены",
+        "carNotFoundDelivery": "Автомобиль не найден",
+        "rentalNotReserved": "Rental is not in reserved status",
+        "notYourCar": "Not your car",
+        "vehicleStatusError": "Vehicle status error",
+        "bookingNotFound": "Бронирование не найдено или уже отменено",
+        "carNotFoundBooking": "Автомобиль не найден",
+        "durationRequiredHoursBooking": "Duration обязателен для аренды по часам",
+        "durationRequiredDaysBooking": "Duration обязателен для посуточной аренды"
+      },
+      "mechanic": {
+        "carsDataError": "Ошибка при получении данных об автомобилях: {error}",
+        "searchError": "Ошибка поиска авто: {error}",
+        "carNotAvailable": "Автомобиль не найден или недоступен для проверки",
+        "noActiveInspection": "Нет активной проверки для старта",
+        "carNotFound": "Автомобиль не найден",
+        "noActiveBooking": "Нет активной брони для отмены",
+        "cancelError": "Ошибка при отмене проверки: {error}",
+        "noActiveInspectionInUse": "Нет активной проверки (IN_USE)",
+        "photoUploadBeforeError": "Ошибка при загрузке фотографий до проверки",
+        "photoUploadAfterError": "Ошибка при загрузке фотографий после проверки",
+        "noActiveInspectionComplete": "Нет активной проверки для завершения",
+        "completeError": "Ошибка при завершении проверки: {error}"
+      },
+      "owner": {
+        "invalidMonth": "Месяц должен быть от 1 до 12"
+      },
+      "gps": {
+        "vehiclesDataError": "Error fetching vehicles data: {error}",
+        "searchError": "Ошибка поиска авто: {error}",
+        "noRentals": "Вы ещё не арендовали ни одной машины",
+        "allCarsBusy": "Все часто используемые вами машины сейчас заняты"
+      },
+      "guarantor": {
+        "userNotFound": "Пользователь не найден"
+      },
+      "general": {
+        "internalServerError": "Internal Server Error",
+        "insufficientBalance": "Пожалуйста, пополните счёт: для бронирования необходимо минимум {amount}₸."
+      }
     },
     "photoInstructions": {
       "idFront": "Сфотографируйте лицевую сторону удостоверения личности",

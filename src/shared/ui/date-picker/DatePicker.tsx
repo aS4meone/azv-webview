@@ -57,12 +57,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
   // Обновление selectedDate при изменении value
   useEffect(() => {
+    console.log("DatePicker useEffect value change:", { value, name });
     if (value) {
-      setSelectedDate(new Date(value));
+      const date = new Date(value);
+      console.log("DatePicker setting selectedDate:", date);
+      setSelectedDate(date);
     } else {
+      console.log("DatePicker clearing selectedDate");
       setSelectedDate(null);
     }
-  }, [value]);
+  }, [value, name]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("ru-RU", {
@@ -73,11 +77,20 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   const handleDateSelect = (date: Date) => {
+    console.log("DatePicker handleDateSelect:", { date, name, value: date.toISOString().split("T")[0] });
     setSelectedDate(date);
     const formattedDate = date.toISOString().split("T")[0];
     const syntheticEvent = {
-      target: { name, value: formattedDate }
+      target: { 
+        name, 
+        value: formattedDate,
+        type: 'text',
+        focus: () => {} // Добавляем пустую функцию focus
+      },
+      preventDefault: () => {},
+      stopPropagation: () => {}
     } as React.ChangeEvent<HTMLInputElement>;
+    console.log("DatePicker calling onChange with:", syntheticEvent);
     onChange(syntheticEvent);
     setIsOpen(false);
   };
@@ -85,7 +98,14 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const handleClear = () => {
     setSelectedDate(null);
     const syntheticEvent = {
-      target: { name, value: "" }
+      target: { 
+        name, 
+        value: "",
+        type: 'text',
+        focus: () => {} // Добавляем пустую функцию focus
+      },
+      preventDefault: () => {},
+      stopPropagation: () => {}
     } as React.ChangeEvent<HTMLInputElement>;
     onChange(syntheticEvent);
     onClear?.();
@@ -138,7 +158,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentYear, currentMonthIndex);
     const firstDay = getFirstDayOfMonth(currentYear, currentMonthIndex);
-    const days = [];
+    const days: React.ReactNode[] = [];
 
     // Пустые ячейки для начала месяца
     for (let i = 0; i < firstDay; i++) {
@@ -161,7 +181,12 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       days.push(
         <button
           key={day}
-          onClick={() => !isDisabled && handleDateSelect(date)}
+          onClick={() => {
+            console.log("Date button clicked:", { day, date, isDisabled, name });
+            if (!isDisabled) {
+              handleDateSelect(date);
+            }
+          }}
           onMouseEnter={() => setHoveredDate(date)}
           onMouseLeave={() => setHoveredDate(null)}
           disabled={isDisabled}
@@ -202,7 +227,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       <div className="relative">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            console.log("DatePicker clicked, current isOpen:", isOpen, "name:", name, "value:", value);
+            setIsOpen(!isOpen);
+          }}
           className={`
             w-full h-14 px-4 pr-12 text-left bg-white border-2 rounded-xl transition-all duration-200
             ${error 

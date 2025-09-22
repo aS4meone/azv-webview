@@ -488,6 +488,79 @@
       "lastNameMinLength": "Тегі кемінде 2 таңбадан тұруы керек",
       "lastNameMaxLength": "Тегі 50 таңбадан аспауы керек"
     },
+    "apiErrors": {
+      "validation": {
+        "iinDigitsOnly": "ЖСН тек сандардан тұруы керек. Мысал: 900515123456",
+        "dateFormat": "Күн YYYY-MM-DD форматында болуы керек. Мысал: 1990-05-15",
+        "birthDateFuture": "Туған күні болашақта болмауы керек. YYYY-MM-DD форматын пайдаланыңыз",
+        "birthDateTooOld": "Жарамсыз туған күні. Жыл 1900-ден үлкен болуы керек",
+        "ageRequirement": "Жас кемінде 18 жас болуы керек",
+        "expiryDatePast": "Құжаттың мерзімі болашақта болуы керек. Мысал: 2030-12-31",
+        "expiryDateFormat": "Күн YYYY-MM-DD форматында болуы керек. Мысал: 2030-12-31",
+        "firstNameLength": "first_name 1..50 таңбадан тұруы керек",
+        "lastNameLength": "last_name 1..50 таңбадан тұруы керек",
+        "phoneDigitsOnly": "Телефон нөмірі тек сандардан тұруы керек.",
+        "smsCodeInvalid": "Жарамсыз SMS коды немесе кодтың мерзімі өтті",
+        "userNotFound": "Пайдаланушы табылмады немесе белсенді емес",
+        "credentialsInvalid": "Деректерді растау мүмкін болмады",
+        "nothingToUpdate": "Жаңарту үшін ештеңе жоқ",
+        "profileUpdateFailed": "Профильді жаңарту сәтсіз",
+        "unsupportedLocale": "Қолдау көрсетілмейтін тіл"
+      },
+      "fileUpload": {
+        "invalidFileType": "{filename} файлы сурет емес. Тек JPEG және PNG рұқсат етілген.",
+        "photoCountInvalid": "'{field_name}' үшін {min} мен {max} арасында файл беру керек",
+        "photoTypeInvalid": "'{field_name}' ішіндегі {filename} файлы JPEG немесе PNG емес",
+        "uploadError": "Құжаттар мен деректерді жүктеу кезінде қате орын алды"
+      },
+      "rental": {
+        "rentalNotFound": "Жалдау тарихы табылмады",
+        "carNotFound": "Көлік табылмады немесе қолжетімді емес",
+        "carNotAvailable": "Көлік табылмады немесе қолжетімді емес",
+        "durationRequiredHours": "Сағаттық жалдау үшін ұзақтық қажет.",
+        "durationRequiredDays": "Күндік жалдау үшін ұзақтық қажет.",
+        "noActiveRental": "Болдырмау үшін белсенді жалдау жоқ",
+        "noActiveDelivery": "Болдырмау үшін белсенді жеткізу тапсырысы жоқ",
+        "carNotFoundDelivery": "Көлік табылмады",
+        "rentalNotReserved": "Жалдау резервтелген күйде емес",
+        "notYourCar": "Сіздің көлігіңіз емес",
+        "vehicleStatusError": "Көлік күйі қатесі",
+        "bookingNotFound": "Брондау табылмады немесе қазірдің өзінде болдырылған",
+        "carNotFoundBooking": "Көлік табылмады",
+        "durationRequiredHoursBooking": "Сағаттық жалдау үшін ұзақтық қажет",
+        "durationRequiredDaysBooking": "Күндік жалдау үшін ұзақтық қажет"
+      },
+      "mechanic": {
+        "carsDataError": "Көліктер деректерін алу қатесі: {error}",
+        "searchError": "Көлік іздеу қатесі: {error}",
+        "carNotAvailable": "Көлік табылмады немесе тексеруге қолжетімді емес",
+        "noActiveInspection": "Бастау үшін белсенді тексеру жоқ",
+        "carNotFound": "Көлік табылмады",
+        "noActiveBooking": "Болдырмау үшін белсенді брондау жоқ",
+        "cancelError": "Тексеруді болдырмау қатесі: {error}",
+        "noActiveInspectionInUse": "Белсенді тексеру жоқ (IN_USE)",
+        "photoUploadBeforeError": "Тексеруге дейін фотосуреттерді жүктеу қатесі",
+        "photoUploadAfterError": "Тексеруден кейін фотосуреттерді жүктеу қатесі",
+        "noActiveInspectionComplete": "Аяқтау үшін белсенді тексеру жоқ",
+        "completeError": "Тексеруді аяқтау қатесі: {error}"
+      },
+      "owner": {
+        "invalidMonth": "Ай 1 мен 12 арасында болуы керек"
+      },
+      "gps": {
+        "vehiclesDataError": "Көліктер деректерін алу қатесі: {error}",
+        "searchError": "Көлік іздеу қатесі: {error}",
+        "noRentals": "Сіз әлі ешқандай көлік жалдамағансыз",
+        "allCarsBusy": "Сіздің жиі пайдаланатын барлық көліктеріңіз қазір алынған"
+      },
+      "guarantor": {
+        "userNotFound": "Пайдаланушы табылмады"
+      },
+      "general": {
+        "internalServerError": "Ішкі сервер қатесі",
+        "insufficientBalance": "Тіркелгіңізді толтырыңыз: брондау үшін кемінде {amount}₸ қажет."
+      }
+    },
     "photoInstructions": {
       "idFront": "Жеке басын куәландыратын құжаттың алдыңғы жағын суретке түсіріңіз",
       "idBack": "Жеке басын куәландыратын құжаттың артқы жағын суретке түсіріңіз",
