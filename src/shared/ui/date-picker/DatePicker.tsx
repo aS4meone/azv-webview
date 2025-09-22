@@ -241,7 +241,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       {/* Выпадающий календарь */}
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 p-4">
-          {/* Заголовок с навигацией */}
+          {/* Заголовок с выпадающими списками */}
           <div className="flex items-center justify-between mb-4">
             <button
               type="button"
@@ -253,9 +253,35 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               </svg>
             </button>
             
-            <h3 className="text-lg font-semibold text-[#191919]">
-              {monthNames[currentMonthIndex]} {currentYear}
-            </h3>
+            {/* Выпадающие списки для месяца и года */}
+            <div className="flex items-center gap-2">
+              <select
+                value={currentMonthIndex}
+                onChange={(e) => setCurrentMonth(new Date(currentYear, parseInt(e.target.value)))}
+                className="px-3 py-2 text-sm font-semibold text-[#191919] bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:border-[#191919] focus:outline-none transition-colors duration-200"
+              >
+                {monthNames.map((month, index) => (
+                  <option key={index} value={index}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+              
+              <select
+                value={currentYear}
+                onChange={(e) => setCurrentMonth(new Date(parseInt(e.target.value), currentMonthIndex))}
+                className="px-3 py-2 text-sm font-semibold text-[#191919] bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus:border-[#191919] focus:outline-none transition-colors duration-200"
+              >
+                {Array.from({ length: 120 }, (_, i) => {
+                  const year = today.getFullYear() - 100 + i;
+                  return (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
             
             <button
               type="button"
@@ -284,16 +310,28 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
           {/* Кнопки действий */}
           <div className="flex justify-between mt-4 pt-4 border-t border-gray-100">
-            <button
-              type="button"
-              onClick={() => {
-                const today = new Date();
-                handleDateSelect(today);
-              }}
-              className="px-4 py-2 text-sm font-medium text-[#191919] bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-            >
-              Сегодня
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const today = new Date();
+                  handleDateSelect(today);
+                }}
+                className="px-4 py-2 text-sm font-medium text-[#191919] bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+              >
+                Сегодня
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const currentYear = new Date().getFullYear();
+                  setCurrentMonth(new Date(currentYear, currentMonthIndex));
+                }}
+                className="px-4 py-2 text-sm font-medium text-[#191919] bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors duration-200"
+              >
+                Текущий год
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
