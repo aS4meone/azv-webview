@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Input, Button } from "@/shared/ui";
+import { Input, Button, DatePicker } from "@/shared/ui";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import Loader from "@/shared/ui/loader";
@@ -264,7 +264,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
           withHeader={true}
           title={t("documentData")}
         >
-          <div className="bg-white min-h-full">
+          <div className="bg-white min-h-full mt-5">
             
 
             {/* Form content */}
@@ -313,16 +313,16 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <Input
+                    <DatePicker
                       label={t("birthDate")}
                       name="birth_date"
-                      type="date"
-                      value={formData.birth_date}
+                      value={formData.birth_date || ""}
                       onChange={handleChange}
+                      error={errors.birth_date}
+                      placeholder="Выберите дату рождения"
                       required
                       max={getMaxBirthDate()}
                       min={getMinBirthDate()}
-                      error={errors.birth_date}
                     />
                     <Input
                       label={t("iin")}
@@ -355,27 +355,27 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                   </div>
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Input
+                  <DatePicker
                     label={t("idCardExpiry")}
                     name="id_card_expiry"
-                    type="date"
-                    value={formData.id_card_expiry}
+                    value={formData.id_card_expiry || ""}
                     onChange={handleChange}
+                    error={errors.id_card_expiry}
+                    placeholder="Выберите дату истечения"
                     required
                     min={new Date().toISOString().split("T")[0]}
                     max={getMaxDate(10)}
-                    error={errors.id_card_expiry}
                   />
-                  <Input
+                  <DatePicker
                     label={t("driversLicenseExpiry")}
                     name="drivers_license_expiry"
-                    type="date"
-                    value={formData.drivers_license_expiry}
+                    value={formData.drivers_license_expiry || ""}
                     onChange={handleChange}
+                    error={errors.drivers_license_expiry}
+                    placeholder="Выберите дату истечения"
                     required
                     min={new Date().toISOString().split("T")[0]}
                     max={getMaxDate(10)}
-                    error={errors.drivers_license_expiry}
                   />
                 </div>
               </div>
@@ -385,8 +385,8 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                 <Button
                   variant="secondary"
                   onClick={handleSubmit}
-                  className="w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                  disabled={!isFormValid || isLoading}
+                  className="w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 opacity-50 cursor-not-allowed"
+                  disabled={true}
                 >
                   {isLoading ? <Loader color="#fff" /> : t("submit")}
                 </Button>

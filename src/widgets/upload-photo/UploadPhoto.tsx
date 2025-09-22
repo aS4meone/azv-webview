@@ -263,7 +263,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   });
 
   const content = (
-    <div className="bg-white min-h-full">
+    <div className="bg-white min-h-full mt-5">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white border-b border-gray-100 px-6 py-6">
         <div className="flex items-center justify-between">
@@ -416,18 +416,18 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       </div>
 
       {/* Bottom submit button */}
-      {allPhotosUploaded && (
-        <div className="bg-white pt-4 pb-6 px-6 mb-10">
-          <Button
-            variant="secondary"
-            onClick={handleSubmit}
-            className="w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-            disabled={isLoading}
-          >
-            {isLoading ? <Loader color="#fff" /> : t("submit")}
-          </Button>
-        </div>
-      )}
+      <div className="bg-white pt-4 pb-6 px-6 mb-10">
+        <Button
+          variant="secondary"
+          onClick={handleSubmit}
+          className={`w-full h-14 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 ${
+            !allPhotosUploaded ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!allPhotosUploaded || isLoading}
+        >
+          {isLoading ? <Loader color="#fff" /> : t("next")}
+        </Button>
+      </div>
     </div>
   );
 

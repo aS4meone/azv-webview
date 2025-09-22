@@ -9,3 +9,4 @@ export * from "./notification-dot";
 export { FastScrollbar } from "./FastScrollbar";
 export { Input } from "./input/Input";
 export { AddressInput } from "./AddressInput";
+export { DatePicker } from "./date-picker";
