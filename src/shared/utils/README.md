@@ -132,3 +132,5 @@ function MyComponent() {
 "Car not found or not available" // EN
 "Көлік табылмады немесе қолжетімді емес" // KZ
 ```
+
+

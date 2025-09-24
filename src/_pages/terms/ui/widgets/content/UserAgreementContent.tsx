@@ -32,29 +32,33 @@ export const UserAgreementContent = () => {
   const sections: Section[] = [
     {
       title: t("sections.generalProvisions.title"),
-      content: t("sections.generalProvisions.content").split('\n'),
+      content: [],
       icon: <FileText className="w-5 h-5" />,
+      items: t.raw("sections.generalProvisions.items") as unknown as string[],
     },
     {
       title: t("sections.serviceDescription.title"),
-      content: t("sections.serviceDescription.content").split('\n'),
+      content: [],
       icon: <Car className="w-5 h-5" />,
+      items: t.raw("sections.serviceDescription.items") as unknown as string[],
     },
     {
       title: t("sections.userObligations.title"),
-      content: [t("sections.userObligations.content")],
+      content: [t("sections.userObligations.description")],
       icon: <Users className="w-5 h-5" />,
-      items: t("sections.userObligations.items").split('\n'),
+      items: t.raw("sections.userObligations.items") as unknown as string[],
     },
     {
       title: t("sections.costAndPayment.title"),
-      content: t("sections.costAndPayment.content").split('\n'),
+      content: [],
       icon: <CreditCard className="w-5 h-5" />,
+      items: t.raw("sections.costAndPayment.items") as unknown as string[],
     },
     {
       title: t("sections.insuranceAndLiability.title"),
-      content: t("sections.insuranceAndLiability.content").split('\n'),
+      content: [],
       icon: <Shield className="w-5 h-5" />,
+      items: t.raw("sections.insuranceAndLiability.items") as unknown as string[],
     },
   ];
 
@@ -65,8 +69,8 @@ export const UserAgreementContent = () => {
       icon: <UserCheck className="w-4 h-4" />,
     },
     {
-      label: t("requirements.experience.label"),
-      value: t("requirements.experience.value"),
+      label: t("requirements.drivingExperience.label"),
+      value: t("requirements.drivingExperience.value"),
       icon: <Car className="w-4 h-4" />,
     },
     {
@@ -81,30 +85,30 @@ export const UserAgreementContent = () => {
     },
   ];
 
-  const rules = t("rules").split('\n');
+  const rules = (t.raw("rules.items") as unknown as string[]) || [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex justify-center">
-          <div className="p-3 bg-blue-100 rounded-full">
-            <FileText className="w-8 h-8 text-blue-600" />
+          <div className="p-3 bg-black/5 rounded-full">
+            <FileText className="w-8 h-8 text-black" />
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-[#191919]">
           {t("mainTitle")}
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
+        <p className="text-black/60 max-w-2xl mx-auto">
           {t("description")}
         </p>
 
         <div className="flex flex-wrap justify-center gap-2">
-          <Badge variant="secondary" className="flex items-center gap-1">
+          <Badge variant="secondary" className="flex items-center gap-1 bg-black text-white">
             <Calendar className="w-3 h-3" />
             {t("effectiveFrom")} {new Date().toLocaleDateString("ru-RU")}
           </Badge>
-          <Badge variant="outline">{t("version")}</Badge>
+          <Badge variant="outline" className="border-black text-black">{t("version")}</Badge>
         </div>
       </div>
 
@@ -114,7 +118,7 @@ export const UserAgreementContent = () => {
           <Card key={index}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className="p-2 bg-gray-100 rounded-lg">{section.icon}</div>
+                <div className="p-2 bg-black/5 rounded-lg text-black">{section.icon}</div>
                 {section.title}
               </CardTitle>
             </CardHeader>
@@ -129,8 +133,8 @@ export const UserAgreementContent = () => {
                   <ul className="space-y-2 mt-4">
                     {section.items.map((item, itemIndex) => (
                       <li key={itemIndex} className="flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-600">{item}</span>
+                        <CheckCircle className="w-4 h-4 text-black mt-0.5 flex-shrink-0" />
+                        <span className="text-black/70">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -145,8 +149,8 @@ export const UserAgreementContent = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <UserCheck className="w-5 h-5" />
+            <div className="p-2 bg-black/5 rounded-lg">
+              <UserCheck className="w-5 h-5 text-black" />
             </div>
             {t("requirements.title")}
           </CardTitle>
@@ -159,10 +163,10 @@ export const UserAgreementContent = () => {
                 className="text-center p-4 bg-gray-50 rounded-lg"
               >
                 <div className="flex justify-center mb-2">
-                  <div className="p-2 bg-blue-100 rounded-full">{req.icon}</div>
+                  <div className="p-2 bg-black/5 rounded-full text-black">{req.icon}</div>
                 </div>
-                <h4 className="font-medium text-gray-900 mb-1">{req.label}</h4>
-                <p className="text-sm text-gray-600">{req.value}</p>
+                <h4 className="font-medium text-[#191919] mb-1">{req.label}</h4>
+                <p className="text-sm text-black/60">{req.value}</p>
               </div>
             ))}
           </div>
@@ -173,8 +177,8 @@ export const UserAgreementContent = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
-            <div className="p-2 bg-gray-100 rounded-lg">
-              <AlertTriangle className="w-5 h-5" />
+            <div className="p-2 bg-black/5 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-black" />
             </div>
             {t("rules.title")}
           </CardTitle>
@@ -184,10 +188,10 @@ export const UserAgreementContent = () => {
             {rules.map((rule, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg"
+                className="flex items-start gap-3 p-3 bg-black/5 rounded-lg"
               >
-                <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-amber-800">{rule}</span>
+                <AlertTriangle className="w-4 h-4 text-black mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-black/70">{rule}</span>
               </div>
             ))}
           </div>
@@ -199,18 +203,18 @@ export const UserAgreementContent = () => {
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <Shield className="w-6 h-6 text-gray-400" />
+              <Shield className="w-6 h-6 text-black/30" />
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-black/60">
                 {t("footer.agreementText")}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-black/60">
                 {t("footer.supportText")}
               </p>
             </div>
             <Separator className="my-4" />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-black/50">
               {t("footer.copyright")}
             </p>
           </div>

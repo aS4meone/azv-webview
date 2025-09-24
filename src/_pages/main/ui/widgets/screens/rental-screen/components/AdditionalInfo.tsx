@@ -45,19 +45,23 @@ export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
       <div className="space-y-3 pt-2 flex flex-col items-start">
         <Button
           variant="outline"
-          className="flex items-center rounded-[10px] w-auto text-[14px] px-2 py-1 h-auto"
+          className="group flex items-center gap-2 rounded-xl w-auto text-[14px] px-3 py-2 h-auto border-[#191919] text-[#191919] hover:bg-black/5 hover:shadow-sm transition-colors duration-200"
           onClick={() => setShowTariff(true)}
         >
-          <span>О тарифе</span>
-          <ArrowRightIcon />
+          <span>{t("widgets.screens.rental.aboutTariff")}</span>
+          <span className="ml-0.5 transition-transform group-hover:translate-x-0.5">
+            <ArrowRightIcon />
+          </span>
         </Button>
 
         <Button
-          className="rounded-none items-center flex justify-between w-full"
+          className="group rounded-2xl items-center flex justify-between w-full bg-gradient-to-r from-[#191919] to-[#0f0f0f] text-white hover:from-black hover:to-[#0a0a0a] shadow-md hover:shadow-lg transition-all duration-200 px-4 py-3"
           onClick={() => setShowAgreement(true)}
         >
-          <span className="text-[#191919] font-medium">Договор аренды</span>
-          <ArrowRightIcon />
+          <span className="text-white font-semibold">{t("terms.userAgreement.title")}</span>
+          <span className="ml-2 transition-transform group-hover:translate-x-0.5">
+            <ArrowRightIcon />
+          </span>
         </Button>
 
         <CustomPushScreen
@@ -74,7 +78,7 @@ export const AdditionalInfo = ({ rentalType, car }: AdditionalInfoProps) => {
           isOpen={showAgreement}
           onClose={() => setShowAgreement(false)}
           direction="bottom"
-          title={t("widgets.screens.rental.rentalAgreement")}
+          title={t("terms.userAgreement.title")}
           className="pt-20"
         >
           <TermsContent contentKey="agreement" />
