@@ -15,6 +15,7 @@ import { DocumentDetailsModal } from "./DocumentDetailsModal";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { useTranslations } from "next-intl";
 import { useErrorTranslator } from "@/shared/utils/errorTranslator";
+import { UserRole } from "@/shared/models/types/user";
 
 interface DocumentFiles {
   id_front?: File;
@@ -24,7 +25,7 @@ interface DocumentFiles {
   selfie_with_license?: File;
 }
 
-export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
+export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?: any }) => {
   const t = useTranslations("profile");
   const errorTranslator = useErrorTranslator();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -209,9 +210,19 @@ export const UploadDocuments = ({ getUser }: { getUser: () => void }) => {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setIsUploadOpen(true)}>
-        {t("replaceDocumentsButton")}
-      </Button>
+      {user.role !== UserRole.USER && (
+        <Button variant="secondary" onClick={() => setIsUploadOpen(true)}>
+          {user && (user.documents.id_card.front_url || 
+                    user.documents.id_card.back_url || 
+                    user.documents.drivers_license.url || 
+                    user.documents.selfie_url || 
+                    user.documents.selfie_with_license_url) 
+            ? (user.role === UserRole.REJECTFIRSTDOC ? t("reuploadDocumentsButton") : 
+               user.role === UserRole.PENDINGTOFIRST ? t("updateDocumentsButton") : 
+               t("replaceDocumentsButton"))
+            : t("uploadDocumentsButton")}
+        </Button>
+      )}
       <UploadPhoto
         config={uploadConfig}
         withCloseButton

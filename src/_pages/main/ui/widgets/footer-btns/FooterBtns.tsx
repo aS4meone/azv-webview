@@ -25,6 +25,7 @@ import MechanicDeliveryPage from "@/_pages/mechanic/delivery/page";
 import MechanicInRentPage from "@/_pages/mechanic/in-rent/page";
 import { useTranslations } from "next-intl";
 import { NotificationDot } from "@/shared/ui";
+import { UserStatusBanner } from "../UserStatusBanner";
 
 enum ServiceButtonType {
   CHECK = "check",
@@ -33,7 +34,7 @@ enum ServiceButtonType {
 }
 
 const FooterBtns = () => {
-  const { user } = useUserStore();
+  const { user, refreshUser } = useUserStore();
   const { allMechanicVehicles, currentDeliveryVehicle } = useVehiclesStore();
   const t = useTranslations();
 
@@ -262,11 +263,21 @@ const FooterBtns = () => {
       );
     }
 
+    // Показываем UserStatusBanner для пользователей с проблемными статусами
+    if (user.role === UserRole.CLIENT || 
+        user.role === UserRole.PENDINGTOFIRST || 
+        user.role === UserRole.PENDINGTOSECOND || 
+        user.role === UserRole.REJECTFIRST || 
+        user.role === UserRole.REJECTFIRSTDOC || 
+        user.role === UserRole.REJECTSECOND) {
+      return <UserStatusBanner user={user} getUser={refreshUser} />;
+    }
+
     if (
       user.role === UserRole.USER ||
-      user.role === UserRole.PENDING ||
-      user.role === UserRole.CLIENT
+      user.role === UserRole.PENDING
     ) {
+      // Для обычных пользователей показываем стандартные кнопки
       return (
         <div className="flex flex-col gap-2">
           <Button

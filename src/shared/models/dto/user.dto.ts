@@ -32,7 +32,12 @@ export interface UploadDocumentsDto {
    */
   birth_date: string;
 
-  iin: string;
+  iin?: string;
+
+  /**
+   * Passport number (alternative to IIN)
+   */
+  passport_number?: string;
 
   /**
    * ID card expiry date

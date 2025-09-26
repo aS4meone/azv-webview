@@ -13,6 +13,7 @@ type DocumentDetailsData = Omit<
 > & {
   first_name?: string;
   last_name?: string;
+  document_type?: 'iin' | 'passport';
 };
 
 interface DocumentDetailsModalProps {
@@ -39,6 +40,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       ...initialData,
       first_name: nameParts[0] || "",
       last_name: nameParts.slice(1).join(" ") || "",
+      document_type: initialData.iin ? 'iin' : 'passport',
     };
   });
   const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
@@ -117,6 +119,12 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     [t]
   );
 
+  const validatePassportNumber = (passport: string) => {
+    if (!passport.trim()) return t("validation.passportRequired");
+    if (passport.trim().length < 3) return t("validation.passportMinLength");
+    return "";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Combine first_name and last_name into full_name for backend
@@ -165,6 +173,14 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       }
     }
 
+    // Validate passport number
+    if (name === "passport_number") {
+      const passportError = validatePassportNumber(value);
+      if (passportError) {
+        newErrors.passport_number = passportError;
+      }
+    }
+
     // Validate birth date (only basic validation)
     if (name === "birth_date" && value) {
       const birthDate = new Date(value);
@@ -210,12 +226,29 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     });
   };
 
+  const handleDocumentTypeChange = (type: 'iin' | 'passport') => {
+    setFormData((prev) => ({
+      ...prev,
+      document_type: type,
+      iin: type === 'iin' ? prev.iin : '',
+      passport_number: type === 'passport' ? prev.passport_number : '',
+    }));
+    setErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors.iin;
+      delete newErrors.passport_number;
+      return newErrors;
+    });
+  };
+
   const isFormValid = React.useMemo(() => {
     // Check if all required fields are filled (basic validation only)
     const hasFirstName = (formData.first_name || "").trim().length >= 2;
     const hasLastName = (formData.last_name || "").trim().length >= 2;
     const hasBirthDate = !!formData.birth_date;
-    const hasIIN = (formData.iin || "").length === 12;
+    const hasIIN = formData.document_type === 'iin' && (formData.iin || "").length === 12;
+    const hasPassport = formData.document_type === 'passport' && (formData.passport_number || "").trim().length > 0;
+    const hasDocumentId = hasIIN || hasPassport;
     const hasIdExpiry = !!formData.id_card_expiry;
     const hasLicenseExpiry = !!formData.drivers_license_expiry;
 
@@ -223,7 +256,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       hasFirstName &&
       hasLastName &&
       hasBirthDate &&
-      hasIIN &&
+      hasDocumentId &&
       hasIdExpiry &&
       hasLicenseExpiry
     );
@@ -234,6 +267,8 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       hasLastName,
       hasBirthDate,
       hasIIN,
+      hasPassport,
+      hasDocumentId,
       hasIdExpiry,
       hasLicenseExpiry,
       isValid,
@@ -337,20 +372,64 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         DatePicker value: "{formData.birth_date}" | Error: "{errors.birth_date}"
                       </div>
                     </div>
-                    <Input
-                      label={t("iin")}
-                      name="iin"
-                      value={formData.iin}
-                      onChange={handleChange}
-                      required
-                      minLength={12}
-                      maxLength={12}
-                      pattern="[0-9]{12}"
-                      error={errors.iin}
-                      placeholder={t("iinPlaceholder")}
-                      showClearButton={!!formData.iin}
-                      onClear={() => handleClearField("iin")}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t("documentType")}
+                      </label>
+                      <div className="flex space-x-4 mb-3">
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="document_type"
+                            value="iin"
+                            checked={formData.document_type === 'iin'}
+                            onChange={() => handleDocumentTypeChange('iin')}
+                            className="mr-2"
+                          />
+                          <span className="text-sm text-gray-700">{t("iin")}</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="document_type"
+                            value="passport"
+                            checked={formData.document_type === 'passport'}
+                            onChange={() => handleDocumentTypeChange('passport')}
+                            className="mr-2"
+                          />
+                          <span className="text-sm text-gray-700">{t("passportNumber")}</span>
+                        </label>
+                      </div>
+                      
+                      {formData.document_type === 'iin' ? (
+                        <Input
+                          label={t("iin")}
+                          name="iin"
+                          value={formData.iin || ""}
+                          onChange={handleChange}
+                          required
+                          minLength={12}
+                          maxLength={12}
+                          pattern="[0-9]{12}"
+                          error={errors.iin}
+                          placeholder={t("iinPlaceholder")}
+                          showClearButton={!!formData.iin}
+                          onClear={() => handleClearField("iin")}
+                        />
+                      ) : (
+                        <Input
+                          label={t("passportNumber")}
+                          name="passport_number"
+                          value={formData.passport_number || ""}
+                          onChange={handleChange}
+                          required
+                          error={errors.passport_number}
+                          placeholder={t("passportNumberPlaceholder")}
+                          showClearButton={!!formData.passport_number}
+                          onClear={() => handleClearField("passport_number")}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
