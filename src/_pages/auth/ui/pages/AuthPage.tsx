@@ -172,6 +172,24 @@ const AuthPage = () => {
               >
                 {t("auth.registration")}
               </Button>
+              
+              {/* Privacy Policy Link */}
+              <div className="mt-4 text-center">
+                <p className="text-white/50 text-[12px] mb-2">
+                  {t("auth.privacyPolicyText")}
+                </p>
+                <button
+                  onClick={() => {
+                    // Open privacy policy in native app
+                    if (window.flutter_channels && window.flutter_channels.openPrivacyPolicy) {
+                      window.flutter_channels.openPrivacyPolicy();
+                    }
+                  }}
+                  className="text-blue-400 text-[12px] underline hover:text-blue-300 transition-colors"
+                >
+                  {t("auth.privacyPolicy")}
+                </button>
+              </div>
             </div>
           )}
         </section>

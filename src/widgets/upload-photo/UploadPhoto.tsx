@@ -139,7 +139,9 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
         const base64Images = await FlutterCamera.captureMultiplePhotos(
           photoConfig.multiple.min,
           photoConfig.multiple.max,
-          cameraType
+          cameraType,
+          photoConfig.stencil,
+          photoConfig.title
         );
         setPhotoProgress(photoId, 50);
         files = FlutterCamera.base64ArrayToFiles(base64Images, photoId);

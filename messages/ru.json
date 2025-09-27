@@ -674,7 +674,9 @@
       "description": "Укажите ваши данные для создания аккаунта",
       "firstNamePlaceholder": "Имя",
       "lastNamePlaceholder": "Фамилия"
-    }
+    },
+    "privacyPolicy": "Политика конфиденциальности",
+    "privacyPolicyText": "Используя приложение, вы соглашаетесь с"
   },
   "main": {
     "drawer": {

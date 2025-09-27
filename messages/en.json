@@ -672,7 +672,9 @@
       "description": "Enter your details to create an account",
       "firstNamePlaceholder": "First Name",
       "lastNamePlaceholder": "Last Name"
-    }
+    },
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyText": "By using the app, you agree to our"
   },
   "main": {
     "drawer": {

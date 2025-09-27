@@ -164,7 +164,9 @@ export class FlutterCamera {
   static async captureMultiplePhotos(
     minPhotos: number = 1,
     maxPhotos: number = 10,
-    cameraType: "front" | "back" = "back"
+    cameraType: "front" | "back" = "back",
+    stencil?: any,
+    photoTitle?: string
   ): Promise<string[]> {
     if (!this.isAvailable()) {
       throw new Error("React Native camera is not available");
@@ -189,12 +191,16 @@ export class FlutterCamera {
           minPhotos,
           maxPhotos,
           cameraType,
+          stencil,
+          photoTitle,
         })
       ) {
         console.log("📱 Отправляем captureMultiplePhotos в React Native", {
           minPhotos,
           maxPhotos,
           cameraType,
+          stencil,
+          photoTitle,
         });
       } else {
         reject(new Error("Failed to send message to React Native"));

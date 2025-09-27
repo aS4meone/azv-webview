@@ -674,7 +674,9 @@
       "description": "Аккаунт жасау үшін деректеріңізді көрсетіңіз",
       "firstNamePlaceholder": "Аты",
       "lastNamePlaceholder": "Тегі"
-    }
+    },
+    "privacyPolicy": "Құпиялылық саясаты",
+    "privacyPolicyText": "Қосымшаны пайдалану арқылы сіз келісесіз"
   },
   "main": {
     "drawer": {
