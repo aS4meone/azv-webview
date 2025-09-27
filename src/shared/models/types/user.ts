@@ -58,4 +58,8 @@ export interface IUser {
   iin?: string | null;
   passport_number?: string | null;
   birth_date?: string | null;
+  locale?: string;
+  guarantors_count?: number;
+  guarantors?: any[];
+  auto_class?: string[];
 }

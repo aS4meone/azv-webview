@@ -111,7 +111,7 @@ const Drawer = () => {
             key: "terms" as ComponentKeys,
           },
         ]
-      : user?.role === UserRole.CLIENT
+      : user?.owned_cars && user?.owned_cars.length > 0
       ? [
           {
             translationKey: "main.drawer.menu.tripsAndPayments",

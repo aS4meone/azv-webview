@@ -52,9 +52,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
 
   return (
     <section ref={containerRef}>
-       
-        
-        <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
+      <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
         {isLoading ? (
           <div className="text-center py-4 text-[#191919] text-[16px]">
             {t('cars.loading')}

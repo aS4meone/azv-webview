@@ -6,6 +6,7 @@ import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import Loader from "@/shared/ui/loader";
 import { useTranslations } from "next-intl";
 import { useUserStore } from "@/shared/stores/userStore";
+import { validateIINBirthDateMatch } from "@/shared/utils/iinValidation";
 
 type DocumentDetailsData = Omit<
   UploadDocumentsDto,
@@ -117,9 +118,18 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       if (!/^\d{12}$/.test(iin)) {
         return t("validation.iinLength");
       }
+      
+      // Проверяем соответствие 7-й цифры ИИН дате рождения
+      if (formData.birth_date && iin.length === 12) {
+        const isValidMatch = validateIINBirthDateMatch(iin, formData.birth_date);
+        if (!isValidMatch) {
+          return t("validation.iinMismatch");
+        }
+      }
+      
       return "";
     },
-    [t]
+    [t, formData.birth_date]
   );
 
   const validatePassportNumber = (passport: string) => {

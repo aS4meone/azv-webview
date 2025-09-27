@@ -525,6 +525,18 @@
       "passportRequired": "Паспорт нөмірін енгізіңіз",
       "passportMinLength": "Паспорт нөмірі кемінде 3 таңбадан тұруы керек"
     },
+    "iinValidation": {
+      "errors": {
+        "invalidFormat": "ЖСН дәл 12 саннан тұруы керек",
+        "invalidSeventhDigit": "ЖСН-дағы 7-ші сан дұрыс емес. 1, 2, 3, 4, 5 немесе 6 болуы керек",
+        "invalidCenturyInfo": "ЖСН-дағы ғасыр туралы ақпарат дұрыс емес",
+        "invalidBirthDateFormat": "Туған күнінің форматы дұрыс емес",
+        "unsupportedCentury": "Қолдау көрсетілмейтін туу ғасыры",
+        "seventhDigitMismatch": "ЖСН-дағы 7-ші сан туу ғасырына {birthYear} сәйкес келмейді. {expectedCentury}-шы жылдары {expectedDigitRange} болуы керек, {actualDigit} емес",
+        "birthYearMismatch": "ЖСН-дағы туу жылы ({iinBirthYear}) көрсетілген туу күніне ({expectedYear}) сәйкес келмейді",
+        "birthDateMismatch": "ЖСН-дағы туу күні көрсетілген туу күніне сәйкес келмейді"
+      }
+    },
     "apiErrors": {
       "validation": {
         "iinDigitsOnly": "ЖСН тек сандардан тұруы керек. Мысал: 900515123456",

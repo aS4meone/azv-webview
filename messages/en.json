@@ -523,6 +523,18 @@
       "passportRequired": "Enter passport number",
       "passportMinLength": "Passport number must contain at least 3 characters"
     },
+    "iinValidation": {
+      "errors": {
+        "invalidFormat": "IIN must contain exactly 12 digits",
+        "invalidSeventhDigit": "Invalid 7th digit in IIN. Must be 1, 2, 3, 4, 5, or 6",
+        "invalidCenturyInfo": "Invalid century information in IIN",
+        "invalidBirthDateFormat": "Invalid birth date format",
+        "unsupportedCentury": "Unsupported birth century",
+        "seventhDigitMismatch": "IIN 7th digit does not match birth century {birthYear}. For {expectedCentury}s it should be {expectedDigitRange}, not {actualDigit}",
+        "birthYearMismatch": "IIN birth year ({iinBirthYear}) does not match provided birth date ({expectedYear})",
+        "birthDateMismatch": "IIN birth date does not match provided birth date"
+      }
+    },
     "apiErrors": {
       "validation": {
         "iinDigitsOnly": "IIN must contain only digits. Example: 900515123456",

@@ -525,6 +525,18 @@
       "passportRequired": "Введите номер паспорта",
       "passportMinLength": "Номер паспорта должен содержать минимум 3 символа"
     },
+    "iinValidation": {
+      "errors": {
+        "invalidFormat": "ИИН должен содержать ровно 12 цифр",
+        "invalidSeventhDigit": "Неверная 7-я цифра в ИИН. Должна быть 1, 2, 3, 4, 5 или 6",
+        "invalidCenturyInfo": "Неверная информация о веке в ИИН",
+        "invalidBirthDateFormat": "Неверный формат даты рождения",
+        "unsupportedCentury": "Неподдерживаемый век рождения",
+        "seventhDigitMismatch": "7-я цифра ИИН не соответствует веку рождения {birthYear}. Для {expectedCentury}-х годов должна быть {expectedDigitRange}, а не {actualDigit}",
+        "birthYearMismatch": "Год рождения в ИИН ({iinBirthYear}) не соответствует указанной дате рождения ({expectedYear})",
+        "birthDateMismatch": "Дата рождения в ИИН не соответствует указанной дате рождения"
+      }
+    },
     "apiErrors": {
       "validation": {
         "iinDigitsOnly": "ИИН должен содержать только цифры. Пример: 900515123456",

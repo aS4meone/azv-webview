@@ -65,6 +65,7 @@ export interface ICar extends UniqueIdentifier {
   description?: string;
   current_renter_details?: ICurrentRenterDetails;
   delivery_coordinates?: IDeliveryCoordinates;
+  available_minutes?: number; // Добавляем поле для owned_cars
 }
 
 export interface ICurrentRenterDetails {
