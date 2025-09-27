@@ -180,9 +180,12 @@ const AuthPage = () => {
                 </p>
                 <button
                   onClick={() => {
-                    // Open privacy policy in native app
-                    if (window.flutter_channels && window.flutter_channels.openPrivacyPolicy) {
-                      window.flutter_channels.openPrivacyPolicy();
+                    // Try to open privacy policy in native app first
+                    if ((window as any).flutter_channels && (window as any).flutter_channels.openPrivacyPolicy) {
+                      (window as any).flutter_channels.openPrivacyPolicy();
+                    } else {
+                      // Fallback: open privacy policy in web browser
+                      window.open('/privacy-policy', '_blank');
                     }
                   }}
                   className="text-blue-400 text-[12px] underline hover:text-blue-300 transition-colors"

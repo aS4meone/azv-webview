@@ -33,6 +33,7 @@ const AUTH_ROUTES = [
   ROUTES.ONBOARDING,
   ROUTES.DELETE_TUTORIAL,
   ROUTES.CONTACT,
+  "/privacy-policy",
 ] as const;
 
 const isAuthRoute = (path: string): path is (typeof AUTH_ROUTES)[number] => {
