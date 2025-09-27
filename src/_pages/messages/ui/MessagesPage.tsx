@@ -8,7 +8,7 @@ import {
   INotification,
 } from "@/shared/api/routes/notifications";
 import { useUserStore } from "@/shared/stores/userStore";
-import MessageCard from "./components/MessageCard";
+import NotificationCard from "./components/NotificationCard";
 
 const MessagesPage = () => {
   const t = useTranslations("messages");
@@ -28,8 +28,10 @@ const MessagesPage = () => {
       description: notification.body,
       time: notification.sent_at,
       isRead: notification.is_read,
+      status: notification.status,
     };
   };
+
 
   // Загрузка уведомлений с API
   useEffect(() => {
@@ -199,7 +201,7 @@ const MessagesPage = () => {
           <EmptyState />
         ) : (
           messages.map((message) => (
-            <MessageCard
+            <NotificationCard
               key={message.id}
               message={message}
               onMarkAsRead={handleMarkAsRead}

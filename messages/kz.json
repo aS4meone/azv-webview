@@ -801,6 +801,14 @@
       "minutesAgo": "мин бұрын",
       "hoursAgo": "сағ бұрын",
       "daysAgo": "күн бұрын"
+    },
+    "categories": {
+      "success": "Сәтті операциялар",
+      "warning": "Ескертулер",
+      "error": "Қателер",
+      "info": "Ақпарат",
+      "delivery": "Жеткізу",
+      "application": "Өтініштер"
     }
   },
   "contract": {

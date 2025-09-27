@@ -799,6 +799,14 @@
       "minutesAgo": "m ago",
       "hoursAgo": "h ago",
       "daysAgo": "d ago"
+    },
+    "categories": {
+      "success": "Success",
+      "warning": "Warnings",
+      "error": "Errors",
+      "info": "Information",
+      "delivery": "Delivery",
+      "application": "Applications"
     }
   },
   "contract": {

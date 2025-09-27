@@ -1,4 +1,5 @@
 import axiosInstance from "../axios";
+import { NotificationStatus } from "@/shared/types/notification";
 
 export const notificationRoutes = {
   getNotifications: "/notifications/",
@@ -16,6 +17,7 @@ export interface INotification {
   body: string;
   sent_at: string;
   is_read: boolean;
+  status?: NotificationStatus;
 }
 
 export interface MarkAsReadResponse {

@@ -109,7 +109,7 @@ export const UserStatusBanner = ({ user, getUser }: UserStatusBannerProps) => {
       <>
         <div className="w-full">
           <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl p-4 shadow-lg">
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col items-center gap-3">
               <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>

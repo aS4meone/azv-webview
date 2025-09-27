@@ -801,6 +801,14 @@
       "minutesAgo": "мин назад",
       "hoursAgo": "ч назад",
       "daysAgo": "дн назад"
+    },
+    "categories": {
+      "success": "Успешные операции",
+      "warning": "Предупреждения",
+      "error": "Ошибки",
+      "info": "Информация",
+      "delivery": "Доставка",
+      "application": "Заявки"
     }
   },
   "contract": {

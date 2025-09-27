@@ -41,6 +41,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       first_name: nameParts[0] || "",
       last_name: nameParts.slice(1).join(" ") || "",
       document_type: initialData.iin ? 'iin' : 'passport',
+      // Не загружаем даты истечения документов при инициализации
+      id_card_expiry: "",
+      drivers_license_expiry: "",
     };
   });
   const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
@@ -60,9 +63,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       ...prev,
       first_name: user.first_name || "",
       last_name: user.last_name || "",
-      // birth_date и iin не загружаем из user, оставляем как есть
-      id_card_expiry: user.documents?.id_card?.expiry || prev.id_card_expiry,
-      drivers_license_expiry: user.documents?.drivers_license?.expiry || prev.drivers_license_expiry,
+      // birth_date, iin, id_card_expiry и drivers_license_expiry не загружаем из user, оставляем как есть
+      // id_card_expiry: user.documents?.id_card?.expiry || prev.id_card_expiry,
+      // drivers_license_expiry: user.documents?.drivers_license?.expiry || prev.drivers_license_expiry,
     }));
   };
 
