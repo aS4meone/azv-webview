@@ -38,8 +38,8 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
   // Convert ICar to MyCar format
   const convertToMyCar = (car: any): MyCar => ({
     id: car.id,
-    name: car.name,
-    plate_number: car.plate_number,
+    name: car.name || 'Неизвестная модель',
+    plate_number: car.plate_number || 'Нет номера',
     photos: car.photos || [],
     available_minutes: car.available_minutes || 0,
     latitude: car.latitude || 0,
@@ -51,30 +51,41 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <section ref={containerRef}>
-      <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
+    <div ref={containerRef} className="min-h-screen bg-[#F5F5F5]">
+      {/* Content */}
+      <div className="py-6">
         {isLoading ? (
-          <div className="text-center py-4 text-[#191919] text-[16px]">
-            {t('cars.loading')}
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+            <p className="mt-4 text-[#666666]">{t('cars.loading')}</p>
           </div>
         ) : ownedCars.length > 0 ? (
-          ownedCars.map((car, index) => (
-            <OwnedCarCard 
-              onCarClick={onClose} 
-              key={car.id} 
-              car={convertToMyCar(car)} 
-              index={index}
-              isTooltipOpen={openTooltipIndex === index}
-              onTooltipHover={handleTooltipHover}
-            />
-          ))
+          <div className="space-y-3">
+            {ownedCars.map((car, index) => (
+              <OwnedCarCard 
+                onCarClick={onClose} 
+                key={car.id} 
+                car={convertToMyCar(car)} 
+                index={index}
+                isTooltipOpen={openTooltipIndex === index}
+                onTooltipHover={handleTooltipHover}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="text-center py-4 text-[#191919] text-[16px]">
-            {t('cars.nothingFound')}
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-[#2D2D2D] mb-2">
+                {t('cars.nothingFound')}
+              </h3>
+              <p className="text-[#666666]">
+                У вас пока нет автомобилей
+              </p>
+            </div>
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 };
 

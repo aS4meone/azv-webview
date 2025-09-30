@@ -1393,7 +1393,10 @@
       "minutes": "мин",
       "availabilityForRental": "Арендаға қол жетімділік",
       "availabilityDescription": "Сіздің көлігіңіз айына кемінде 15 күн (21,600 минут) арендаға қол жетімді болуы керек",
-      "currentTime": "Ағымдағы уақыт:"
+      "currentTime": "Ағымдағы уақыт:",
+      "lowAvailability": "Төмен қол жетімділік",
+      "lowAvailabilityDescription": "Сіздің көлігіңіз арендаға қол жетімді емес. Көлік күйін тексеріңіз.",
+      "close": "Жабу"
     }
   },
   "enums": {

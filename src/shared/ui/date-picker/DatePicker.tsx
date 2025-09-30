@@ -32,9 +32,14 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 }) => {
   const t = useTranslations("profile");
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(
-    value ? new Date(value) : null
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
+    if (value) {
+      // Исправляем проблему с часовыми поясами при инициализации
+      const [year, month, day] = value.split('-').map(Number);
+      return new Date(year, month - 1, day);
+    }
+    return null;
+  });
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -59,7 +64,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   useEffect(() => {
     console.log("DatePicker useEffect value change:", { value, name });
     if (value) {
-      const date = new Date(value);
+      // Исправляем проблему с часовыми поясами - создаем дату в локальном времени
+      const [year, month, day] = value.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
       console.log("DatePicker setting selectedDate:", date);
       setSelectedDate(date);
     } else {
@@ -120,8 +127,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   const isDateDisabled = (date: Date) => {
-    if (min && date < new Date(min)) return true;
-    if (max && date > new Date(max)) return true;
+    if (min) {
+      const [minYear, minMonth, minDay] = min.split('-').map(Number);
+      const minDate = new Date(minYear, minMonth - 1, minDay);
+      if (date < minDate) return true;
+    }
+    if (max) {
+      const [maxYear, maxMonth, maxDay] = max.split('-').map(Number);
+      const maxDate = new Date(maxYear, maxMonth - 1, maxDay);
+      if (date > maxDate) return true;
+    }
     return false;
   };
 

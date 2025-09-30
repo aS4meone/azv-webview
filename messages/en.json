@@ -1389,7 +1389,10 @@
       "minutes": "min",
       "availabilityForRental": "Availability for rental",
       "availabilityDescription": "Your car must be available for rental for at least 15 days per month (21,600 minutes)",
-      "currentTime": "Current time:"
+      "currentTime": "Current time:",
+      "lowAvailability": "Low availability",
+      "lowAvailabilityDescription": "Your car is not available for rental. Please check the vehicle status.",
+      "close": "Close"
     }
   },
   "enums": {

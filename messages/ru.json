@@ -1393,7 +1393,10 @@
       "minutes": "мин",
       "availabilityForRental": "Доступность для аренды",
       "availabilityDescription": "Ваша машина должна быть доступна для аренды минимум 15 дней в месяц (21,600 минут)",
-      "currentTime": "Текущее время:"
+      "currentTime": "Текущее время:",
+      "lowAvailability": "Низкая доступность",
+      "lowAvailabilityDescription": "Ваша машина недоступна для аренды. Пожалуйста, проверьте статус автомобиля.",
+      "close": "Закрыть"
     }
   },
   "enums": {
