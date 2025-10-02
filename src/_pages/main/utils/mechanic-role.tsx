@@ -25,6 +25,7 @@ export const mechaniRoleInteraction = ({
     return (
       <MechanicTrackingCarModal
         car={notRentedCar}
+        currentMechanicId={user.id}
         onClose={() => {
           hideModal();
           removeAllQueriesFromUrl();
@@ -78,6 +79,20 @@ export const mechaniRoleInteraction = ({
   }
 
   if (user.current_rental === null) {
+    // Если нажали на машину в IN_USE - это слежка или осмотр
+    if (notRentedCar.status === CarStatus.inUse) {
+      return (
+        <MechanicTrackingCarModal
+          car={notRentedCar}
+          currentMechanicId={user.id}
+          onClose={() => {
+            hideModal();
+            removeAllQueriesFromUrl();
+          }}
+        />
+      );
+    }
+    
     return (
       <MechanicStartCheckModal
         car={notRentedCar}
@@ -101,15 +116,35 @@ export const mechaniRoleInteraction = ({
         />
       );
     }
-    return (
-      <MechanicInUseModal
-        user={user}
-        onClose={() => {
-          hideModal();
-          removeAllQueriesFromUrl();
-        }}
-      />
-    );
+    
+    // Проверяем, это rental механика или чужой
+    const car = user.current_rental.car_details;
+    const isMechanicRental = car.current_renter_details?.id === user.id;
+    
+    if (isMechanicRental) {
+      // Это rental механика - показываем управление
+      return (
+        <MechanicInUseModal
+          user={user}
+          onClose={() => {
+            hideModal();
+            removeAllQueriesFromUrl();
+          }}
+        />
+      );
+    } else {
+      // Это чужой rental - показываем слежку
+      return (
+        <MechanicTrackingCarModal
+          car={car}
+          currentMechanicId={user.id}
+          onClose={() => {
+            hideModal();
+            removeAllQueriesFromUrl();
+          }}
+        />
+      );
+    }
   }
 
   return null;

@@ -350,18 +350,25 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
             </div>
 
             {/* Photos */}
-            <PhotoSection
-              title={t("myAuto.tripDetails.photos.clientBefore")}
-              photos={tripDetails.photos.client_before.photos}
-            />
-            <PhotoSection
-              title={t("myAuto.tripDetails.photos.clientAfter")}
-              photos={tripDetails.photos.client_after.photos}
-            />
-            <PhotoSection
-              title={t("myAuto.tripDetails.photos.mechanicAfter")}
-              photos={filterSelfiePhotos(tripDetails.photos.mechanic_after.photos)}
-            />
+            {tripDetails.photos && (
+              <>
+                <PhotoSection
+                  title={t("myAuto.tripDetails.photos.clientBefore")}
+                  photos={tripDetails.photos.client_before?.photos || []}
+                />
+                <PhotoSection
+                  title={t("myAuto.tripDetails.photos.clientAfter")}
+                  photos={tripDetails.photos.client_after?.photos || []}
+                />
+                {/* Механик после осмотра - только салон и кузов */}
+                {tripDetails.mechanic_inspection?.photos_after && (
+                  <PhotoSection
+                    title={t("myAuto.tripDetails.photos.mechanicAfter")}
+                    photos={filterSelfiePhotos(tripDetails.mechanic_inspection.photos_after)}
+                  />
+                )}
+              </>
+            )}
 
             {/* Route Map Info */}
             {tripDetails.route_map && (

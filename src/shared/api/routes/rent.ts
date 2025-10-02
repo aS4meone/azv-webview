@@ -7,13 +7,17 @@ export const rentRoutes = {
   cancelReservation: `/rent/cancel`,
   cancelDelivery: `/rent/cancel-delivery`,
 
-  startRent: `/rent/start`,
+  startRent: (id: number) => `/rent/start/${id}`,
 
   uploadBeforeRent: `/rent/upload-photos-before`,
+  uploadBeforeRentInterior: `/rent/upload-photos-before-interior`,
   uploadAfterRent: `/rent/upload-photos-after`,
+  uploadAfterRentCar: `/rent/upload-photos-after-car`,
 
   uploadOwnerBeforeRent: `/rent/upload-photos-before-owner`,
+  uploadOwnerBeforeRentInterior: `/rent/upload-photos-before-owner-interior`,
   uploadOwnerAfterRent: `/rent/upload-photos-after-owner`,
+  uploadOwnerAfterRentCar: `/rent/upload-photos-after-owner-car`,
 
   completeRent: "/rent/complete",
   applyPromoCode: "/rent/promo_codes/apply",
@@ -51,13 +55,25 @@ export const rentApi = {
     const response = await axiosInstance.post(rentRoutes.cancelDelivery);
     return response;
   },
-  startRent: async () => {
-    const response = await axiosInstance.post(rentRoutes.startRent);
+  startRent: async (carId: number) => {
+    const response = await axiosInstance.post(rentRoutes.startRent(carId));
     return response;
   },
   uploadBeforeRent: async (formData: FormData) => {
     const response = await axiosInstance.post(
       rentRoutes.uploadBeforeRent,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
+  uploadBeforeRentInterior: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadBeforeRentInterior,
       formData,
       {
         headers: {
@@ -91,9 +107,45 @@ export const rentApi = {
     );
     return response;
   },
+  uploadOwnerBeforeRentInterior: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadOwnerBeforeRentInterior,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
   uploadOwnerAfterRent: async (formData: FormData) => {
     const response = await axiosInstance.post(
       rentRoutes.uploadOwnerAfterRent,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
+  uploadAfterRentCar: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadAfterRentCar,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
+  uploadOwnerAfterRentCar: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      rentRoutes.uploadOwnerAfterRentCar,
       formData,
       {
         headers: {

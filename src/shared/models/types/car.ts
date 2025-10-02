@@ -38,6 +38,15 @@ export interface IDeliveryCoordinates {
   longitude: number;
 }
 
+export interface ILastClientReview {
+  rating: number;
+  comment: string | null;
+  photos_after?: {
+    interior: string[];
+    exterior: string[];
+  };
+}
+
 export interface ICar extends UniqueIdentifier {
   id: number;
   name: string;
@@ -65,11 +74,21 @@ export interface ICar extends UniqueIdentifier {
   description?: string;
   current_renter_details?: ICurrentRenterDetails;
   delivery_coordinates?: IDeliveryCoordinates;
-  available_minutes?: number; // Добавляем поле для owned_cars
+  available_minutes?: number;
+  last_client_review?: ILastClientReview;
+  photo_before_selfie_uploaded?: boolean;
+  photo_before_car_uploaded?: boolean;
+  photo_before_interior_uploaded?: boolean;
+  photo_after_selfie_uploaded?: boolean;
+  photo_after_car_uploaded?: boolean;
+  photo_after_interior_uploaded?: boolean;
 }
 
 export interface ICurrentRenterDetails {
-  full_name: string;
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   phone_number: string;
   selfie_url: string;
   rent_selfie_url: string;

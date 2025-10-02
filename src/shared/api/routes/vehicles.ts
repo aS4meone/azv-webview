@@ -11,6 +11,8 @@ export const vehicleActionsRoutes = {
   closeVehicle: "/vehicles/close",
   giveKey: "/vehicles/give_key",
   takeKey: "/vehicles/take_key",
+  unlockEngine: "/vehicles/unlock_engine",
+  lockEngine: "/vehicles/lock_engine",
 };
 
 export const vehicleApi = {
@@ -49,6 +51,14 @@ export const vehicleActionsApi = {
   },
   takeKey: async () => {
     const response = await axiosInstance.post(vehicleActionsRoutes.takeKey);
+    return response.data;
+  },
+  unlockEngine: async () => {
+    const response = await axiosInstance.post(vehicleActionsRoutes.unlockEngine);
+    return response.data;
+  },
+  lockEngine: async () => {
+    const response = await axiosInstance.post(vehicleActionsRoutes.lockEngine);
     return response.data;
   },
 };

@@ -94,6 +94,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   isOpen = false,
   onClose,
   isLoading = false,
+  isCloseable = true,
 }) => {
   const t = useTranslations("uploadPhoto");
   const { showModal } = useResponseModal();
@@ -444,7 +445,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       direction="bottom"
       withHeader={true}
       withCloseButton={false}
-      isCloseable={false}
+      isCloseable={isCloseable}
     >
       <div className="flex flex-col bg-white h-full">
         {content}

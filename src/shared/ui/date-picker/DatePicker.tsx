@@ -67,7 +67,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       // Исправляем проблему с часовыми поясами - создаем дату в локальном времени
       const [year, month, day] = value.split('-').map(Number);
       const date = new Date(year, month - 1, day);
-      console.log("DatePicker setting selectedDate:", date);
+      console.log("DatePicker setting selectedDate:", { 
+        originalValue: value, 
+        parsedDate: date, 
+        formattedDisplay: formatDate(date) 
+      });
       setSelectedDate(date);
     } else {
       console.log("DatePicker clearing selectedDate");
@@ -84,9 +88,16 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   const handleDateSelect = (date: Date) => {
-    console.log("DatePicker handleDateSelect:", { date, name, value: date.toISOString().split("T")[0] });
+    console.log("DatePicker handleDateSelect:", { date, name });
     setSelectedDate(date);
-    const formattedDate = date.toISOString().split("T")[0];
+    // Форматируем дату в локальном времени без проблем с часовыми поясами
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    
+    console.log("DatePicker formatted date:", formattedDate);
+    
     const syntheticEvent = {
       target: { 
         name, 
@@ -103,6 +114,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   };
 
   const handleClear = () => {
+    console.log("DatePicker handleClear:", { name });
     setSelectedDate(null);
     const syntheticEvent = {
       target: { 
@@ -114,6 +126,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       preventDefault: () => {},
       stopPropagation: () => {}
     } as React.ChangeEvent<HTMLInputElement>;
+    console.log("DatePicker calling onChange with clear:", syntheticEvent);
     onChange(syntheticEvent);
     onClear?.();
   };
@@ -243,7 +256,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         <button
           type="button"
           onClick={() => {
-            console.log("DatePicker clicked, current isOpen:", isOpen, "name:", name, "value:", value);
+            console.log("DatePicker clicked, current isOpen:", isOpen, "name:", name, "value:", value, "selectedDate:", selectedDate);
             setIsOpen(!isOpen);
           }}
           className={`

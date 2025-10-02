@@ -16,7 +16,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { IUser } from "@/shared/models/types/user";
 import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
-import { baseConfig } from "@/shared/contexts/PhotoUploadContext";
+import { baseConfigStep1, baseConfigStep2 } from "@/shared/contexts/PhotoUploadContext";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
@@ -42,7 +42,8 @@ export const MechanicDeliveryInUseModal = ({
 
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [actionType, setActionType] = useState<VehicleActionType | null>(null);
-  const [showUploadPhoto, setShowUploadPhoto] = useState(false);
+  const [showUploadPhotoStep1, setShowUploadPhotoStep1] = useState(false);
+  const [showUploadPhotoStep2, setShowUploadPhotoStep2] = useState(false);
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
 
@@ -86,7 +87,7 @@ export const MechanicDeliveryInUseModal = ({
     onClose();
   };
 
-  const handleUploadAfterDelivery = async (files: {
+  const handleUploadStep1 = async (files: {
     [key: string]: File[];
   }) => {
     setIsLoading(true);
@@ -100,11 +101,56 @@ export const MechanicDeliveryInUseModal = ({
     try {
       const res = await mechanicApi.uploadAfterDelivery(formData);
       if (res.status === 200) {
-        // Сразу завершаем доставку после загрузки фото
+        setIsLoading(false);
+        setShowUploadPhotoStep1(false);
+        
+        setResponseModal({
+          type: "success",
+          isOpen: true,
+          title: "Фото загружены",
+          description: "Селфи и фото салона загружены. Теперь сфотографируйте кузов.",
+          buttonText: "Продолжить",
+          onButtonClick: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+          onClose: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+        });
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description:
+          error?.response?.data?.detail || t("mechanic.delivery.completionError"),
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => { },
+      });
+    }
+  };
+
+  const handleUploadStep2 = async (files: {
+    [key: string]: File[];
+  }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+
+    try {
+      const res = await mechanicApi.uploadAfterDeliveryCar(formData);
+      if (res.status === 200) {
+        // Завершаем доставку после загрузки фото кузова
         const completeRes = await mechanicApi.completeDelivery();
         if (completeRes.status === 200) {
           setIsLoading(false);
-          setShowUploadPhoto(false);
+          setShowUploadPhotoStep2(false);
 
           // Дополнительно обновляем данные после завершения доставки
           try {
@@ -132,21 +178,21 @@ export const MechanicDeliveryInUseModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            description: t("mechanic.delivery.successfullyCompleted"),
-            buttonText: t("mechanic.common.excellent"),
+            title: "Доставка завершена",
+            description: "Все фото загружены. Доставка успешно завершена.",
+            buttonText: "Отлично",
             onButtonClick: handleClose,
             onClose: handleClose,
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       setIsLoading(false);
       showModal({
         type: "error",
-        description:
-          error?.response?.data?.detail || t("mechanic.delivery.completionError"),
+        description: error.response?.data?.detail || "Ошибка при загрузке фото",
         buttonText: t("modal.error.tryAgain"),
-        onClose: () => { },
+        onClose: () => {},
       });
     }
   };
@@ -289,12 +335,21 @@ export const MechanicDeliveryInUseModal = ({
       />
 
       <UploadPhoto
-        config={baseConfig}
+        config={baseConfigStep1}
         isLoading={isLoading}
-        onPhotoUpload={handleUploadAfterDelivery}
-        isOpen={showUploadPhoto}
+        onPhotoUpload={handleUploadStep1}
+        isOpen={showUploadPhotoStep1}
         withCloseButton
-        onClose={() => setShowUploadPhoto(false)}
+        onClose={() => setShowUploadPhotoStep1(false)}
+      />
+
+      <UploadPhoto
+        config={baseConfigStep2}
+        isLoading={isLoading}
+        onPhotoUpload={handleUploadStep2}
+        isOpen={showUploadPhotoStep2}
+        withCloseButton
+        onClose={() => setShowUploadPhotoStep2(false)}
       />
 
       <div className="p-6 pt-4 space-y-6">
@@ -318,7 +373,7 @@ export const MechanicDeliveryInUseModal = ({
         {/* Car Controls Slider */}
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
-        <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
+        <Button onClick={() => setShowUploadPhotoStep1(true)} variant="secondary">
           {t("mechanic.delivery.completeDelivery")}
         </Button>
 

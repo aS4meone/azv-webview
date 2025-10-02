@@ -5,16 +5,19 @@ export const mechanicRoutes = {
   getAllVehicles: "/mechanic/all_vehicles",
   getPendingVehicles: "/mechanic/get_pending_vehicles",
   getInUseVehicles: "/mechanic/get_in_use_vehicles",
+  getServiceVehicles: "/mechanic/get_service_vehicles",
   searchVehicles: "/mechanic/search",
 
   reserveCheckCar: (id: number) => `/mechanic/check-car/${id}`,
   startDeliveryCar: `mechanic/start-delivery`,
 
-  startCheckCar: "/mechanic/start",
+  startCheckCar: (id: number) => `/mechanic/start/${id}`,
   cancelCheckCar: "/mechanic/cancel",
 
   uploadBeforeCheckCar: "/mechanic/upload-photos-before",
+  uploadBeforeCheckCarInterior: "/mechanic/upload-photos-before-interior",
   uploadAfterCheckCar: "/mechanic/upload-photos-after",
+  uploadAfterCheckCarCar: "/mechanic/upload-photos-after-car",
 
   completeCheckCar: "/mechanic/complete",
 
@@ -26,7 +29,9 @@ export const mechanicRoutes = {
   getCurrentDelivery: "/mechanic/current-delivery",
 
   uploadBeforeDelivery: "/mechanic/upload-delivery-photos-before",
+  uploadBeforeDeliveryInterior: "/mechanic/upload-delivery-photos-before-interior",
   uploadAfterDelivery: "/mechanic/upload-delivery-photos-after",
+  uploadAfterDeliveryCar: "/mechanic/upload-delivery-photos-after-car",
 };
 
 export const mechanicActionsRoutes = {
@@ -49,6 +54,10 @@ export const mechanicApi = {
     const response = await axiosInstance.get(mechanicRoutes.getInUseVehicles);
     return response;
   },
+  getServiceVehicles: async () => {
+    const response = await axiosInstance.get(mechanicRoutes.getServiceVehicles);
+    return response;
+  },
   searchVehicles: async (search: string) => {
     const response = await axiosInstance.get(mechanicRoutes.searchVehicles, {
       params: { query: search },
@@ -65,8 +74,8 @@ export const mechanicApi = {
     const response = await axiosInstance.post(mechanicRoutes.startDeliveryCar);
     return response;
   },
-  startCheckCar: async () => {
-    const response = await axiosInstance.post(mechanicRoutes.startCheckCar);
+  startCheckCar: async (carId: number) => {
+    const response = await axiosInstance.post(mechanicRoutes.startCheckCar(carId));
     return response;
   },
   cancelCheckCar: async () => {
@@ -85,10 +94,34 @@ export const mechanicApi = {
     );
     return response;
   },
+  uploadBeforeCheckCarInterior: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      mechanicRoutes.uploadBeforeCheckCarInterior,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
 
   uploadAfterCheckCar: async (formData: FormData) => {
     const response = await axiosInstance.post(
       mechanicRoutes.uploadAfterCheckCar,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
+  uploadAfterCheckCarCar: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      mechanicRoutes.uploadAfterCheckCarCar,
       formData,
       {
         headers: {
@@ -138,9 +171,34 @@ export const mechanicApi = {
 
     return response;
   },
+  uploadBeforeDeliveryInterior: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      mechanicRoutes.uploadBeforeDeliveryInterior,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return response;
+  },
   uploadAfterDelivery: async (formData: FormData) => {
     const response = await axiosInstance.post(
       mechanicRoutes.uploadAfterDelivery,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  },
+  uploadAfterDeliveryCar: async (formData: FormData) => {
+    const response = await axiosInstance.post(
+      mechanicRoutes.uploadAfterDeliveryCar,
       formData,
       {
         headers: {

@@ -7,9 +7,7 @@ import { CarImageCarousel, CarInfoHeader, CarSpecs } from "../ui";
 import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
-import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import {
-  baseConfig,
   SERVICE_UPLOAD,
   usePhotoUpload,
 } from "@/shared/contexts/PhotoUploadContext";
@@ -29,14 +27,12 @@ export const MechanicCarInWaitingModal = ({
   onClose,
 }: MechanicCarInWaitingModalProps) => {
   const t = useTranslations();
-  const [showUploadPhoto, setShowUploadPhoto] = useState(false);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const { setUploadRequired } = usePhotoUpload();
   const [showDataScreen, setShowDataScreen] = useState(false);
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const car = user.current_rental!.car_details;
 
   const handleClose = async () => {
@@ -47,7 +43,7 @@ export const MechanicCarInWaitingModal = ({
 
   async function handleStartInspection() {
     try {
-      const res = await mechanicApi.startCheckCar();
+      const res = await mechanicApi.startCheckCar(car.id);
       if (res.status === 200) {
         setUploadRequired(SERVICE_UPLOAD, true);
         setResponseModal({
@@ -58,7 +54,6 @@ export const MechanicCarInWaitingModal = ({
           buttonText: t("mechanic.common.excellent"),
           onButtonClick: async () => {
             await refreshUser();
-            setShowUploadPhoto(true);
             handleClose();
           },
           onClose: handleClose,
@@ -97,57 +92,12 @@ export const MechanicCarInWaitingModal = ({
     }
   };
 
-  const handleUploadBeforeInspection = async (files: {
-    [key: string]: File[];
-  }) => {
-    setIsLoading(true);
-    const formData = new FormData();
-    for (const key in files) {
-      for (const file of files[key]) {
-        formData.append(key, file);
-      }
-    }
-    try {
-      const res = await mechanicApi.uploadBeforeCheckCar(formData);
-      if (res.status === 200) {
-        setIsLoading(false);
-        setShowUploadPhoto(false);
-        setResponseModal({
-          type: "success",
-          isOpen: true,
-          title: t("mechanic.inspection.photosUploaded"),
-          description: t("mechanic.inspection.photosUploadedSuccessfully"),
-          buttonText: t("mechanic.common.excellent"),
-          onButtonClick: handleClose,
-          onClose: handleClose,
-        });
-      }
-    } catch (error) {
-      setIsLoading(false);
-      showModal({
-        type: "error",
-        description:
-          error.response?.data?.detail || t("mechanic.inspection.photoUploadError"),
-        buttonText: t("modal.error.tryAgain"),
-        onClose: () => { },
-      });
-    }
-  };
-
   const handleViewData = () => {
     setShowDataScreen(true);
   };
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
-      <UploadPhoto
-        config={baseConfig}
-        onPhotoUpload={handleUploadBeforeInspection}
-        isLoading={isLoading}
-        isOpen={showUploadPhoto}
-        onClose={() => setShowUploadPhoto(false)}
-      />
-
       <CustomResponseModal
         isOpen={responseModal?.isOpen || false}
         onClose={responseModal?.onClose || (() => { })}

@@ -25,12 +25,19 @@ interface PhotoUploadContextType {
   isOwnerUploadRequired: boolean;
   isServiceUploadRequired: boolean;
   isDeliveryUploadRequired: boolean;
+  isUserUploadStep2Required: boolean;
+  isOwnerUploadStep2Required: boolean;
+  isServiceUploadStep2Required: boolean;
   setUploadCompleted: (uploadType: string) => void;
   setUploadRequired: (uploadType: string, required: boolean) => void;
   showUserUploadModal: () => void;
   showOwnerUploadModal: () => void;
   showServiceUploadModal: () => void;
   showDeliveryUploadModal: () => void;
+  showUserUploadModalStep2: () => void;
+  showOwnerUploadModalStep2: () => void;
+  showServiceUploadModalStep2: () => void;
+  isPhotoUploadCompleted: (uploadType: string) => boolean;
   isInitialized: boolean;
 }
 
@@ -50,6 +57,9 @@ export const PhotoUploadProvider = ({
   const [isServiceUploadRequired, setIsServiceUploadRequired] = useState(false);
   const [isDeliveryUploadRequired, setIsDeliveryUploadRequired] =
     useState(false);
+  const [isUserUploadStep2Required, setIsUserUploadStep2Required] = useState(false);
+  const [isOwnerUploadStep2Required, setIsOwnerUploadStep2Required] = useState(false);
+  const [isServiceUploadStep2Required, setIsServiceUploadStep2Required] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const { hideModal } = useModal();
@@ -149,6 +159,19 @@ export const PhotoUploadProvider = ({
     }
   };
 
+  const showUserUploadModalStep2 = () => {
+    setIsUserUploadStep2Required(true);
+  };
+
+  const showOwnerUploadModalStep2 = () => {
+    setIsOwnerUploadStep2Required(true);
+  };
+
+  const isPhotoUploadCompleted = (uploadType: string): boolean => {
+    const value = localStorage.getItem(uploadType);
+    return value === "true";
+  };
+
   const handleUserPhotoUpload = async (files: { [key: string]: File[] }) => {
     setIsLoading(true);
     const formData = new FormData();
@@ -161,10 +184,45 @@ export const PhotoUploadProvider = ({
       const res = await rentApi.uploadBeforeRent(formData);
       if (res.status === 200) {
         setIsLoading(false);
+        // После успешной загрузки селфи + кузова, показываем второй этап
+        setIsUserUploadStep2Required(true);
+        showModal({
+          type: "success",
+          description: "Замки автомобиля открыты! Теперь сфотографируйте салон.",
+          buttonText: "Продолжить",
+          onClose: () => {
+            hideModal();
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description: "Ошибка загрузки фотографий",
+        buttonText: "Попробовать снова",
+      });
+    }
+  };
+
+  const handleUserPhotoUploadStep2 = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await rentApi.uploadBeforeRentInterior(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setIsUserUploadStep2Required(false);
         setUploadCompleted(USER_UPLOAD);
         showModal({
           type: "success",
-          description: "Фотографии успешно загружены",
+          description: "Фотографии успешно загружены! Двигатель разблокирован.",
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
@@ -196,10 +254,45 @@ export const PhotoUploadProvider = ({
       const res = await rentApi.uploadOwnerBeforeRent(formData);
       if (res.status === 200) {
         setIsLoading(false);
+        // После успешной загрузки фото кузова, показываем второй этап
+        setIsOwnerUploadStep2Required(true);
+        showModal({
+          type: "success",
+          description: "Замки автомобиля открыты! Теперь сфотографируйте салон.",
+          buttonText: "Продолжить",
+          onClose: () => {
+            hideModal();
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description: "Ошибка загрузки фотографий",
+        buttonText: "Попробовать снова",
+      });
+    }
+  };
+
+  const handleOwnerPhotoUploadStep2 = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await rentApi.uploadOwnerBeforeRentInterior(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setIsOwnerUploadStep2Required(false);
         setUploadCompleted(OWNER_UPLOAD);
         showModal({
           type: "success",
-          description: "Фотографии успешно загружены",
+          description: "Фотографии успешно загружены! Двигатель разблокирован.",
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
@@ -231,10 +324,46 @@ export const PhotoUploadProvider = ({
       const res = await mechanicApi.uploadBeforeCheckCar(formData);
       if (res.status === 200) {
         setIsLoading(false);
+        // После успешной загрузки фото кузова и селфи, показываем второй этап
+        setIsServiceUploadRequired(false);
+        setIsServiceUploadStep2Required(true);
+        showModal({
+          type: "success",
+          description: "Замки автомобиля открыты! Теперь сфотографируйте салон.",
+          buttonText: "Продолжить",
+          onClose: () => {
+            hideModal();
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description: "Ошибка загрузки фотографий сервиса",
+        buttonText: "Попробовать снова",
+      });
+    }
+  };
+
+  const handleServicePhotoUploadStep2 = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await mechanicApi.uploadBeforeCheckCarInterior(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setIsServiceUploadStep2Required(false);
         setUploadCompleted(SERVICE_UPLOAD);
         showModal({
           type: "success",
-          description: "Фотографии успешно загружены, можно начинать осмотр",
+          description: "Фотографии успешно загружены! Двигатель разблокирован.",
           buttonText: "Отлично",
           onClose: () => {
             router.refresh();
@@ -248,7 +377,7 @@ export const PhotoUploadProvider = ({
       setIsLoading(false);
       showModal({
         type: "error",
-        description: "Ошибка загрузки фотографий сервиса",
+        description: "Ошибка загрузки фотографий салона",
         buttonText: "Попробовать снова",
       });
     }
@@ -291,17 +420,28 @@ export const PhotoUploadProvider = ({
     }
   };
 
+  const showServiceUploadModalStep2 = () => {
+    setIsServiceUploadStep2Required(true);
+  };
+
   const contextValue: PhotoUploadContextType = {
     isUserUploadRequired,
     isOwnerUploadRequired,
     isServiceUploadRequired,
     isDeliveryUploadRequired,
+    isUserUploadStep2Required,
+    isOwnerUploadStep2Required,
+    isServiceUploadStep2Required,
     setUploadCompleted,
     setUploadRequired,
     showUserUploadModal,
     showOwnerUploadModal,
     showServiceUploadModal,
     showDeliveryUploadModal,
+    showServiceUploadModalStep2,
+    showUserUploadModalStep2,
+    showOwnerUploadModalStep2,
+    isPhotoUploadCompleted,
     isInitialized,
   };
 
@@ -309,37 +449,73 @@ export const PhotoUploadProvider = ({
     <PhotoUploadMgrContext.Provider value={contextValue}>
       {children}
 
-      {/* User Upload Modal */}
+      {/* User Upload Modal Step 1 */}
       {isUserUploadRequired && (
         <UploadPhoto
-          config={baseConfig}
+          config={userConfigStep1}
           onPhotoUpload={handleUserPhotoUpload}
           isOpen={true}
-          onClose={() => setUploadRequired(USER_UPLOAD, false)}
+          onClose={undefined}
           isLoading={isLoading}
           isCloseable={false}
         />
       )}
 
-      {/* Owner Upload Modal */}
+      {/* User Upload Modal Step 2 */}
+      {isUserUploadStep2Required && (
+        <UploadPhoto
+          config={userConfigStep2}
+          onPhotoUpload={handleUserPhotoUploadStep2}
+          isOpen={true}
+          onClose={undefined}
+          isLoading={isLoading}
+          isCloseable={false}
+        />
+      )}
+
+      {/* Owner Upload Modal Step 1 */}
       {isOwnerUploadRequired && (
         <UploadPhoto
-          config={ownerConfig}
+          config={ownerConfigStep1}
           onPhotoUpload={handleOwnerPhotoUpload}
           isOpen={true}
-          onClose={() => setUploadRequired(OWNER_UPLOAD, false)}
+          onClose={undefined}
           isLoading={isLoading}
           isCloseable={false}
         />
       )}
 
-      {/* Service Upload Modal */}
+      {/* Owner Upload Modal Step 2 */}
+      {isOwnerUploadStep2Required && (
+        <UploadPhoto
+          config={ownerConfigStep2}
+          onPhotoUpload={handleOwnerPhotoUploadStep2}
+          isOpen={true}
+          onClose={undefined}
+          isLoading={isLoading}
+          isCloseable={false}
+        />
+      )}
+
+      {/* Service Upload Modal Step 1 */}
       {isServiceUploadRequired && (
         <UploadPhoto
-          config={baseConfig}
+          config={baseConfigStep1}
           onPhotoUpload={handleServicePhotoUpload}
           isOpen={true}
           onClose={() => setUploadRequired(SERVICE_UPLOAD, false)}
+          isLoading={isLoading}
+          isCloseable={false}
+        />
+      )}
+
+      {/* Service Upload Modal Step 2 */}
+      {isServiceUploadStep2Required && (
+        <UploadPhoto
+          config={baseConfigStep2}
+          onPhotoUpload={handleServicePhotoUploadStep2}
+          isOpen={true}
+          onClose={undefined}
           isLoading={isLoading}
           isCloseable={false}
         />
@@ -390,4 +566,141 @@ export const baseConfig: PhotoConfig[] = [
   },
 ];
 
+// Новые конфигурации для двухэтапной загрузки
+export const baseConfigStep1: PhotoConfig[] = [
+  {
+    id: "selfie",
+    title: "Сделайте селфи с машиной.",
+    cameraType: "front",
+    multiple: { min: 1, max: 1 },
+  },
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+export const baseConfigStep2: PhotoConfig[] = [
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+// Конфигурации для фото ПОСЛЕ осмотра механиком
+export const mechanicAfterConfigStep1: PhotoConfig[] = [
+  {
+    id: "selfie",
+    title: "Сделайте селфи с машиной.",
+    cameraType: "front",
+    multiple: { min: 1, max: 1 },
+  },
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+export const mechanicAfterConfigStep2: PhotoConfig[] = [
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+// Конфигурации для пользователей (селфи + кузов)
+export const userConfigStep1: PhotoConfig[] = [
+  {
+    id: "selfie",
+    title: "Сделайте селфи с машиной.",
+    cameraType: "front",
+    multiple: { min: 1, max: 1 },
+  },
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+export const userConfigStep2: PhotoConfig[] = [
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
 export const ownerConfig: PhotoConfig[] = baseConfig.slice(1);
+
+export const ownerConfigStep1: PhotoConfig[] = [
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+export const ownerConfigStep2: PhotoConfig[] = [
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+// Конфигурации для завершения аренды (ПОСЛЕ)
+export const afterRentConfigStep1: PhotoConfig[] = [
+  {
+    id: "selfie",
+    title: "Сделайте селфи.",
+    cameraType: "front",
+    multiple: { min: 1, max: 1 },
+  },
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+export const afterRentConfigStep2: PhotoConfig[] = [
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+// Для владельца после аренды (без селфи)
+export const ownerAfterRentConfigStep1: PhotoConfig[] = [
+  {
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];
+
+export const ownerAfterRentConfigStep2: PhotoConfig[] = [
+  {
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
+    multiple: { min: 1, max: 1 },
+    cameraType: "back",
+  },
+];

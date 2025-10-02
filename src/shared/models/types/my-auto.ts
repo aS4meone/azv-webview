@@ -40,15 +40,15 @@ export interface CarTripsResponse {
 }
 
 export interface TripPhotos {
-  client_before: {
+  client_before?: {
     photos: string[];
-  };
-  client_after: {
+  } | null;
+  client_after?: {
     photos: string[];
-  };
-  mechanic_after: {
+  } | null;
+  mechanic_after?: {
     photos: string[];
-  };
+  } | null;
 }
 
 export interface RouteCoordinate {
@@ -82,6 +82,25 @@ export interface RouteMap {
   route_data: RouteData;
 }
 
+export interface MechanicInspection {
+  mechanic: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+  };
+  start_time: string;
+  end_time: string;
+  status: string;
+  comment: string;
+  photos_before: string[];
+  photos_after: string[];
+  client_rating: number;
+  client_comment: string | null;
+  mechanic_rating: number;
+  mechanic_comment: string;
+}
+
 export interface TripDetailsResponse {
   id: number;
   vehicle_id: number;
@@ -92,6 +111,8 @@ export interface TripDetailsResponse {
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
-  photos: TripPhotos;
+  photos?: TripPhotos | null;
   route_map: RouteMap;
+  mechanic_delivery?: any | null;
+  mechanic_inspection?: MechanicInspection | null;
 }

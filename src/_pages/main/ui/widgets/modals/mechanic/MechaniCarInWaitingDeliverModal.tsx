@@ -8,7 +8,8 @@ import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
 import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import {
-  baseConfig,
+  baseConfigStep1,
+  baseConfigStep2,
   DELIVERY_UPLOAD,
   usePhotoUpload,
 } from "@/shared/contexts/PhotoUploadContext";
@@ -30,7 +31,9 @@ export const MechaniCarInWaitingDeliverModal = ({
   onClose,
 }: MechaniCarInWaitingDeliverModalProps) => {
   const t = useTranslations();
-  const [showUploadPhoto, setShowUploadPhoto] = useState(false);
+  const [showUploadPhotoStep1, setShowUploadPhotoStep1] = useState(false);
+  const [showUploadPhotoStep2, setShowUploadPhotoStep2] = useState(false);
+  const [showPhotoUploadButton, setShowPhotoUploadButton] = useState(false);
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const { setUploadRequired } = usePhotoUpload();
@@ -59,38 +62,55 @@ export const MechaniCarInWaitingDeliverModal = ({
 
   async function handleStartDelivery() {
     try {
+      console.log("Starting delivery process...");
+      // Сначала проверяем машину
+      const checkRes = await mechanicApi.reserveCheckCar(notHaveCar.id);
+      console.log("Car check result:", checkRes);
+      
+      // Затем пытаемся запустить доставку
       const res = await mechanicApi.startDeliveryCar();
       if (res.status === 200) {
-        setUploadRequired(DELIVERY_UPLOAD, true);
-        setResponseModal({
-          type: "success",
-          isOpen: true,
-          title: t("mechanic.delivery.successfullyStarted"),
-          description: t("mechanic.delivery.uploadPhotosBeforeStart"),
-          buttonText: t("mechanic.common.excellent"),
-          onButtonClick: async () => {
-            await refreshUser();
-            setShowUploadPhoto(true);
-            handleClose();
-          },
-          onClose: async () => {
-            await refreshUser();
-            setShowUploadPhoto(true);
-            handleClose();
-          },
-        });
+        // Если успешно - закрываем модал
+        handleClose();
       }
     } catch (error) {
+      console.error("Error in handleStartDelivery:", error);
+      // Если ошибка - показываем кнопку загрузки фото
+      if (error.response?.data?.detail?.includes("загрузите фото")) {
+        setShowPhotoUploadButton(true);
+        console.log("Showing photo upload button");
+      } else {
+        showModal({
+          type: "error",
+          description: error.response?.data?.detail || "Ошибка при запуске доставки",
+          buttonText: t("modal.error.tryAgain"),
+          onClose: () => {},
+        });
+      }
+    }
+  }
+
+  const handleStartPhotoUpload = async () => {
+    try {
+      console.log("Starting photo upload process...");
+      
+      // Закрываем все модальные окна и показываем первый этап загрузки фото
+      setResponseModal(null);
+      setShowPhotoUploadButton(false);
+      setShowUploadPhotoStep1(true);
+      console.log("Upload photo step 1 should be visible now");
+    } catch (error) {
+      console.error("Error in handleStartPhotoUpload:", error);
       showModal({
         type: "error",
-        description: error.response.data.detail,
+        description: error.response?.data?.detail || "Ошибка при запуске загрузки фото",
         buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
     }
-  }
+  };
 
-  const handleUploadBeforeDelivery = async (files: {
+  const handleUploadStep1 = async (files: {
     [key: string]: File[];
   }) => {
     setIsLoading(true);
@@ -104,16 +124,68 @@ export const MechaniCarInWaitingDeliverModal = ({
       const res = await mechanicApi.uploadBeforeDelivery(formData);
       if (res.status === 200) {
         setIsLoading(false);
-        setShowUploadPhoto(false);
+        setShowUploadPhotoStep1(false);
+        
+        // Показываем успех и переходим ко второму этапу
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: t("mechanic.delivery.photosUploaded"),
-          description: t("mechanic.delivery.photosUploadedSuccessfully"),
-          buttonText: t("mechanic.common.excellent"),
-          onButtonClick: handleClose,
-          onClose: handleClose,
+          title: "Фото загружены",
+          description: "Селфи и фото кузова загружены. Теперь сфотографируйте салон.",
+          buttonText: "Продолжить",
+          onButtonClick: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+          onClose: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
         });
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description:
+          error.response?.data?.detail || t("mechanic.delivery.photoUploadError"),
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => {},
+      });
+    }
+  };
+
+  const handleUploadStep2 = async (files: {
+    [key: string]: File[];
+  }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      // Загружаем фото салона
+      const res = await mechanicApi.uploadBeforeDeliveryInterior(formData);
+      if (res.status === 200) {
+        // После загрузки фото салона запускаем доставку
+        const startRes = await mechanicApi.startDeliveryCar();
+        if (startRes.status === 200) {
+          setIsLoading(false);
+          setShowUploadPhotoStep2(false);
+          
+          // Показываем успех и закрываем модал
+          setResponseModal({
+            type: "success",
+            isOpen: true,
+            title: "Доставка запущена",
+            description: "Все фото загружены. Доставка успешно запущена.",
+            buttonText: "Отлично",
+            onButtonClick: handleClose,
+            onClose: handleClose,
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -129,13 +201,7 @@ export const MechaniCarInWaitingDeliverModal = ({
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
-      <UploadPhoto
-        config={baseConfig}
-        onPhotoUpload={handleUploadBeforeDelivery}
-        isLoading={isLoading}
-        isOpen={showUploadPhoto}
-        onClose={() => setShowUploadPhoto(false)}
-      />
+      
 
       <CustomResponseModal
         isOpen={responseModal?.isOpen || false}
@@ -144,6 +210,22 @@ export const MechaniCarInWaitingDeliverModal = ({
         description={responseModal?.description || ""}
         buttonText={responseModal?.buttonText || ""}
         onButtonClick={responseModal?.onButtonClick || (() => {})}
+      />
+      
+      <UploadPhoto
+        config={baseConfigStep1}
+        onPhotoUpload={handleUploadStep1}
+        isLoading={isLoading}
+        isOpen={showUploadPhotoStep1}
+        onClose={() => setShowUploadPhotoStep1(false)}
+      />
+      
+      <UploadPhoto
+        config={baseConfigStep2}
+        onPhotoUpload={handleUploadStep2}
+        isLoading={isLoading}
+        isOpen={showUploadPhotoStep2}
+        onClose={() => setShowUploadPhotoStep2(false)}
       />
 
       {/* Таймер ожидания */}
@@ -177,9 +259,15 @@ export const MechaniCarInWaitingDeliverModal = ({
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <Button onClick={handleStartDelivery} variant="secondary">
-            {t("mechanic.delivery.startDelivery")}
-          </Button>
+          {!showPhotoUploadButton ? (
+            <Button onClick={handleStartDelivery} variant="secondary">
+              {t("mechanic.delivery.startDelivery")}
+            </Button>
+          ) : (
+            <Button onClick={handleStartPhotoUpload} variant="secondary">
+              Загрузить фото кузова и селфи
+            </Button>
+          )}
         </div>
       </div>
     </div>

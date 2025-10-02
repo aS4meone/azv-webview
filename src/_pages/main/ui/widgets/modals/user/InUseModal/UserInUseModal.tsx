@@ -11,12 +11,18 @@ import {
 import { rentApi } from "@/shared/api/routes/rent";
 import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { useUserStore } from "@/shared/stores/userStore";
+import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { IUser } from "@/shared/models/types/user";
 import { RentalType } from "@/shared/models/dto/rent.dto";
 import { ArrowRightIcon } from "@/shared/icons";
 import { cn } from "@/shared/utils/cn";
 import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
-import { baseConfig, ownerConfig } from "@/shared/contexts/PhotoUploadContext";
+import { 
+  afterRentConfigStep1, 
+  afterRentConfigStep2, 
+  ownerAfterRentConfigStep1, 
+  ownerAfterRentConfigStep2 
+} from "@/shared/contexts/PhotoUploadContext";
 import PushScreen from "@/shared/ui/push-screen";
 import { ICar } from "@/shared/models/types/car";
 import { getRentalConfig } from "../../../screens/rental-screen/hooks/usePricingCalculator";
@@ -34,12 +40,14 @@ interface UserInUseModalProps {
 export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
   const t = useTranslations();
   const { refreshUser } = useUserStore();
+  const { allVehicles } = useVehiclesStore();
   const [isLoading, setIsLoading] = useState(false);
 
   const [showMore, setShowMore] = useState(false);
   const [isSuccessOpen, setIsSuccessOpen] = useState(false);
   const [actionType, setActionType] = useState<VehicleActionType | null>(null);
   const [showUploadPhoto, setShowUploadPhoto] = useState(false);
+  const [showUploadPhotoStep2, setShowUploadPhotoStep2] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -62,11 +70,65 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         formData.append(key, file);
       }
     }
-    const res = await rentApi.uploadAfterRent(formData);
-    if (res.status === 200) {
+    try {
+      const res = await rentApi.uploadAfterRent(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhoto(false);
+        // Показываем сообщение о блокировке и переходим ко второму шагу
+        setResponseModal({
+          isOpen: true,
+          type: "success",
+          description: "Замки, двигатель заблокированы, ключ забран. Теперь сфотографируйте кузов автомобиля.",
+          buttonText: "Продолжить",
+          onClose: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+          onButtonClick: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+        });
+      }
+    } catch (error: any) {
       setIsLoading(false);
-      setShowUploadPhoto(false);
-      setShowRatingModal(true);
+      setResponseModal({
+        isOpen: true,
+        type: "error",
+        description: error.response?.data?.detail || "Ошибка при загрузке фотографий",
+        buttonText: "Попробовать снова",
+        onClose: () => setResponseModal(null),
+        onButtonClick: () => setResponseModal(null),
+      });
+    }
+  };
+
+  const handlePhotoUploadStep2 = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await rentApi.uploadAfterRentCar(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhotoStep2(false);
+        setShowRatingModal(true);
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      setResponseModal({
+        isOpen: true,
+        type: "error",
+        description: error.response?.data?.detail || "Ошибка при загрузке фотографий кузова",
+        buttonText: "Попробовать снова",
+        onClose: () => setResponseModal(null),
+        onButtonClick: () => setResponseModal(null),
+      });
     }
   };
 
@@ -78,11 +140,65 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         formData.append(key, file);
       }
     }
-    const res = await rentApi.uploadOwnerAfterRent(formData);
-    if (res.status === 200) {
+    try {
+      const res = await rentApi.uploadOwnerAfterRent(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhoto(false);
+        // Показываем сообщение о блокировке и переходим ко второму шагу
+        setResponseModal({
+          isOpen: true,
+          type: "success",
+          description: "Замки, двигатель заблокированы, ключ забран. Теперь сфотографируйте кузов автомобиля.",
+          buttonText: "Продолжить",
+          onClose: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+          onButtonClick: () => {
+            setResponseModal(null);
+            setShowUploadPhotoStep2(true);
+          },
+        });
+      }
+    } catch (error: any) {
       setIsLoading(false);
-      setShowUploadPhoto(false);
-      setShowRatingModal(true);
+      setResponseModal({
+        isOpen: true,
+        type: "error",
+        description: error.response?.data?.detail || "Ошибка при загрузке фотографий",
+        buttonText: "Попробовать снова",
+        onClose: () => setResponseModal(null),
+        onButtonClick: () => setResponseModal(null),
+      });
+    }
+  };
+
+  const handleOwnerPhotoUploadStep2 = async (files: { [key: string]: File[] }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await rentApi.uploadOwnerAfterRentCar(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhotoStep2(false);
+        setShowRatingModal(true);
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      setResponseModal({
+        isOpen: true,
+        type: "error",
+        description: error.response?.data?.detail || "Ошибка при загрузке фотографий кузова",
+        buttonText: "Попробовать снова",
+        onClose: () => setResponseModal(null),
+        onButtonClick: () => setResponseModal(null),
+      });
     }
   };
 
@@ -99,7 +215,8 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
     }
   }, [isSuccessOpen, responseModal]);
 
-  const car = user.current_rental!.car_details;
+  // Получаем актуальные данные о машине из vehiclesStore или fallback на user.current_rental
+  const car = allVehicles.find(v => v.current_renter_id === user.id) || user.current_rental!.car_details;
   const rentalDetails = user.current_rental!.rental_details;
   const rentalType = rentalDetails.rental_type as RentalType;
 
@@ -305,6 +422,52 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
     }
   };
 
+  const handleUnlockEngine = async () => {
+    try {
+      await vehicleActionsApi.unlockEngine();
+      showSuccessModal("unlock");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error && "response" in error
+          ? (error as { response?: { data?: { detail?: string } } }).response
+              ?.data?.detail
+          : "Ошибка разблокировки двигателя";
+
+      setResponseModal({
+        isOpen: true,
+        onClose: () => {},
+        type: "error",
+        title: t("error"),
+        description: errorMessage || "Ошибка разблокировки двигателя",
+        buttonText: t("modal.error.tryAgain"),
+        onButtonClick: () => {},
+      });
+    }
+  };
+
+  const handleLockEngine = async () => {
+    try {
+      await vehicleActionsApi.lockEngine();
+      showSuccessModal("lock");
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error && "response" in error
+          ? (error as { response?: { data?: { detail?: string } } }).response
+              ?.data?.detail
+          : "Ошибка блокировки двигателя";
+
+      setResponseModal({
+        isOpen: true,
+        onClose: () => {},
+        type: "error",
+        title: t("error"),
+        description: errorMessage || "Ошибка блокировки двигателя",
+        buttonText: t("modal.error.tryAgain"),
+        onButtonClick: () => {},
+      });
+    }
+  };
+
   const renderRentalTypeContent = () => {
     switch (rentalType) {
       case "minutes":
@@ -346,15 +509,28 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         actionType={actionType!}
       />
 
+      {/* Шаг 1: Селфи + Салон */}
       <UploadPhoto
-        config={car.owned_car ? ownerConfig : baseConfig}
+        config={car.owner_id === user.id ? ownerAfterRentConfigStep1 : afterRentConfigStep1}
         onPhotoUpload={
-          car.owned_car ? handleOwnerPhotoUpload : handlePhotoUpload
+          car.owner_id === user.id ? handleOwnerPhotoUpload : handlePhotoUpload
         }
         isLoading={isLoading}
         isOpen={showUploadPhoto}
         withCloseButton
         onClose={() => setShowUploadPhoto(false)}
+      />
+
+      {/* Шаг 2: Фото кузова */}
+      <UploadPhoto
+        config={car.owner_id === user.id ? ownerAfterRentConfigStep2 : afterRentConfigStep2}
+        onPhotoUpload={
+          car.owner_id === user.id ? handleOwnerPhotoUploadStep2 : handlePhotoUploadStep2
+        }
+        isLoading={isLoading}
+        isOpen={showUploadPhotoStep2}
+        withCloseButton={false}
+        onClose={() => setShowUploadPhotoStep2(false)}
       />
 
       {showRatingModal && (
@@ -371,7 +547,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         />
       )}
 
-      {car.owned_car ? null : (
+      {car.owner_id === user.id ? null : (
         <button
           onClick={() => setShowMore(!showMore)}
           className={cn(
@@ -410,7 +586,82 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         {/* Car Controls Slider */}
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
-        <Button onClick={() => setShowUploadPhoto(true)} variant="secondary">
+        {/* Engine Controls */}
+        <div className="flex justify-between gap-2">
+          <Button
+            variant="outline"
+            className="text-[14px] flex-1"
+            onClick={handleLockEngine}
+          >
+            Заблокировать двигатель
+          </Button>
+          <Button
+            variant="outline"
+            className="text-[14px] flex-1"
+            onClick={handleUnlockEngine}
+          >
+            Разблокировать двигатель
+          </Button>
+        </div>
+
+        <Button onClick={() => {
+          // 🔍 DEBUG: Выводим все значения для диагностики
+          console.log("--- DEBUG: Complete Rental button clicked ---");
+          console.log("car.owned_car:", car.owned_car);
+          console.log("car.owner_id:", car.owner_id);
+          console.log("user.id:", user.id);
+          console.log("photo_after_selfie_uploaded:", car.photo_after_selfie_uploaded);
+          console.log("photo_after_car_uploaded:", car.photo_after_car_uploaded);
+          console.log("photo_after_interior_uploaded:", car.photo_after_interior_uploaded);
+          
+          // Проверяем, является ли пользователь владельцем автомобиля
+          const isOwner = car.owner_id === user.id;
+          
+          if (isOwner) {
+            console.log("🔍 DEBUG: User is OWNER");
+            // Для владельца проверяем статусы фото (селфи не требуется)
+            const hasInteriorAfter = car.photo_after_interior_uploaded || false;
+            const hasCarAfter = car.photo_after_car_uploaded || false;
+            
+            console.log("🔍 DEBUG: Owner - hasInteriorAfter:", hasInteriorAfter, "hasCarAfter:", hasCarAfter);
+            
+            if (!hasInteriorAfter) {
+              console.log("🔍 DEBUG: Owner - Need interior photos, showing upload photo modal");
+              // Нужно загрузить фото салона
+              setShowUploadPhoto(true);
+            } else if (hasInteriorAfter && !hasCarAfter) {
+              console.log("🔍 DEBUG: Owner - Need car photos, showing upload photo step 2 modal");
+              // Нужно загрузить фото кузова
+              setShowUploadPhotoStep2(true);
+            } else if (hasInteriorAfter && hasCarAfter) {
+              console.log("🔍 DEBUG: Owner - All photos uploaded, showing rating modal");
+              // ✅ Все необходимые фото загружены (салон + кузов), показываем рейтинг
+              setShowRatingModal(true);
+            }
+          } else {
+            console.log("🔍 DEBUG: User is REGULAR USER");
+            // Для обычных пользователей проверяем статусы фото
+            const hasSelfieAfter = car.photo_after_selfie_uploaded || false;
+            const hasInteriorAfter = car.photo_after_interior_uploaded || false;
+            const hasCarAfter = car.photo_after_car_uploaded || false;
+            
+            console.log("🔍 DEBUG: Regular - hasSelfieAfter:", hasSelfieAfter, "hasInteriorAfter:", hasInteriorAfter, "hasCarAfter:", hasCarAfter);
+            
+            if (!hasSelfieAfter || !hasInteriorAfter) {
+              console.log("🔍 DEBUG: Regular - Need selfie + interior photos, showing upload photo modal");
+              // Нужно загрузить селфи + салон
+              setShowUploadPhoto(true);
+            } else if (hasSelfieAfter && hasInteriorAfter && !hasCarAfter) {
+              console.log("🔍 DEBUG: Regular - Need car photos, showing upload photo step 2 modal");
+              // Нужно загрузить фото кузова
+              setShowUploadPhotoStep2(true);
+            } else {
+              console.log("🔍 DEBUG: Regular - All photos uploaded, showing rating modal");
+              // Все фото загружены, показываем рейтинг
+              setShowRatingModal(true);
+            }
+          }
+        }} variant="secondary">
           {t("widgets.modals.rentalContent.completeRental")}
         </Button>
       </div>
