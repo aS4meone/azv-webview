@@ -29,6 +29,14 @@ interface UploadPhotoProps {
   withCloseButton?: boolean;
   isLoading?: boolean;
   isCloseable?: boolean;
+  // Флаги из API для определения уже загруженных фотографий (ДО осмотра)
+  photoBeforeSelfieUploaded?: boolean;
+  photoBeforeCarUploaded?: boolean;
+  photoBeforeInteriorUploaded?: boolean;
+  // Флаги из API для определения уже загруженных фотографий (ПОСЛЕ осмотра)
+  photoAfterSelfieUploaded?: boolean;
+  photoAfterCarUploaded?: boolean;
+  photoAfterInteriorUploaded?: boolean;
 }
 
 // Компонент индикатора прогресса
@@ -95,6 +103,12 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   onClose,
   isLoading = false,
   isCloseable = true,
+  photoBeforeSelfieUploaded = false,
+  photoBeforeCarUploaded = false,
+  photoBeforeInteriorUploaded = false,
+  photoAfterSelfieUploaded = false,
+  photoAfterCarUploaded = false,
+  photoAfterInteriorUploaded = false,
 }) => {
   const t = useTranslations("uploadPhoto");
   const { showModal } = useResponseModal();
@@ -245,25 +259,37 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     onPhotoUpload(selectedFiles);
   };
 
-  const allPhotosUploaded = config.every(
-    (photo) => selectedFiles[photo.id]?.length > 0
-  );
+  const allPhotosUploaded = config.every((photo) => {
+    // Проверяем, загружена ли фотография через интерфейс
+    const hasLocalPhoto = selectedFiles[photo.id]?.length > 0;
+    
+    // Проверяем флаги из API (ДО осмотра)
+    let hasApiPhotoBefore = false;
+    if (photo.id === "selfie") {
+      hasApiPhotoBefore = photoBeforeSelfieUploaded;
+    } else if (photo.id === "car_photos") {
+      hasApiPhotoBefore = photoBeforeCarUploaded;
+    } else if (photo.id === "interior_photos") {
+      hasApiPhotoBefore = photoBeforeInteriorUploaded;
+    }
+    
+    // Проверяем флаги из API (ПОСЛЕ осмотра)
+    let hasApiPhotoAfter = false;
+    if (photo.id === "selfie") {
+      hasApiPhotoAfter = photoAfterSelfieUploaded;
+    } else if (photo.id === "car_photos") {
+      hasApiPhotoAfter = photoAfterCarUploaded;
+    } else if (photo.id === "interior_photos") {
+      hasApiPhotoAfter = photoAfterInteriorUploaded;
+    }
+    
+    const hasApiPhoto = hasApiPhotoBefore || hasApiPhotoAfter;
+    
+    // Фотография считается загруженной, если она загружена либо через интерфейс, либо через API (до или после осмотра)
+    return hasLocalPhoto || hasApiPhoto;
+  });
 
   const isFlutterAvailable = FlutterCamera.isAvailable();
-
-  // Добавляем отладочную информацию
-  console.log("🔍 React Native Camera Debug Info:", {
-    isFlutterAvailable,
-    hasReactNativeWebView: !!(
-      typeof window !== "undefined" && window.ReactNativeWebView
-    ),
-    userAgent:
-      typeof window !== "undefined" ? window.navigator.userAgent : "unknown",
-    windowObject:
-      typeof window !== "undefined"
-        ? Object.keys(window).filter((k) => k.includes("ReactNative"))
-        : [],
-  });
 
   const content = (
     <div className="bg-white min-h-full mt-5">

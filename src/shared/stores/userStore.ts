@@ -67,6 +67,14 @@ export const useUserStore = create<UserStore>((set, get) => ({
         throw new Error("No user data received");
       }
 
+      // 🔍 DEBUG: Отслеживаем обновление данных пользователя
+      console.log("🔍 DEBUG: refreshUser - User data updated");
+      console.log("User data:", response.data);
+      console.log("Current rental:", response.data.current_rental);
+      console.log("Car details:", response.data.current_rental?.car_details);
+      console.log("Car status:", response.data.current_rental?.car_details?.status);
+      console.log("Car current_renter_details:", response.data.current_rental?.car_details?.current_renter_details);
+
       set({ user: response.data, isLoading: false });
     } catch (error) {
       console.error("Failed to fetch user:", error);

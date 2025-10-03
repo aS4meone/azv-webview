@@ -11,11 +11,14 @@ import {
   SERVICE_UPLOAD,
   usePhotoUpload,
 } from "@/shared/contexts/PhotoUploadContext";
-import { mechanicApi } from "@/shared/api/routes/mechanic";
+import { mechanicApi, mechanicActionsApi } from "@/shared/api/routes/mechanic";
 import { MechanicWaitingTimer } from "../../timers/MechanicTimer";
 import { CarStatus } from "@/shared/models/types/car";
 import { DescriptionScreen } from "../../screens/description-screen/DescriptionScreen";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
+import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
+import { baseConfigStep1, baseConfigStep2 } from "@/shared/contexts/PhotoUploadContext";
+import Loader from "@/shared/ui/loader";
 
 interface MechanicCarInWaitingModalProps {
   user: IUser;
@@ -33,6 +36,9 @@ export const MechanicCarInWaitingModal = ({
   const [showDataScreen, setShowDataScreen] = useState(false);
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showUploadPhotoStep1, setShowUploadPhotoStep1] = useState(false);
+  const [showUploadPhotoStep2, setShowUploadPhotoStep2] = useState(false);
   const car = user.current_rental!.car_details;
 
   const handleClose = async () => {
@@ -42,32 +48,195 @@ export const MechanicCarInWaitingModal = ({
   };
 
   async function handleStartInspection() {
-    try {
-      const res = await mechanicApi.startCheckCar(car.id);
-      if (res.status === 200) {
-        setUploadRequired(SERVICE_UPLOAD, true);
-        setResponseModal({
-          type: "success",
-          isOpen: true,
-          title: t("mechanic.inspection.successfullyStarted"),
-          description: t("mechanic.inspection.uploadPhotosBeforeStart"),
-          buttonText: t("mechanic.common.excellent"),
-          onButtonClick: async () => {
-            await refreshUser();
-            handleClose();
-          },
-          onClose: handleClose,
+    // Проверяем статус загрузки фотографий из auth/user/me
+    const hasSelfie = car.photo_before_selfie_uploaded || false;
+    const hasCarPhotos = car.photo_before_car_uploaded || false;
+    const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
+    
+    // Если селфи или фото кузова не загружены - показываем модал для их загрузки
+    if (!hasSelfie || !hasCarPhotos) {
+      setShowUploadPhotoStep1(true);
+      return;
+    }
+    
+    // Если селфи и фото кузова загружены, но фото салона не загружено - показываем модал для загрузки салона
+    if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
+      setShowUploadPhotoStep2(true);
+      return;
+    }
+    
+    // Если все фото загружены, отправляем запрос на начало осмотра
+    if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
+      try {
+        const res = await mechanicApi.startCheckCar(car.id);
+        if (res.status === 200) {
+          setUploadRequired(SERVICE_UPLOAD, true);
+          setResponseModal({
+            type: "success",
+            isOpen: true,
+            title: t("mechanic.inspection.successfullyStarted"),
+            description: t("mechanic.inspection.uploadPhotosBeforeStart"),
+            buttonText: t("mechanic.common.excellent"),
+            onButtonClick: async () => {
+              await refreshUser();
+              handleClose();
+            },
+            onClose: handleClose,
+          });
+        }
+      } catch (error) {
+        showModal({
+          type: "error",
+          description: error.response.data.detail,
+          buttonText: t("modal.error.tryAgain"),
+          onClose: () => { },
         });
       }
-    } catch (error) {
-      showModal({
-        type: "error",
-        description: error.response.data.detail,
-        buttonText: t("modal.error.tryAgain"),
-        onClose: () => { },
-      });
     }
   }
+
+  // Загрузка фото ДО осмотра - Шаг 1 (селфи + кузов)
+  const handleUploadStep1 = async (files: {
+    [key: string]: File[];
+  }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await mechanicApi.uploadBeforeCheckCar(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhotoStep1(false);
+        
+        // Обновляем данные пользователя чтобы получить обновленные флаги
+        await refreshUser();
+        
+        // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
+        try {
+          await mechanicActionsApi.openVehicle();
+          
+          setResponseModal({
+            isOpen: true,
+            type: "success",
+            description: "Фотографии загружены! Замки автомобиля открыты. Теперь сфотографируйте салон.",
+            buttonText: "Продолжить",
+            onClose: () => {
+              setResponseModal(null);
+              setShowUploadPhotoStep2(true);
+            },
+            onButtonClick: () => {
+              setResponseModal(null);
+              setShowUploadPhotoStep2(true);
+            },
+          });
+        } catch (unlockError) {
+          console.error("Ошибка при открытии замков:", unlockError);
+          setResponseModal({
+            isOpen: true,
+            type: "success",
+            description: "Фотографии загружены! Теперь сфотографируйте салон.",
+            buttonText: "Продолжить",
+            onClose: () => {
+              setResponseModal(null);
+              setShowUploadPhotoStep2(true);
+            },
+            onButtonClick: () => {
+              setResponseModal(null);
+              setShowUploadPhotoStep2(true);
+            },
+          });
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description:
+          error.response?.data?.detail || "Ошибка загрузки фотографий",
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => {},
+      });
+    }
+  };
+
+  // Загрузка фото ДО осмотра - Шаг 2 (салон)
+  const handleUploadStep2 = async (files: {
+    [key: string]: File[];
+  }) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    for (const key in files) {
+      for (const file of files[key]) {
+        formData.append(key, file);
+      }
+    }
+    try {
+      const res = await mechanicApi.uploadBeforeCheckCarInterior(formData);
+      if (res.status === 200) {
+        setIsLoading(false);
+        setShowUploadPhotoStep2(false);
+        
+        // Обновляем данные пользователя чтобы получить обновленные флаги
+        await refreshUser();
+        
+        // РАЗБЛОКИРУЕМ ДВИГАТЕЛЬ после загрузки фото салона
+        try {
+          await mechanicActionsApi.unlockEngine();
+          
+          // Теперь автоматически начинаем осмотр, так как все фото загружены
+          const startRes = await mechanicApi.startCheckCar(car.id);
+          if (startRes.status === 200) {
+            // Дополнительно обновляем данные после начала осмотра
+            await refreshUser();
+            
+            setResponseModal({
+              isOpen: true,
+              type: "success",
+              description: "Фотографии салона загружены! Двигатель разблокирован. Осмотр автомобиля начат успешно!",
+              buttonText: "Отлично",
+              onClose: () => {
+                setResponseModal(null);
+                handleClose();
+              },
+              onButtonClick: () => {
+                setResponseModal(null);
+                handleClose();
+              },
+            });
+          }
+        } catch (unlockError) {
+          console.error("Ошибка при разблокировке двигателя:", unlockError);
+          setResponseModal({
+            isOpen: true,
+            type: "success",
+            description: "Фотографии салона загружены! Осмотр автомобиля начат успешно!",
+            buttonText: "Отлично",
+            onClose: () => {
+              setResponseModal(null);
+              handleClose();
+            },
+            onButtonClick: () => {
+              setResponseModal(null);
+              handleClose();
+            },
+          });
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description:
+          error.response?.data?.detail || "Ошибка загрузки фотографий",
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => {},
+      });
+    }
+  };
 
   const handleCancelInspection = async () => {
     try {
@@ -144,7 +313,21 @@ export const MechanicCarInWaitingModal = ({
             {t("mechanic.inspection.cancelInspection")}
           </Button>
           <Button onClick={handleStartInspection} variant="secondary">
-            {t("mechanic.inspection.startInspection")}
+            {(() => {
+              const hasSelfie = car.photo_before_selfie_uploaded || false;
+              const hasCarPhotos = car.photo_before_car_uploaded || false;
+              const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
+              
+              if (!hasSelfie || !hasCarPhotos) {
+                return "Загрузить селфи и фото кузова";
+              } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
+                return "Загрузить фото салона";
+              } else if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
+                return t("mechanic.inspection.startInspection");
+              } else {
+                return "Загрузить селфи и фото кузова";
+              }
+            })()}
           </Button>
         </div>
       </div>
@@ -152,6 +335,36 @@ export const MechanicCarInWaitingModal = ({
       {showDataScreen && (
         <DescriptionScreen car={car} onClose={() => setShowDataScreen(false)} />
       )}
+
+      {/* Модальное окно загрузки фотографий - Шаг 1 (селфи + кузов) */}
+      <UploadPhoto
+        config={baseConfigStep1}
+        onPhotoUpload={handleUploadStep1}
+        isOpen={showUploadPhotoStep1}
+        onClose={() => setShowUploadPhotoStep1(false)}
+        isLoading={isLoading}
+        isCloseable={false}
+        {...({
+          photoBeforeSelfieUploaded: car.photo_before_selfie_uploaded,
+          photoBeforeCarUploaded: car.photo_before_car_uploaded,
+          photoBeforeInteriorUploaded: car.photo_before_interior_uploaded,
+        } as any)}
+      />
+
+      {/* Модальное окно загрузки фотографий - Шаг 2 (салон) */}
+      <UploadPhoto
+        config={baseConfigStep2}
+        onPhotoUpload={handleUploadStep2}
+        isOpen={showUploadPhotoStep2}
+        onClose={() => setShowUploadPhotoStep2(false)}
+        isLoading={isLoading}
+        isCloseable={false}
+        {...({
+          photoBeforeSelfieUploaded: car.photo_before_selfie_uploaded,
+          photoBeforeCarUploaded: car.photo_before_car_uploaded,
+          photoBeforeInteriorUploaded: car.photo_before_interior_uploaded,
+        } as any)}
+      />
     </div>
   );
 };

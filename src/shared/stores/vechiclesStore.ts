@@ -343,6 +343,12 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       // Выполняем все запросы параллельно
       const response = await mechanicApi.getAllVehicles();
 
+      // 🔍 DEBUG: Отслеживаем обновление данных механика
+      console.log("🔍 DEBUG: fetchAllMechanicVehicles - API Response");
+      console.log("Response data:", response.data);
+      console.log("Vehicles count:", response.data.vehicles?.length);
+      console.log("Vehicles:", response.data.vehicles);
+
       set({
         allMechanicVehicles: response.data.vehicles,
         isLoadingAllMechanic: false,

@@ -7,7 +7,6 @@ import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { useUserStore } from "@/shared/stores/userStore";
 import { TrackingDataScreen } from "../../screens/tracking-screen/TrackingDataScreen";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
-import { ClientReviewSection } from "./ClientReviewSection";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 import { vehicleActionsApi } from "@/shared/api/routes/vehicles";
 import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
@@ -20,22 +19,22 @@ import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 
 interface MechanicTrackingCarModalProps {
   car: ICar;
-  currentMechanicId?: number | null;
   onClose: () => void;
 }
 
 export const MechanicTrackingCarModal = ({
   car: initialCar,
-  currentMechanicId,
   onClose,
 }: MechanicTrackingCarModalProps) => {
   const t = useTranslations();
   const { showModal } = useResponseModal();
-  const { refreshUser } = useUserStore();
-  const { allVehicles } = useVehiclesStore();
+  const { user, refreshUser } = useUserStore();
+  const { allMechanicVehicles, fetchAllMechanicVehicles } = useVehiclesStore();
   
-  // Получаем актуальные данные о машине из vehiclesStore
-  const car = allVehicles.find(v => v.id === initialCar.id) || initialCar;
+  // Получаем актуальные данные о машине из user.current_rental.car_details (из /auth/user/me)
+  // Это важно для получения правильных флагов photo_after_*_uploaded
+  const car = user?.current_rental?.car_details || allMechanicVehicles?.find(v => v.id === initialCar.id) || initialCar;
+  
   const [showDataScreen, setShowDataScreen] = useState(false);
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
@@ -49,39 +48,31 @@ export const MechanicTrackingCarModal = ({
   const handleClose = async () => {
     setResponseModal(null);
     onClose();
-    await refreshUser();
+    try {
+      await refreshUser();
+      // Обновляем данные о всех машинах для корректного отображения статусов
+      await fetchAllMechanicVehicles();
+    } catch (error) {
+      console.warn("Failed to refresh data on modal close:", error);
+      // Continue with close even if refresh fails
+    }
   };
 
   const handleCompleteTracking = async () => {
     try {
       if (isMechanicInspecting) {
-        // 🔍 DEBUG: Выводим все значения для диагностики
-        console.log("--- DEBUG: Mechanic Complete Tracking clicked ---");
-        console.log("car.photo_after_selfie_uploaded:", car.photo_after_selfie_uploaded);
-        console.log("car.photo_after_car_uploaded:", car.photo_after_car_uploaded);
-        console.log("car.photo_after_interior_uploaded:", car.photo_after_interior_uploaded);
-        console.log("car.status:", car.status);
-        console.log("car.current_renter_details?.id:", car.current_renter_details?.id);
-        console.log("currentMechanicId:", currentMechanicId);
-        console.log("isMechanicInspecting:", isMechanicInspecting);
-        
         // Проверяем флаги photo_after_*_uploaded для определения следующих шагов
-        const needsSelfieInterior = !car.photo_after_selfie_uploaded || !car.photo_after_interior_uploaded;
-        const needsCarPhotos = !car.photo_after_car_uploaded;
+        const hasSelfie = car.photo_after_selfie_uploaded || false;
+        const hasCarPhotos = car.photo_after_car_uploaded || false;
+        const hasInteriorPhotos = car.photo_after_interior_uploaded || false;
         
-        console.log("🔍 DEBUG: needsSelfieInterior:", needsSelfieInterior);
-        console.log("🔍 DEBUG: needsCarPhotos:", needsCarPhotos);
-        
-        if (needsSelfieInterior) {
-          console.log("🔍 DEBUG: Showing Step 1 (selfie + interior)");
-          // Первый шаг: загружаем селфи + салон
+        if (!hasSelfie || !hasCarPhotos) {
+          // Первый шаг: загружаем селфи + фото кузова
           setShowUploadPhotoStep1(true);
-        } else if (needsCarPhotos) {
-          console.log("🔍 DEBUG: Showing Step 2 (car photos)");
-          // Второй шаг: загружаем фото кузова
+        } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
+          // Второй шаг: загружаем только фото салона
           setShowUploadPhotoStep2(true);
-        } else {
-          console.log("🔍 DEBUG: All photos uploaded, showing rating modal");
+        } else if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
           // Все фото загружены - показываем рейтинг
           setShowRatingModal(true);
         }
@@ -129,8 +120,8 @@ export const MechanicTrackingCarModal = ({
         setIsLoading(false);
         setShowUploadPhotoStep1(false);
         
-        // Обновляем данные пользователя чтобы получить обновленные флаги
-        await refreshUser();
+        // Обновляем данные пользователя и машины чтобы получить обновленные флаги
+        await Promise.all([refreshUser(), fetchAllMechanicVehicles()]);
         
         setResponseModal({
           type: "success",
@@ -175,8 +166,8 @@ export const MechanicTrackingCarModal = ({
         setIsLoading(false);
         setShowUploadPhotoStep2(false);
         
-        // Обновляем данные пользователя чтобы получить обновленные флаги
-        await refreshUser();
+        // Обновляем данные пользователя и машины чтобы получить обновленные флаги
+        await Promise.all([refreshUser(), fetchAllMechanicVehicles()]);
         
         // Показываем модальное окно рейтинга вместо прямого завершения
         setShowRatingModal(true);
@@ -201,6 +192,15 @@ export const MechanicTrackingCarModal = ({
       });
       if (res.status === 200) {
         setShowRatingModal(false);
+        
+        // 🔍 DEBUG: Выводим информацию о завершении осмотра
+        console.log("--- DEBUG: Mechanic inspection completed successfully ---");
+        console.log("Rating:", rating, "Comment:", comment);
+        
+        // Обновляем данные пользователя и машины сразу после успешного завершения осмотра
+        await Promise.all([refreshUser(), fetchAllMechanicVehicles()]);
+        console.log("🔍 DEBUG: Data refreshed after inspection completion");
+        
         setResponseModal({
           type: "success",
           isOpen: true,
@@ -212,6 +212,7 @@ export const MechanicTrackingCarModal = ({
         });
       }
     } catch (error: any) {
+      console.error("Error completing inspection:", error);
       showModal({
         type: "error",
         description: error.response?.data?.detail || "Ошибка при завершении осмотра",
@@ -221,9 +222,13 @@ export const MechanicTrackingCarModal = ({
     }
   };
 
+  // Получаем ID текущего механика из user store
+  const currentMechanicId = user?.id;
+  
   // Проверяем, осматривает ли текущий механик эту машину
   const isMechanicInspecting = car?.status === "IN_USE" && 
     car?.current_renter_details?.id === currentMechanicId;
+
 
   // Функции управления автомобилем
   const handleLock = async () => {
@@ -371,14 +376,6 @@ export const MechanicTrackingCarModal = ({
           {/* Car Specs */}
           <CarSpecs car={car} />
 
-          {/* Client Review Section */}
-          {car.last_client_review && (
-            <ClientReviewSection 
-              review={car.last_client_review} 
-              car={car}
-              currentMechanicId={car.current_renter_id}
-            />
-          )}
 
           {/* Inspection Status */}
           {isMechanicInspecting ? (
@@ -458,7 +455,21 @@ export const MechanicTrackingCarModal = ({
             </Button>
 
             <Button variant="secondary" onClick={handleCompleteTracking}>
-              {isMechanicInspecting ? "Завершить осмотр" : t("mechanic.tracking.completeTracking")}
+              {isMechanicInspecting ? (() => {
+                const hasSelfie = car.photo_after_selfie_uploaded || false;
+                const hasCarPhotos = car.photo_after_car_uploaded || false;
+                const hasInteriorPhotos = car.photo_after_interior_uploaded || false;
+                
+                if (!hasSelfie || !hasCarPhotos) {
+                  return "Загрузить селфи и фото кузова";
+                } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
+                  return "Загрузить фото салона";
+                } else if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
+                  return "Завершить осмотр";
+                } else {
+                  return "Загрузить селфи и фото кузова";
+                }
+              })() : t("mechanic.tracking.completeTracking")}
             </Button>
           </div>
         </div>
@@ -473,23 +484,33 @@ export const MechanicTrackingCarModal = ({
       )}
 
       {/* Модальные окна загрузки фотографий */}
-      <UploadPhoto
-        config={mechanicAfterConfigStep1}
-        onPhotoUpload={handleUploadStep1}
-        isOpen={showUploadPhotoStep1}
-        onClose={() => setShowUploadPhotoStep1(false)}
-        isLoading={isLoading}
-        isCloseable={false}
-      />
+      {showUploadPhotoStep1 && (
+        <UploadPhoto
+          config={mechanicAfterConfigStep1}
+          onPhotoUpload={handleUploadStep1}
+          isOpen={showUploadPhotoStep1}
+          onClose={() => setShowUploadPhotoStep1(false)}
+          isLoading={isLoading}
+          isCloseable={false}
+          photoAfterSelfieUploaded={car.photo_after_selfie_uploaded}
+          photoAfterCarUploaded={car.photo_after_car_uploaded}
+          photoAfterInteriorUploaded={car.photo_after_interior_uploaded}
+        />
+      )}
 
-      <UploadPhoto
-        config={mechanicAfterConfigStep2}
-        onPhotoUpload={handleUploadStep2}
-        isOpen={showUploadPhotoStep2}
-        onClose={() => setShowUploadPhotoStep2(false)}
-        isLoading={isLoading}
-        isCloseable={false}
-      />
+      {showUploadPhotoStep2 && (
+        <UploadPhoto
+          config={mechanicAfterConfigStep2}
+          onPhotoUpload={handleUploadStep2}
+          isOpen={showUploadPhotoStep2}
+          onClose={() => setShowUploadPhotoStep2(false)}
+          isLoading={isLoading}
+          isCloseable={false}
+          photoAfterSelfieUploaded={car.photo_after_selfie_uploaded}
+          photoAfterCarUploaded={car.photo_after_car_uploaded}
+          photoAfterInteriorUploaded={car.photo_after_interior_uploaded}
+        />
+      )}
 
       {/* Модальное окно рейтинга */}
       {showRatingModal && (

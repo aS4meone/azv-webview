@@ -8,6 +8,7 @@ import { IUser } from "@/shared/models/types/user";
 import { WaitingTimer } from "../../timers/WaitingTimer";
 import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
+import { UserRole } from "@/shared/models/types/user";
 import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
 import {
   userConfigStep1,
@@ -37,11 +38,22 @@ export const UserCarInWaitingModal = ({
   const [showOwnerUploadPhoto, setShowOwnerUploadPhoto] = useState(false);
   const [showOwnerUploadPhotoStep2, setShowOwnerUploadPhotoStep2] = useState(false);
   const { refreshUser } = useUserStore();
-  const { allVehicles, fetchAllVehicles } = useVehiclesStore();
+  const { allVehicles, allMechanicVehicles, fetchAllVehicles, fetchAllMechanicVehicles } = useVehiclesStore();
+  
+  // Функция для обновления данных в зависимости от роли пользователя
+  const refreshVehiclesData = async () => {
+    if (user.role === UserRole.MECHANIC) {
+      await fetchAllMechanicVehicles();
+    } else {
+      await fetchAllVehicles();
+    }
+  };
   const [isLoading, setIsLoading] = useState(false);
   
   // Получаем данные машины из vehicles store (свежие данные из API)
-  const car = allVehicles.find(v => v.current_renter_id === user.id) || user.current_rental!.car_details;
+  // Для механиков используем allMechanicVehicles, для обычных пользователей - allVehicles
+  const vehiclesData = user.role === UserRole.MECHANIC ? allMechanicVehicles : allVehicles;
+  const car = vehiclesData.find(v => v.current_renter_id === user.id) || user.current_rental!.car_details;
   const { setUploadRequired, isPhotoUploadCompleted } = usePhotoUpload();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
@@ -70,38 +82,71 @@ export const UserCarInWaitingModal = ({
   };
 
   async function handleOpenCar() {
+    // Сначала обновляем данные пользователя и машин для получения актуальных флагов
+    await Promise.all([refreshUser(), refreshVehiclesData()]);
+    
+    // Получаем обновленные данные машины
+    const updatedVehiclesData = user.role === UserRole.MECHANIC ? allMechanicVehicles : allVehicles;
+    const updatedCar = updatedVehiclesData.find(v => v.current_renter_id === user.id) || user.current_rental!.car_details;
+    
     // Проверяем, является ли пользователь владельцем автомобиля
-    const isOwner = car.owner_id === user.id;
+    const isOwner = updatedCar.owner_id === user.id;
+    
+    // 🔍 DEBUG: Выводим все значения для диагностики
+    console.log("--- DEBUG: User Car In Waiting - handleOpenCar clicked ---");
+    console.log("updatedCar.owner_id:", updatedCar.owner_id);
+    console.log("user.id:", user.id);
+    console.log("isOwner:", isOwner);
+    console.log("updatedCar.photo_before_selfie_uploaded:", updatedCar.photo_before_selfie_uploaded);
+    console.log("updatedCar.photo_before_car_uploaded:", updatedCar.photo_before_car_uploaded);
+    console.log("updatedCar.photo_before_interior_uploaded:", updatedCar.photo_before_interior_uploaded);
     
     // Проверяем статус загрузки фотографий по новым полям из API
-    const hasSelfie = car.photo_before_selfie_uploaded || false;
-    const hasCarPhotos = car.photo_before_car_uploaded || false;
-    const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
+    const hasSelfie = updatedCar.photo_before_selfie_uploaded || false;
+    const hasCarPhotos = updatedCar.photo_before_car_uploaded || false;
+    const hasInteriorPhotos = updatedCar.photo_before_interior_uploaded || false;
     
-    // Для владельца автомобиля пропускаем селфи - сразу даем доступ
+    console.log("🔍 DEBUG: hasSelfie:", hasSelfie, "hasCarPhotos:", hasCarPhotos, "hasInteriorPhotos:", hasInteriorPhotos);
+    
     if (isOwner) {
-      await handleOpenCarAndUnlock();
-      return;
-    }
-    
-    // Для обычных пользователей проверяем статус загрузки фотографий
-    if (!hasSelfie || !hasCarPhotos) {
-      // Показываем первый модал для загрузки селфи и фото кузова
-      if (car.owned_car) {
-        setShowOwnerUploadPhoto(true);
+      console.log("🔍 DEBUG: User is OWNER - checking photo requirements");
+      // Для владельца автомобиля пропускаем селфи, но требуем фото кузова и салона
+      if (!hasCarPhotos || !hasInteriorPhotos) {
+        console.log("🔍 DEBUG: Owner - Need car or interior photos");
+        if (!hasCarPhotos) {
+          console.log("🔍 DEBUG: Owner - Showing Step 1 (car photos)");
+          // Показываем первый модал для загрузки фото кузова
+          setShowOwnerUploadPhoto(true);
+        } else if (hasCarPhotos && !hasInteriorPhotos) {
+          console.log("🔍 DEBUG: Owner - Showing Step 2 (interior photos)");
+          // Показываем второй модал для загрузки фото салона
+          setShowOwnerUploadPhotoStep2(true);
+        }
       } else {
-        setShowUploadPhoto(true);
-      }
-    } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
-      // Показываем второй модал для загрузки фото салона
-      if (car.owned_car) {
-        setShowOwnerUploadPhotoStep2(true);
-      } else {
-        setShowUploadPhotoStep2(true);
+        console.log("🔍 DEBUG: Owner - All required photos uploaded, starting rental");
+        // Все необходимые фото загружены (кузов + салон), открываем замки и разблокируем двигатель
+        await handleOpenCarAndUnlock();
       }
     } else {
-      // Все фотографии загружены, открываем замки и разблокируем двигатель
-      await handleOpenCarAndUnlock();
+      console.log("🔍 DEBUG: User is REGULAR USER - checking all photo requirements");
+      // Для обычных пользователей проверяем статус загрузки фотографий
+      if (!hasSelfie || !hasCarPhotos) {
+        console.log("🔍 DEBUG: Regular - Need selfie or car photos, showing Step 1");
+        console.log("🔍 DEBUG: Setting showUploadPhoto to true");
+        // Показываем первый модал для загрузки селфи и фото кузова
+        setShowUploadPhoto(true);
+        console.log("🔍 DEBUG: showUploadPhoto state set to:", true);
+      } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
+        console.log("🔍 DEBUG: Regular - Need interior photos, showing Step 2");
+        console.log("🔍 DEBUG: Setting showUploadPhotoStep2 to true");
+        // Показываем второй модал для загрузки фото салона
+        setShowUploadPhotoStep2(true);
+        console.log("🔍 DEBUG: showUploadPhotoStep2 state set to:", true);
+      } else {
+        console.log("🔍 DEBUG: Regular - All photos uploaded, starting rental");
+        // Все фотографии загружены, открываем замки и разблокируем двигатель
+        await handleOpenCarAndUnlock();
+      }
     }
   }
 
@@ -122,7 +167,7 @@ export const UserCarInWaitingModal = ({
       setIsLoading(false);
       
       // Обновляем данные пользователя и машин после успешного начала аренды
-      await Promise.all([refreshUser(), fetchAllVehicles()]);
+      await Promise.all([refreshUser(), refreshVehiclesData()]);
       
       setResponseModal({
         isOpen: true,
@@ -260,22 +305,43 @@ export const UserCarInWaitingModal = ({
         setShowUploadPhoto(false);
         
         // Обновляем данные пользователя и машин после успешной загрузки фотографий
-        await Promise.all([refreshUser(), fetchAllVehicles()]);
+        await Promise.all([refreshUser(), refreshVehiclesData()]);
         
-        setResponseModal({
-          isOpen: true,
-          onClose: () => {
-            setShowUploadPhotoStep2(true);
-            setResponseModal(null);
-          },
-          type: "success",
-          description: "Фотографии успешно загружены! Теперь сфотографируйте салон.",
-          buttonText: "Продолжить",
-          onButtonClick: () => {
-            setShowUploadPhotoStep2(true);
-            setResponseModal(null);
-          },
-        });
+        // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
+        try {
+          await vehicleActionsApi.openVehicle();
+          
+          setResponseModal({
+            isOpen: true,
+            onClose: () => {
+              setShowUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии загружены! Замки автомобиля открыты. Теперь сфотографируйте салон.",
+            buttonText: "Продолжить",
+            onButtonClick: () => {
+              setShowUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+          });
+        } catch (unlockError) {
+          console.error("Ошибка при открытии замков:", unlockError);
+          setResponseModal({
+            isOpen: true,
+            onClose: () => {
+              setShowUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии загружены! Теперь сфотографируйте салон.",
+            buttonText: "Продолжить",
+            onButtonClick: () => {
+              setShowUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -305,21 +371,39 @@ export const UserCarInWaitingModal = ({
         setShowUploadPhotoStep2(false);
         
         // Обновляем данные пользователя и машин после успешной загрузки фотографий салона
-        await Promise.all([refreshUser(), fetchAllVehicles()]);
+        await Promise.all([refreshUser(), refreshVehiclesData()]);
         
-        setResponseModal({
-          isOpen: true,
-          onClose: async () => {
-            setResponseModal(null);
-          },
-          type: "success",
-          description: "Фотографии салона успешно загружены! Теперь вы можете открыть автомобиль и начать аренду.",
-          buttonText: "Открыть автомобиль",
-          onButtonClick: async () => {
-            setResponseModal(null);
-            await handleOpenCarAndUnlock();
-          },
-        });
+        // РАЗБЛОКИРУЕМ ДВИГАТЕЛЬ после загрузки фото салона
+        try {
+          await vehicleActionsApi.unlockEngine();
+          
+          setResponseModal({
+            isOpen: true,
+            onClose: async () => {
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии салона загружены! Двигатель разблокирован. Теперь автомобиль доступен для управления.",
+            buttonText: "Отлично",
+            onButtonClick: async () => {
+              setResponseModal(null);
+            },
+          });
+        } catch (unlockError) {
+          console.error("Ошибка при разблокировке двигателя:", unlockError);
+          setResponseModal({
+            isOpen: true,
+            onClose: async () => {
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии салона загружены! Теперь автомобиль доступен для управления.",
+            buttonText: "Отлично",
+            onButtonClick: async () => {
+              setResponseModal(null);
+            },
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -349,22 +433,43 @@ export const UserCarInWaitingModal = ({
         setShowOwnerUploadPhoto(false);
         
         // Обновляем данные пользователя и машин после успешной загрузки фотографий
-        await Promise.all([refreshUser(), fetchAllVehicles()]);
+        await Promise.all([refreshUser(), refreshVehiclesData()]);
         
-        setResponseModal({
-          isOpen: true,
-          onClose: () => {
-            setShowOwnerUploadPhotoStep2(true);
-            setResponseModal(null);
-          },
-          type: "success",
-          description: "Фотографии успешно загружены! Теперь сфотографируйте салон.",
-          buttonText: "Продолжить",
-          onButtonClick: () => {
-            setShowOwnerUploadPhotoStep2(true);
-            setResponseModal(null);
-          },
-        });
+        // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки фото кузова (для владельца)
+        try {
+          await vehicleActionsApi.openVehicle();
+          
+          setResponseModal({
+            isOpen: true,
+            onClose: () => {
+              setShowOwnerUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии загружены! Замки автомобиля открыты. Теперь сфотографируйте салон.",
+            buttonText: "Продолжить",
+            onButtonClick: () => {
+              setShowOwnerUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+          });
+        } catch (unlockError) {
+          console.error("Ошибка при открытии замков:", unlockError);
+          setResponseModal({
+            isOpen: true,
+            onClose: () => {
+              setShowOwnerUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии загружены! Теперь сфотографируйте салон.",
+            buttonText: "Продолжить",
+            onButtonClick: () => {
+              setShowOwnerUploadPhotoStep2(true);
+              setResponseModal(null);
+            },
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -394,21 +499,39 @@ export const UserCarInWaitingModal = ({
         setShowOwnerUploadPhotoStep2(false);
         
         // Обновляем данные пользователя и машин после успешной загрузки фотографий салона
-        await Promise.all([refreshUser(), fetchAllVehicles()]);
+        await Promise.all([refreshUser(), refreshVehiclesData()]);
         
-        setResponseModal({
-          isOpen: true,
-          onClose: async () => {
-            setResponseModal(null);
-          },
-          type: "success",
-          description: "Фотографии салона успешно загружены! Теперь вы можете открыть автомобиль и начать аренду.",
-          buttonText: "Открыть автомобиль",
-          onButtonClick: async () => {
-            setResponseModal(null);
-            await handleOpenCarAndUnlock();
-          },
-        });
+        // РАЗБЛОКИРУЕМ ДВИГАТЕЛЬ после загрузки фото салона (для владельца)
+        try {
+          await vehicleActionsApi.unlockEngine();
+          
+          setResponseModal({
+            isOpen: true,
+            onClose: async () => {
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии салона загружены! Двигатель разблокирован. Теперь автомобиль доступен для управления.",
+            buttonText: "Отлично",
+            onButtonClick: async () => {
+              setResponseModal(null);
+            },
+          });
+        } catch (unlockError) {
+          console.error("Ошибка при разблокировке двигателя:", unlockError);
+          setResponseModal({
+            isOpen: true,
+            onClose: async () => {
+              setResponseModal(null);
+            },
+            type: "success",
+            description: "Фотографии салона загружены! Теперь автомобиль доступен для управления.",
+            buttonText: "Отлично",
+            onButtonClick: async () => {
+              setResponseModal(null);
+            },
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -441,6 +564,11 @@ export const UserCarInWaitingModal = ({
         isLoading={isLoading}
         onClose={() => setShowUploadPhoto(false)}
         isCloseable={true}
+        {...({
+          photoBeforeSelfieUploaded: car.photo_before_selfie_uploaded,
+          photoBeforeCarUploaded: car.photo_before_car_uploaded,
+          photoBeforeInteriorUploaded: car.photo_before_interior_uploaded,
+        } as any)}
       />
 
       {/* User Upload Photo Step 2 */}
@@ -451,6 +579,11 @@ export const UserCarInWaitingModal = ({
         isLoading={isLoading}
         onClose={() => setShowUploadPhotoStep2(false)}
         isCloseable={true}
+        {...({
+          photoBeforeSelfieUploaded: car.photo_before_selfie_uploaded,
+          photoBeforeCarUploaded: car.photo_before_car_uploaded,
+          photoBeforeInteriorUploaded: car.photo_before_interior_uploaded,
+        } as any)}
       />
 
       {/* Owner Upload Photo Step 1 */}
@@ -461,6 +594,11 @@ export const UserCarInWaitingModal = ({
         isLoading={isLoading}
         onClose={() => setShowOwnerUploadPhoto(false)}
         isCloseable={true}
+        {...({
+          photoBeforeSelfieUploaded: car.photo_before_selfie_uploaded,
+          photoBeforeCarUploaded: car.photo_before_car_uploaded,
+          photoBeforeInteriorUploaded: car.photo_before_interior_uploaded,
+        } as any)}
       />
 
       {/* Owner Upload Photo Step 2 */}
@@ -471,6 +609,11 @@ export const UserCarInWaitingModal = ({
         isLoading={isLoading}
         onClose={() => setShowOwnerUploadPhotoStep2(false)}
         isCloseable={true}
+        {...({
+          photoBeforeSelfieUploaded: car.photo_before_selfie_uploaded,
+          photoBeforeCarUploaded: car.photo_before_car_uploaded,
+          photoBeforeInteriorUploaded: car.photo_before_interior_uploaded,
+        } as any)}
       />
 
       {/* Таймер ожидания */}
@@ -505,16 +648,29 @@ export const UserCarInWaitingModal = ({
           </Button>
           <Button onClick={handleOpenCar} variant="secondary">
             {(() => {
+              const isOwner = car.owner_id === user.id;
               const hasSelfie = car.photo_before_selfie_uploaded || false;
               const hasCarPhotos = car.photo_before_car_uploaded || false;
               const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
               
-              if (!hasSelfie || !hasCarPhotos) {
-                return "Загрузить фото и открыть авто";
-              } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
-                return "Загрузить фото салона";
+              if (isOwner) {
+                // Логика для владельца
+                if (!hasCarPhotos) {
+                  return "Загрузить фото кузова";
+                } else if (hasCarPhotos && !hasInteriorPhotos) {
+                  return "Загрузить фото салона";
+                } else {
+                  return "Начать аренду";
+                }
               } else {
-                return "Открыть авто и разблокировать двигатель";
+                // Логика для обычных пользователей
+                if (!hasSelfie || !hasCarPhotos) {
+                  return "Загрузить селфи и фото кузова";
+                } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
+                  return "Загрузить фото салона";
+                } else {
+                  return "Начать аренду";
+                }
               }
             })()}
           </Button>

@@ -600,8 +600,8 @@ export const mechanicAfterConfigStep1: PhotoConfig[] = [
     multiple: { min: 1, max: 1 },
   },
   {
-    id: "interior_photos",
-    title: "Сделайте фото салона.",
+    id: "car_photos",
+    title: "Сделайте фото машины со всех сторон.",
     multiple: { min: 1, max: 1 },
     cameraType: "back",
   },
@@ -609,8 +609,8 @@ export const mechanicAfterConfigStep1: PhotoConfig[] = [
 
 export const mechanicAfterConfigStep2: PhotoConfig[] = [
   {
-    id: "car_photos",
-    title: "Сделайте фото машины со всех сторон.",
+    id: "interior_photos",
+    title: "Сделайте фото салона.",
     multiple: { min: 1, max: 1 },
     cameraType: "back",
   },

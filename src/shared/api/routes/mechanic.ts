@@ -39,6 +39,8 @@ export const mechanicActionsRoutes = {
   closeVehicle: "/mechanic/close",
   giveKey: "/mechanic/give-key",
   takeKey: "/mechanic/take-key",
+  unlockEngine: "/mechanic/unlock-engine",
+  lockEngine: "/mechanic/lock-engine",
 };
 
 export const mechanicApi = {
@@ -229,6 +231,18 @@ export const mechanicActionsApi = {
   },
   takeKey: async () => {
     const response = await axiosInstance.post(mechanicActionsRoutes.takeKey);
+    return response.data;
+  },
+  unlockEngine: async () => {
+    const response = await axiosInstance.post(
+      mechanicActionsRoutes.unlockEngine
+    );
+    return response.data;
+  },
+  lockEngine: async () => {
+    const response = await axiosInstance.post(
+      mechanicActionsRoutes.lockEngine
+    );
     return response.data;
   },
 };

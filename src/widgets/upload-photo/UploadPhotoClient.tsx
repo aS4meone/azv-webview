@@ -17,6 +17,14 @@ export interface UploadPhotoClientProps {
   withCloseButton?: boolean;
   isLoading?: boolean;
   isCloseable?: boolean;
+  // Флаги из API для определения уже загруженных фотографий (ДО осмотра)
+  photoBeforeSelfieUploaded?: boolean;
+  photoBeforeCarUploaded?: boolean;
+  photoBeforeInteriorUploaded?: boolean;
+  // Флаги из API для определения уже загруженных фотографий (ПОСЛЕ осмотра)
+  photoAfterSelfieUploaded?: boolean;
+  photoAfterCarUploaded?: boolean;
+  photoAfterInteriorUploaded?: boolean;
 }
 
 export const UploadPhotoClient: React.FC<UploadPhotoClientProps> = (props) => {

@@ -19,13 +19,13 @@ export const mechaniRoleInteraction = ({
   notRentedCar: ICar;
   hideModal: () => void;
 }) => {
+  
   const trackingCarId = localStorage.getItem("tracking_car_id");
 
   if (trackingCarId) {
     return (
       <MechanicTrackingCarModal
         car={notRentedCar}
-        currentMechanicId={user.id}
         onClose={() => {
           hideModal();
           removeAllQueriesFromUrl();
@@ -84,7 +84,6 @@ export const mechaniRoleInteraction = ({
       return (
         <MechanicTrackingCarModal
           car={notRentedCar}
-          currentMechanicId={user.id}
           onClose={() => {
             hideModal();
             removeAllQueriesFromUrl();
@@ -120,7 +119,7 @@ export const mechaniRoleInteraction = ({
     // Проверяем, это rental механика или чужой
     const car = user.current_rental.car_details;
     const isMechanicRental = car.current_renter_details?.id === user.id;
-    
+
     if (isMechanicRental) {
       // Это rental механика - показываем управление
       return (
@@ -137,7 +136,6 @@ export const mechaniRoleInteraction = ({
       return (
         <MechanicTrackingCarModal
           car={car}
-          currentMechanicId={user.id}
           onClose={() => {
             hideModal();
             removeAllQueriesFromUrl();
