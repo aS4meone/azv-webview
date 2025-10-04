@@ -5,7 +5,7 @@ import { webviewDebugger } from "@/shared/utils/webview-debug";
 import { CarTypeSelection } from "./ui/CarTypeSelection";
 import { FilteredCarsList } from "./ui/FilteredCarsList";
 import { ICar } from "@/shared/models/types/car";
-import { CarBodyType } from "@/shared/models/types/car";
+import { CarBodyType, CarStatus } from "@/shared/models/types/car";
 import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
 type ViewState = 'type-selection' | 'filtered-cars';
@@ -32,6 +32,22 @@ const FreeCarsPage = ({ onClose }: { onClose: () => void }) => {
   };
 
   const getFilteredCars = (): ICar[] => {
+    if (selectedBodyType === CarBodyType.OCCUPIED) {
+      // Показываем все занятые машины
+      const occupiedCars = allVehicles.filter(car => car.status !== CarStatus.free);
+      
+      // Отладочная информация
+      console.log('=== Occupied Cars Debug ===');
+      console.log('All vehicles count:', allVehicles.length);
+      console.log('Occupied cars count:', occupiedCars.length);
+      console.log('Selected body type:', selectedBodyType);
+      console.log('All vehicle statuses:', allVehicles.map(car => ({ id: car.id, name: car.name, status: car.status })));
+      console.log('========================');
+      
+      return occupiedCars;
+    }
+    
+    // Показываем ВСЕ машины (не только свободные)
     if (selectedBodyType === CarBodyType.ELECTRIC) {
       // Показываем все электромобили (engine_volume === 0.0 или body_type === 'ELECTRIC')
       const electricCars = allVehicles.filter(car => 

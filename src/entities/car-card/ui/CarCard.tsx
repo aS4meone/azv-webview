@@ -14,6 +14,11 @@ const CarCard = ({ car, onCarClick }: CarCardProps) => {
   const t = useTranslations("cars.statuses");
 
   const handleClick = () => {
+    // Занятые машины не открываются в модальное окно
+    if (car.status === CarStatus.occupied) {
+      return;
+    }
+    
     router.push(
       `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
     );
@@ -24,7 +29,11 @@ const CarCard = ({ car, onCarClick }: CarCardProps) => {
 
   return (
     <div
-      className="bg-[#F7F7F7] border-[#E8E8E8] rounded-[10px] p-4 cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+      className={`bg-[#F7F7F7] border-[#E8E8E8] rounded-[10px] p-4 transition-colors ${
+        car.status === CarStatus.occupied 
+          ? 'cursor-not-allowed opacity-75' 
+          : 'cursor-pointer hover:bg-[#F0F0F0]'
+      }`}
       onClick={handleClick}
     >
       <div className="flex justify-between items-center">
@@ -52,6 +61,7 @@ const CarStatusBadge = ({ status }: { status: CarStatus }) => {
     [CarStatus.reserved]: t("RESERVED"),
     [CarStatus.delivering]: t("DELIVERING"),
     [CarStatus.tracking]: t("TRACKING"),
+    [CarStatus.occupied]: "Занята",
   };
 
   const color = {
@@ -64,6 +74,7 @@ const CarStatusBadge = ({ status }: { status: CarStatus }) => {
     [CarStatus.reserved]: "#EF7C7C",
     [CarStatus.delivering]: "#FFE494",
     [CarStatus.tracking]: "#EF7C7C",
+    [CarStatus.occupied]: "#EF7C7C",
   };
 
   return (

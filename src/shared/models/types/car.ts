@@ -10,6 +10,7 @@ export enum CarStatus {
   tracking = "TRACKING",
   deliveryReserved = "delivery_reserved",
   deliveryInProgress = "delivering_in_progress",
+  occupied = "OCCUPIED",
 }
 
 export enum CarBodyType {
@@ -22,6 +23,7 @@ export enum CarBodyType {
   WAGON = "WAGON",
   MINIBUS = "MINIBUS",
   ELECTRIC = "ELECTRIC", // Для электромобилей
+  OCCUPIED = "OCCUPIED", // Занятые машины
 }
 
 export enum TransmissionType {

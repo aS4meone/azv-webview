@@ -671,53 +671,6 @@ export const MechanicStartCheckModal = ({
                     Закрыть замки
                   </Button>
                   
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        await mechanicActionsApi.unlockEngine();
-                        showModal({
-                          type: "success",
-                          description: "Двигатель разблокирован",
-                          buttonText: "Отлично",
-                          onClose: () => {},
-                        });
-                      } catch (error) {
-                        showModal({
-                          type: "error",
-                          description: "Ошибка при разблокировке двигателя",
-                          buttonText: "Понятно",
-                          onClose: () => {},
-                        });
-                      }
-                    }}
-                  >
-                    Разблокировать двигатель
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        await mechanicActionsApi.lockEngine();
-                        showModal({
-                          type: "success",
-                          description: "Двигатель заблокирован",
-                          buttonText: "Отлично",
-                          onClose: () => {},
-                        });
-                      } catch (error) {
-                        showModal({
-                          type: "error",
-                          description: "Ошибка при блокировке двигателя",
-                          buttonText: "Понятно",
-                          onClose: () => {},
-                        });
-                      }
-                    }}
-                  >
-                    Заблокировать двигатель
-                  </Button>
                 </div>
               </div>
             )}

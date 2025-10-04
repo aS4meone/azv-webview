@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { ICar, CarBodyType } from "@/shared/models/types/car";
+import { ICar, CarBodyType, CarStatus } from "@/shared/models/types/car";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
 import { useClientTranslations } from "@/shared/utils/useClientTranslations";
@@ -23,6 +23,7 @@ const getBodyTypeLabel = (bodyType: string, t: (key: string) => string): string 
     [CarBodyType.WAGON]: t('cars.bodyTypes.wagon'),
     [CarBodyType.MINIBUS]: t('cars.bodyTypes.minibus'),
     [CarBodyType.ELECTRIC]: t('cars.bodyTypes.electric'),
+    [CarBodyType.OCCUPIED]: 'Занятые машины',
   };
   return labels[bodyType] || bodyType;
 };
@@ -38,6 +39,7 @@ const CarStatusBadge = ({ status, t }: { status: string; t: (key: string) => str
     "RESERVED": t('cars.statuses.RESERVED'),
     "DELIVERING": t('cars.statuses.DELIVERING'),
     "TRACKING": t('cars.statuses.TRACKING'),
+    "OCCUPIED": "Занята",
   };
 
   const color: Record<string, string> = {
@@ -50,6 +52,7 @@ const CarStatusBadge = ({ status, t }: { status: string; t: (key: string) => str
     "RESERVED": "#EF7C7C",
     "DELIVERING": "#FFE494",
     "TRACKING": "#EF7C7C",
+    "OCCUPIED": "#EF7C7C",
   };
 
   return (
@@ -66,6 +69,11 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
   const router = useRouter();
   
   const handleClick = () => {
+    // Занятые машины не открываются в модальное окно
+    if (car.status === CarStatus.occupied) {
+      return;
+    }
+    
     // Навигация к главной странице с параметрами машины
     router.push(
       `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
@@ -83,15 +91,19 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
 
   return (
     <div
-      className="bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors"
+      className={`bg-white border border-gray-200 rounded-lg overflow-hidden transition-colors ${
+        car.status === CarStatus.occupied 
+          ? 'cursor-not-allowed opacity-75' 
+          : 'cursor-pointer hover:bg-gray-50'
+      }`}
       onClick={handleClick}
     >
-      {/* Car Image - Full Width */}
+      {/* Car Image - Only first photo */}
       {car.photos && car.photos.length > 0 ? (
-        <div className="w-full h-48 bg-gray-100 image-container flex items-center justify-center">
+        <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
           <img
             src={getImageUrl(car.photos[0])}
-            className="free-cars-image"
+            className="!w-full !h-full object-cover"
             alt={car.name}
           />
         </div>
@@ -147,8 +159,8 @@ export const FilteredCarsList = ({ cars, selectedBodyType, onCarClickAction, onB
       <div className="py-4">
         <div className="space-y-3">
           {cars.length > 0 ? (
-            cars.map((car) => (
-              <CarCard key={car.id} car={car} onCarClickAction={onCarClickAction} t={t} />
+            cars.map((car, index) => (
+              <CarCard key={`${car.id}-${index}`} car={car} onCarClickAction={onCarClickAction} t={t} />
             ))
           ) : (
             <div className="text-center py-8">

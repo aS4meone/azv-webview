@@ -138,6 +138,7 @@ export default function GoogleMapsPage() {
       <MapComponent />
 
       <Drawer />
+      
       {user?.current_rental === null &&
       !(
         user?.role === UserRole.MECHANIC &&

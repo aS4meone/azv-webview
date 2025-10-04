@@ -422,51 +422,6 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
     }
   };
 
-  const handleUnlockEngine = async () => {
-    try {
-      await vehicleActionsApi.unlockEngine();
-      showSuccessModal("unlock");
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error && "response" in error
-          ? (error as { response?: { data?: { detail?: string } } }).response
-              ?.data?.detail
-          : "Ошибка разблокировки двигателя";
-
-      setResponseModal({
-        isOpen: true,
-        onClose: () => {},
-        type: "error",
-        title: t("error"),
-        description: errorMessage || "Ошибка разблокировки двигателя",
-        buttonText: t("modal.error.tryAgain"),
-        onButtonClick: () => {},
-      });
-    }
-  };
-
-  const handleLockEngine = async () => {
-    try {
-      await vehicleActionsApi.lockEngine();
-      showSuccessModal("lock");
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error && "response" in error
-          ? (error as { response?: { data?: { detail?: string } } }).response
-              ?.data?.detail
-          : "Ошибка блокировки двигателя";
-
-      setResponseModal({
-        isOpen: true,
-        onClose: () => {},
-        type: "error",
-        title: t("error"),
-        description: errorMessage || "Ошибка блокировки двигателя",
-        buttonText: t("modal.error.tryAgain"),
-        onButtonClick: () => {},
-      });
-    }
-  };
 
   const renderRentalTypeContent = () => {
     switch (rentalType) {
@@ -586,23 +541,6 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         {/* Car Controls Slider */}
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
-        {/* Engine Controls */}
-        <div className="flex justify-between gap-2">
-          <Button
-            variant="outline"
-            className="text-[14px] flex-1"
-            onClick={handleLockEngine}
-          >
-            Заблокировать двигатель
-          </Button>
-          <Button
-            variant="outline"
-            className="text-[14px] flex-1"
-            onClick={handleUnlockEngine}
-          >
-            Разблокировать двигатель
-          </Button>
-        </div>
 
         <Button onClick={() => {
           // 🔍 DEBUG: Выводим все значения для диагностики

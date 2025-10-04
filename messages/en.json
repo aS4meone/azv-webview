@@ -1095,7 +1095,7 @@
   "widgets": {
     "footerBtns": {
       "myCars": "My Cars",
-      "freeCars": "Free Cars",
+      "freeCars": "Cars",
       "freqUsedCars": "Frequently Used",
       "mechanicPending": "Inspection",
       "mechanicDelivery": "Delivery",

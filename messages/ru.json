@@ -1099,7 +1099,7 @@
   "widgets": {
     "footerBtns": {
       "myCars": "Мои машины",
-      "freeCars": "Свободные машины",
+      "freeCars": "Машины",
       "freqUsedCars": "Часто используемые",
       "mechanicPending": "Проверка",
       "mechanicDelivery": "Доставка",

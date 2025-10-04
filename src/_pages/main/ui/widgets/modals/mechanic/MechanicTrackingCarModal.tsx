@@ -271,46 +271,6 @@ export const MechanicTrackingCarModal = ({
     }
   };
 
-  // Функции управления двигателем
-  const handleLockEngine = async () => {
-    try {
-      await vehicleActionsApi.lockEngine();
-      showModal({
-        type: "success",
-        description: "Двигатель заблокирован",
-        buttonText: "Отлично",
-        onClose: () => {},
-      });
-    } catch (error) {
-      console.log(error);
-      showModal({
-        type: "error",
-        description: "Ошибка при блокировке двигателя",
-        buttonText: "Попробовать снова",
-        onClose: () => {},
-      });
-    }
-  };
-
-  const handleUnlockEngine = async () => {
-    try {
-      await vehicleActionsApi.unlockEngine();
-      showModal({
-        type: "success",
-        description: "Двигатель разблокирован",
-        buttonText: "Отлично",
-        onClose: () => {},
-      });
-    } catch (error) {
-      console.log(error);
-      showModal({
-        type: "error",
-        description: "Ошибка при разблокировке двигателя",
-        buttonText: "Попробовать снова",
-        onClose: () => {},
-      });
-    }
-  };
 
   // Функции управления ключами
   const handleGiveKey = async () => {
@@ -410,23 +370,6 @@ export const MechanicTrackingCarModal = ({
               {/* Car Controls Slider */}
               <CarControlsSlider onLock={handleLock} onUnlock={handleUnlock} />
               
-              {/* Engine Controls */}
-              <div className="flex justify-between gap-2">
-                <Button
-                  variant="outline"
-                  className="text-[14px] flex-1"
-                  onClick={handleLockEngine}
-                >
-                  Заблокировать двигатель
-                </Button>
-                <Button
-                  variant="outline"
-                  className="text-[14px] flex-1"
-                  onClick={handleUnlockEngine}
-                >
-                  Разблокировать двигатель
-                </Button>
-              </div>
               
               {/* Key Controls */}
               <div className="flex justify-between gap-2">

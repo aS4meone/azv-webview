@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { CarBodyType } from "@/shared/models/types/car";
+import { CarBodyType, CarStatus } from "@/shared/models/types/car";
 import { ICar } from "@/shared/models/types/car";
 import { useClientTranslations } from "@/shared/utils/useClientTranslations";
 
@@ -21,6 +21,7 @@ const getBodyTypeLabel = (bodyType: string, t: (key: string) => string): string 
     [CarBodyType.WAGON]: t('cars.bodyTypes.wagon'),
     [CarBodyType.MINIBUS]: t('cars.bodyTypes.minibus'),
     [CarBodyType.ELECTRIC]: t('cars.bodyTypes.electric'),
+    [CarBodyType.OCCUPIED]: 'Занятые машины',
   };
   return labels[bodyType] || bodyType;
 };
@@ -32,6 +33,7 @@ export const CarTypeSelection = ({ cars, onTypeSelectAction, onBackAction }: Car
   const getCarCounts = () => {
     const counts: Record<string, number> = {};
     
+    // Показываем ВСЕ машины (не только свободные)
     cars.forEach(car => {
       // Проверяем, является ли машина электромобилем
       const isElectric = car.engine_volume === 0.0 || 
@@ -47,6 +49,17 @@ export const CarTypeSelection = ({ cars, onTypeSelectAction, onBackAction }: Car
         counts[bodyType] = (counts[bodyType] || 0) + 1;
       }
     });
+    
+    // Добавляем занятые машины отдельно
+    const occupiedCars = cars.filter(car => car.status !== CarStatus.free);
+    counts[CarBodyType.OCCUPIED] = occupiedCars.length;
+    
+    // Отладочная информация
+    console.log('=== CarTypeSelection Debug ===');
+    console.log('All cars count:', cars.length);
+    console.log('Occupied cars count:', occupiedCars.length);
+    console.log('All car statuses:', cars.map(car => ({ id: car.id, name: car.name, status: car.status })));
+    console.log('=============================');
     
     return counts;
   };

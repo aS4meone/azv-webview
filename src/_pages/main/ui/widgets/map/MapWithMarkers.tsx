@@ -880,8 +880,11 @@ export const MapWithMarkers = ({
             await window.google.maps.importLibrary("marker");
           }
 
+          // Фильтруем машины: убираем только машины со статусом "occupied"
+          const filteredVehicles = vehicles.filter(car => car.status !== CarStatus.occupied);
+          
           // Фильтруем только видимые машины для производительности
-          const visibleVehicles = getVisibleVehicles(vehicles);
+          const visibleVehicles = getVisibleVehicles(filteredVehicles);
 
           // Возвращаем старые маркеры в пул
           markersRef.current.forEach((marker) => {
@@ -893,6 +896,7 @@ export const MapWithMarkers = ({
             deliveryMarkerRef.current = null;
           }
 
+          // Создание маркеров машин (кроме occupied)
           // Пакетная обработка создания маркеров
           const newMarkers: google.maps.marker.AdvancedMarkerElement[] = [];
 
@@ -933,7 +937,7 @@ export const MapWithMarkers = ({
 
               // Логируем производительность
               logPerformance(
-                `Optimized markers update (${newMarkers.length}/${vehicles.length} markers)`,
+                `Optimized markers update (${newMarkers.length}/${filteredVehicles.length} markers, excluded ${vehicles.length - filteredVehicles.length} occupied)`,
                 startTime
               );
             }
