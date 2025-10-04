@@ -117,7 +117,7 @@ export const MechanicCarInWaitingModal = ({
         
         // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
         try {
-          await mechanicActionsApi.openVehicle();
+          // await mechanicActionsApi.openVehicle();
           
           setResponseModal({
             isOpen: true,
@@ -183,48 +183,21 @@ export const MechanicCarInWaitingModal = ({
         // Обновляем данные пользователя чтобы получить обновленные флаги
         await refreshUser();
         
-        // РАЗБЛОКИРУЕМ ДВИГАТЕЛЬ после загрузки фото салона
-        try {
-          await mechanicActionsApi.unlockEngine();
-          
-          // Теперь автоматически начинаем осмотр, так как все фото загружены
-          const startRes = await mechanicApi.startCheckCar(car.id);
-          if (startRes.status === 200) {
-            // Дополнительно обновляем данные после начала осмотра
-            await refreshUser();
-            
-            setResponseModal({
-              isOpen: true,
-              type: "success",
-              description: "Фотографии салона загружены! Двигатель разблокирован. Осмотр автомобиля начат успешно!",
-              buttonText: "Отлично",
-              onClose: () => {
-                setResponseModal(null);
-                handleClose();
-              },
-              onButtonClick: () => {
-                setResponseModal(null);
-                handleClose();
-              },
-            });
-          }
-        } catch (unlockError) {
-          console.error("Ошибка при разблокировке двигателя:", unlockError);
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: "Фотографии салона загружены! Осмотр автомобиля начат успешно!",
-            buttonText: "Отлично",
-            onClose: () => {
-              setResponseModal(null);
-              handleClose();
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-              handleClose();
-            },
-          });
-        }
+        // Фото салона загружены успешно
+        setResponseModal({
+          isOpen: true,
+          type: "success",
+          description: "Фотографии салона загружены!",
+          buttonText: "Отлично",
+          onClose: () => {
+            setResponseModal(null);
+            handleClose();
+          },
+          onButtonClick: () => {
+            setResponseModal(null);
+            handleClose();
+          },
+        });
       }
     } catch (error) {
       setIsLoading(false);

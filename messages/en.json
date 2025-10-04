@@ -441,6 +441,10 @@
       "validUntil": "Valid until",
       "notUploaded": "Not uploaded"
     },
+    "uploaded": "Uploaded",
+    "frontSide": "Front",
+    "backSide": "Back",
+    "validUntilDate": "Valid until",
     "replaceDocuments": "Replace Documents",
     "deleteAccount": "Delete Account",
     "logout": "Logout",
@@ -453,8 +457,6 @@
     "loggingOut": "Logging out...",
     "documentsUnderReview": "Documents under review",
     "documentsRequired": "Documents required",
-    "uploaded": "Uploaded",
-    "validUntilDate": "Valid until",
     "notSpecified": "not specified",
     "notUploaded": "Not uploaded",
     "documentData": "Document data",
@@ -502,8 +504,6 @@
     "updateDocumentsTitle": "Update Documents",
     "updateDocumentsDescription": "You can change your documents until verification is complete.",
     "updateDocumentsButton": "Update documents",
-    "frontSide": "Front",
-    "backSide": "Back",
     "view": "View",
     "bothSides": "Front and back sides",
     "validation": {
@@ -619,7 +619,21 @@
     "personalDataSection": "Personal Data",
     "personalDataDescription": "Basic user information",
     "documentExpirySection": "Document Expiry Dates",
-    "documentExpiryDescription": "Document expiration dates"
+    "documentExpiryDescription": "Document expiration dates",
+    "selectBirthDate": "Select birth date",
+    "selectExpiryDate": "Select expiry date",
+    "debugInfo": "Debug information:",
+    "valid": "✅ Valid",
+    "invalid": "❌ Invalid",
+    "length": "(length:",
+    "missingFields": "Required fields not filled:",
+    "firstNameRequired": "• First Name (minimum 2 characters)",
+    "lastNameRequired": "• Last Name (minimum 2 characters)",
+    "birthDateRequired": "• Birth Date",
+    "iinRequired": "• IIN (12 digits)",
+    "idCardExpiryRequired": "• ID Card expiry date",
+    "driversLicenseExpiryRequired": "• Driver's License expiry date",
+    "issuesCount": "{count} Issues"
   },
   "uploadPhoto": {
     "error": "Error",
@@ -1090,7 +1104,11 @@
       "excellent": "Excellent",
       "lockError": "Error trying to lock vehicle",
       "unlockError": "Error trying to unlock vehicle"
-    }
+    },
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "occupiedCars": "Occupied cars",
+    "occupiedStatus": "Occupied"
   },
   "widgets": {
     "footerBtns": {
@@ -1353,9 +1371,22 @@
     "loading": "Loading...",
     "noResults": "No results found"
   },
+  "tariff": {
+    "perMinute": "₸/minute",
+    "perHour": "₸/hour", 
+    "perDay": "₸/day",
+    "perMin": "₸/min"
+  },
+  "modals": {
+    "locksBlocked": "Locks, engine blocked, key taken. Now photograph the vehicle body.",
+    "continue": "Continue",
+    "photoUploadError": "Error uploading photos",
+    "tryAgain": "Try again"
+  },
   "cars": {
     "loading": "Loading...",
     "nothingFound": "Nothing found",
+    "noCarsYet": "You don't have any cars yet",
     "bodyType": "Body Type",
     "noAvailableCars": "No available cars",
     "carsCount": "cars",
@@ -1461,5 +1492,62 @@
       "activated": "Activated",
       "used": "Used"
     }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy - AZV Motors",
+    "description": "AZV Motors privacy policy and personal data processing. Learn how we collect, use and protect your information.",
+    "mainTitle": "Privacy Policy",
+    "mainDescription": "We value your trust and care about protecting your personal data. Below is information about how we collect, use and protect your data.",
+    "backToMain": "Back to main",
+    "lastUpdated": "Last updated:",
+    "copyright": "© 2024 AZV Motors. All rights reserved.",
+    "contactInfo": "If you have questions about this policy, contact us through the app or by phone."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "companyName": "AZV MOTORS",
+    "getInTouch": "Get in Touch",
+    "email": "📧 team@azvmotors.kz",
+    "hours": "🕒 Mon - Fri: 9:00 AM - 6:00 PM",
+    "location": "📍 Kazakhstan",
+    "whyContact": "Why Contact Us?",
+    "vehicleInquiries": "• Vehicle inquiries",
+    "serviceSupport": "• Service support", 
+    "partnership": "• Partnership opportunities",
+    "generalInfo": "• General information",
+    "formTitle": "Contact Us",
+    "formSubtitle": "Send us a message and we'll get back to you soon",
+    "successMessage": "Thank you for your message! We'll get back to you soon.",
+    "fullName": "Full Name",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "subject": "Subject",
+    "message": "Message",
+    "messagePlaceholder": "Please describe your inquiry in detail...",
+    "sendMessage": "Send Message",
+    "required": "*"
+  },
+  "deleteTutorial": {
+    "title": "How to Delete Your Account",
+    "subtitle": "Follow these simple steps to permanently delete your account",
+    "step1Title": "Click on Your Name",
+    "step1Description": "First, locate and click on your name or profile section to access your account menu.",
+    "step2Title": "Scroll to Bottom and Click Delete",
+    "step2Description": "Once the menu is open, scroll down to the bottom where you'll find the \"Delete Account\" option in the danger zone.",
+    "step3Title": "Submit Delete Confirmation",
+    "step3Description": "A confirmation dialog will appear. Carefully read the warning and confirm that you want to permanently delete your account.",
+    "note": "Note:",
+    "noteText": "The delete option is typically located at the bottom of your account settings for safety reasons.",
+    "warning": "Warning:",
+    "warningText": "This action cannot be undone. All your data will be permanently deleted.",
+    "demoComplete": "Demo Complete!",
+    "demoText": "Your account would be permanently deleted in a real scenario.",
+    "deleteAccount": "Delete Account",
+    "dangerZone": "Danger Zone",
+    "dangerText": "Once you delete your account, there is no going back. Please be certain.",
+    "modalTitle": "⚠️ Delete Account",
+    "modalText": "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.",
+    "cancel": "Cancel",
+    "yesDelete": "Yes, Delete Account"
   }
 }

@@ -79,7 +79,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
                 {t('cars.nothingFound')}
               </h3>
               <p className="text-[#666666]">
-                У вас пока нет автомобилей
+                {t('cars.noCarsYet')}
               </p>
             </div>
           </div>

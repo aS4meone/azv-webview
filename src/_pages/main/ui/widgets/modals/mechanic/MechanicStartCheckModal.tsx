@@ -331,7 +331,7 @@ export const MechanicStartCheckModal = ({
         
         // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
         try {
-          await mechanicActionsApi.openVehicle();
+          // await mechanicActionsApi.openVehicle();
           
           setResponseModal({
             isOpen: true,
@@ -402,70 +402,21 @@ export const MechanicStartCheckModal = ({
         console.log("Car status after refresh:", car.status);
         console.log("Car current_renter_details after refresh:", car.current_renter_details);
         
-        // РАЗБЛОКИРУЕМ ДВИГАТЕЛЬ после загрузки фото салона
-        try {
-          await mechanicActionsApi.unlockEngine();
-          
-          // Теперь автоматически начинаем осмотр, так как все фото загружены
-          const startRes = await mechanicApi.startCheckCar(car.id);
-          if (startRes.status === 200) {
-            // Дополнительно обновляем данные после начала осмотра
-            await Promise.all([refreshUser(), fetchAllMechanicVehicles()]);
-            
-            // 🔍 DEBUG: После начала осмотра и обновления данных
-            console.log("🔍 DEBUG: MechanicStartCheckModal - After starting inspection and data refresh");
-            console.log("Car status after inspection start:", car.status);
-            console.log("Car current_renter_details after inspection start:", car.current_renter_details);
-            console.log("isMechanicInspecting after inspection start:", isMechanicInspecting);
-            console.log("Should now show car management controls!");
-            
-            setResponseModal({
-              isOpen: true,
-              type: "success",
-              description: "Фотографии салона загружены! Двигатель разблокирован. Осмотр автомобиля начат успешно!",
-              buttonText: "Отлично",
-              onClose: () => {
-                setResponseModal(null);
-                handleClose();
-              },
-              onButtonClick: () => {
-                setResponseModal(null);
-                handleClose();
-              },
-            });
-          }
-        } catch (unlockError) {
-          console.error("Ошибка при разблокировке двигателя:", unlockError);
-          // Если не удалось разблокировать двигатель, все равно начинаем осмотр
-          try {
-            const startRes = await mechanicApi.startCheckCar(car.id);
-            if (startRes.status === 200) {
-              await Promise.all([refreshUser(), fetchAllMechanicVehicles()]);
-              
-              setResponseModal({
-                isOpen: true,
-                type: "success",
-                description: "Фотографии салона загружены! Осмотр автомобиля начат успешно!",
-                buttonText: "Отлично",
-                onClose: () => {
-                  setResponseModal(null);
-                  handleClose();
-                },
-                onButtonClick: () => {
-                  setResponseModal(null);
-                  handleClose();
-                },
-              });
-            }
-          } catch (startError) {
-            showModal({
-              type: "error",
-              description: startError.response?.data?.detail || "Ошибка при начале осмотра",
-              buttonText: t("modal.error.tryAgain"),
-              onClose: () => {},
-            });
-          }
-        }
+        // Фото салона загружены успешно
+        setResponseModal({
+          isOpen: true,
+          type: "success",
+          description: "Фотографии салона загружены!",
+          buttonText: "Отлично",
+          onClose: () => {
+            setResponseModal(null);
+            handleClose();
+          },
+          onButtonClick: () => {
+            setResponseModal(null);
+            handleClose();
+          },
+        });
       }
     } catch (error) {
       setIsLoading(false);

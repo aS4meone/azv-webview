@@ -23,7 +23,7 @@ const getBodyTypeLabel = (bodyType: string, t: (key: string) => string): string 
     [CarBodyType.WAGON]: t('cars.bodyTypes.wagon'),
     [CarBodyType.MINIBUS]: t('cars.bodyTypes.minibus'),
     [CarBodyType.ELECTRIC]: t('cars.bodyTypes.electric'),
-    [CarBodyType.OCCUPIED]: 'Занятые машины',
+    [CarBodyType.OCCUPIED]: t('mechanic.occupiedCars'),
   };
   return labels[bodyType] || bodyType;
 };
@@ -39,7 +39,7 @@ const CarStatusBadge = ({ status, t }: { status: string; t: (key: string) => str
     "RESERVED": t('cars.statuses.RESERVED'),
     "DELIVERING": t('cars.statuses.DELIVERING'),
     "TRACKING": t('cars.statuses.TRACKING'),
-    "OCCUPIED": "Занята",
+    "OCCUPIED": t('mechanic.occupiedStatus'),
   };
 
   const color: Record<string, string> = {
@@ -69,16 +69,16 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
   const router = useRouter();
   
   const handleClick = () => {
-    // Занятые машины не открываются в модальное окно
+    // Occupied cars don't open in modal
     if (car.status === CarStatus.occupied) {
       return;
     }
     
-    // Навигация к главной странице с параметрами машины
+    // Navigation to main page with car parameters
     router.push(
       `${ROUTES.MAIN}?carId=${car.id}&lat=${car.latitude}&lng=${car.longitude}`
     );
-    // Закрываем экран фильтрации
+    // Close filtering screen
     onCarClickAction(car);
   };
 

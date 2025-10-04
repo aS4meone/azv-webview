@@ -1,23 +1,28 @@
 import { Metadata } from "next";
 import { Shield, Lock, Eye, UserCheck, Database, Phone, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: "Политика конфиденциальности - AZV Motors",
-  description: "Политика конфиденциальности и обработки персональных данных AZV Motors. Узнайте, как мы собираем, используем и защищаем вашу информацию.",
-  robots: "index, follow",
-  openGraph: {
-    title: "Политика конфиденциальности - AZV Motors",
-    description: "Политика конфиденциальности и обработки персональных данных AZV Motors",
-    type: "website",
-    locale: "ru_RU",
-  },
-  twitter: {
-    card: "summary",
-    title: "Политика конфиденциальности - AZV Motors",
-    description: "Политика конфиденциальности и обработки персональных данных AZV Motors",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('privacyPolicy');
+  
+  return {
+    title: t('title'),
+    description: t('description'),
+    robots: "index, follow",
+    openGraph: {
+      title: t('title'),
+      description: t('description'),
+      type: "website",
+      locale: "ru_RU",
+    },
+    twitter: {
+      card: "summary",
+      title: t('title'),
+      description: t('description'),
+    },
+  };
+}
 
 export const viewport = {
   width: "device-width",

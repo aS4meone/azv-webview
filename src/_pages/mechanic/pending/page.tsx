@@ -19,7 +19,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
       <div className="flex flex-col gap-4 pt-4 overflow-scroll h-[calc(100vh-100px)] pb-[200px]">
         {isLoadingPending ? (
           <div className="text-center py-4 text-[#191919] text-[16px]">
-            {t("search.loading", "Загрузка...")}
+            {t("mechanic.loading")}
           </div>
         ) : pendingVehicles.length > 0 ? (
           pendingVehicles.map((car) => (
@@ -27,7 +27,7 @@ const MyCarsPage = ({ onClose }: { onClose: () => void }) => {
           ))
         ) : (
           <div className="text-center py-4 text-[#191919] text-[16px]">
-            {t("search.noResults", "Ничего не найдено")}
+            {t("mechanic.noResults")}
           </div>
         )}
       </div>

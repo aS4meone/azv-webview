@@ -48,11 +48,11 @@ export const NOTIFICATION_COLORS: Record<NotificationCategory, NotificationColor
     badge: "bg-green-100 text-green-800",
   },
   [NotificationCategory.WARNING]: {
-    background: "bg-yellow-50",
-    border: "border-yellow-200",
-    text: "text-yellow-800",
-    icon: "text-yellow-600",
-    badge: "bg-yellow-100 text-yellow-800",
+    background: "bg-amber-50",
+    border: "border-amber-300",
+    text: "text-amber-900",
+    icon: "text-amber-700",
+    badge: "bg-amber-200 text-amber-900",
   },
   [NotificationCategory.ERROR]: {
     background: "bg-red-50",

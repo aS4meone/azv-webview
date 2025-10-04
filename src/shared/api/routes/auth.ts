@@ -18,7 +18,7 @@ export const authApi = {
     } catch (error) {
       return {
         data: null,
-        error: error.response?.data.detail || "Failed to send SMS",
+        error: error.response?.data?.detail || "Failed to send SMS",
         statusCode: error.status,
       };
     }
@@ -34,7 +34,7 @@ export const authApi = {
     } catch (error) {
       return {
         data: null,
-        error: error.response?.data.detail || "Failed to send SMS",
+        error: error.response?.data?.detail || "Failed to send SMS",
         statusCode: error.status,
       };
     }
@@ -49,8 +49,7 @@ export const authApi = {
     } catch (error) {
       return {
         data: null,
-        error: error.response.data.detail || "Failed to verify SMS code",
-
+        error: error.response?.data?.detail || "Failed to verify SMS code",
         statusCode: error.status,
       };
     }
@@ -74,7 +73,7 @@ export const authApi = {
     } catch (error) {
       return {
         data: null,
-        error: error.response?.data.detail || "Failed to refresh token",
+        error: error.response?.data?.detail || "Failed to refresh token",
         statusCode: error.status,
       };
     }

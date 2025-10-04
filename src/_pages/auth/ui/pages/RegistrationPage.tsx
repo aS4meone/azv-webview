@@ -153,7 +153,7 @@ const RegistrationPage = () => {
                   showModal({
                     type: "error",
                     title: t("error"),
-                    description: error.response.data.detail,
+                    description: error.response?.data?.detail || "Произошла ошибка",
                     buttonText: t("modal.error.button"),
                   });
                 }

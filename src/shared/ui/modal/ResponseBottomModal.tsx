@@ -168,7 +168,7 @@ export const ResponseBottomModalContent = ({
           transition={{ duration: 0.3, delay: 0.5 }}
           className="text-[18px] mb-8 text-[#191919] whitespace-pre-line"
         >
-          {description}
+          {typeof description === 'string' ? description : JSON.stringify(description)}
         </motion.p>
 
         {/* Button with animation */}

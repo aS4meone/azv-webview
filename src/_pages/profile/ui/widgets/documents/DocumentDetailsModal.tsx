@@ -375,7 +375,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         value={formData.birth_date || ""}
                         onChange={handleChange}
                         error={errors.birth_date}
-                        placeholder="Выберите дату рождения"
+                        placeholder={t("profile.selectBirthDate")}
                         required
                         max={getMaxBirthDate()}
                         min={getMinBirthDate()}
@@ -467,7 +467,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                       value={formData.id_card_expiry || ""}
                       onChange={handleChange}
                       error={errors.id_card_expiry}
-                      placeholder="Выберите дату истечения"
+                      placeholder={t("selectExpiryDate")}
                       required
                       min={new Date().toISOString().split("T")[0]}
                       max={getMaxDate(10)}
@@ -483,7 +483,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                       value={formData.drivers_license_expiry || ""}
                       onChange={handleChange}
                       error={errors.drivers_license_expiry}
-                      placeholder="Выберите дату истечения"
+                      placeholder={t("selectExpiryDate")}
                       required
                       min={new Date().toISOString().split("T")[0]}
                       max={getMaxDate(10)}
@@ -497,39 +497,39 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
 
               {/* Debug information */}
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
-                <h4 className="text-sm font-semibold text-gray-800 mb-2">Отладочная информация:</h4>
+                <h4 className="text-sm font-semibold text-gray-800 mb-2">{t("debugInfo")}</h4>
                 <div className="text-xs text-gray-600 space-y-1">
-                  <div>Имя: "{formData.first_name}" (длина: {formData.first_name?.length || 0})</div>
-                  <div>Фамилия: "{formData.last_name}" (длина: {formData.last_name?.length || 0})</div>
-                  <div>Дата рождения: "{formData.birth_date}"</div>
-                  <div>ИИН: "{formData.iin}" (длина: {formData.iin?.length || 0})</div>
-                  <div>Срок удостоверения: "{formData.id_card_expiry}"</div>
-                  <div>Срок водительского: "{formData.drivers_license_expiry}"</div>
-                  <div className="mt-2 font-semibold">Валидация: {isFormValid ? "✅ Валидна" : "❌ Невалидна"}</div>
+                  <div>{t("firstName")} "{formData.first_name}" {t("length")} {formData.first_name?.length || 0})</div>
+                  <div>{t("lastName")} "{formData.last_name}" {t("length")} {formData.last_name?.length || 0})</div>
+                  <div>{t("birthDate")} "{formData.birth_date}"</div>
+                  <div>{t("iin")} "{formData.iin}" {t("length")} {formData.iin?.length || 0})</div>
+                  <div>{t("idCardExpiry")} "{formData.id_card_expiry}"</div>
+                  <div>{t("driversLicenseExpiry")} "{formData.drivers_license_expiry}"</div>
+                  <div className="mt-2 font-semibold">{t("validation")} {isFormValid ? t("valid") : t("invalid")}</div>
                 </div>
               </div>
 
               {!isFormValid && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                  <h4 className="text-sm font-semibold text-red-800 mb-2">Не заполнены обязательные поля:</h4>
+                  <h4 className="text-sm font-semibold text-red-800 mb-2">{t("missingFields")}</h4>
                   <ul className="text-sm text-red-700 space-y-1">
                     {(!formData.first_name || formData.first_name.trim().length < 2) && (
-                      <li>• Имя (минимум 2 символа)</li>
+                      <li>{t("firstNameRequired")}</li>
                     )}
                     {(!formData.last_name || formData.last_name.trim().length < 2) && (
-                      <li>• Фамилия (минимум 2 символа)</li>
+                      <li>{t("lastNameRequired")}</li>
                     )}
                     {!formData.birth_date && (
-                      <li>• Дата рождения</li>
+                      <li>{t("birthDateRequired")}</li>
                     )}
                     {(!formData.iin || formData.iin.length !== 12) && (
-                      <li>• ИИН (12 цифр)</li>
+                      <li>{t("iinRequired")}</li>
                     )}
                     {!formData.id_card_expiry && (
-                      <li>• Срок действия удостоверения личности</li>
+                      <li>{t("idCardExpiryRequired")}</li>
                     )}
                     {!formData.drivers_license_expiry && (
-                      <li>• Срок действия водительского удостоверения</li>
+                      <li>{t("driversLicenseExpiryRequired")}</li>
                     )}
                   </ul>
                 </div>

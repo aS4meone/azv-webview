@@ -75,12 +75,12 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       if (res.status === 200) {
         setIsLoading(false);
         setShowUploadPhoto(false);
-        // Показываем сообщение о блокировке и переходим ко второму шагу
+        // Show blocking message and go to second step
         setResponseModal({
           isOpen: true,
           type: "success",
-          description: "Замки, двигатель заблокированы, ключ забран. Теперь сфотографируйте кузов автомобиля.",
-          buttonText: "Продолжить",
+          description: t("modals.locksBlocked"),
+          buttonText: t("modals.continue"),
           onClose: () => {
             setResponseModal(null);
             setShowUploadPhotoStep2(true);
@@ -96,8 +96,8 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       setResponseModal({
         isOpen: true,
         type: "error",
-        description: error.response?.data?.detail || "Ошибка при загрузке фотографий",
-        buttonText: "Попробовать снова",
+        description: error.response?.data?.detail || t("modals.photoUploadError"),
+        buttonText: t("modals.tryAgain"),
         onClose: () => setResponseModal(null),
         onButtonClick: () => setResponseModal(null),
       });
@@ -124,7 +124,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       setResponseModal({
         isOpen: true,
         type: "error",
-        description: error.response?.data?.detail || "Ошибка при загрузке фотографий кузова",
+        description: error.response?.data?.detail || t("modals.photoUploadError"),
         buttonText: "Попробовать снова",
         onClose: () => setResponseModal(null),
         onButtonClick: () => setResponseModal(null),
@@ -145,12 +145,12 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       if (res.status === 200) {
         setIsLoading(false);
         setShowUploadPhoto(false);
-        // Показываем сообщение о блокировке и переходим ко второму шагу
+        // Show blocking message and go to second step
         setResponseModal({
           isOpen: true,
           type: "success",
-          description: "Замки, двигатель заблокированы, ключ забран. Теперь сфотографируйте кузов автомобиля.",
-          buttonText: "Продолжить",
+          description: t("modals.locksBlocked"),
+          buttonText: t("modals.continue"),
           onClose: () => {
             setResponseModal(null);
             setShowUploadPhotoStep2(true);
@@ -166,8 +166,8 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       setResponseModal({
         isOpen: true,
         type: "error",
-        description: error.response?.data?.detail || "Ошибка при загрузке фотографий",
-        buttonText: "Попробовать снова",
+        description: error.response?.data?.detail || t("modals.photoUploadError"),
+        buttonText: t("modals.tryAgain"),
         onClose: () => setResponseModal(null),
         onButtonClick: () => setResponseModal(null),
       });
@@ -194,7 +194,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       setResponseModal({
         isOpen: true,
         type: "error",
-        description: error.response?.data?.detail || "Ошибка при загрузке фотографий кузова",
+        description: error.response?.data?.detail || t("modals.photoUploadError"),
         buttonText: "Попробовать снова",
         onClose: () => setResponseModal(null),
         onButtonClick: () => setResponseModal(null),

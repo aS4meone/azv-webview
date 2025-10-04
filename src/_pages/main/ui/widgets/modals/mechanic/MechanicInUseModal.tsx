@@ -126,7 +126,7 @@ export const MechanicInUseModal = ({
         
         // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
         try {
-          await mechanicActionsApi.openVehicle();
+          // await mechanicActionsApi.openVehicle();
           
           setResponseModal({
             isOpen: true,
@@ -194,37 +194,19 @@ export const MechanicInUseModal = ({
         
         setPhotosBeforeUploaded(true);
         
-        // РАЗБЛОКИРУЕМ ДВИГАТЕЛЬ после загрузки фото салона
-        try {
-          await mechanicActionsApi.unlockEngine();
-          
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: "Фотографии салона загружены! Двигатель разблокирован. Теперь автомобиль доступен для управления.",
-            buttonText: "Отлично",
-            onClose: () => {
-              setResponseModal(null);
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-            },
-          });
-        } catch (unlockError) {
-          console.error("Ошибка при разблокировке двигателя:", unlockError);
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: "Фотографии салона загружены! Теперь автомобиль доступен для управления.",
-            buttonText: "Отлично",
-            onClose: () => {
-              setResponseModal(null);
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-            },
-          });
-        }
+        // Фото салона загружены успешно
+        setResponseModal({
+          isOpen: true,
+          type: "success",
+          description: "Фотографии салона загружены!",
+          buttonText: "Отлично",
+          onClose: () => {
+            setResponseModal(null);
+          },
+          onButtonClick: () => {
+            setResponseModal(null);
+          },
+        });
       }
     } catch (error) {
       setIsLoading(false);

@@ -112,9 +112,9 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ message, onMarkAsRe
           <p
             className={cn(
               "text-sm leading-5 mb-3",
+              colorScheme.text,
               message.isRead ? "opacity-70" : "opacity-90"
             )}
-            style={{ color: colorScheme.text.replace('text-', '').replace('-800', '') }}
           >
             {message.description}
           </p>
@@ -122,18 +122,19 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ message, onMarkAsRe
           <div className="flex items-center justify-between">
             <span
               className={cn(
-                "text-xs",
+                "text-xs text-gray-600",
                 message.isRead ? "opacity-50" : "opacity-70"
               )}
-              style={{ color: colorScheme.text.replace('text-', '').replace('-800', '') }}
             >
               {formatTime(message.time)}
             </span>
 
             {!message.isRead && (
               <button
-                className="text-xs font-medium transition-colors hover:opacity-80"
-                style={{ color: colorScheme.text.replace('text-', '').replace('-800', '') }}
+                className={cn(
+                  "text-xs font-medium transition-colors hover:opacity-80",
+                  colorScheme.text
+                )}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleMarkAsRead();

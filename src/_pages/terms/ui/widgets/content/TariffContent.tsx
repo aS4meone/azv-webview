@@ -45,7 +45,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
       case "minutes":
         return {
           title: t("minute.title"),
-          basePrice: `${car.price_per_minute} ₸/минута`,
+          basePrice: `${car.price_per_minute} ${t("tariff.perMinute")}`,
           description: t("minute.description"),
           icon: <Timer className="w-6 h-6" />,
           popular: true,
@@ -59,7 +59,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
       case "hours":
         return {
           title: t("hour.title"),
-          basePrice: `${car.price_per_hour} ₸/час`,
+          basePrice: `${car.price_per_hour} ${t("tariff.perHour")}`,
           description: t("hour.description"),
           icon: <Clock className="w-6 h-6" />,
           popular: false,
@@ -77,7 +77,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
       case "days":
         return {
           title: t("day.title"),
-          basePrice: `${car.price_per_day} ₸/день`,
+          basePrice: `${car.price_per_day} ${t("tariff.perDay")}`,
           description: t("day.description"),
           icon: <Calendar className="w-6 h-6" />,
           popular: false,
@@ -227,7 +227,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                 <Timer className="w-6 h-6 mx-auto text-black" />
                 <h3 className="font-semibold">{t("minute.title")}</h3>
                 <p className="text-2xl font-bold text-[#1D77FF]">
-                  {car.price_per_minute} ₸/мин
+                  {car.price_per_minute} {t("tariff.perMin")}
                 </p>
                 <p className="text-sm text-black/60">{t("comparison.forShortTrips")}</p>
               </div>
@@ -242,7 +242,7 @@ export const TariffContent = ({ rentalType, car }: TariffContentProps) => {
                 <Clock className="w-6 h-6 mx-auto text-black" />
                 <h3 className="font-semibold">{t("hour.title")}</h3>
                 <p className="text-2xl font-bold text-black">
-                  {car.price_per_hour} ₸/час
+                  {car.price_per_hour} {t("tariff.perHour")}
                 </p>
                 <p className="text-sm text-black/60">{t("comparison.optimalChoice")}</p>
               </div>
