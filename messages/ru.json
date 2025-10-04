@@ -1094,6 +1094,50 @@
       "excellent": "Отлично",
       "lockError": "Ошибка при попытке заблокировать автомобиль",
       "unlockError": "Ошибка при попытке разблокировать автомобиль"
+    },
+    "startCheck": {
+      "uploadPhotos": "Загрузка фотографий",
+      "uploadPhotosDescription": "Машина принята на осмотр. Сначала загрузите селфи с автомобилем и фото кузова.",
+      "uploadPhotosButton": "Загрузить фотографии",
+      "uploadInteriorPhotos": "Загрузка фотографий салона",
+      "uploadInteriorPhotosDescription": "Машина принята на осмотр. Отлично! Фотографии селфи и кузова загружены. Теперь загрузите фотографии салона автомобиля.",
+      "uploadInteriorPhotosButton": "Загрузить фото салона",
+      "allPhotosUploaded": "Машина принята на осмотр. Все фотографии загружены. Осмотр можно начать.",
+      "startInspectionButton": "Начать осмотр",
+      "uploadPhotosFallback": "Машина принята на осмотр. Теперь загрузите фотографии для начала осмотра.",
+      "photosUploadedSuccess": "Фотографии загружены! Замки автомобиля открыты. Теперь сфотографируйте салон.",
+      "continueButton": "Продолжить",
+      "photosUploadedSuccessFallback": "Фотографии загружены! Теперь сфотографируйте салон.",
+      "interiorPhotosUploaded": "Фотографии салона загружены!",
+      "excellentButton": "Отлично",
+      "carManagement": "Управление автомобилем",
+      "openLocks": "Открыть замки",
+      "closeLocks": "Закрыть замки",
+      "locksOpened": "Замки автомобиля открыты",
+      "locksClosed": "Замки автомобиля закрыты",
+      "openLocksError": "Ошибка при открытии замков",
+      "closeLocksError": "Ошибка при закрытии замков",
+      "understood": "Понятно",
+      "uploadSelfieAndCar": "Загрузить селфи и фото кузова",
+      "uploadInterior": "Загрузить фото салона",
+      "startInspection": "Начать осмотр"
+    },
+    "carSpecs": {
+      "transmission": {
+        "manual": "МКПП",
+        "automatic": "АКПП",
+        "cvt": "CVT",
+        "semi_automatic": "РКПП"
+      },
+      "driveType": {
+        "rwd": "RWD",
+        "fwd": "FWD",
+        "awd": "AWD"
+      },
+      "fuelUnit": "л",
+      "electric": "Электро",
+      "class": "КЛАСС",
+      "year": "год"
     }
   },
   "widgets": {
@@ -1201,9 +1245,10 @@
           "startDelivery": "Начать доставку"
         },
         "startCheck": {
-          "viewData": "Посмотреть данные",
-          "carPoint": "Точка авто",
-          "deliveryPoint": "Точка доставки",
+      "viewData": "Посмотреть данные",
+      "viewInspectionData": "Посмотреть данные осмотра",
+      "carPoint": "Точка авто",
+      "deliveryPoint": "Точка доставки",
           "acceptInspection": "Принять осмотр",
           "startDelivery": "Начать доставку",
           "startTracking": "Начать слежку"
@@ -1325,7 +1370,12 @@
       "description": {
         "carDescription": "Описание автомобиля",
         "carInfo": "Информация о автомобиле",
-        "backToMap": "Вернуться к карте"
+        "backToMap": "Вернуться к карте",
+        "lastClientReview": "Отзыв последнего клиента",
+        "photosAfterRental": "Фотографии после аренды",
+        "interior": "Салон",
+        "exterior": "Кузов",
+        "photosCount": "фото"
       },
       "tracking": {
         "trackingData": "Данные слежки",
@@ -1337,7 +1387,6 @@
         "profileSelfie": "Селфи профиля",
         "noPhoto": "Нет фото",
         "renterPhotosNotAvailable": "Фотографии арендатора недоступны",
-        "backToMap": "Вернуться к карте",
         "noPhotoAvailable": "Нет фото"
       }
     },
@@ -1356,35 +1405,6 @@
     "placeholder": "Поиск...",
     "loading": "Загрузка...",
     "noResults": "Ничего не найдено"
-  },
-  "mechanic": {
-    "loading": "Загрузка...",
-    "noResults": "Ничего не найдено",
-    "occupiedCars": "Занятые машины",
-    "occupiedStatus": "Занята"
-  },
-  "profile": {
-    "selectBirthDate": "Выберите дату рождения",
-    "selectExpiryDate": "Выберите дату истечения",
-    "debugInfo": "Отладочная информация:",
-    "firstName": "Имя:",
-    "lastName": "Фамилия:",
-    "birthDate": "Дата рождения:",
-    "iin": "ИИН:",
-    "idCardExpiry": "Срок удостоверения:",
-    "driversLicenseExpiry": "Срок водительского:",
-    "validation": "Валидация:",
-    "valid": "✅ Валидна",
-    "invalid": "❌ Невалидна",
-    "length": "(длина:",
-    "missingFields": "Не заполнены обязательные поля:",
-    "firstNameRequired": "• Имя (минимум 2 символа)",
-    "lastNameRequired": "• Фамилия (минимум 2 символа)",
-    "birthDateRequired": "• Дата рождения",
-    "iinRequired": "• ИИН (12 цифр)",
-    "idCardExpiryRequired": "• Срок действия удостоверения личности",
-    "driversLicenseExpiryRequired": "• Срок действия водительского удостоверения",
-    "issuesCount": "{count} Проблем"
   },
   "tariff": {
     "perMinute": "₸/минута",

@@ -45,7 +45,7 @@ const PushScreen = ({
           duration: 0.4,
           ease: [0.4, 0.0, 0.2, 1],
         }}
-        className={`fixed inset-0 z-30 bg-white px-8 py-10`}
+        className={`fixed inset-0 z-30 bg-white px-8 py-10 overflow-y-auto`}
         style={{ pointerEvents: "auto" }}
         data-push-screen="true"
       >

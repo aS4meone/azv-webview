@@ -26,7 +26,8 @@ export const MechanicTrackingCarModal = ({
   car: initialCar,
   onClose,
 }: MechanicTrackingCarModalProps) => {
-  const t = useTranslations();
+  const t = useTranslations("mechanic");
+  const tModal = useTranslations("modal");
   const { showModal } = useResponseModal();
   const { user, refreshUser } = useUserStore();
   const { allMechanicVehicles, fetchAllMechanicVehicles } = useVehiclesStore();
@@ -82,9 +83,9 @@ export const MechanicTrackingCarModal = ({
         setResponseModal({
           type: "success",
           isOpen: true,
-          title: t("mechanic.tracking.completed"),
-          description: t("mechanic.tracking.successfullyCompleted"),
-          buttonText: t("mechanic.common.excellent"),
+          title: t("tracking.completed"),
+          description: t("tracking.successfullyCompleted"),
+          buttonText: t("common.excellent"),
           onButtonClick: handleClose,
           onClose: handleClose,
         });
@@ -93,8 +94,8 @@ export const MechanicTrackingCarModal = ({
       console.log(error);
       showModal({
         type: "error",
-        description: isMechanicInspecting ? "Ошибка при завершении осмотра" : t("mechanic.tracking.completionError"),
-        buttonText: t("modal.error.tryAgain"),
+        description: isMechanicInspecting ? "Ошибка при завершении осмотра" : t("tracking.completionError"),
+        buttonText: tModal("error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -352,10 +353,10 @@ export const MechanicTrackingCarModal = ({
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-green-700 font-medium">{t("mechanic.tracking.active")}</span>
+                <span className="text-green-700 font-medium">{t("tracking.active")}</span>
               </div>
               <p className="text-green-600 text-sm mt-1">
-                {t("mechanic.tracking.description")}
+                {t("tracking.description")}
               </p>
             </div>
           )}
@@ -394,7 +395,7 @@ export const MechanicTrackingCarModal = ({
           {/* Action Buttons */}
           <div className="space-y-3">
             <Button variant="outline" onClick={handleViewData}>
-              {isMechanicInspecting ? "Посмотреть данные осмотра" : t("mechanic.tracking.viewData")}
+              {isMechanicInspecting ? t("startCheck.viewInspectionData") : t("tracking.viewData")}
             </Button>
 
             <Button variant="secondary" onClick={handleCompleteTracking}>
@@ -412,7 +413,7 @@ export const MechanicTrackingCarModal = ({
                 } else {
                   return "Загрузить селфи и фото кузова";
                 }
-              })() : t("mechanic.tracking.completeTracking")}
+              })() : t("tracking.completeTracking")}
             </Button>
           </div>
         </div>
@@ -497,7 +498,6 @@ const RatingModal = ({
   user,
   isLoading,
 }: RatingModalProps) => {
-  const t = useTranslations();
   return (
     <PushScreen onClose={onClose} withOutStyles>
       <div className="bg-white px-8 py-10 pt-[140px] text-[#191919] flex flex-col justify-between h-full">

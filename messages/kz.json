@@ -1094,6 +1094,50 @@
       "excellent": "Керемет",
       "lockError": "Автомобильді құлыптауға тырысу қатесі",
       "unlockError": "Автомобильді ашуға тырысу қатесі"
+    },
+    "startCheck": {
+      "uploadPhotos": "Суреттерді жүктеу",
+      "uploadPhotosDescription": "Көлік тексеруге қабылданды. Алдымен көлікпен селфи және кузов суреттерін жүктеңіз.",
+      "uploadPhotosButton": "Суреттерді жүктеу",
+      "uploadInteriorPhotos": "Салон суреттерін жүктеу",
+      "uploadInteriorPhotosDescription": "Көлік тексеруге қабылданды. Керемет! Селфи және кузов суреттері жүктелді. Енді көліктің салон суреттерін жүктеңіз.",
+      "uploadInteriorPhotosButton": "Салон суреттерін жүктеу",
+      "allPhotosUploaded": "Көлік тексеруге қабылданды. Барлық суреттер жүктелді. Тексеру басталуы мүмкін.",
+      "startInspectionButton": "Тексеруді бастау",
+      "uploadPhotosFallback": "Көлік тексеруге қабылданды. Енді тексеруді бастау үшін суреттерді жүктеңіз.",
+      "photosUploadedSuccess": "Суреттер жүктелді! Көлік құлыптары ашылды. Енді салонды суретке түсіріңіз.",
+      "continueButton": "Жалғастыру",
+      "photosUploadedSuccessFallback": "Суреттер жүктелді! Енді салонды суретке түсіріңіз.",
+      "interiorPhotosUploaded": "Салон суреттері жүктелді!",
+      "excellentButton": "Керемет",
+      "carManagement": "Көлікті басқару",
+      "openLocks": "Құлыптарды ашу",
+      "closeLocks": "Құлыптарды жабу",
+      "locksOpened": "Көлік құлыптары ашылды",
+      "locksClosed": "Көлік құлыптары жабылды",
+      "openLocksError": "Құлыптарды ашу қатесі",
+      "closeLocksError": "Құлыптарды жабу қатесі",
+      "understood": "Түсіндім",
+      "uploadSelfieAndCar": "Селфи және көлік суреттерін жүктеу",
+      "uploadInterior": "Салон суреттерін жүктеу",
+      "startInspection": "Тексеруді бастау"
+    },
+    "carSpecs": {
+      "transmission": {
+        "manual": "МКПП",
+        "automatic": "АКПП",
+        "cvt": "CVT",
+        "semi_automatic": "РКПП"
+      },
+      "driveType": {
+        "rwd": "RWD",
+        "fwd": "FWD",
+        "awd": "AWD"
+      },
+      "fuelUnit": "л",
+      "electric": "Электро",
+      "class": "КЛАСС",
+      "year": "жыл"
     }
   },
   "widgets": {
@@ -1202,6 +1246,7 @@
         },
         "startCheck": {
           "viewData": "Деректерді көру",
+          "viewInspectionData": "Тексеру деректерін көру",
           "carPoint": "Көлік нүктесі",
           "deliveryPoint": "Жеткізу нүктесі",
           "acceptInspection": "Тексеруді қабылдау",
@@ -1325,7 +1370,12 @@
       "description": {
         "carDescription": "Көлік сипаттамасы",
         "carInfo": "Көлік туралы ақпарат",
-        "backToMap": "Картаға оралу"
+        "backToMap": "Картаға оралу",
+        "lastClientReview": "Соңғы клиент пікірі",
+        "photosAfterRental": "Арендадан кейінгі суреттер",
+        "interior": "Салон",
+        "exterior": "Кузов",
+        "photosCount": "сурет"
       },
       "tracking": {
         "trackingData": "Бақылау деректері",
@@ -1337,7 +1387,6 @@
         "profileSelfie": "Профиль селфи",
         "noPhoto": "Сурет жоқ",
         "renterPhotosNotAvailable": "Арендатор суреттері қол жетімді емес",
-        "backToMap": "Картаға оралу",
         "noPhotoAvailable": "Сурет жоқ"
       }
     },
@@ -1356,35 +1405,6 @@
     "placeholder": "Іздеу...",
     "loading": "Жүктелуде...",
     "noResults": "Еш нәрсе табылмады"
-  },
-  "mechanic": {
-    "loading": "Жүктелуде...",
-    "noResults": "Еш нәрсе табылмады",
-    "occupiedCars": "Бос емес көліктер",
-    "occupiedStatus": "Бос емес"
-  },
-  "profile": {
-    "selectBirthDate": "Туған күнді таңдаңыз",
-    "selectExpiryDate": "Мерзімдік күнді таңдаңыз",
-    "debugInfo": "Жөндеу ақпараты:",
-    "firstName": "Аты:",
-    "lastName": "Тегі:",
-    "birthDate": "Туған күні:",
-    "iin": "ЖСН:",
-    "idCardExpiry": "Жеке куәлік мерзімі:",
-    "driversLicenseExpiry": "Жүргізуші куәлігі мерзімі:",
-    "validation": "Дұрыстық тексеру:",
-    "valid": "✅ Дұрыс",
-    "invalid": "❌ Дұрыс емес",
-    "length": "(ұзындығы:",
-    "missingFields": "Міндетті өрістер толтырылмаған:",
-    "firstNameRequired": "• Аты (минимум 2 таңба)",
-    "lastNameRequired": "• Тегі (минимум 2 таңба)",
-    "birthDateRequired": "• Туған күні",
-    "iinRequired": "• ЖСН (12 цифр)",
-    "idCardExpiryRequired": "• Жеке куәлік мерзімі",
-    "driversLicenseExpiryRequired": "• Жүргізуші куәлігі мерзімі",
-    "issuesCount": "{count} Мәселе"
   },
   "tariff": {
     "perMinute": "₸/минут",

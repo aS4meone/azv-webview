@@ -1,6 +1,7 @@
 import { ICar, TransmissionType } from "@/shared/models/types/car";
 import { DriveTypeIcon, EngineVolumeIcon, FuelIcon, LightningIcon, BatteryIcon, TransmissionIconPNG } from "@/shared/icons";
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface CarSpecsProps {
   car: ICar;
@@ -8,14 +9,16 @@ interface CarSpecsProps {
 }
 
 export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
+  const t = useTranslations("mechanic");
+  
   const returnDriveType = () => {
     switch (car.drive_type) {
       case 1:
-        return "RWD";
+        return t("carSpecs.driveType.rwd");
       case 2:
-        return "FWD";
+        return t("carSpecs.driveType.fwd");
       case 3:
-        return "AWD";
+        return t("carSpecs.driveType.awd");
       default:
         return "";
     }
@@ -24,15 +27,15 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
   const returnTransmissionType = () => {
     switch (car.transmission_type) {
       case "manual":
-        return "МКПП";
+        return t("carSpecs.transmission.manual");
       case "automatic":
-        return "АКПП";
+        return t("carSpecs.transmission.automatic");
       case "cvt":
-        return "CVT";
+        return t("carSpecs.transmission.cvt");
       case "semi_automatic":
-        return "РКПП";
+        return t("carSpecs.transmission.semi_automatic");
       default:
-        return "АКПП"; // По умолчанию АКПП
+        return t("carSpecs.transmission.automatic"); // По умолчанию АКПП
     }
   };
 
@@ -41,11 +44,11 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
   const specs = [
     { 
       icon: isElectric ? <BatteryIcon /> : <FuelIcon />, 
-      value: isElectric ? `${car.fuel_level || 0}%` : `${car.fuel_level || 0}л` 
+      value: isElectric ? `${car.fuel_level || 0}%` : `${car.fuel_level || 0} ${t("carSpecs.fuelUnit")}` 
     },
     {
       icon: isElectric ? <LightningIcon /> : <EngineVolumeIcon />,
-      value: isElectric ? "Электро" : (car.engine_volume ? car.engine_volume.toFixed(1) : "0.0"),
+      value: isElectric ? t("carSpecs.electric") : (car.engine_volume ? car.engine_volume.toFixed(1) : "0.0"),
     },
     {
       icon: <DriveTypeIcon type={car.drive_type || 0} />,
@@ -55,7 +58,7 @@ export const CarSpecs = ({ car, className = "" }: CarSpecsProps) => {
       icon: <TransmissionIconPNG type={car.transmission_type} />,
       value: returnTransmissionType(),
     },
-    { value: `КЛАСС: ${car.auto_class || "A"}` }, // Класс авто
+    { value: `${t("carSpecs.class")}: A` }, // Класс авто
     { value: car.year ? car.year.toString() : "0" },
   ];
 

@@ -1105,6 +1105,50 @@
       "lockError": "Error trying to lock vehicle",
       "unlockError": "Error trying to unlock vehicle"
     },
+    "startCheck": {
+      "uploadPhotos": "Upload Photos",
+      "uploadPhotosDescription": "Car accepted for inspection. First upload a selfie with the car and car body photos.",
+      "uploadPhotosButton": "Upload Photos",
+      "uploadInteriorPhotos": "Upload Interior Photos",
+      "uploadInteriorPhotosDescription": "Car accepted for inspection. Great! Selfie and car body photos uploaded. Now upload interior photos of the car.",
+      "uploadInteriorPhotosButton": "Upload Interior Photos",
+      "allPhotosUploaded": "Car accepted for inspection. All photos uploaded. Inspection can begin.",
+      "startInspectionButton": "Start Inspection",
+      "uploadPhotosFallback": "Car accepted for inspection. Now upload photos to start inspection.",
+      "photosUploadedSuccess": "Photos uploaded! Car locks opened. Now photograph the interior.",
+      "continueButton": "Continue",
+      "photosUploadedSuccessFallback": "Photos uploaded! Now photograph the interior.",
+      "interiorPhotosUploaded": "Interior photos uploaded!",
+      "excellentButton": "Excellent",
+      "carManagement": "Car Management",
+      "openLocks": "Open Locks",
+      "closeLocks": "Close Locks",
+      "locksOpened": "Car locks opened",
+      "locksClosed": "Car locks closed",
+      "openLocksError": "Error opening locks",
+      "closeLocksError": "Error closing locks",
+      "understood": "Understood",
+      "uploadSelfieAndCar": "Upload selfie and car photos",
+      "uploadInterior": "Upload interior photos",
+      "startInspection": "Start inspection"
+    },
+    "carSpecs": {
+      "transmission": {
+        "manual": "Manual",
+        "automatic": "Auto",
+        "cvt": "CVT",
+        "semi_automatic": "Semi-Auto"
+      },
+      "driveType": {
+        "rwd": "RWD",
+        "fwd": "FWD",
+        "awd": "AWD"
+      },
+      "fuelUnit": "L",
+      "electric": "Electric",
+      "class": "CLASS",
+      "year": "year"
+    },
     "loading": "Loading...",
     "noResults": "No results found",
     "occupiedCars": "Occupied cars",
@@ -1216,6 +1260,7 @@
         },
         "startCheck": {
           "viewData": "View data",
+          "viewInspectionData": "View inspection data",
           "carPoint": "Car point",
           "deliveryPoint": "Delivery point",
           "acceptInspection": "Accept inspection",
@@ -1339,7 +1384,12 @@
       "description": {
         "carDescription": "Car description",
         "carInfo": "Car information",
-        "backToMap": "Back to map"
+        "backToMap": "Back to map",
+        "lastClientReview": "Last client's review",
+        "photosAfterRental": "Photos after rental",
+        "interior": "Interior",
+        "exterior": "Exterior",
+        "photosCount": "photos"
       },
       "tracking": {
         "trackingData": "Tracking data",
@@ -1351,7 +1401,6 @@
         "profileSelfie": "Profile selfie",
         "noPhoto": "No photo",
         "renterPhotosNotAvailable": "Renter photos not available",
-        "backToMap": "Back to map",
         "noPhotoAvailable": "No photo"
       }
     },

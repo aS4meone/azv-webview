@@ -25,7 +25,8 @@ export const MechanicStartCheckModal = ({
   car: initialCar,
   onClose,
 }: MechanicStartCheckModalProps) => {
-  const t = useTranslations();
+  const t = useTranslations("mechanic");
+  const tModal = useTranslations("modal");
   const { showModal } = useResponseModal();
   const { user, refreshUser } = useUserStore();
   const { allMechanicVehicles, fetchCurrentDeliveryVehicle, fetchAllMechanicVehicles } = useVehiclesStore();
@@ -45,23 +46,7 @@ export const MechanicStartCheckModal = ({
   const isMechanicInspecting = car?.status === "IN_USE" && 
     car?.current_renter_details?.id === currentMechanicId;
     
-  // 🔍 DEBUG: Отслеживаем источник данных и условия для управления автомобилем
-  console.log("🔍 DEBUG: MechanicStartCheckModal - Data Source");
-  console.log("user?.current_rental?.car_details:", user?.current_rental?.car_details);
-  console.log("allMechanicVehicles:", allMechanicVehicles);
-  console.log("car from user.current_rental:", user?.current_rental?.car_details);
-  console.log("car from allMechanicVehicles:", allMechanicVehicles?.find(v => v.id === initialCar.id));
-  console.log("final car object:", car);
-  console.log("---");
-  
-  console.log("🔍 DEBUG: MechanicStartCheckModal - Car Management Conditions");
-  console.log("car?.status:", car?.status);
-  console.log("car?.current_renter_details?.id:", car?.current_renter_details?.id);
-  console.log("currentMechanicId:", currentMechanicId);
-  console.log("car?.status === 'IN_USE':", car?.status === "IN_USE");
-  console.log("car?.current_renter_details?.id === currentMechanicId:", car?.current_renter_details?.id === currentMechanicId);
-  console.log("isMechanicInspecting:", isMechanicInspecting);
-  console.log("---");
+
 
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
@@ -78,13 +63,6 @@ export const MechanicStartCheckModal = ({
     const hasCarPhotos = car.photo_before_car_uploaded || false;
     const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
     
-    console.log("🔍 DEBUG: MechanicStartCheckModal - Photo status check on init");
-    console.log("car.photo_before_selfie_uploaded:", car.photo_before_selfie_uploaded);
-    console.log("car.photo_before_car_uploaded:", car.photo_before_car_uploaded);
-    console.log("car.photo_before_interior_uploaded:", car.photo_before_interior_uploaded);
-    console.log("hasSelfie:", hasSelfie, "hasCarPhotos:", hasCarPhotos, "hasInteriorPhotos:", hasInteriorPhotos);
-    console.log("isMechanicInspecting:", isMechanicInspecting);
-    console.log("car.status:", car.status);
     
     // Если механик уже осматривает машину (статус IN_USE), не показываем модалы загрузки фотографий
     if (isMechanicInspecting) {
@@ -162,9 +140,9 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            title: "Загрузка фотографий",
-            description: "Машина принята на осмотр. Сначала загрузите селфи с автомобилем и фото кузова.",
-            buttonText: "Загрузить фотографии",
+            title: t("startCheck.uploadPhotos"),
+            description: t("startCheck.uploadPhotosDescription"),
+            buttonText: t("startCheck.uploadPhotosButton"),
             onButtonClick: () => {
               setResponseModal(null);
               setShowUploadPhotoStep1(true);
@@ -179,9 +157,9 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            title: "Загрузка фотографий салона",
-            description: "Машина принята на осмотр. Отлично! Фотографии селфи и кузова загружены. Теперь загрузите фотографии салона автомобиля.",
-            buttonText: "Загрузить фото салона",
+            title: t("startCheck.uploadInteriorPhotos"),
+            description: t("startCheck.uploadInteriorPhotosDescription"),
+            buttonText: t("startCheck.uploadInteriorPhotosButton"),
             onButtonClick: () => {
               setResponseModal(null);
               setShowUploadPhotoStep2(true);
@@ -196,9 +174,9 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            title: t("mechanic.inspection.acceptedInWork"),
-            description: "Машина принята на осмотр. Все фотографии загружены. Осмотр можно начать.",
-            buttonText: "Начать осмотр",
+            title: t("inspection.acceptedInWork"),
+            description: t("startCheck.allPhotosUploaded"),
+            buttonText: t("startCheck.startInspectionButton"),
             onButtonClick: () => {
               setResponseModal(null);
               // Начинаем осмотр сразу
@@ -214,9 +192,9 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            title: "Загрузка фотографий",
-            description: "Машина принята на осмотр. Теперь загрузите фотографии для начала осмотра.",
-            buttonText: "Загрузить фотографии",
+            title: t("startCheck.uploadPhotos"),
+            description: t("startCheck.uploadPhotosFallback"),
+            buttonText: t("startCheck.uploadPhotosButton"),
             onButtonClick: () => {
               setResponseModal(null);
               setShowUploadPhotoStep1(true);
@@ -232,8 +210,8 @@ export const MechanicStartCheckModal = ({
       console.error("Error accepting car for inspection:", error);
       showModal({
         type: "error",
-        description: error.response?.data?.detail || "Ошибка при принятии машины на осмотр",
-        buttonText: t("modal.error.tryAgain"),
+        description: error.response?.data?.detail || t("apiErrors.acceptError"),
+        buttonText: tModal("error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -286,9 +264,9 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             type: "success",
             isOpen: true,
-            title: t("mechanic.inspection.successfullyStarted"),
-            description: "Осмотр автомобиля начат успешно!",
-            buttonText: t("mechanic.common.excellent"),
+            title: t("inspection.successfullyStarted"),
+            description: t("inspection.successfullyStarted"),
+            buttonText: t("common.excellent"),
             onButtonClick: handleClose,
             onClose: handleClose,
           });
@@ -297,7 +275,7 @@ export const MechanicStartCheckModal = ({
         showModal({
           type: "error",
           description: error.response.data.detail,
-          buttonText: t("modal.error.tryAgain"),
+          buttonText: tModal("error.tryAgain"),
           onClose: () => { },
         });
       }
@@ -336,8 +314,8 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             isOpen: true,
             type: "success",
-            description: "Фотографии загружены! Замки автомобиля открыты. Теперь сфотографируйте салон.",
-            buttonText: "Продолжить",
+            description: t("startCheck.photosUploadedSuccess"),
+            buttonText: t("startCheck.continueButton"),
             onClose: () => {
               setResponseModal(null);
               setShowUploadPhotoStep2(true);
@@ -352,8 +330,8 @@ export const MechanicStartCheckModal = ({
           setResponseModal({
             isOpen: true,
             type: "success",
-            description: "Фотографии загружены! Теперь сфотографируйте салон.",
-            buttonText: "Продолжить",
+            description: t("startCheck.photosUploadedSuccessFallback"),
+            buttonText: t("startCheck.continueButton"),
             onClose: () => {
               setResponseModal(null);
               setShowUploadPhotoStep2(true);
@@ -370,8 +348,8 @@ export const MechanicStartCheckModal = ({
       showModal({
         type: "error",
         description:
-          error.response?.data?.detail || "Ошибка загрузки фотографий",
-        buttonText: t("modal.error.tryAgain"),
+          error.response?.data?.detail || t("apiErrors.photoUploadBeforeError"),
+        buttonText: tModal("error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -406,8 +384,8 @@ export const MechanicStartCheckModal = ({
         setResponseModal({
           isOpen: true,
           type: "success",
-          description: "Фотографии салона загружены!",
-          buttonText: "Отлично",
+          description: t("startCheck.interiorPhotosUploaded"),
+          buttonText: t("startCheck.excellentButton"),
           onClose: () => {
             setResponseModal(null);
             handleClose();
@@ -423,8 +401,8 @@ export const MechanicStartCheckModal = ({
       showModal({
         type: "error",
         description:
-          error.response?.data?.detail || "Ошибка загрузки фотографий",
-        buttonText: t("modal.error.tryAgain"),
+          error.response?.data?.detail || t("apiErrors.photoUploadBeforeError"),
+        buttonText: tModal("error.tryAgain"),
         onClose: () => {},
       });
     }
@@ -451,8 +429,8 @@ export const MechanicStartCheckModal = ({
           onButtonClick: () => {
             handleClose();
           },
-          description: t("mechanic.delivery.acceptedInWork"),
-          buttonText: t("mechanic.common.excellent"),
+          description: t("delivery.acceptedInWork"),
+          buttonText: t("common.excellent"),
           onClose: () => {
             handleClose();
           },
@@ -462,7 +440,7 @@ export const MechanicStartCheckModal = ({
       showModal({
         type: "error",
         description: error.response.data.detail,
-        buttonText: t("modal.error.tryAgain"),
+        buttonText: tModal("error.tryAgain"),
         onClose: () => { },
       });
     }
@@ -478,8 +456,8 @@ export const MechanicStartCheckModal = ({
         isOpen: true,
 
         onButtonClick: handleClose,
-        description: t("mechanic.tracking.started"),
-        buttonText: t("mechanic.common.excellent"),
+        description: t("tracking.started"),
+        buttonText: t("common.excellent"),
         onClose: handleClose,
       });
     } catch (error) {
@@ -488,8 +466,8 @@ export const MechanicStartCheckModal = ({
         type: "error",
         isOpen: true,
 
-        description: t("mechanic.tracking.startError"),
-        buttonText: t("modal.error.tryAgain"),
+        description: t("tracking.startError"),
+        buttonText: tModal("error.tryAgain"),
         onButtonClick: handleClose,
         onClose: handleClose,
       });
@@ -529,7 +507,7 @@ export const MechanicStartCheckModal = ({
           <div className="space-y-3 flex flex-col gap-3">
             {(car.status === CarStatus.pending || car.status === CarStatus.service) && (
               <Button variant="outline" onClick={handleViewData}>
-                {t("mechanic.tracking.viewData")}
+                {t("tracking.viewData")}
               </Button>
             )}
 
@@ -547,7 +525,7 @@ export const MechanicStartCheckModal = ({
                   className="flex items-center justify-center gap-2"
                 >
                   <FaCar className="w-4 h-4" />
-                  {t("mechanic.vehicle.carPoint")}
+                  {t("vehicle.carPoint")}
                 </Button>
                 <Button
                   variant="outline"
@@ -560,7 +538,7 @@ export const MechanicStartCheckModal = ({
                   className="flex items-center justify-center gap-2"
                 >
                   <FaMapMarkerAlt className="w-4 h-4" />
-                  {t("mechanic.vehicle.deliveryPoint")}
+                  {t("vehicle.deliveryPoint")}
                 </Button>
               </>
 
@@ -570,7 +548,7 @@ export const MechanicStartCheckModal = ({
             {isMechanicInspecting && (
               <div className="space-y-4">
                 <h3 className="text-base font-semibold text-[#191919]">
-                  Управление автомобилем
+                  {t("startCheck.carManagement")}
                 </h3>
                 
                 <div className="grid grid-cols-2 gap-3">
@@ -581,21 +559,21 @@ export const MechanicStartCheckModal = ({
                         await mechanicActionsApi.openVehicle();
                         showModal({
                           type: "success",
-                          description: "Замки автомобиля открыты",
-                          buttonText: "Отлично",
+                          description: t("startCheck.locksOpened"),
+                          buttonText: t("startCheck.excellentButton"),
                           onClose: () => {},
                         });
                       } catch (error) {
                         showModal({
                           type: "error",
-                          description: "Ошибка при открытии замков",
-                          buttonText: "Понятно",
+                          description: t("startCheck.openLocksError"),
+                          buttonText: t("startCheck.understood"),
                           onClose: () => {},
                         });
                       }
                     }}
                   >
-                    Открыть замки
+                    {t("startCheck.openLocks")}
                   </Button>
                   
                   <Button
@@ -605,21 +583,21 @@ export const MechanicStartCheckModal = ({
                         await mechanicActionsApi.closeVehicle();
                         showModal({
                           type: "success",
-                          description: "Замки автомобиля закрыты",
-                          buttonText: "Отлично",
+                          description: t("startCheck.locksClosed"),
+                          buttonText: t("startCheck.excellentButton"),
                           onClose: () => {},
                         });
                       } catch (error) {
                         showModal({
                           type: "error",
-                          description: "Ошибка при закрытии замков",
-                          buttonText: "Понятно",
+                          description: t("startCheck.closeLocksError"),
+                          buttonText: t("startCheck.understood"),
                           onClose: () => {},
                         });
                       }
                     }}
                   >
-                    Закрыть замки
+                    {t("startCheck.closeLocks")}
                   </Button>
                   
                 </div>
@@ -641,9 +619,9 @@ export const MechanicStartCheckModal = ({
               }}
             >
               {delivering
-                ? t("mechanic.delivery.startDelivery")
+                ? t("delivery.startDelivery")
                 : tracking
-                  ? t("mechanic.tracking.startTracking")
+                  ? t("tracking.startTracking")
                   : isService
                     ? (() => {
                         const hasSelfie = car.photo_before_selfie_uploaded || false;
@@ -651,16 +629,16 @@ export const MechanicStartCheckModal = ({
                         const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
                         
                         if (!hasSelfie || !hasCarPhotos) {
-                          return "Загрузить селфи и фото кузова";
+                          return t("startCheck.uploadSelfieAndCar");
                         } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
-                          return "Загрузить фото салона";
+                          return t("startCheck.uploadInterior");
                         } else if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
-                          return "Начать осмотр";
+                          return t("startCheck.startInspection");
                         } else {
-                          return "Загрузить селфи и фото кузова";
+                          return t("startCheck.uploadSelfieAndCar");
                         }
                       })()
-                    : t("mechanic.inspection.acceptInspection")}
+                    : t("inspection.acceptInspection")}
             </Button>
           </div>
         </div>

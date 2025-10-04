@@ -37,7 +37,7 @@ export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
     return (
       <div className="space-y-2">
         <h5 className="text-sm font-medium text-gray-700">
-          {title} ({photos.length} фото)
+          {title} ({photos.length} {t("widgets.screens.description.photosCount")})
         </h5>
         <div className="relative h-48 bg-gray-100 rounded-lg overflow-hidden">
           {photos.length === 1 ? (
@@ -109,7 +109,7 @@ export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
   
   return (
     <PushScreen onClose={onClose} withCloseButton={true}>
-      <div className="space-y-6">
+      <div className="space-y-6 pb-6">
         {/* Заголовок */}
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-gray-900">
@@ -130,7 +130,7 @@ export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
           <div className="space-y-4">
             <div className="border-t pt-4">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Отзыв последнего клиента
+                {t("widgets.screens.description.lastClientReview")}
               </h3>
               
               {/* Рейтинг и комментарий */}
@@ -168,13 +168,13 @@ export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
               {(interiorPhotos.length > 0 || exteriorPhotos.length > 0) && (
                 <div className="space-y-4">
                   <h4 className="text-md font-medium text-gray-800">
-                    Фотографии после аренды
+                    {t("widgets.screens.description.photosAfterRental")}
                   </h4>
                   
                   {/* Фотографии салона */}
                   <PhotoSection
                     photos={interiorPhotos}
-                    title="Салон"
+                    title={t("widgets.screens.description.interior")}
                     activeSlide={activeInteriorSlide}
                     setActiveSlide={setActiveInteriorSlide}
                   />
@@ -182,7 +182,7 @@ export const DescriptionScreen = ({ car, onClose }: DescriptionScreenProps) => {
                   {/* Фотографии кузова */}
                   <PhotoSection
                     photos={exteriorPhotos}
-                    title="Кузов"
+                    title={t("widgets.screens.description.exterior")}
                     activeSlide={activeExteriorSlide}
                     setActiveSlide={setActiveExteriorSlide}
                   />
