@@ -18,13 +18,19 @@ export const MechanicWaitingTimer = ({
   deReservationTime,
 }: WaitingTimerProps) => {
   const t = useTranslations();
-  const car = deCar != null ? deCar : user.current_rental!.car_details;
+  const car = deCar != null ? deCar : user.current_rental?.car_details;
   const reservationTime =
     deReservationTime != null
       ? deReservationTime
-      : user.current_rental!.rental_details!.reservation_time || "";
+      : user.current_rental?.rental_details?.reservation_time || "";
 
-  const { timeLeft, isExpired } = useMechanicTimer(reservationTime);
+  // Вызываем хук ВСЕГДА, до любых условных возвратов
+  const { timeLeft, isExpired } = useMechanicTimer(reservationTime || new Date().toISOString());
+
+  // Если нет данных о машине или времени резервации, не показываем таймер
+  if (!car || !reservationTime) {
+    return null;
+  }
 
   return car.owned_car ? null : (
     <div

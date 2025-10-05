@@ -115,41 +115,8 @@ export const MechanicCarInWaitingModal = ({
         // Обновляем данные пользователя чтобы получить обновленные флаги
         await refreshUser();
         
-        // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
-        try {
-          // await mechanicActionsApi.openVehicle();
-          
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: "Фотографии загружены! Замки автомобиля открыты. Теперь сфотографируйте салон.",
-            buttonText: "Продолжить",
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-          });
-        } catch (unlockError) {
-          console.error("Ошибка при открытии замков:", unlockError);
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: "Фотографии загружены! Теперь сфотографируйте салон.",
-            buttonText: "Продолжить",
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-          });
-        }
+        // Автоматически переходим к загрузке фото салона
+        setShowUploadPhotoStep2(true);
       }
     } catch (error) {
       setIsLoading(false);
@@ -183,21 +150,9 @@ export const MechanicCarInWaitingModal = ({
         // Обновляем данные пользователя чтобы получить обновленные флаги
         await refreshUser();
         
-        // Фото салона загружены успешно
-        setResponseModal({
-          isOpen: true,
-          type: "success",
-          description: "Фотографии салона загружены!",
-          buttonText: "Отлично",
-          onClose: () => {
-            setResponseModal(null);
-            handleClose();
-          },
-          onButtonClick: () => {
-            setResponseModal(null);
-            handleClose();
-          },
-        });
+        // Закрываем модальное окно после успешной загрузки всех фотографий
+        console.log("✅ All photos uploaded successfully, closing modal");
+        handleClose();
       }
     } catch (error) {
       setIsLoading(false);

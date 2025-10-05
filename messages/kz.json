@@ -1138,7 +1138,11 @@
       "electric": "Электро",
       "class": "КЛАСС",
       "year": "жыл"
-    }
+    },
+    "loading": "Жүктелуде...",
+    "noResults": "Еш нәрсе табылмады",
+    "occupiedCars": "Бос емес көліктер",
+    "occupiedStatus": "Бос емес"
   },
   "widgets": {
     "footerBtns": {

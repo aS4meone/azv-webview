@@ -2,8 +2,9 @@
 
 import { Button } from "@/shared/ui";
 import React, { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";import { CarInfoHeader, CarControlsSlider } from "../ui";
-import { FaCar, FaMapMarkerAlt } from "react-icons/fa";
+import { useTranslations } from "next-intl";
+import { CarInfoHeader, CarControlsSlider, CarImageCarousel } from "../ui";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 import {
   useResponseModal,
@@ -16,7 +17,7 @@ import { useUserStore } from "@/shared/stores/userStore";
 import { useVehiclesStore } from "@/shared/stores/vechiclesStore";
 import { IUser } from "@/shared/models/types/user";
 import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadPhotoClient";
-import { baseConfigStep1, baseConfigStep2 } from "@/shared/contexts/PhotoUploadContext";
+import { afterRentConfigStep1, afterRentConfigStep2 } from "@/shared/contexts/PhotoUploadContext";
 import { CarStatus, ICar } from "@/shared/models/types/car";
 import { mechanicActionsApi, mechanicApi } from "@/shared/api/routes/mechanic";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
@@ -36,7 +37,7 @@ export const MechanicDeliveryInUseModal = ({
   const t = useTranslations();
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
-  const { fetchCurrentDeliveryVehicle, forceClearCacheAndRefresh } =
+  const { fetchCurrentDeliveryVehicle, forceClearCacheAndRefresh, currentDeliveryVehicle } =
     useVehiclesStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,8 +47,58 @@ export const MechanicDeliveryInUseModal = ({
   const [showUploadPhotoStep2, setShowUploadPhotoStep2] = useState(false);
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
+  const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
 
-  const car: ICar = notRentedCar || ({} as ICar);
+  // Используем currentDeliveryVehicle если доступен (содержит актуальные данные о фото), 
+  // иначе используем user.current_rental.car_details или notRentedCar
+  const car: ICar = (currentDeliveryVehicle && currentDeliveryVehicle.id > 0) 
+    ? currentDeliveryVehicle 
+    : (user.current_rental?.car_details || notRentedCar || ({} as ICar));
+
+  // Обновляем данные о текущей доставке при открытии модального окна
+  useEffect(() => {
+    // Загружаем данные доставки только если машина в статусе доставки
+    const isCarInDelivery = user?.current_rental?.car_details?.status === CarStatus.delivering;
+    if (isCarInDelivery) {
+      fetchCurrentDeliveryVehicle();
+    }
+  }, [fetchCurrentDeliveryVehicle, user?.current_rental?.car_details?.status]);
+
+  // Временное логирование для отладки
+  useEffect(() => {
+    console.log("🔍 MechanicDeliveryInUseModal - currentDeliveryVehicle:", currentDeliveryVehicle);
+    console.log("🔍 MechanicDeliveryInUseModal - user.current_rental:", user.current_rental);
+    console.log("🔍 MechanicDeliveryInUseModal - car (used for display):", car);
+    console.log("🔍 MechanicDeliveryInUseModal - car delivery_coordinates:", car?.delivery_coordinates);
+    console.log("🔍 MechanicDeliveryInUseModal - AFTER delivery photos:", {
+      photo_after_selfie_uploaded: car?.photo_after_selfie_uploaded,
+      photo_after_car_uploaded: car?.photo_after_car_uploaded,
+      photo_after_interior_uploaded: car?.photo_after_interior_uploaded
+    });
+  }, [currentDeliveryVehicle, user.current_rental, car]);
+
+
+  // Проверка статуса загруженных фотографий ПОСЛЕ доставки при монтировании компонента
+  useEffect(() => {
+    if (isInitialCheckDone) return;
+
+    // Используем данные из user.current_rental.car_details
+    const carData = user.current_rental?.car_details || car;
+    const hasSelfie = carData.photo_after_selfie_uploaded || false;
+    const hasCarPhotos = carData.photo_after_car_uploaded || false;
+    const hasInteriorPhotos = carData.photo_after_interior_uploaded || false;
+
+    console.log("Checking AFTER delivery photo upload status:", {
+      hasSelfie,
+      hasCarPhotos,
+      hasInteriorPhotos,
+      carData: carData
+    });
+
+    // Всегда ждём действия пользователя - НЕ открываем модалы автоматически
+    console.log("Photos status checked, waiting for user action...");
+    setIsInitialCheckDone(true);
+  }, [user.current_rental?.car_details?.photo_after_selfie_uploaded, user.current_rental?.car_details?.photo_after_car_uploaded, user.current_rental?.car_details?.photo_after_interior_uploaded, car.photo_after_selfie_uploaded, car.photo_after_car_uploaded, car.photo_after_interior_uploaded]);
 
   const handleClose = async () => {
     try {
@@ -104,6 +155,13 @@ export const MechanicDeliveryInUseModal = ({
         setIsLoading(false);
         setShowUploadPhotoStep1(false);
         
+        // Обновляем данные доставки чтобы получить актуальный статус фотографий
+        try {
+          await fetchCurrentDeliveryVehicle();
+        } catch (err) {
+          console.log("Failed to update delivery data:", err);
+        }
+        
         setResponseModal({
           type: "success",
           isOpen: true,
@@ -146,51 +204,91 @@ export const MechanicDeliveryInUseModal = ({
     try {
       const res = await mechanicApi.uploadAfterDeliveryCar(formData);
       if (res.status === 200) {
-        // Завершаем доставку после загрузки фото кузова
-        const completeRes = await mechanicApi.completeDelivery();
-        if (completeRes.status === 200) {
-          setIsLoading(false);
-          setShowUploadPhotoStep2(false);
-
-          // Дополнительно обновляем данные после завершения доставки
-          try {
-            await refreshUser();
-            await forceClearCacheAndRefresh();
-
-            // Отправляем событие для принудительной очистки кэша карты
-            window.dispatchEvent(new CustomEvent("deliveryCompleted"));
-
-            // Небольшая задержка для обновления карты
-            setTimeout(async () => {
-              try {
-                await forceClearCacheAndRefresh();
-              } catch (error) {
-                console.warn("Failed to refresh data after delay:", error);
-              }
-            }, 1000);
-          } catch (error) {
-            console.warn(
-              "Failed to refresh data after delivery completion:",
-              error
-            );
-          }
-
-          setResponseModal({
-            type: "success",
-            isOpen: true,
-            title: "Доставка завершена",
-            description: "Все фото загружены. Доставка успешно завершена.",
-            buttonText: "Отлично",
-            onButtonClick: handleClose,
-            onClose: handleClose,
-          });
+        // Обновляем данные доставки чтобы получить актуальный статус фотографий
+        try {
+          await fetchCurrentDeliveryVehicle();
+        } catch (err) {
+          console.log("Failed to update delivery data:", err);
         }
+        
+        // Обновляем данные пользователя
+        await refreshUser();
+        
+        setIsLoading(false);
+        setShowUploadPhotoStep2(false);
+        
+        // Показываем успех - все фото загружены, можно завершать доставку
+        setResponseModal({
+          type: "success",
+          isOpen: true,
+          title: "Фото кузова загружены",
+          description: "Все фотографии загружены. Теперь вы можете завершить доставку.",
+          buttonText: "Продолжить",
+          onButtonClick: () => {
+            setResponseModal(null);
+          },
+          onClose: () => {
+            setResponseModal(null);
+          },
+        });
       }
     } catch (error: any) {
       setIsLoading(false);
       showModal({
         type: "error",
         description: error.response?.data?.detail || "Ошибка при загрузке фото",
+        buttonText: t("modal.error.tryAgain"),
+        onClose: () => {},
+      });
+    }
+  };
+
+  // Автоматическое завершение доставки когда все фото загружены
+  const handleCompleteDeliveryAutomatically = async () => {
+    try {
+      setIsLoading(true);
+      const completeRes = await mechanicApi.completeDelivery();
+      if (completeRes.status === 200) {
+        setIsLoading(false);
+
+        // Обновляем данные после завершения доставки
+        try {
+          await refreshUser();
+          await forceClearCacheAndRefresh();
+
+          // Отправляем событие для принудительной очистки кэша карты
+          window.dispatchEvent(new CustomEvent("deliveryCompleted"));
+
+          // Небольшая задержка для обновления карты
+          setTimeout(async () => {
+            try {
+              await forceClearCacheAndRefresh();
+            } catch (error) {
+              console.warn("Failed to refresh data after delay:", error);
+            }
+          }, 1000);
+        } catch (error) {
+          console.warn(
+            "Failed to refresh data after delivery completion:",
+            error
+          );
+        }
+
+        setResponseModal({
+          type: "success",
+          isOpen: true,
+          title: "Доставка завершена",
+          description: "Все фото загружены. Доставка успешно завершена.",
+          buttonText: "Отлично",
+          onButtonClick: handleClose,
+          onClose: handleClose,
+        });
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      showModal({
+        type: "error",
+        description: error.response?.data?.detail || "Ошибка при завершении доставки",
         buttonText: t("modal.error.tryAgain"),
         onClose: () => {},
       });
@@ -312,7 +410,6 @@ export const MechanicDeliveryInUseModal = ({
 
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 relative">
-      
       <div className="p-6 pt-4 space-y-6">
         <CarInfoHeader car={car} />
       </div>
@@ -335,7 +432,7 @@ export const MechanicDeliveryInUseModal = ({
       />
 
       <UploadPhoto
-        config={baseConfigStep1}
+        config={afterRentConfigStep1}
         isLoading={isLoading}
         onPhotoUpload={handleUploadStep1}
         isOpen={showUploadPhotoStep1}
@@ -344,7 +441,7 @@ export const MechanicDeliveryInUseModal = ({
       />
 
       <UploadPhoto
-        config={baseConfigStep2}
+        config={afterRentConfigStep2}
         isLoading={isLoading}
         onPhotoUpload={handleUploadStep2}
         isOpen={showUploadPhotoStep2}
@@ -373,43 +470,56 @@ export const MechanicDeliveryInUseModal = ({
         {/* Car Controls Slider */}
         <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
-        <Button onClick={() => setShowUploadPhotoStep1(true)} variant="secondary">
-          {t("mechanic.delivery.completeDelivery")}
+        {/* Кнопка для навигации к точке доставки */}
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (currentDeliveryVehicle?.delivery_coordinates) {
+              openIn2GIS(
+                currentDeliveryVehicle.delivery_coordinates.latitude,
+                currentDeliveryVehicle.delivery_coordinates.longitude
+              );
+            } else {
+              console.log("🔍 No delivery coordinates available in currentDeliveryVehicle");
+            }
+          }}
+          className="flex items-center justify-center gap-2 w-full"
+        >
+          <FaMapMarkerAlt className="w-4 h-4" />
+          {t("mechanic.vehicle.deliveryPoint")}
+          {currentDeliveryVehicle?.delivery_coordinates ? "" : " (Нет данных)"}
         </Button>
 
-        {/* Кнопка для просмотра в 2GIS */}
-        {notRentedCar.delivery_coordinates && (
-          <>
-            <Button
-              variant="outline"
-              onClick={() =>
-                openIn2GIS(
-                  notRentedCar.latitude,
-                  notRentedCar.longitude
-                )
-              }
-              className="flex items-center justify-center gap-2"
-            >
-              <FaCar className="w-4 h-4" />
-              {t("mechanic.vehicle.carPoint")}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                openIn2GIS(
-                  notRentedCar.delivery_coordinates!.latitude,
-                  notRentedCar.delivery_coordinates!.longitude
-                )
-              }
-              className="flex items-center justify-center gap-2"
-            >
-              <FaMapMarkerAlt className="w-4 h-4" />
-              {t("mechanic.vehicle.deliveryPoint")}
-            </Button>
-          </>
-
-
-        )}
+        <Button 
+          onClick={() => {
+            const hasSelfie = car.photo_after_selfie_uploaded || false;
+            const hasCarPhotos = car.photo_after_car_uploaded || false;
+            const hasInteriorPhotos = car.photo_after_interior_uploaded || false;
+            
+            console.log("📸 Checking AFTER delivery photos:", {
+              hasSelfie,
+              hasCarPhotos,
+              hasInteriorPhotos
+            });
+            
+            if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
+              // Все фото ПОСЛЕ доставки загружены - завершаем доставку
+              console.log("✅ All AFTER photos uploaded, completing delivery");
+              handleCompleteDeliveryAutomatically();
+            } else if (hasSelfie && hasInteriorPhotos && !hasCarPhotos) {
+              // Загружены селфи и салон ПОСЛЕ доставки - открываем окно для загрузки кузова
+              console.log("📷 Opening step 2: upload car photos AFTER delivery");
+              setShowUploadPhotoStep2(true);
+            } else {
+              // Не загружены селфи или салон ПОСЛЕ доставки - открываем окно для их загрузки
+              console.log("📷 Opening step 1: upload selfie and interior photos AFTER delivery");
+              setShowUploadPhotoStep1(true);
+            }
+          }} 
+          variant="secondary"
+        >
+          {t("mechanic.delivery.completeDelivery")}
+        </Button>
       </div>
     </div>
   );

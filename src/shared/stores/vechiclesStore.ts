@@ -15,7 +15,7 @@ interface VehiclesStore {
   inUseVehicles: ICar[];
   allMechanicVehicles: ICar[];
   searchResults: ICar[];
-  currentDeliveryVehicle: ICar;
+  currentDeliveryVehicle: ICar | null;
 
   // Loading states
   isCurrentDeliveryVehicle: boolean;
@@ -61,28 +61,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
   deliveryVehicles: [],
   inUseVehicles: [],
   allMechanicVehicles: [],
-  currentDeliveryVehicle: {
-    id: 0,
-    name: "",
-    plate_number: "",
-    latitude: 0,
-    longitude: 0,
-    course: 0,
-    fuel_level: 0,
-    price_per_minute: 0,
-    price_per_hour: 0,
-    price_per_day: 0,
-    engine_volume: 0,
-    year: 0,
-    drive_type: 0,
-    photos: [],
-    owner_id: 0,
-    current_renter_id: null,
-    status: CarStatus.free,
-    open_price: 0,
-    owned_car: false,
-    rental_id: 0,
-  },
+  currentDeliveryVehicle: null,
 
   searchResults: [],
 
@@ -127,36 +106,22 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           open_price: response.data.open_price || 0,
           owned_car: response.data.owned_car || false,
           rental_id: response.data.rental_id || 0,
+          delivery_coordinates: response.data.delivery_coordinates || null,
+          photo_before_selfie_uploaded: response.data.photo_before_selfie_uploaded || false,
+          photo_before_car_uploaded: response.data.photo_before_car_uploaded || false,
+          photo_before_interior_uploaded: response.data.photo_before_interior_uploaded || false,
+          photo_after_selfie_uploaded: response.data.photo_after_selfie_uploaded || false,
+          photo_after_car_uploaded: response.data.photo_after_car_uploaded || false,
+          photo_after_interior_uploaded: response.data.photo_after_interior_uploaded || false,
         };
         set({
           currentDeliveryVehicle: car,
           isCurrentDeliveryVehicle: false,
         });
       } else {
-        // Reset current delivery vehicle to default state
+        // Reset current delivery vehicle to null when no delivery exists
         set({
-          currentDeliveryVehicle: {
-            id: 0,
-            name: "",
-            plate_number: "",
-            latitude: 0,
-            longitude: 0,
-            course: 0,
-            fuel_level: 0,
-            price_per_minute: 0,
-            price_per_hour: 0,
-            price_per_day: 0,
-            engine_volume: 0,
-            year: 0,
-            drive_type: 0,
-            photos: [],
-            owner_id: 0,
-            current_renter_id: null,
-            status: CarStatus.free,
-            open_price: 0,
-            owned_car: false,
-            rental_id: 0,
-          },
+          currentDeliveryVehicle: null,
           isCurrentDeliveryVehicle: false,
         });
       }
@@ -178,28 +143,7 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
       }
 
       set({
-        currentDeliveryVehicle: {
-          id: 0,
-          name: "",
-          plate_number: "",
-          latitude: 0,
-          longitude: 0,
-          course: 0,
-          fuel_level: 0,
-          price_per_minute: 0,
-          price_per_hour: 0,
-          price_per_day: 0,
-          engine_volume: 0,
-          year: 0,
-          drive_type: 0,
-          photos: [],
-          owner_id: 0,
-          current_renter_id: null,
-          status: CarStatus.free,
-          open_price: 0,
-          owned_car: false,
-          rental_id: 0,
-        },
+        currentDeliveryVehicle: null,
         error: null, // Don't set error for 404 as it's expected
         isCurrentDeliveryVehicle: false,
       });
@@ -456,6 +400,8 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           engine_volume: 0,
           year: 0,
           drive_type: 0,
+          transmission_type: null,
+          body_type: "",
           photos: [],
           owner_id: 0,
           current_renter_id: null,
@@ -486,6 +432,8 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
           engine_volume: 0,
           year: 0,
           drive_type: 0,
+          transmission_type: null,
+          body_type: "",
           photos: [],
           owner_id: 0,
           current_renter_id: null,

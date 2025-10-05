@@ -1090,6 +1090,8 @@
       "isFree": "Машина свободна",
       "close": "Закрыть"
     },
+    "occupiedCars": "Занятые автомобили",
+    "occupiedStatus": "Занят",
     "common": {
       "excellent": "Отлично",
       "lockError": "Ошибка при попытке заблокировать автомобиль",
@@ -1404,7 +1406,9 @@
   "search": {
     "placeholder": "Поиск...",
     "loading": "Загрузка...",
-    "noResults": "Ничего не найдено"
+    "noResults": "Ничего не найдено",
+    "occupiedCars": "Занятые автомобили",
+    "occupiedStatus": "Занят"
   },
   "tariff": {
     "perMinute": "₸/минута",

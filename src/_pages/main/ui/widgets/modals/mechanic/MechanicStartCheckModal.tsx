@@ -56,48 +56,16 @@ export const MechanicStartCheckModal = ({
   const [showUploadPhotoStep1, setShowUploadPhotoStep1] = useState(false);
   const [showUploadPhotoStep2, setShowUploadPhotoStep2] = useState(false);
 
-  // Проверяем состояние загрузки фотографий при инициализации
+  // НЕ открываем модалы загрузки фото автоматически - только по нажатию кнопки
+  // Этот useEffect только закрывает модалы если механик уже осматривает машину
   useEffect(() => {
-    // Проверяем статус загрузки фотографий по новым полям из API
-    const hasSelfie = car.photo_before_selfie_uploaded || false;
-    const hasCarPhotos = car.photo_before_car_uploaded || false;
-    const hasInteriorPhotos = car.photo_before_interior_uploaded || false;
-    
-    
-    // Если механик уже осматривает машину (статус IN_USE), не показываем модалы загрузки фотографий
+    // Если механик уже осматривает машину (статус IN_USE), закрываем все модалы загрузки фотографий
     if (isMechanicInspecting) {
       console.log("🔍 DEBUG: Mechanic is already inspecting, closing all photo upload modals");
       setShowUploadPhotoStep1(false);
       setShowUploadPhotoStep2(false);
-      return;
     }
-    
-    // Если статус машины PENDING, не показываем модалы загрузки фотографий автоматически
-    // Они будут показаны только при нажатии кнопки "Начать осмотр"
-    if (car.status === CarStatus.pending) {
-      console.log("🔍 DEBUG: Car status is PENDING, not showing photo upload modals automatically");
-      setShowUploadPhotoStep1(false);
-      setShowUploadPhotoStep2(false);
-      return;
-    }
-    
-    // Если все фотографии загружены, закрываем все модалы загрузки фотографий
-    if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
-      console.log("🔍 DEBUG: All photos uploaded, closing photo upload modals");
-      setShowUploadPhotoStep1(false);
-      setShowUploadPhotoStep2(false);
-    }
-    // Если загружены селфи и фото кузова, но не загружены фото салона - показываем второй модал
-    else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
-      console.log("🔍 DEBUG: Selfie and car photos uploaded, showing Step 2 modal");
-      setShowUploadPhotoStep2(true);
-    }
-    // Если не загружены селфи или фото кузова - показываем первый модал
-    else if (!hasSelfie || !hasCarPhotos) {
-      console.log("🔍 DEBUG: Need selfie or car photos, showing Step 1 modal");
-      setShowUploadPhotoStep1(true);
-    }
-  }, [car.photo_before_selfie_uploaded, car.photo_before_car_uploaded, car.photo_before_interior_uploaded, isMechanicInspecting, car.status]);
+  }, [isMechanicInspecting]);
 
   const handleClose = async () => {
     setResponseModal(null);
@@ -135,75 +103,23 @@ export const MechanicStartCheckModal = ({
         console.log("🔍 DEBUG: Photo status after data refresh:");
         console.log("hasSelfie:", hasSelfie, "hasCarPhotos:", hasCarPhotos, "hasInteriorPhotos:", hasInteriorPhotos);
         
-        if (!hasSelfie || !hasCarPhotos) {
-          // Нужно загрузить селфи + кузов
-          setResponseModal({
-            type: "success",
-            isOpen: true,
-            title: t("startCheck.uploadPhotos"),
-            description: t("startCheck.uploadPhotosDescription"),
-            buttonText: t("startCheck.uploadPhotosButton"),
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep1(true);
-            },
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep1(true);
-            },
-          });
+        if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
+          // ✅ Все фотографии загружены - начинаем осмотр сразу и закрываем модалку
+          console.log("✅ All photos uploaded, starting inspection and closing modal");
+          await handleStartServiceInspection();
+          onClose(); // Закрываем модальное окно
+        } else if (!hasSelfie || !hasCarPhotos) {
+          // 📷 Нужно загрузить селфи + кузов - сразу открываем окно загрузки
+          console.log("📷 Need to upload selfie/car photos, opening upload modal");
+          setShowUploadPhotoStep1(true);
         } else if (hasSelfie && hasCarPhotos && !hasInteriorPhotos) {
-          // Селфи + кузов уже загружены, нужно загрузить салон
-          setResponseModal({
-            type: "success",
-            isOpen: true,
-            title: t("startCheck.uploadInteriorPhotos"),
-            description: t("startCheck.uploadInteriorPhotosDescription"),
-            buttonText: t("startCheck.uploadInteriorPhotosButton"),
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-          });
-        } else if (hasSelfie && hasCarPhotos && hasInteriorPhotos) {
-          // Все фотографии загружены, можем начать осмотр
-          setResponseModal({
-            type: "success",
-            isOpen: true,
-            title: t("inspection.acceptedInWork"),
-            description: t("startCheck.allPhotosUploaded"),
-            buttonText: t("startCheck.startInspectionButton"),
-            onButtonClick: () => {
-              setResponseModal(null);
-              // Начинаем осмотр сразу
-              handleStartServiceInspection();
-            },
-            onClose: () => {
-              setResponseModal(null);
-              handleStartServiceInspection();
-            },
-          });
+          // 📷 Селфи + кузов уже загружены, нужно загрузить салон - сразу открываем окно загрузки
+          console.log("📷 Need to upload interior photos, opening upload modal");
+          setShowUploadPhotoStep2(true);
         } else {
           // Fallback - показываем первый шаг
-          setResponseModal({
-            type: "success",
-            isOpen: true,
-            title: t("startCheck.uploadPhotos"),
-            description: t("startCheck.uploadPhotosFallback"),
-            buttonText: t("startCheck.uploadPhotosButton"),
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep1(true);
-            },
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep1(true);
-            },
-          });
+          console.log("⚠️ Fallback: opening step 1");
+          setShowUploadPhotoStep1(true);
         }
       }
     } catch (error) {
@@ -307,41 +223,8 @@ export const MechanicStartCheckModal = ({
         console.log("Car status after refresh:", car.status);
         console.log("Car current_renter_details after refresh:", car.current_renter_details);
         
-        // РАЗБЛОКИРУЕМ ЗАМКИ после загрузки селфи и фото кузова
-        try {
-          // await mechanicActionsApi.openVehicle();
-          
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: t("startCheck.photosUploadedSuccess"),
-            buttonText: t("startCheck.continueButton"),
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-          });
-        } catch (unlockError) {
-          console.error("Ошибка при открытии замков:", unlockError);
-          setResponseModal({
-            isOpen: true,
-            type: "success",
-            description: t("startCheck.photosUploadedSuccessFallback"),
-            buttonText: t("startCheck.continueButton"),
-            onClose: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-            onButtonClick: () => {
-              setResponseModal(null);
-              setShowUploadPhotoStep2(true);
-            },
-          });
-        }
+        // Автоматически переходим к загрузке фото салона
+        setShowUploadPhotoStep2(true);
       }
     } catch (error) {
       setIsLoading(false);
@@ -380,21 +263,24 @@ export const MechanicStartCheckModal = ({
         console.log("Car status after refresh:", car.status);
         console.log("Car current_renter_details after refresh:", car.current_renter_details);
         
-        // Фото салона загружены успешно
-        setResponseModal({
-          isOpen: true,
-          type: "success",
-          description: t("startCheck.interiorPhotosUploaded"),
-          buttonText: t("startCheck.excellentButton"),
-          onClose: () => {
-            setResponseModal(null);
-            handleClose();
-          },
-          onButtonClick: () => {
-            setResponseModal(null);
-            handleClose();
-          },
-        });
+        // Автоматически начинаем осмотр после загрузки всех фотографий и закрываем модалку
+        try {
+          console.log("✅ All photos uploaded, starting inspection automatically");
+          const res = await mechanicApi.startCheckCar(car.id);
+          if (res.status === 200) {
+            console.log("✅ Inspection started successfully, closing modal");
+            // Обновляем данные и закрываем модалку
+            await refreshUser();
+            onClose(); // Закрываем модальное окно
+          }
+        } catch (error) {
+          showModal({
+            type: "error",
+            description: error.response?.data?.detail || "Ошибка при начале осмотра",
+            buttonText: tModal("error.tryAgain"),
+            onClose: () => {},
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -415,6 +301,7 @@ export const MechanicStartCheckModal = ({
         // Safely update delivery data with error handling
         try {
           await fetchCurrentDeliveryVehicle();
+          await refreshUser();
         } catch (error) {
           console.warn(
             "Failed to fetch current delivery vehicle after accepting delivery:",
@@ -423,18 +310,9 @@ export const MechanicStartCheckModal = ({
           // Continue with success flow even if fetch fails
         }
 
-        setResponseModal({
-          type: "success",
-          isOpen: true,
-          onButtonClick: () => {
-            handleClose();
-          },
-          description: t("delivery.acceptedInWork"),
-          buttonText: t("common.excellent"),
-          onClose: () => {
-            handleClose();
-          },
-        });
+        // Закрываем модальное окно после успешного принятия доставки
+        console.log("✅ Delivery accepted successfully, closing modal");
+        handleClose();
       }
     } catch (error) {
       showModal({

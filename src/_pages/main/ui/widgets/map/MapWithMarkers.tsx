@@ -335,23 +335,26 @@ export const MapWithMarkers = ({
         // Загружаем все машины механика
         await fetchAllMechanicVehicles();
 
-        // Пытаемся загрузить текущую доставку, но не падаем при 404
-        try {
-          await fetchCurrentDeliveryVehicle();
-        } catch (error: unknown) {
-          // 404 означает, что нет текущей доставки - это нормально
-          if (
-            error &&
-            typeof error === "object" &&
-            "response" in error &&
-            error.response &&
-            typeof error.response === "object" &&
-            "status" in error.response &&
-            error.response.status === 404
-          ) {
-            console.log("No current delivery found - this is normal");
-          } else {
-            console.warn("Failed to fetch current delivery vehicle:", error);
+        // Пытаемся загрузить текущую доставку только если машина в статусе доставки
+        const isCarInDelivery = user?.current_rental?.car_details?.status === CarStatus.delivering;
+        if (isCarInDelivery) {
+          try {
+            await fetchCurrentDeliveryVehicle();
+          } catch (error: unknown) {
+            // 404 означает, что нет текущей доставки - это нормально
+            if (
+              error &&
+              typeof error === "object" &&
+              "response" in error &&
+              error.response &&
+              typeof error.response === "object" &&
+              "status" in error.response &&
+              error.response.status === 404
+            ) {
+              console.log("No current delivery found - this is normal");
+            } else {
+              console.warn("Failed to fetch current delivery vehicle:", error);
+            }
           }
         }
 

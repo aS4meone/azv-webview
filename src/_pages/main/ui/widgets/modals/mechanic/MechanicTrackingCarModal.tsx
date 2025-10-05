@@ -227,8 +227,18 @@ export const MechanicTrackingCarModal = ({
   const currentMechanicId = user?.id;
   
   // Проверяем, осматривает ли текущий механик эту машину
-  const isMechanicInspecting = car?.status === "IN_USE" && 
-    car?.current_renter_details?.id === currentMechanicId;
+  // ИЛИ если механик находится в процессе доставки (имеет current_rental)
+  const isMechanicInspecting = (car?.status === "IN_USE" && 
+    car?.current_renter_details?.id === currentMechanicId) ||
+    (user?.current_rental !== null);
+    
+  console.log("[MechanicTrackingCarModal] Debug info:", {
+    carStatus: car?.status,
+    currentRenterId: car?.current_renter_details?.id,
+    currentMechanicId,
+    hasCurrentRental: !!user?.current_rental,
+    isMechanicInspecting
+  });
 
 
   // Функции управления автомобилем
