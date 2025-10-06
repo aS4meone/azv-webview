@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { ICar, CarBodyType, CarStatus } from "@/shared/models/types/car";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/shared/constants/routes";
@@ -67,6 +67,7 @@ const CarStatusBadge = ({ status, t }: { status: string; t: (key: string) => str
 
 const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (car: ICar) => void; t: (key: string) => string }) => {
   const router = useRouter();
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   
   const handleClick = () => {
     // Occupied cars don't open in modal
@@ -89,6 +90,27 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
     return `https://api.azvmotors.kz${photoPath}`;
   };
 
+  const handlePrevPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentPhotoIndex((prev) => 
+      prev === 0 ? (car.photos?.length || 1) - 1 : prev - 1
+    );
+  };
+
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentPhotoIndex((prev) => 
+      prev === (car.photos?.length || 1) - 1 ? 0 : prev + 1
+    );
+  };
+
+  const handleDotClick = (e: React.MouseEvent, index: number) => {
+    e.stopPropagation();
+    setCurrentPhotoIndex(index);
+  };
+
+  const hasMultiplePhotos = car.photos && car.photos.length > 1;
+
   return (
     <div
       className={`bg-white border border-gray-200 rounded-lg overflow-hidden transition-colors ${
@@ -98,14 +120,57 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
       }`}
       onClick={handleClick}
     >
-      {/* Car Image - Only first photo */}
+      {/* Car Image Carousel */}
       {car.photos && car.photos.length > 0 ? (
-        <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
+        <div className="w-full h-48 bg-gray-100 relative overflow-hidden group">
           <img
-            src={getImageUrl(car.photos[0])}
+            src={getImageUrl(car.photos[currentPhotoIndex])}
             className="!w-full !h-full object-cover"
             alt={car.name}
           />
+          
+          {/* Navigation Arrows - Show only if multiple photos */}
+          {hasMultiplePhotos && (
+            <>
+              <button
+                onClick={handlePrevPhoto}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Previous photo"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              
+              <button
+                onClick={handleNextPhoto}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Next photo"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+          
+          {/* Photo Indicators - Show only if multiple photos */}
+          {hasMultiplePhotos && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+              {car.photos.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => handleDotClick(e, index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentPhotoIndex 
+                      ? 'bg-white w-6' 
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Go to photo ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         <div className="w-full h-48 flex items-center justify-center bg-gray-200">
