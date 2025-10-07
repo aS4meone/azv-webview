@@ -122,7 +122,7 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
     >
       {/* Car Image Carousel */}
       {car.photos && car.photos.length > 0 ? (
-        <div className="w-full h-48 bg-gray-100 relative overflow-hidden group">
+        <div className="w-full h-48 bg-gray-100 relative overflow-hidden">
           <img
             src={getImageUrl(car.photos[currentPhotoIndex])}
             className="!w-full !h-full object-cover"
@@ -134,7 +134,7 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
             <>
               <button
                 onClick={handlePrevPhoto}
-                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all"
                 aria-label="Previous photo"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ const CarCard = ({ car, onCarClickAction, t }: { car: ICar; onCarClickAction: (c
               
               <button
                 onClick={handleNextPhoto}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all"
                 aria-label="Next photo"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

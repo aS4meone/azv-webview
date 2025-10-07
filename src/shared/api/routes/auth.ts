@@ -6,6 +6,8 @@ export const authRoutes = {
   sendSms: "/auth/send_sms/",
   verifySms: "/auth/verify_sms/",
   refreshToken: "auth/refresh_token/",
+  verifyEmail: "/auth/verify_email/",
+  resendEmailCode: "/auth/resend_email_code/",
 };
 
 export const authApi = {
@@ -74,6 +76,32 @@ export const authApi = {
       return {
         data: null,
         error: error.response?.data?.detail || "Failed to refresh token",
+        statusCode: error.status,
+      };
+    }
+  },
+  verifyEmail: async (code: string) => {
+    try {
+      const response = await axiosInstance.post(authRoutes.verifyEmail, {
+        code,
+      });
+      return { data: response.data, error: null, statusCode: response.status };
+    } catch (error) {
+      return {
+        data: null,
+        error: error.response?.data?.detail || "Failed to verify email",
+        statusCode: error.status,
+      };
+    }
+  },
+  resendEmailCode: async () => {
+    try {
+      const response = await axiosInstance.post(authRoutes.resendEmailCode);
+      return { data: response.data, error: null, statusCode: response.status };
+    } catch (error) {
+      return {
+        data: null,
+        error: error.response?.data?.detail || "Failed to resend email code",
         statusCode: error.status,
       };
     }

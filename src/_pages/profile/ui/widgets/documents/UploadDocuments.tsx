@@ -12,6 +12,7 @@ import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadP
 import { userApi } from "@/shared/api/routes/user";
 import { UploadDocumentsDto } from "@/shared/models/dto/user.dto";
 import { DocumentDetailsModal } from "./DocumentDetailsModal";
+import { EmailVerificationModal } from "./EmailVerificationModal";
 import { CustomPushScreen } from "@/components/ui/custom-push-screen";
 import { useTranslations } from "next-intl";
 import { useErrorTranslator } from "@/shared/utils/errorTranslator";
@@ -23,6 +24,10 @@ interface DocumentFiles {
   drivers_license?: File;
   selfie?: File;
   selfie_with_license?: File;
+  psych_neurology_certificate?: File;
+  narcology_certificate?: File;
+  pension_contributions_certificate?: File;
+  criminal_record_certificate?: File;
 }
 
 export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?: any }) => {
@@ -30,6 +35,7 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
   const errorTranslator = useErrorTranslator();
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isEmailVerificationOpen, setIsEmailVerificationOpen] = useState(false);
   const [files, setFiles] = useState<DocumentFiles>({});
   const [isLoading, setIsLoading] = useState(false);
   const [responseModal, setResponseModal] =
@@ -42,9 +48,14 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
       | "drivers_license"
       | "selfie"
       | "selfie_with_license"
+      | "psych_neurology_certificate"
+      | "narcology_certificate"
+      | "pension_contributions_certificate"
+      | "criminal_record_certificate"
     > & {
       first_name?: string;
       last_name?: string;
+      is_rk_citizen?: boolean;
     }
   >({
     full_name: "",
@@ -54,6 +65,8 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
     iin: "",
     id_card_expiry: "",
     drivers_license_expiry: "",
+    email: "",
+    is_rk_citizen: false,
   });
 
   const handlePhotoUpload = async (uploadedFiles: {
@@ -88,7 +101,7 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
         description: errorMessage,
         buttonText: t("understood"),
         onButtonClick: () => {
-          handleCloseResponseModal();
+          handleCloseErrorModal();
         },
       });
     } finally {
@@ -96,22 +109,68 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
     }
   };
 
-  const handleDetailsSubmit = async (formData: typeof data) => {
+  const handleDetailsSubmit = async (formData: typeof data, certificateFiles?: any) => {
     try {
       setIsLoading(true);
+
+      // Validate required files before submission
+      const missingFiles: string[] = [];
+      if (!files.id_front) missingFiles.push(t("photoInstructions.idFront"));
+      if (!files.id_back) missingFiles.push(t("photoInstructions.idBack"));
+      if (!files.drivers_license) missingFiles.push(t("photoInstructions.driversLicense"));
+      if (!files.selfie) missingFiles.push(t("photoInstructions.selfie"));
+      if (!files.selfie_with_license) missingFiles.push(t("photoInstructions.selfieWithLicense"));
+
+      if (missingFiles.length > 0) {
+        setResponseModal({
+          type: "error",
+          title: t("error"),
+          description: `${t("missingRequiredFiles")}: ${missingFiles.join(", ")}`,
+          buttonText: t("understood"),
+          onButtonClick: () => {
+            handleCloseErrorModal();
+          },
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const form = new FormData();
 
-      if (files.id_front) form.append("id_front", files.id_front);
-      if (files.id_back) form.append("id_back", files.id_back);
-      if (files.drivers_license)
-        form.append("drivers_license", files.drivers_license);
-      if (files.selfie) form.append("selfie", files.selfie);
-      if (files.selfie_with_license)
-        form.append("selfie_with_license", files.selfie_with_license);
+      // Non-null assertion is safe here because we validated above
+      form.append("id_front", files.id_front!);
+      form.append("id_back", files.id_back!);
+      form.append("drivers_license", files.drivers_license!);
+      form.append("selfie", files.selfie!);
+      form.append("selfie_with_license", files.selfie_with_license!);
 
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value) form.append(key, value);
-      });
+      // Add certificate files if user is RK citizen and files were uploaded
+      if (formData.is_rk_citizen && certificateFiles) {
+        if (certificateFiles.psych_neurology_certificate) 
+          form.append("psych_neurology_certificate", certificateFiles.psych_neurology_certificate);
+        if (certificateFiles.narcology_certificate) 
+          form.append("narcology_certificate", certificateFiles.narcology_certificate);
+        if (certificateFiles.pension_contributions_certificate) 
+          form.append("pension_contributions_certificate", certificateFiles.pension_contributions_certificate);
+        if (certificateFiles.criminal_record_certificate) 
+          form.append("criminal_record_certificate", certificateFiles.criminal_record_certificate);
+      }
+
+      // Add required form fields that backend expects
+      form.append("first_name", formData.first_name || "");
+      form.append("last_name", formData.last_name || "");
+      form.append("birth_date", formData.birth_date || "");
+      form.append("id_card_expiry", formData.id_card_expiry || "");
+      form.append("drivers_license_expiry", formData.drivers_license_expiry || "");
+      form.append("email", formData.email || "");
+
+      // Add optional fields (iin or passport_number)
+      if (formData.iin) {
+        form.append("iin", formData.iin);
+      }
+      if (formData.passport_number) {
+        form.append("passport_number", formData.passport_number);
+      }
 
       const response = await userApi.uploadDocuments(form);
 
@@ -125,6 +184,10 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
           buttonText: t("ok"),
           onButtonClick: () => {
             handleCloseResponseModal();
+            // Open email verification modal after closing success modal with a small delay
+            setTimeout(() => {
+              setIsEmailVerificationOpen(true);
+            }, 100);
           },
         });
       } else {
@@ -134,7 +197,7 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
           description: t("failedToUploadDocuments"),
           buttonText: t("understood"),
           onButtonClick: () => {
-            handleCloseResponseModal();
+            handleCloseErrorModal();
           },
         });
       }
@@ -146,12 +209,25 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
         description: errorMessage,
         buttonText: t("understood"),
         onButtonClick: () => {
-          handleCloseResponseModal();
+          handleCloseErrorModal();
         },
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEmailVerificationSuccess = () => {
+    setIsEmailVerificationOpen(false);
+    setResponseModal({
+      type: "success",
+      title: t("success"),
+      description: t("emailVerification.successMessage"),
+      buttonText: t("ok"),
+      onButtonClick: () => {
+        handleCloseResponseModal();
+      },
+    });
   };
 
   const handleCloseResponseModal = () => {
@@ -165,7 +241,14 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
       iin: "",
       id_card_expiry: "",
       drivers_license_expiry: "",
+      email: "",
+      is_rk_citizen: false,
     });
+    setResponseModal(null);
+  };
+
+  const handleCloseErrorModal = () => {
+    // Just close the modal without resetting files and data
     setResponseModal(null);
   };
 
@@ -239,6 +322,14 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
         initialData={data}
         isLoading={isLoading}
       />
+
+      <EmailVerificationModal
+        isOpen={isEmailVerificationOpen}
+        onClose={() => setIsEmailVerificationOpen(false)}
+        onSuccess={handleEmailVerificationSuccess}
+        email={data.email || ""}
+      />
+
       <CustomPushScreen
         isOpen={!!responseModal}
         onClose={() => {
@@ -255,7 +346,7 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
           description={responseModal?.description || ""}
           buttonText={responseModal?.buttonText || ""}
           onButtonClick={() => {
-            handleCloseResponseModal();
+            responseModal?.onButtonClick?.();
           }}
         />
       </CustomPushScreen>

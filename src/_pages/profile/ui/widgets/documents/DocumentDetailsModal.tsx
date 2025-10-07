@@ -10,17 +10,25 @@ import { validateIINBirthDateMatch } from "@/shared/utils/iinValidation";
 
 type DocumentDetailsData = Omit<
   UploadDocumentsDto,
-  "id_front" | "id_back" | "drivers_license" | "selfie" | "selfie_with_license"
+  "id_front" | "id_back" | "drivers_license" | "selfie" | "selfie_with_license" | "psych_neurology_certificate" | "narcology_certificate" | "pension_contributions_certificate" | "criminal_record_certificate"
 > & {
   first_name?: string;
   last_name?: string;
   document_type?: 'iin' | 'passport';
+  is_rk_citizen?: boolean;
 };
+
+interface CertificateFiles {
+  psych_neurology_certificate?: File | null;
+  narcology_certificate?: File | null;
+  pension_contributions_certificate?: File | null;
+  criminal_record_certificate?: File | null;
+}
 
 interface DocumentDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: DocumentDetailsData) => void;
+  onSubmit: (data: DocumentDetailsData, files?: CertificateFiles) => void;
   initialData: DocumentDetailsData;
   isLoading?: boolean;
 }
@@ -42,12 +50,20 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       first_name: nameParts[0] || "",
       last_name: nameParts.slice(1).join(" ") || "",
       document_type: initialData.iin ? 'iin' : 'passport',
+      is_rk_citizen: false,
+      email: "",
       // Не загружаем даты истечения документов при инициализации
       id_card_expiry: "",
       drivers_license_expiry: "",
     };
   });
   const [errors, setErrors] = React.useState<{ [key: string]: string }>({});
+  const [certificateFiles, setCertificateFiles] = React.useState<CertificateFiles>({
+    psych_neurology_certificate: null,
+    narcology_certificate: null,
+    pension_contributions_certificate: null,
+    criminal_record_certificate: null,
+  });
   const { user, isLoading: isLoadingUser } = useUserStore();
 
   // Load user data when modal opens
@@ -64,6 +80,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       ...prev,
       first_name: user.first_name || "",
       last_name: user.last_name || "",
+      email: (user as any).email || "",
       // birth_date, iin, id_card_expiry и drivers_license_expiry не загружаем из user, оставляем как есть
       // id_card_expiry: user.documents?.id_card?.expiry || prev.id_card_expiry,
       // drivers_license_expiry: user.documents?.drivers_license?.expiry || prev.drivers_license_expiry,
@@ -138,6 +155,20 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     return "";
   };
 
+  const validateEmail = (email: string) => {
+    if (!email.trim()) return t("validation.emailRequired");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return t("validation.emailInvalid");
+    return "";
+  };
+
+  const handleFileChange = (field: keyof CertificateFiles, file: File | null) => {
+    setCertificateFiles(prev => ({
+      ...prev,
+      [field]: file,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Combine first_name and last_name into full_name for backend
@@ -145,7 +176,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       ...formData,
       full_name: `${formData.first_name || ""} ${formData.last_name || ""}`.trim(),
     };
-    onSubmit(submitData);
+    onSubmit(submitData, certificateFiles);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,6 +222,14 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       const passportError = validatePassportNumber(value);
       if (passportError) {
         newErrors.passport_number = passportError;
+      }
+    }
+
+    // Validate email
+    if (name === "email") {
+      const emailError = validateEmail(value);
+      if (emailError) {
+        newErrors.email = emailError;
       }
     }
 
@@ -264,6 +303,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     const hasDocumentId = hasIIN || hasPassport;
     const hasIdExpiry = !!formData.id_card_expiry;
     const hasLicenseExpiry = !!formData.drivers_license_expiry;
+    const hasEmail = !!formData.email && validateEmail(formData.email) === "";
 
     const isValid = (
       hasFirstName &&
@@ -271,7 +311,8 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       hasBirthDate &&
       hasDocumentId &&
       hasIdExpiry &&
-      hasLicenseExpiry
+      hasLicenseExpiry &&
+      hasEmail
     );
 
     // Debug information
@@ -284,6 +325,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       hasDocumentId,
       hasIdExpiry,
       hasLicenseExpiry,
+      hasEmail,
       isValid,
       formData,
       errors
@@ -375,7 +417,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         value={formData.birth_date || ""}
                         onChange={handleChange}
                         error={errors.birth_date}
-                        placeholder={t("profile.selectBirthDate")}
+                        placeholder={t("selectBirthDate")}
                         required
                         max={getMaxBirthDate()}
                         min={getMinBirthDate()}
@@ -495,6 +537,296 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                 </div>
               </div>
 
+              {/* Email Section */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                <h3 className="text-lg font-semibold text-[#191919] mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#191919] flex items-center justify-center shadow-md">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold text-[#191919]">{t("emailSection")}</div>
+                    <div className="text-sm text-[#666666]">{t("emailDescription")}</div>
+                  </div>
+                </h3>
+                <Input
+                  label={t("email")}
+                  name="email"
+                  type="email"
+                  value={formData.email || ""}
+                  onChange={handleChange}
+                  required
+                  error={errors.email}
+                  placeholder={t("emailPlaceholder")}
+                  showClearButton={!!formData.email}
+                  onClear={() => handleClearField("email")}
+                />
+              </div>
+
+              {/* RK Citizenship Section */}
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                <h3 className="text-lg font-semibold text-[#191919] mb-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#191919] flex items-center justify-center shadow-md">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-lg font-semibold text-[#191919]">{t("citizenshipSection")}</div>
+                    <div className="text-sm text-[#191919]">{t("citizenshipDescription")}</div>
+                  </div>
+                </h3>
+                
+                <label className="flex items-center space-x-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_rk_citizen || false}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        is_rk_citizen: e.target.checked,
+                      }));
+                    }}
+                    className="w-5 h-5 text-[#191919] border-gray-300 rounded focus:ring-[#191919]"
+                  />
+                  <span className="text-base font-medium text-gray-700">{t("isRkCitizen")}</span>
+                </label>
+                
+                {formData.is_rk_citizen && (
+                  <div className="mt-6 space-y-3">
+                    <div className="flex items-start gap-2 p-4 bg-gray-100 border-l-4 border-gray-700 rounded-r-lg">
+                      <svg className="w-5 h-5 text-gray-700 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="text-sm text-gray-800">
+                        {t("rkCitizenInfo")}
+                      </p>
+                    </div>
+                    
+                    {/* Certificate 1: Psychoneurology */}
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-400 transition-all duration-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm">
+                            1
+                          </div>
+                          <span className="text-sm font-medium text-gray-800">{t("psychNeurologyCertificate")}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => window.open("https://kaspi.kz", "_blank")}
+                          className="w-7 h-7 rounded-lg bg-gray-700 text-white flex items-center justify-center hover:bg-[#191919] transition-colors shadow-sm"
+                          title={t("getOnKaspi")}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      {!certificateFiles.psych_neurology_certificate ? (
+                        <label className="flex items-center justify-center gap-2 p-3 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-all">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-600">{t("uploadDocument") || "Выберите файл"}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange('psych_neurology_certificate', e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                        </label>
+                      ) : (
+                        <div className="flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-lg">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm text-gray-800 truncate">{certificateFiles.psych_neurology_certificate.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleFileChange('psych_neurology_certificate', null)}
+                            className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                          >
+                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Certificate 2: Narcology */}
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-400 transition-all duration-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm">
+                            2
+                          </div>
+                          <span className="text-sm font-medium text-gray-800">{t("narcologyCertificate")}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => window.open("https://kaspi.kz", "_blank")}
+                          className="w-7 h-7 rounded-lg bg-gray-700 text-white flex items-center justify-center hover:bg-[#191919] transition-colors shadow-sm"
+                          title={t("getOnKaspi")}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      {!certificateFiles.narcology_certificate ? (
+                        <label className="flex items-center justify-center gap-2 p-3 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-all">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-600">{t("uploadDocument") || "Выберите файл"}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange('narcology_certificate', e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                        </label>
+                      ) : (
+                        <div className="flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-lg">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm text-gray-800 truncate">{certificateFiles.narcology_certificate.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleFileChange('narcology_certificate', null)}
+                            className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                          >
+                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Certificate 3: Pension Contributions */}
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-400 transition-all duration-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-sm">
+                            3
+                          </div>
+                          <span className="text-sm font-medium text-gray-800">{t("pensionContributionsCertificate")}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => window.open("https://kaspi.kz", "_blank")}
+                          className="w-7 h-7 rounded-lg bg-gray-700 text-white flex items-center justify-center hover:bg-[#191919] transition-colors shadow-sm"
+                          title={t("getOnKaspi")}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      {!certificateFiles.pension_contributions_certificate ? (
+                        <label className="flex items-center justify-center gap-2 p-3 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-all">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-600">{t("uploadDocument") || "Выберите файл"}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange('pension_contributions_certificate', e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                        </label>
+                      ) : (
+                        <div className="flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-lg">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm text-gray-800 truncate">{certificateFiles.pension_contributions_certificate.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleFileChange('pension_contributions_certificate', null)}
+                            className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                          >
+                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Certificate 4: Criminal Record */}
+                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-400 transition-all duration-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-gray-300 flex items-center justify-center text-gray-800 font-semibold text-sm">
+                            4
+                          </div>
+                          <span className="text-sm font-medium text-gray-800">{t("criminalRecordCertificate")}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => window.open("https://egov.kz", "_blank")}
+                          className="w-7 h-7 rounded-lg bg-[#191919] text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-sm"
+                          title={t("getOnEgov")}
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      {!certificateFiles.criminal_record_certificate ? (
+                        <label className="flex items-center justify-center gap-2 p-3 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-all">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <span className="text-sm font-medium text-gray-600">{t("uploadDocument") || "Выберите файл"}</span>
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            onChange={(e) => handleFileChange('criminal_record_certificate', e.target.files?.[0] || null)}
+                            className="hidden"
+                          />
+                        </label>
+                      ) : (
+                        <div className="flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-lg">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm text-gray-800 truncate">{certificateFiles.criminal_record_certificate.name}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleFileChange('criminal_record_certificate', null)}
+                            className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                          >
+                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Debug information */}
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
                 <h4 className="text-sm font-semibold text-gray-800 mb-2">{t("debugInfo")}</h4>
@@ -505,7 +837,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                   <div>{t("iin")} "{formData.iin}" {t("length")} {formData.iin?.length || 0})</div>
                   <div>{t("idCardExpiry")} "{formData.id_card_expiry}"</div>
                   <div>{t("driversLicenseExpiry")} "{formData.drivers_license_expiry}"</div>
-                  <div className="mt-2 font-semibold">{t("validation")} {isFormValid ? t("valid") : t("invalid")}</div>
+                  <div className="mt-2 font-semibold">Validation: {isFormValid ? t("valid") : t("invalid")}</div>
                 </div>
               </div>
 

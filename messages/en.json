@@ -418,6 +418,8 @@
   },
   "profile": {
     "title": "My Profile",
+    "error": "Error",
+    "success": "Success",
     "fullName": "Full Name",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -479,6 +481,7 @@
     "moderationDescriptionMvd": "We are checking your documents and financial information. This may take several business days.",
     "success": "Success",
     "documentsUploadedSuccessfully": "Documents uploaded successfully",
+    "missingRequiredFiles": "Missing required files",
     "ok": "OK",
     "understood": "Understood",
     "failedToUploadDocuments": "Failed to upload documents. Please try again",
@@ -521,7 +524,9 @@
       "lastNameMinLength": "Last name must contain at least 2 characters",
       "lastNameMaxLength": "Last name must contain at most 50 characters",
       "passportRequired": "Enter passport number",
-      "passportMinLength": "Passport number must contain at least 3 characters"
+      "passportMinLength": "Passport number must contain at least 3 characters",
+      "emailRequired": "Enter email address",
+      "emailInvalid": "Enter a valid email address"
     },
     "iinValidation": {
       "errors": {
@@ -620,6 +625,33 @@
     "personalDataDescription": "Basic user information",
     "documentExpirySection": "Document Expiry Dates",
     "documentExpiryDescription": "Document expiration dates",
+    "emailSection": "Email",
+    "emailDescription": "Enter email for verification and contact",
+    "email": "Email",
+    "emailPlaceholder": "example@mail.com",
+    "citizenshipSection": "Citizenship",
+    "citizenshipDescription": "Specify your citizenship",
+    "isRkCitizen": "I am a citizen of the Republic of Kazakhstan",
+    "rkCitizenInfo": "Additional certificates are required for citizens of the Republic of Kazakhstan:",
+    "psychNeurologyCertificate": "Certificate from psychoneurological dispensary",
+    "narcologyCertificate": "Certificate from narcological dispensary",
+    "pensionContributionsCertificate": "Certificate of pension contributions",
+    "criminalRecordCertificate": "Certificate of criminal record",
+    "getOnKaspi": "Get on Kaspi.kz",
+    "getOnEgov": "Get on Egov.kz",
+    "emailVerification": {
+      "title": "Email Verification",
+      "description": "Enter the 6-digit code sent to",
+      "invalidCodeLength": "Code must be 6 digits",
+      "successMessage": "Email successfully verified!",
+      "verificationFailed": "Failed to verify email. Please try again.",
+      "codeSent": "Code sent to your email",
+      "resendFailed": "Failed to send code. Please try again.",
+      "resendCode": "Resend code",
+      "resendIn": "Resend in ",
+      "seconds": " sec",
+      "verify": "Verify"
+    },
     "selectBirthDate": "Select birth date",
     "selectExpiryDate": "Select expiry date",
     "debugInfo": "Debug information:",
@@ -633,6 +665,8 @@
     "iinRequired": "• IIN (12 digits)",
     "idCardExpiryRequired": "• ID Card expiry date",
     "driversLicenseExpiryRequired": "• Driver's License expiry date",
+    "emailRequired": "• Email address",
+    "uploadDocument": "Choose file",
     "issuesCount": "{count} Issues"
   },
   "uploadPhoto": {
