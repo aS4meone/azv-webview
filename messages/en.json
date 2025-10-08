@@ -821,6 +821,7 @@
       "title": "Trip Details",
       "duration": "Duration",
       "earnings": "Earnings",
+      "fuelCost": "Fuel Cost",
       "rentalType": "Rental Type",
       "startTime": "Start Time",
       "endTime": "End Time",

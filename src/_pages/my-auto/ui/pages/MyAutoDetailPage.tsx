@@ -408,6 +408,11 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                             <p className="text-2xl font-bold text-black">
                               {trip.earnings.toLocaleString()} ₸
                             </p>
+                            {trip.fuel_cost !== null && trip.fuel_cost !== undefined && (
+                              <p className="text-sm font-medium text-[#D32F2F] mt-1">
+                                -{trip.fuel_cost.toLocaleString()} ₸
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="flex justify-between items-center">

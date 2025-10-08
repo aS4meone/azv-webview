@@ -324,9 +324,16 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-[#666666]">{t("myAuto.tripDetails.earnings")}:</span>
-                  <span className="font-bold text-black text-2xl">
-                    {tripDetails.earnings.toLocaleString()} ₸
-                  </span>
+                  <div className="text-right">
+                    <div className="font-bold text-black text-2xl">
+                      {tripDetails.earnings.toLocaleString()} ₸
+                    </div>
+                    {tripDetails.fuel_cost !== null && tripDetails.fuel_cost !== undefined && (
+                      <div className="text-sm font-medium text-[#D32F2F] mt-1">
+                        -{tripDetails.fuel_cost.toLocaleString()} ₸
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="flex justify-between items-center py-2">
                   <span className="text-[#666666]">{t("myAuto.tripDetails.rentalType")}:</span>

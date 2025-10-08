@@ -24,6 +24,7 @@ export interface Trip {
   id: number;
   duration_minutes: number;
   earnings: number;
+  fuel_cost: number | null;
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
@@ -108,6 +109,7 @@ export interface TripDetailsResponse {
   vehicle_plate_number: string;
   duration_minutes: number;
   earnings: number;
+  fuel_cost: number | null;
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
