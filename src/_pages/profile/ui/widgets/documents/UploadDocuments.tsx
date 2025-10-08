@@ -312,7 +312,6 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
       )}
       <UploadPhoto
         config={uploadConfig}
-        withCloseButton
         onPhotoUpload={handlePhotoUpload}
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}

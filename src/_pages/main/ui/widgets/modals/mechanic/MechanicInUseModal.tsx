@@ -672,6 +672,23 @@ export const MechanicInUseModal = ({
             {/* Car Controls Slider */}
             <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
 
+            {/* Upload photos reminder text */}
+            {(() => {
+              const hasSelfie = car.photo_after_selfie_uploaded || false;
+              const hasInteriorPhotos = car.photo_after_interior_uploaded || false;
+              
+              if (!hasSelfie || !hasInteriorPhotos) {
+                return (
+                  <div className="text-center py-4 px-6 bg-gray-50 rounded-lg mb-4">
+                    <p className="text-sm text-gray-700">
+                      {t("mechanic.inspection.uploadPhotosBeforeComplete")}
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
             <Button onClick={handleCompleteInspectionClick} variant="secondary">
               {(() => {
                 const hasSelfie = car.photo_after_selfie_uploaded || false;
