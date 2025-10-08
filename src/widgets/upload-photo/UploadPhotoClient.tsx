@@ -25,6 +25,8 @@ export interface UploadPhotoClientProps {
   photoAfterSelfieUploaded?: boolean;
   photoAfterCarUploaded?: boolean;
   photoAfterInteriorUploaded?: boolean;
+  // Флаг для определения, что это фото ПОСЛЕ аренды/осмотра
+  isAfterRental?: boolean;
 }
 
 export const UploadPhotoClient: React.FC<UploadPhotoClientProps> = (props) => {

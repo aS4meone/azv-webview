@@ -442,6 +442,25 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
     }
   };
 
+  // Проверяем, заблокированы ли кнопки управления
+  // Блокируем в двух случаях:
+  // 1. Когда селфи и салон загружены, но фото кузова нет (машина закрыта, осталось только загрузить фото кузова)
+  // 2. Когда все фото загружены (процесс завершен, осталось только нажать кнопку завершения)
+  const areControlsDisabled = () => {
+    const hasSelfie = car.photo_after_selfie_uploaded || false;
+    const hasInterior = car.photo_after_interior_uploaded || false;
+    const hasCar = car.photo_after_car_uploaded || false;
+    
+    // Для владельца селфи не требуется
+    if (car.owner_id === user.id) {
+      // Блокируем если салон загружен (независимо от статуса фото кузова)
+      return hasInterior;
+    }
+    
+    // Для обычного пользователя блокируем если селфи и салон загружены (независимо от статуса фото кузова)
+    return hasSelfie && hasInterior;
+  };
+
   return (
     <div className="bg-white rounded-t-[24px] w-full mb-0 overflow-scroll">
       <div className="p-6 pt-4 space-y-6">
@@ -474,6 +493,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         isOpen={showUploadPhoto}
         withCloseButton
         onClose={() => setShowUploadPhoto(false)}
+        isAfterRental={true}
       />
 
       {/* Шаг 2: Фото кузова */}
@@ -486,6 +506,7 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
         isOpen={showUploadPhotoStep2}
         withCloseButton={false}
         onClose={() => setShowUploadPhotoStep2(false)}
+        isAfterRental={true}
       />
 
       {showRatingModal && (
@@ -521,11 +542,33 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
       )}
 
       <div className="p-6 pt-4 space-y-6">
+        {/* Информационное сообщение когда кнопки заблокированы */}
+        {areControlsDisabled() && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></div>
+              <div>
+                <p className="text-[14px] text-blue-700">
+                  {(() => {
+                    const hasCar = car.photo_after_car_uploaded || false;
+                    if (hasCar) {
+                      return t("widgets.modals.user.inUse.allPhotosUploadedCompleteRental");
+                    } else {
+                      return t("widgets.modals.user.inUse.carLockedUploadCarPhoto");
+                    }
+                  })()}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="flex justify-between gap-2">
           <Button
             variant="outline"
             className="text-[14px]"
             onClick={handlePause}
+            disabled={areControlsDisabled()}
           >
             {t("widgets.modals.user.inUse.pause")}
           </Button>
@@ -533,13 +576,18 @@ export const UserInUseModal = ({ user, onClose }: UserInUseModalProps) => {
             variant="outline"
             className="text-[14px]"
             onClick={handleStartTrip}
+            disabled={areControlsDisabled()}
           >
             {t("widgets.modals.user.inUse.startTrip")}
           </Button>
         </div>
 
         {/* Car Controls Slider */}
-        <CarControlsSlider onLock={handleUnlock} onUnlock={handleLock} />
+        <CarControlsSlider 
+          onLock={handleUnlock} 
+          onUnlock={handleLock}
+          disabled={areControlsDisabled()}
+        />
 
 
         <Button onClick={() => {

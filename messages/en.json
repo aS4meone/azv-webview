@@ -1111,7 +1111,9 @@
       "acceptInspection": "Accept inspection",
       "rateCarCondition": "Rate vehicle condition",
       "specifyDefects": "Specify detected defects (required)",
-      "additionalComments": "Additional comments (optional)"
+      "additionalComments": "Additional comments (optional)",
+      "carLockedUploadCarPhoto": "Car is locked. Only car body photo upload remains to complete the inspection.",
+      "allPhotosUploadedCompleteInspection": "All photos uploaded. Car is locked. Click 'Complete inspection' button to finish."
     },
     "delivery": {
       "successfullyStarted": "Delivery successfully started",
@@ -1129,7 +1131,9 @@
       "completionError": "Error completing delivery",
       "pauseError": "Error trying to pause delivery",
       "resumeError": "Error trying to resume delivery",
-      "acceptedInWork": "Delivery successfully accepted for work"
+      "acceptedInWork": "Delivery successfully accepted for work",
+      "carLockedUploadCarPhoto": "Car is locked. Only car body photo upload remains to complete the delivery.",
+      "allPhotosUploadedCompleteDelivery": "All photos uploaded. Car is locked. Click 'Complete delivery' button to finish."
     },
     "tracking": {
       "started": "Tracking started",
@@ -1283,7 +1287,9 @@
           "errorStartingTrip": "Error trying to start trip",
           "errorLocking": "Error trying to lock car",
           "errorUnlocking": "Error trying to unlock car",
-          "unknownRentalType": "Unknown rental type"
+          "unknownRentalType": "Unknown rental type",
+          "carLockedUploadCarPhoto": "Car is locked. Only car body photo upload remains to complete the rental.",
+          "allPhotosUploadedCompleteRental": "All photos uploaded. Car is locked. Click 'Complete rental' button to finish."
         },
         "rentalContent": {
           "tariff": "Tariff",

@@ -38,6 +38,8 @@ interface UploadPhotoProps {
   photoAfterSelfieUploaded?: boolean;
   photoAfterCarUploaded?: boolean;
   photoAfterInteriorUploaded?: boolean;
+  // Флаг для определения, что это фото ПОСЛЕ аренды/осмотра
+  isAfterRental?: boolean;
 }
 
 // Компонент индикатора прогресса
@@ -110,6 +112,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   photoAfterSelfieUploaded = false,
   photoAfterCarUploaded = false,
   photoAfterInteriorUploaded = false,
+  isAfterRental = false,
 }) => {
   const t = useTranslations("uploadPhoto");
   const { showModal } = useResponseModal();
@@ -182,8 +185,8 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
 
       setSelectedFiles((prev) => ({ ...prev, [photoId]: files }));
 
-      // Проверяем, если загружено фото салона (interior_photos), показываем гайд
-      if (photoId === "interior_photos" && files.length > 0) {
+      // Проверяем, если загружено фото салона (interior_photos) ПОСЛЕ аренды, показываем гайд
+      if (photoId === "interior_photos" && files.length > 0 && isAfterRental) {
         setTimeout(() => {
           setShowRentalGuide(true);
         }, 500); // Небольшая задержка для плавности
@@ -263,8 +266,8 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       [photoId]: processedFiles,
     }));
 
-    // Проверяем, если загружено фото салона (interior_photos), показываем гайд
-    if (photoId === "interior_photos" && processedFiles.length > 0) {
+    // Проверяем, если загружено фото салона (interior_photos) ПОСЛЕ аренды, показываем гайд
+    if (photoId === "interior_photos" && processedFiles.length > 0 && isAfterRental) {
       setTimeout(() => {
         setShowRentalGuide(true);
       }, 500); // Небольшая задержка для плавности

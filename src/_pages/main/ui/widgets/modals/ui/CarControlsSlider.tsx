@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 interface CarControlsSliderProps {
   onLock?: () => void;
   onUnlock?: () => void;
+  disabled?: boolean;
 }
 
 const LockClosedIcon = ({ className }: { className?: string }) => (
@@ -51,6 +52,7 @@ const LockOpenIcon = ({ className }: { className?: string }) => (
 export const CarControlsSlider = ({
   onLock,
   onUnlock,
+  disabled = false,
 }: CarControlsSliderProps) => {
   const [slidePosition, setSlidePosition] = useState(0); // Позиция для анимации
   const [isAnimating, setIsAnimating] = useState(false);
@@ -133,6 +135,8 @@ export const CarControlsSlider = ({
 
   // Touch событий для свайпов
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (disabled) return; // Блокируем взаимодействие если disabled
+    
     touchStartX.current = e.targetTouches[0].clientX;
     currentTouchX.current = e.targetTouches[0].clientX;
     setIsDragging(true);
@@ -145,7 +149,7 @@ export const CarControlsSlider = ({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
+    if (disabled || !isDragging) return; // Блокируем взаимодействие если disabled
 
     touchEndX.current = e.targetTouches[0].clientX;
     currentTouchX.current = e.targetTouches[0].clientX;
@@ -161,7 +165,7 @@ export const CarControlsSlider = ({
   };
 
   const handleTouchEnd = () => {
-    if (!isDragging) return;
+    if (disabled || !isDragging) return; // Блокируем взаимодействие если disabled
 
     if (!touchStartX.current || !touchEndX.current) {
       resetPosition();
@@ -200,7 +204,9 @@ export const CarControlsSlider = ({
   return (
     <div
       ref={containerRef}
-      className="w-full bg-gray-100 rounded-full flex items-center justify-between overflow-hidden"
+      className={`w-full bg-gray-100 rounded-full flex items-center justify-between overflow-hidden ${
+        disabled ? "opacity-50 cursor-not-allowed" : ""
+      }`}
     >
       <div className="pl-5">
         <LockClosedIcon className=" text-gray-700" />
@@ -213,7 +219,7 @@ export const CarControlsSlider = ({
           !isDragging && !isAnimating
             ? "transition-transform duration-200 ease-out"
             : ""
-        }`}
+        } ${disabled ? "pointer-events-none" : ""}`}
         style={{
           transform: `translateX(${slidePosition}px)`,
           willChange: "transform", // оптимизация для GPU
@@ -222,11 +228,11 @@ export const CarControlsSlider = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out">
+        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out" disabled={disabled}>
           <ArrowLeftIcon color="white" className="w-6 h-6" />
         </button>
 
-        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out">
+        <button className="p-2 hover:bg-gray-700 rounded-full transition-colors duration-200 ease-out" disabled={disabled}>
           <ArrowRightIcon color="white" className="w-6 h-6" />
         </button>
       </div>
