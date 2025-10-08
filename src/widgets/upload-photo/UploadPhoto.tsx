@@ -9,6 +9,7 @@ import Loader from "@/shared/ui/loader";
 import { FlutterCamera } from "@/shared/utils/flutter-camera";
 import { StencilConfig } from "@/shared/models/types/stencil";
 import { StencilOverlay } from "@/widgets/upload-photo/StencilOverlay";
+import { RentalCompletionGuideModal } from "@/widgets/upload-photo/RentalCompletionGuideModal";
 import { useTranslations } from "next-intl";
 
 export interface PhotoConfig {
@@ -122,6 +123,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
     [key: string]: number;
   }>({});
   const [activeStencil, setActiveStencil] = useState<StencilConfig | undefined>();
+  const [showRentalGuide, setShowRentalGuide] = useState(false);
 
 
   const setPhotoLoading = (photoId: string, loading: boolean) => {
@@ -179,6 +181,13 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       }
 
       setSelectedFiles((prev) => ({ ...prev, [photoId]: files }));
+
+      // Проверяем, если загружено фото салона (interior_photos), показываем гайд
+      if (photoId === "interior_photos" && files.length > 0) {
+        setTimeout(() => {
+          setShowRentalGuide(true);
+        }, 500); // Небольшая задержка для плавности
+      }
     } catch (e) {
       console.error(e);
       showModal({ type: "error", title: t("error"), description: t("cameraError"), buttonText: t("understood") });
@@ -253,6 +262,13 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
       ...prev,
       [photoId]: processedFiles,
     }));
+
+    // Проверяем, если загружено фото салона (interior_photos), показываем гайд
+    if (photoId === "interior_photos" && processedFiles.length > 0) {
+      setTimeout(() => {
+        setShowRentalGuide(true);
+      }, 500); // Небольшая задержка для плавности
+    }
   };
 
   const handleSubmit = () => {
@@ -457,5 +473,13 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({
   );
 
   // Рендерим напрямую, без Portal, чтобы сохранить контекст NextIntlClientProvider
-  return modalContent;
+  return (
+    <>
+      {modalContent}
+      <RentalCompletionGuideModal
+        isOpen={showRentalGuide}
+        onClose={() => setShowRentalGuide(false)}
+      />
+    </>
+  );
 };

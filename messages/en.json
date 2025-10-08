@@ -688,7 +688,22 @@
     "completing": "Completing...",
     "pleaseWait": "Please wait",
     "uploadDocuments": "Upload Documents",
-    "takeRequiredDocuments": "Take photos of required documents"
+    "takeRequiredDocuments": "Take photos of required documents",
+    "rentalCompletionGuide": {
+      "title": "Rental Completion",
+      "description": "Follow the instructions for proper rental completion",
+      "step": "Step",
+      "steps": {
+        "closeWindows": "Close all windows",
+        "turnOffEngine": "Turn off the engine",
+        "takeYourBelongings": "Take all your belongings from the interior",
+        "leaveTheCar": "Leave the car",
+        "closeAllDoors": "Close all doors"
+      },
+      "warning": "Important!",
+      "warningText": "After clicking the \"Next\" button, all doors will automatically lock, and you will no longer be able to use the vehicle. Please carefully check that you haven't left anything inside.",
+      "buttonText": "Next"
+    }
   },
   "onboarding": {
     "slides": [
