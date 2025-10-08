@@ -419,7 +419,6 @@
   "profile": {
     "title": "Мой профиль",
     "error": "Ошибка",
-    "success": "Успешно",
     "fullName": "ФИО",
     "firstName": "Имя",
     "lastName": "Фамилия",
@@ -1076,6 +1075,8 @@
     "kz": "Қазақша"
   },
   "mechanic": {
+    "loading": "Загрузка...",
+    "noResults": "Нет результатов",
     "inspection": {
       "successfullyStarted": "Осмотр успешно начат",
       "uploadPhotosBeforeStart": "Загрузите фотографии автомобиля перед началом осмотра",
@@ -1436,7 +1437,8 @@
         "profileSelfie": "Селфи профиля",
         "noPhoto": "Нет фото",
         "renterPhotosNotAvailable": "Фотографии арендатора недоступны",
-        "noPhotoAvailable": "Нет фото"
+        "noPhotoAvailable": "Нет фото",
+        "backToMap": "Вернуться на карту"
       }
     },
     "timers": {

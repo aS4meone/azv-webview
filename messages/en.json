@@ -418,8 +418,6 @@
   },
   "profile": {
     "title": "My Profile",
-    "error": "Error",
-    "success": "Success",
     "fullName": "Full Name",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -1435,7 +1433,8 @@
         "profileSelfie": "Profile selfie",
         "noPhoto": "No photo",
         "renterPhotosNotAvailable": "Renter photos not available",
-        "noPhotoAvailable": "No photo"
+        "noPhotoAvailable": "No photo",
+        "backToMap": "Back to Map"
       }
     },
     "timers": {

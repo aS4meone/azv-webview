@@ -48,10 +48,6 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
       | "drivers_license"
       | "selfie"
       | "selfie_with_license"
-      | "psych_neurology_certificate"
-      | "narcology_certificate"
-      | "pension_contributions_certificate"
-      | "criminal_record_certificate"
     > & {
       first_name?: string;
       last_name?: string;
@@ -163,6 +159,9 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
       form.append("id_card_expiry", formData.id_card_expiry || "");
       form.append("drivers_license_expiry", formData.drivers_license_expiry || "");
       form.append("email", formData.email || "");
+      
+      // Add citizenship status (backend expects is_citizen_kz)
+      form.append("is_citizen_kz", formData.is_rk_citizen ? "true" : "false");
 
       // Add optional fields (iin or passport_number)
       if (formData.iin) {
@@ -177,6 +176,9 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
       setIsDetailsOpen(false);
 
       if (response.status === 200) {
+        // Check if email verification is needed based on backend response
+        const needsEmailVerification = response.data?.data?.is_verified_email === false;
+        
         setResponseModal({
           type: "success",
           title: t("success"),
@@ -184,10 +186,12 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
           buttonText: t("ok"),
           onButtonClick: () => {
             handleCloseResponseModal();
-            // Open email verification modal after closing success modal with a small delay
-            setTimeout(() => {
-              setIsEmailVerificationOpen(true);
-            }, 100);
+            // Open email verification modal only if email needs verification
+            if (needsEmailVerification) {
+              setTimeout(() => {
+                setIsEmailVerificationOpen(true);
+              }, 100);
+            }
           },
         });
       } else {

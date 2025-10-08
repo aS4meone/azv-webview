@@ -421,7 +421,6 @@
   "profile": {
     "title": "Менің профилім",
     "error": "Қате",
-    "success": "Сәтті",
     "fullName": "Толық аты-жөні",
     "firstName": "Аты",
     "lastName": "Тегі",
@@ -1076,6 +1075,8 @@
     "kz": "Қазақша"
   },
   "mechanic": {
+    "loading": "Жүктелуде...",
+    "noResults": "Нәтиже жоқ",
     "inspection": {
       "successfullyStarted": "Техникалық тексеру сәтті басталды",
       "uploadPhotosBeforeStart": "Техникалық тексеруді бастамас бұрын автомобильдің фотосуреттерін жүктеңіз",
@@ -1186,8 +1187,6 @@
       "class": "КЛАСС",
       "year": "жыл"
     },
-    "loading": "Жүктелуде...",
-    "noResults": "Еш нәрсе табылмады",
     "occupiedCars": "Бос емес көліктер",
     "occupiedStatus": "Бос емес"
   },
@@ -1433,6 +1432,7 @@
         "trackingInfo": "Көлік бақылау ақпараты",
         "renter": "Арендатор",
         "name": "Аты:",
+        "backToMap": "Картаға оралу",
         "phone": "Телефон:",
         "rentSelfie": "Аренда селфи",
         "profileSelfie": "Профиль селфи",

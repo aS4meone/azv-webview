@@ -48,4 +48,29 @@ export interface UploadDocumentsDto {
    * Driver's license expiry date
    */
   drivers_license_expiry: string;
+
+  /**
+   * Email address for verification
+   */
+  email: string;
+
+  /**
+   * Certificate from psychoneurological dispensary (optional, for RK citizens)
+   */
+  psych_neurology_certificate?: string;
+
+  /**
+   * Certificate from narcological dispensary (optional, for RK citizens)
+   */
+  narcology_certificate?: string;
+
+  /**
+   * Certificate of pension contributions (optional, for RK citizens)
+   */
+  pension_contributions_certificate?: string;
+
+  /**
+   * Certificate of criminal record (optional, for RK citizens)
+   */
+  criminal_record_certificate?: string;
 }
