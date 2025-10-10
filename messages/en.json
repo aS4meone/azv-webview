@@ -637,6 +637,13 @@
     "criminalRecordCertificate": "Certificate of criminal record",
     "getOnKaspi": "Get on Kaspi.kz",
     "getOnEgov": "Get on Egov.kz",
+    "howToGet": "How to get",
+    "note": "Note",
+    "saveToFiles": "After obtaining the certificate, save it to files on your device, then attach it in our application.",
+    "psychNeurologyGuide": "open the \"Kaspi\" app⇒services⇒government services⇒certificates⇒\"from psychoneurological dispensary\"⇒send document⇒save to files",
+    "narcologyGuide": "open the \"Kaspi\" app⇒services⇒government services⇒certificates⇒\"from narcological dispensary\"⇒send document⇒save to files",
+    "pensionGuide": "open the \"Kaspi\" app⇒services⇒government services⇒certificates⇒\"pension contributions\"⇒for all time⇒get certificate⇒send document⇒save to files",
+    "criminalRecordGuide": "open the \"eGov mobile\" app⇒quick search⇒\"issue of certificate of presence or absence of criminal record\"⇒order service for yourself⇒purpose of certificate \"certificate(electronic)\"⇒continue⇒refresh application status in the upper right corner⇒\"certificate of presence or absence of criminal record - rus\"⇒save button in the upper right corner⇒save to files",
     "emailVerification": {
       "title": "Email Verification",
       "description": "Enter the 6-digit code sent to",
@@ -817,11 +824,14 @@
       "errorDescription": "Something went wrong while loading trips. Please try again.",
       "retry": "Try again"
     },
+    "fuelCost": "Fuel Cost",
+    "deliveryCost": "Delivery Cost",
     "tripDetails": {
       "title": "Trip Details",
       "duration": "Duration",
       "earnings": "Earnings",
       "fuelCost": "Fuel Cost",
+      "deliveryCost": "Delivery Cost",
       "rentalType": "Rental Type",
       "startTime": "Start Time",
       "endTime": "End Time",

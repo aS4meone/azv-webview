@@ -25,6 +25,7 @@ export interface Trip {
   duration_minutes: number;
   earnings: number;
   fuel_cost: number | null;
+  delivery_cost: number | null;
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
@@ -110,9 +111,11 @@ export interface TripDetailsResponse {
   duration_minutes: number;
   earnings: number;
   fuel_cost: number | null;
+  delivery_cost: number | null;
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
+  user_id?: number;
   photos?: TripPhotos | null;
   route_map: RouteMap;
   mechanic_delivery?: any | null;

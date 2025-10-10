@@ -14,9 +14,10 @@ interface TripDetailPageProps {
   car: MyCar;
   trip: Trip;
   onBackAction: () => void;
+  userId?: number;
 }
 
-export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps) => {
+export const TripDetailPage = ({ car, trip, onBackAction, userId }: TripDetailPageProps) => {
   const t = useTranslations();
   const [tripDetails, setTripDetails] = useState<TripDetailsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -328,10 +329,25 @@ export const TripDetailPage = ({ car, trip, onBackAction }: TripDetailPageProps)
                     <div className="font-bold text-black text-2xl">
                       {tripDetails.earnings.toLocaleString()} ₸
                     </div>
-                    {tripDetails.fuel_cost !== null && tripDetails.fuel_cost !== undefined && (
-                      <div className="text-sm font-medium text-[#D32F2F] mt-1">
-                        -{tripDetails.fuel_cost.toLocaleString()} ₸
-                      </div>
+                    {tripDetails.user_id === userId && (
+                      <>
+                        {tripDetails.fuel_cost !== null && tripDetails.fuel_cost !== undefined && tripDetails.fuel_cost > 0 && (
+                          <div className="text-sm mt-2">
+                            <p className="text-[#666666] text-xs">{t("myAuto.fuelCost")}</p>
+                            <p className="font-medium text-[#D32F2F]">
+                              -{tripDetails.fuel_cost.toLocaleString()} ₸
+                            </p>
+                          </div>
+                        )}
+                        {tripDetails.delivery_cost !== null && tripDetails.delivery_cost !== undefined && tripDetails.delivery_cost > 0 && (
+                          <div className="text-sm mt-2">
+                            <p className="text-[#666666] text-xs">{t("myAuto.deliveryCost")}</p>
+                            <p className="font-medium text-[#D32F2F]">
+                              -{tripDetails.delivery_cost.toLocaleString()} ₸
+                            </p>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

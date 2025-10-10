@@ -64,6 +64,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     pension_contributions_certificate: null,
     criminal_record_certificate: null,
   });
+  const [guideModalOpen, setGuideModalOpen] = React.useState<number | null>(null);
   const { user, isLoading: isLoadingUser } = useUserStore();
 
   // Load user data when modal opens
@@ -352,20 +353,106 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     return date.toISOString().split("T")[0];
   };
 
+  const GuideModal = ({ certificateNumber }: { certificateNumber: number }) => {
+    const guides = [
+      {
+        title: t("psychNeurologyCertificate"),
+        steps: t("psychNeurologyGuide").split("⇒"),
+        app: "Kaspi",
+      },
+      {
+        title: t("narcologyCertificate"),
+        steps: t("narcologyGuide").split("⇒"),
+        app: "Kaspi",
+      },
+      {
+        title: t("pensionContributionsCertificate"),
+        steps: t("pensionGuide").split("⇒"),
+        app: "Kaspi",
+      },
+      {
+        title: t("criminalRecordCertificate"),
+        steps: t("criminalRecordGuide").split("⇒"),
+        app: "eGov mobile",
+      },
+    ];
+
+    const guide = guides[certificateNumber - 1];
+    if (!guide) return null;
+
+    return createPortal(
+      <div 
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-end animate-fadeIn"
+        onClick={() => setGuideModalOpen(null)}
+      >
+        <div 
+          className="bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto shadow-2xl animate-slideUp"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-3xl">
+            {/* Handle bar */}
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">{guide.title}</h3>
+              <button
+                onClick={() => setGuideModalOpen(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-700">
+                {guide.app}
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 pb-8">
+            <div className="space-y-4">
+              {guide.steps.map((step, index) => (
+                <div key={index} className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#191919] text-white flex items-center justify-center font-semibold text-sm">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <p className="text-gray-800 leading-relaxed">{step.trim()}</p>
+                  </div>
+                </div>
+              ))}
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>{t("note")}:</strong> {t("saveToFiles")}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>,
+      document.body
+    );
+  };
+
   return isOpen && typeof window !== "undefined"
     ? createPortal(
-        <CustomPushScreen
-          isOpen={true}
-          onClose={onClose}
-          direction="bottom"
-          withHeader={true}
-          title={t("documentData")}
-        >
-          <div className="bg-white min-h-full mt-5">
-            
+        <>
+          <CustomPushScreen
+            isOpen={true}
+            onClose={onClose}
+            direction="bottom"
+            withHeader={true}
+            title={t("documentData")}
+          >
+            <div className="bg-white min-h-full mt-5">
+              
 
-            {/* Form content */}
-            <div className="py-6 space-y-6">
+              {/* Form content */}
+              <div className="py-6 space-y-6">
               {isLoadingUser && (
                 <div className="flex items-center justify-center py-8">
                   <Loader color="#191919" />
@@ -615,9 +702,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         </div>
                         <button
                           type="button"
-                          onClick={() => window.open("https://kaspi.kz", "_blank")}
+                          onClick={() => setGuideModalOpen(1)}
                           className="w-7 h-7 rounded-lg bg-gray-700 text-white flex items-center justify-center hover:bg-[#191919] transition-colors shadow-sm"
-                          title={t("getOnKaspi")}
+                          title={t("howToGet")}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -670,9 +757,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         </div>
                         <button
                           type="button"
-                          onClick={() => window.open("https://kaspi.kz", "_blank")}
+                          onClick={() => setGuideModalOpen(2)}
                           className="w-7 h-7 rounded-lg bg-gray-700 text-white flex items-center justify-center hover:bg-[#191919] transition-colors shadow-sm"
-                          title={t("getOnKaspi")}
+                          title={t("howToGet")}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -725,9 +812,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         </div>
                         <button
                           type="button"
-                          onClick={() => window.open("https://kaspi.kz", "_blank")}
+                          onClick={() => setGuideModalOpen(3)}
                           className="w-7 h-7 rounded-lg bg-gray-700 text-white flex items-center justify-center hover:bg-[#191919] transition-colors shadow-sm"
-                          title={t("getOnKaspi")}
+                          title={t("howToGet")}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -780,9 +867,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                         </div>
                         <button
                           type="button"
-                          onClick={() => window.open("https://egov.kz", "_blank")}
+                          onClick={() => setGuideModalOpen(4)}
                           className="w-7 h-7 rounded-lg bg-[#191919] text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-sm"
-                          title={t("getOnEgov")}
+                          title={t("howToGet")}
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -882,7 +969,9 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
               </div>
             </div>
           </div>
-        </CustomPushScreen>,
+        </CustomPushScreen>
+        {guideModalOpen && <GuideModal certificateNumber={guideModalOpen} />}
+        </>,
         document.body
       )
     : null;

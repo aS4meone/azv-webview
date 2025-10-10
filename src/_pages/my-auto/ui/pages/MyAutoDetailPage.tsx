@@ -174,7 +174,8 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
         <TripDetailPage 
           car={car} 
           trip={selectedTrip} 
-          onBackAction={handleBack} 
+          onBackAction={handleBack}
+          userId={userId}
         />
       </CustomPushScreen>
     );
@@ -408,10 +409,25 @@ export const MyAutoDetailPage = ({ car, onBackAction, userId }: MyAutoDetailPage
                             <p className="text-2xl font-bold text-black">
                               {trip.earnings.toLocaleString()} ₸
                             </p>
-                            {trip.fuel_cost !== null && trip.fuel_cost !== undefined && (
-                              <p className="text-sm font-medium text-[#D32F2F] mt-1">
-                                -{trip.fuel_cost.toLocaleString()} ₸
-                              </p>
+                            {isOwnerTrip && (
+                              <>
+                                {trip.fuel_cost !== null && trip.fuel_cost !== undefined && trip.fuel_cost > 0 && (
+                                  <div className="text-sm mt-1">
+                                    <p className="text-[#666666] text-xs">{t("myAuto.fuelCost")}</p>
+                                    <p className="font-medium text-[#D32F2F]">
+                                      -{trip.fuel_cost.toLocaleString()} ₸
+                                    </p>
+                                  </div>
+                                )}
+                                {trip.delivery_cost !== null && trip.delivery_cost !== undefined && trip.delivery_cost > 0 && (
+                                  <div className="text-sm mt-1">
+                                    <p className="text-[#666666] text-xs">{t("myAuto.deliveryCost")}</p>
+                                    <p className="font-medium text-[#D32F2F]">
+                                      -{trip.delivery_cost.toLocaleString()} ₸
+                                    </p>
+                                  </div>
+                                )}
+                              </>
                             )}
                           </div>
                         </div>
