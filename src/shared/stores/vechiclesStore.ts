@@ -3,7 +3,6 @@ import { CarStatus, ICar } from "../models/types/car";
 import { vehicleApi } from "../api/routes/vehicles";
 import { mechanicApi } from "../api/routes/mechanic";
 import { UserRole } from "../models/types/user";
-import { getMockCars, getFreeCars, getAllOccupiedCars, searchCars } from "../data/mockData";
 
 interface VehiclesStore {
   // User
@@ -161,11 +160,12 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
 
     try {
       set({ isLoadingAll: true, error: null });
-      console.log("[vehiclesStore] fetchAllVehicles: используем API get_vehicles + fallback");
+      console.log("[vehiclesStore] fetchAllVehicles: используем API get_vehicles");
       
-      // Используем функцию getMockCars которая объединяет API + fallback данные
-      const combinedCars = await getMockCars();
-      set({ allVehicles: combinedCars, isLoadingAll: false });
+      // Используем только API без fallback данных
+      const response = await vehicleApi.getVehicles();
+      const apiCars = response?.vehicles || [];
+      set({ allVehicles: apiCars, isLoadingAll: false });
     } catch (error) {
       console.error("Failed to fetch all vehicles:", error);
       set({

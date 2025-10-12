@@ -28,19 +28,14 @@ const SearchPage = ({ onClose }: { onClose: () => void }) => {
       try {
         setIsLoading(true);
         
-        // Используем mockdata для поиска
-        const { searchCars } = await import("@/shared/data/mockData");
-        const searchResults = searchCars(query);
-        setCars(searchResults);
-        
-        // Раскомментируйте для использования реального API:
-        // if (user!.role === UserRole.MECHANIC) {
-        //   const response = await mechanicApi.searchVehicles(query);
-        //   setCars(response.vehicles || []);
-        // } else {
-        //   const response = await vehicleApi.searchVehicles(query);
-        //   setCars(response.vehicles || []);
-        // }
+        // Используем реальный API для поиска
+        if (user!.role === UserRole.MECHANIC) {
+          const response = await mechanicApi.searchVehicles(query);
+          setCars(response.vehicles || []);
+        } else {
+          const response = await vehicleApi.searchVehicles(query);
+          setCars(response.vehicles || []);
+        }
       } catch (error) {
         console.error("Search failed:", error);
         setCars([]);
