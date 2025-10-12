@@ -10,7 +10,7 @@ import { validateIINBirthDateMatch } from "@/shared/utils/iinValidation";
 
 type DocumentDetailsData = Omit<
   UploadDocumentsDto,
-  "id_front" | "id_back" | "drivers_license" | "selfie" | "selfie_with_license" | "psych_neurology_certificate" | "narcology_certificate" | "pension_contributions_certificate" | "criminal_record_certificate"
+  "id_front" | "id_back" | "drivers_license" | "selfie" | "selfie_with_license" | "psych_neurology_certificate" | "narcology_certificate" | "pension_contributions_certificate"
 > & {
   first_name?: string;
   last_name?: string;
@@ -22,7 +22,6 @@ interface CertificateFiles {
   psych_neurology_certificate?: File | null;
   narcology_certificate?: File | null;
   pension_contributions_certificate?: File | null;
-  criminal_record_certificate?: File | null;
 }
 
 interface DocumentDetailsModalProps {
@@ -62,7 +61,6 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
     psych_neurology_certificate: null,
     narcology_certificate: null,
     pension_contributions_certificate: null,
-    criminal_record_certificate: null,
   });
   const [guideModalOpen, setGuideModalOpen] = React.useState<number | null>(null);
   const { user, isLoading: isLoadingUser } = useUserStore();
@@ -369,11 +367,6 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
         title: t("pensionContributionsCertificate"),
         steps: t("pensionGuide").split("⇒"),
         app: "Kaspi",
-      },
-      {
-        title: t("criminalRecordCertificate"),
-        steps: t("criminalRecordGuide").split("⇒"),
-        app: "eGov mobile",
       },
     ];
 
@@ -856,60 +849,6 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
                       )}
                     </div>
 
-                    {/* Certificate 4: Criminal Record */}
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-400 transition-all duration-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-gray-300 flex items-center justify-center text-gray-800 font-semibold text-sm">
-                            4
-                          </div>
-                          <span className="text-sm font-medium text-gray-800">{t("criminalRecordCertificate")}</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setGuideModalOpen(4)}
-                          className="w-7 h-7 rounded-lg bg-[#191919] text-white flex items-center justify-center hover:bg-gray-800 transition-colors shadow-sm"
-                          title={t("howToGet")}
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </button>
-                      </div>
-                      
-                      {!certificateFiles.criminal_record_certificate ? (
-                        <label className="flex items-center justify-center gap-2 p-3 bg-white border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-500 hover:bg-gray-50 transition-all">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                          </svg>
-                          <span className="text-sm font-medium text-gray-600">{t("uploadDocument") || "Выберите файл"}</span>
-                          <input
-                            type="file"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('criminal_record_certificate', e.target.files?.[0] || null)}
-                            className="hidden"
-                          />
-                        </label>
-                      ) : (
-                        <div className="flex items-center justify-between p-3 bg-gray-100 border border-gray-300 rounded-lg">
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span className="text-sm text-gray-800 truncate">{certificateFiles.criminal_record_certificate.name}</span>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleFileChange('criminal_record_certificate', null)}
-                            className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
-                          >
-                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                      )}
-                    </div>
                   </div>
                 )}
               </div>

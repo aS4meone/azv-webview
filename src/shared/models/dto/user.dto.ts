@@ -68,9 +68,4 @@ export interface UploadDocumentsDto {
    * Certificate of pension contributions (optional, for RK citizens)
    */
   pension_contributions_certificate?: string;
-
-  /**
-   * Certificate of criminal record (optional, for RK citizens)
-   */
-  criminal_record_certificate?: string;
 }

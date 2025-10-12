@@ -27,7 +27,6 @@ interface DocumentFiles {
   psych_neurology_certificate?: File;
   narcology_certificate?: File;
   pension_contributions_certificate?: File;
-  criminal_record_certificate?: File;
 }
 
 export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?: any }) => {
@@ -148,8 +147,6 @@ export const UploadDocuments = ({ getUser, user }: { getUser: () => void; user?:
           form.append("narcology_certificate", certificateFiles.narcology_certificate);
         if (certificateFiles.pension_contributions_certificate) 
           form.append("pension_contributions_certificate", certificateFiles.pension_contributions_certificate);
-        if (certificateFiles.criminal_record_certificate) 
-          form.append("criminal_record_certificate", certificateFiles.criminal_record_certificate);
       }
 
       // Add required form fields that backend expects
