@@ -50,7 +50,7 @@ export interface ILastClientReview {
 }
 
 export interface ICar extends UniqueIdentifier {
-  id: number;
+  id: number; // Car ID is Integer
   name: string;
   plate_number: string;
   latitude: number;
@@ -66,12 +66,12 @@ export interface ICar extends UniqueIdentifier {
   transmission_type: string | null;
   body_type: string;
   photos: string[];
-  owner_id: number;
-  current_renter_id: number | null;
+  owner_id: string; // sid (short ID) - base64 encoded UUID
+  current_renter_id: string | null; // sid (short ID) - base64 encoded UUID
   status: CarStatus;
   open_price: number;
   owned_car: boolean;
-  rental_id: number;
+  rental_id: string; // sid (short ID) - base64 encoded UUID
   reservation_time?: string;
   description?: string;
   current_renter_details?: ICurrentRenterDetails;
@@ -87,7 +87,7 @@ export interface ICar extends UniqueIdentifier {
 }
 
 export interface ICurrentRenterDetails {
-  id: number;
+  id: string; // sid (short ID) - base64 encoded UUID
   first_name?: string;
   last_name?: string;
   full_name?: string;

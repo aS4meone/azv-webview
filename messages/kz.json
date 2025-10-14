@@ -1198,7 +1198,8 @@
       "understood": "Түсіндім",
       "uploadSelfieAndCar": "Селфи және көлік суреттерін жүктеу",
       "uploadInterior": "Салон суреттерін жүктеу",
-      "startInspection": "Тексеруді бастау"
+      "startInspection": "Тексеруді бастау",
+      "viewInspectionData": "Тексерудің деректерін көру"
     },
     "carSpecs": {
       "transmission": {

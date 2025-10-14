@@ -23,7 +23,7 @@ export const mechanicRoutes = {
 
   getDeliveryVehicles: "/mechanic/get-delivery-vehicles",
 
-  acceptDelivery: (id: number) => `/mechanic/accept-delivery/${id}`,
+  acceptDelivery: (id: string) => `/mechanic/accept-delivery/${id}`, // sid (short ID) - base64 encoded UUID
   completeDelivery: "/mechanic/complete-delivery",
 
   getCurrentDelivery: "/mechanic/current-delivery",
@@ -146,7 +146,7 @@ export const mechanicApi = {
     );
     return response;
   },
-  acceptDelivery: async (id: number) => {
+  acceptDelivery: async (id: string) => { // sid (short ID) - base64 encoded UUID
     const response = await axiosInstance.post(
       mechanicRoutes.acceptDelivery(id)
     );

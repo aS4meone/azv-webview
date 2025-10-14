@@ -1,5 +1,5 @@
 export interface IHistory {
-  history_id: number;
+  history_id: string; // sid (short ID) - base64 encoded UUID
   date: string;
   car_name: string;
   final_total_price: number;
@@ -64,8 +64,8 @@ export interface RouteMap {
 }
 
 export interface IRentalHistoryDetail {
-  history_id: number;
-  user_id: number;
+  history_id: string; // sid (short ID) - base64 encoded UUID
+  user_id: string; // sid (short ID) - base64 encoded UUID
   car_id: number;
   rental_type: string;
   duration: number | null;

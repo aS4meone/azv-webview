@@ -31,7 +31,7 @@ export interface GuarantorRequestResponse {
 }
 
 export interface SimpleGuarantor {
-  id: number;
+  id: string; // sid (short ID) - base64 encoded UUID
   first_name: string | null;
   last_name: string | null;
   phone: string;
@@ -41,7 +41,7 @@ export interface SimpleGuarantor {
 }
 
 export interface SimpleClient {
-  id: number;
+  id: string; // sid (short ID) - base64 encoded UUID
   first_name: string | null;
   last_name: string | null;
   phone: string;
@@ -66,8 +66,8 @@ export enum VerificationStatus {
 }
 
 export interface ClientGuarantorRequestItem {
-  id: number;
-  guarantor_id?: number;
+  id: number; // Integer ID
+  guarantor_id?: string; // sid (short ID) - base64 encoded UUID
   guarantor_first_name?: string;
   guarantor_last_name?: string;
   guarantor_phone?: string;

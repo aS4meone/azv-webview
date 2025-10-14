@@ -29,7 +29,7 @@ export interface Trip {
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
-  user_id?: number;
+  user_id?: string; // sid (short ID) - base64 encoded UUID
 }
 
 export interface CarTripsResponse {
@@ -86,7 +86,7 @@ export interface RouteMap {
 
 export interface MechanicInspection {
   mechanic: {
-    id: number;
+    id: string; // sid (short ID) - base64 encoded UUID
     first_name: string;
     last_name: string;
     phone_number: string;
@@ -115,7 +115,7 @@ export interface TripDetailsResponse {
   rental_type: "minutes" | "hours" | "days";
   start_time: string;
   end_time: string;
-  user_id?: number;
+  user_id?: string; // sid (short ID) - base64 encoded UUID
   photos?: TripPhotos | null;
   route_map: RouteMap;
   mechanic_delivery?: any | null;

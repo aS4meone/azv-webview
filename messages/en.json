@@ -1192,7 +1192,8 @@
       "understood": "Understood",
       "uploadSelfieAndCar": "Upload selfie and car photos",
       "uploadInterior": "Upload interior photos",
-      "startInspection": "Start inspection"
+      "startInspection": "Start inspection",
+      "viewInspectionData": "View inspection data"
     },
     "carSpecs": {
       "transmission": {

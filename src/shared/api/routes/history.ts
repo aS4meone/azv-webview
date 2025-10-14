@@ -2,7 +2,7 @@ import axiosInstance from "../axios";
 
 export const historyRoutes = {
   getHistories: "/rent/history",
-  getHistoryOfRent: (id: number) => `/rent/history/${id}`,
+  getHistoryOfRent: (id: string) => `/rent/history/${id}`, // sid (short ID) - base64 encoded UUID
 };
 
 export const historyApi = {
@@ -10,7 +10,7 @@ export const historyApi = {
     const response = await axiosInstance.get(historyRoutes.getHistories);
     return response;
   },
-  getHistoryOfRent: async (id: number) => {
+  getHistoryOfRent: async (id: string) => { // sid (short ID) - base64 encoded UUID
     const response = await axiosInstance.get(
       historyRoutes.getHistoryOfRent(id)
     );

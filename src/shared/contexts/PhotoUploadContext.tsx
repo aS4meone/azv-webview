@@ -561,7 +561,7 @@ export const baseConfig: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];
@@ -586,7 +586,7 @@ export const baseConfigStep2: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];
@@ -611,7 +611,7 @@ export const mechanicAfterConfigStep2: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];
@@ -636,7 +636,7 @@ export const userConfigStep2: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];
@@ -656,7 +656,7 @@ export const ownerConfigStep2: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];
@@ -672,7 +672,7 @@ export const afterRentConfigStep1: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];
@@ -691,7 +691,7 @@ export const ownerAfterRentConfigStep1: PhotoConfig[] = [
   {
     id: "interior_photos",
     title: "Сделайте фото салона.",
-    multiple: { min: 1, max: 1 },
+    multiple: { min: 1, max: 5 },
     cameraType: "back",
   },
 ];

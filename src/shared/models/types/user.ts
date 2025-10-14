@@ -43,7 +43,7 @@ interface Application {
 }
 
 export interface IUser {
-  id: number;
+  id: string; // sid (short ID) - base64 encoded UUID
   phone_number: string;
   first_name: string | null;
   last_name: string | null;

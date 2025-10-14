@@ -1200,7 +1200,8 @@
       "understood": "Понятно",
       "uploadSelfieAndCar": "Загрузить селфи и фото кузова",
       "uploadInterior": "Загрузить фото салона",
-      "startInspection": "Начать осмотр"
+      "startInspection": "Начать осмотр",
+      "viewInspectionData": "Посмотреть данные осмотра"
     },
     "carSpecs": {
       "transmission": {
@@ -1327,10 +1328,10 @@
           "startDelivery": "Начать доставку"
         },
         "startCheck": {
-      "viewData": "Посмотреть данные",
-      "viewInspectionData": "Посмотреть данные осмотра",
-      "carPoint": "Точка авто",
-      "deliveryPoint": "Точка доставки",
+          "viewData": "Посмотреть данные",
+          "viewInspectionData": "Посмотреть данные осмотра",
+          "carPoint": "Точка авто",
+          "deliveryPoint": "Точка доставки",
           "acceptInspection": "Принять осмотр",
           "startDelivery": "Начать доставку",
           "startTracking": "Начать слежку"
