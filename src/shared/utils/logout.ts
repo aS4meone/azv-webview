@@ -2,6 +2,7 @@
 
 import { clearTokens } from "./tokenStorage";
 import { callFlutterLogout } from "./flutterLogout";
+import { sendLogoutToNative } from "./sendAccessTokenToNative";
 
 export interface LogoutOptions {
   redirectTo?: string;
@@ -22,7 +23,16 @@ export async function performLogout(
   try {
     console.log("Starting logout process...");
 
-    // Step 1: Clear FCM token via Flutter
+    // Step 1: Notify React Native WebView about logout (for push notifications)
+    try {
+      sendLogoutToNative();
+      console.log("React Native notified about logout");
+    } catch (error) {
+      console.error("Error notifying React Native:", error);
+      // Continue with logout even if notification fails
+    }
+
+    // Step 2: Clear FCM token via Flutter
     try {
       await callFlutterLogout();
       console.log("FCM token cleared successfully");
@@ -31,7 +41,7 @@ export async function performLogout(
       // Continue with logout even if FCM clearing fails
     }
 
-    // Step 2: Clear local tokens
+    // Step 3: Clear local tokens
     clearTokens();
     console.log("Local tokens cleared");
 

@@ -1,5 +1,7 @@
 // Helper for storing access and refresh tokens in localStorage
 
+import { sendAccessTokenToNative } from "./sendAccessTokenToNative";
+
 export type Tokens = {
   accessToken: string;
   refreshToken: string;
@@ -11,6 +13,9 @@ const REFRESH_TOKEN_KEY = "refresh_token";
 export function setTokens({ accessToken, refreshToken }: Tokens) {
   localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  
+  // 🔥 CRITICAL: Send access token to React Native for push notifications
+  sendAccessTokenToNative(accessToken);
 }
 export function getAccessToken() {
   const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);

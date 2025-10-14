@@ -12,6 +12,7 @@ import {
 } from "@/shared/ui/modal";
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 import { LanguageProvider } from "@/shared/contexts/LanguageContext";
+import { ReactNativeSyncProvider } from "@/shared/components/ReactNativeSyncProvider";
 
 // Импортируем click fixer для автоматического исправления кликов в WebView
 import "@/shared/utils/clickFix";
@@ -70,10 +71,12 @@ export default async function RootLayout({
             <NextIntlClientProvider locale={locale as "ru" | "en" | "kz"} messages={messages}>
               <LanguageProvider initialLocale={locale as "ru" | "en" | "kz"}>
                 <AuthProvider>
-                  <PhotoUploadProvider>
-                    {children}
-                    <ModalPortal />
-                  </PhotoUploadProvider>
+                  <ReactNativeSyncProvider>
+                    <PhotoUploadProvider>
+                      {children}
+                      <ModalPortal />
+                    </PhotoUploadProvider>
+                  </ReactNativeSyncProvider>
                 </AuthProvider>
               </LanguageProvider>
             </NextIntlClientProvider>
