@@ -1507,6 +1507,10 @@
     "carsCount": "cars",
     "year": "year",
     "electric": "Electric",
+    "frequentlyUsed": {
+      "noAvailable": "All your frequently used cars are currently busy or you have no rental history",
+      "tryAllCars": "Try viewing all available cars"
+    },
     "bodyTypes": {
       "sedan": "Sedan",
       "suv": "SUV",

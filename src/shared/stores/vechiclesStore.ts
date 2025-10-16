@@ -271,15 +271,29 @@ export const useVehiclesStore = create<VehiclesStore>((set, get) => ({
         frequentlyUsedVehicles: response?.vehicles || [],
         isLoadingFrequent: false,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch frequently used vehicles:", error);
-      set({
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch frequently used vehicles",
-        isLoadingFrequent: false,
-      });
+      
+      // Проверяем если это 404 ошибка от бэкенда - это нормальная ситуация
+      if (error?.response?.status === 404) {
+        // 404 означает что нет часто используемых машин или они все заняты
+        // Это не ошибка, просто пустой результат
+        set({
+          frequentlyUsedVehicles: [],
+          isLoadingFrequent: false,
+          error: null, // Не показываем ошибку
+        });
+      } else {
+        // Для других ошибок показываем сообщение
+        set({
+          error:
+            error?.response?.data?.detail ||
+            error?.message ||
+            "Failed to fetch frequently used vehicles",
+          isLoadingFrequent: false,
+          frequentlyUsedVehicles: [],
+        });
+      }
     }
   },
 

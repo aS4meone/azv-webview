@@ -572,7 +572,7 @@ export const MechanicInUseModal = ({
 
       {/* Фото ПОСЛЕ осмотра - Шаг 1: Селфи + Салон */}
       <UploadPhoto
-        config={afterRentConfigStep1}
+        config={mechanicAfterConfigStep1}
         isLoading={isLoading}
         onPhotoUpload={handleUploadAfterInspection}
         isOpen={showUploadPhoto}
@@ -586,7 +586,7 @@ export const MechanicInUseModal = ({
 
       {/* Фото ПОСЛЕ осмотра - Шаг 2: Кузов */}
       <UploadPhoto
-        config={afterRentConfigStep2}
+        config={mechanicAfterConfigStep2}
         isLoading={isLoading}
         onPhotoUpload={handleUploadAfterInspectionStep2}
         isOpen={showUploadPhotoStep2}

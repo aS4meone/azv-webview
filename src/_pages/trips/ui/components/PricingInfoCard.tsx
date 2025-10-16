@@ -2,14 +2,14 @@ import React from "react";
 import { useTranslations } from "next-intl";
 
 interface PricingInfoCardProps {
-  basePrice: number;
-  openFee: number;
-  deliveryFee: number;
-  waitingFee: number;
-  overtimeFee: number;
-  distanceFee: number;
-  totalPrice: number;
-  alreadyPayed: number;
+  basePrice: number | null;
+  openFee: number | null;
+  deliveryFee: number | null;
+  waitingFee: number | null;
+  overtimeFee: number | null;
+  distanceFee: number | null;
+  totalPrice: number | null;
+  alreadyPayed: number | null;
 }
 
 const DollarIcon = () => (
@@ -37,7 +37,10 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
   alreadyPayed,
 }) => {
   const t = useTranslations();
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | null) => {
+    if (price === null || price === undefined) {
+      return `0 ${t("trips.currency")}`;
+    }
     return `${price.toLocaleString()} ${t("trips.currency")}`;
   };
 
@@ -53,7 +56,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
       </div>
       <div className="px-6 py-4">
         <div className="space-y-3 mb-4">
-          {basePrice > 0 && (
+          {(basePrice ?? 0) > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">{t("trips.pricing.basePrice")}</span>
               <span className="text-gray-900 font-medium">
@@ -61,7 +64,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
               </span>
             </div>
           )}
-          {openFee > 0 && (
+          {(openFee ?? 0) > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">{t("trips.pricing.openFee")}</span>
               <span className="text-gray-900 font-medium">
@@ -69,7 +72,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
               </span>
             </div>
           )}
-          {deliveryFee > 0 && (
+          {(deliveryFee ?? 0) > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">{t("trips.pricing.deliveryFee")}</span>
               <span className="text-gray-900 font-medium">
@@ -77,7 +80,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
               </span>
             </div>
           )}
-          {waitingFee > 0 && (
+          {(waitingFee ?? 0) > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">{t("trips.pricing.waitingFee")}</span>
               <span className="text-gray-900 font-medium">
@@ -85,7 +88,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
               </span>
             </div>
           )}
-          {overtimeFee > 0 && (
+          {(overtimeFee ?? 0) > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">{t("trips.pricing.overtimeFee")}</span>
               <span className="text-gray-900 font-medium">
@@ -93,7 +96,7 @@ export const PricingInfoCard: React.FC<PricingInfoCardProps> = ({
               </span>
             </div>
           )}
-          {distanceFee > 0 && (
+          {(distanceFee ?? 0) > 0 && (
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">{t("trips.pricing.distanceFee")}</span>
               <span className="text-gray-900 font-medium">

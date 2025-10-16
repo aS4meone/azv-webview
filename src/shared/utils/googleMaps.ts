@@ -11,9 +11,15 @@ interface GoogleMapsResponse {
 }
 
 export const getAddressFromCoordinates = async (
-  lat: number,
-  lng: number
+  lat: number | null | undefined,
+  lng: number | null | undefined
 ): Promise<string> => {
+  // Проверка на null/undefined
+  if (lat === null || lat === undefined || lng === null || lng === undefined) {
+    console.warn("Invalid coordinates provided:", { lat, lng });
+    return "Координаты недоступны";
+  }
+
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {

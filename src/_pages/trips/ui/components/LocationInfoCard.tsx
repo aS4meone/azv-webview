@@ -3,10 +3,10 @@ import { getAddressFromCoordinates } from "@/shared/utils/googleMaps";
 import { useTranslations } from "next-intl";
 
 interface LocationInfoCardProps {
-  startLatitude: number;
-  startLongitude: number;
-  endLatitude: number;
-  endLongitude: number;
+  startLatitude: number | null;
+  startLongitude: number | null;
+  endLatitude: number | null;
+  endLongitude: number | null;
 }
 
 const MapPinIcon = () => (
@@ -47,10 +47,16 @@ export const LocationInfoCard: React.FC<LocationInfoCardProps> = ({
         setEndAddress(endAddr);
       } catch (error) {
         console.error("Error fetching addresses:", error);
-        setStartAddress(
-          `${startLatitude.toFixed(6)}, ${startLongitude.toFixed(6)}`
-        );
-        setEndAddress(`${endLatitude.toFixed(6)}, ${endLongitude.toFixed(6)}`);
+        // Проверяем на null/undefined перед вызовом toFixed
+        const startCoords = startLatitude !== null && startLongitude !== null
+          ? `${startLatitude.toFixed(6)}, ${startLongitude.toFixed(6)}`
+          : "Координаты недоступны";
+        const endCoords = endLatitude !== null && endLongitude !== null
+          ? `${endLatitude.toFixed(6)}, ${endLongitude.toFixed(6)}`
+          : "Координаты недоступны";
+        
+        setStartAddress(startCoords);
+        setEndAddress(endCoords);
       } finally {
         setLoading(false);
       }
