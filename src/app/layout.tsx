@@ -14,6 +14,7 @@ import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 import { LanguageProvider } from "@/shared/contexts/LanguageContext";
 import { ReactNativeSyncProvider } from "@/shared/components/ReactNativeSyncProvider";
 import { LocalStorageCleanup } from "@/shared/components/LocalStorageCleanup";
+import { DebugConsole } from "@/components/DebugConsole";
 
 // Импортируем click fixer для автоматического исправления кликов в WebView
 import "@/shared/utils/clickFix";
@@ -68,6 +69,8 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <LocalStorageCleanup />
+        {/* Debug Console - только в режиме разработки или для WebView */}
+        <DebugConsole enabled={process.env.NODE_ENV === 'development' || typeof window !== 'undefined' && !!(window as any).ReactNativeWebView} maxLogs={200} />
         <ResponseModalProvider>
           <ModalProvider>
             <NextIntlClientProvider locale={locale as "ru" | "en" | "kz"} messages={messages}>

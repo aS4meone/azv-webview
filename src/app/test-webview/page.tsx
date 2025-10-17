@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { WebViewDiagnostics } from "@/components/WebViewDiagnostics";
+import { DebugConsole } from "@/components/DebugConsole";
 
 export default function TestWebViewPage() {
   const [webViewInfo, setWebViewInfo] = useState<any>({});
@@ -66,8 +67,42 @@ export default function TestWebViewPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
+      {/* Debug Console is always enabled on test page */}
+      <DebugConsole enabled={true} maxLogs={500} />
+      
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Тест WebView</h1>
+        
+        {/* Test buttons for logging */}
+        <div className="bg-white rounded-lg p-4 mb-6">
+          <h2 className="text-lg font-semibold mb-3">Тест логирования:</h2>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => console.log("Test log message", { test: true })}
+              className="px-3 py-2 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+            >
+              Test Log
+            </button>
+            <button
+              onClick={() => console.info("Test info message", { info: "data" })}
+              className="px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+            >
+              Test Info
+            </button>
+            <button
+              onClick={() => console.warn("Test warning message")}
+              className="px-3 py-2 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600"
+            >
+              Test Warn
+            </button>
+            <button
+              onClick={() => console.error("Test error message", new Error("Test error"))}
+              className="px-3 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+            >
+              Test Error
+            </button>
+          </div>
+        </div>
         
         {/* WebView Diagnostics */}
         <div className="mb-6">
