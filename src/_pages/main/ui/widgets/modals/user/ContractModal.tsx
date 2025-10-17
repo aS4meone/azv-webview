@@ -256,6 +256,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         addDebugLog(`🔍 HTML contains DOCTYPE: ${html.includes('<!DOCTYPE')}`, 'info');
         addDebugLog(`🔍 HTML contains body tag: ${html.includes('<body')}`, 'info');
         addDebugLog(`🔍 HTML contains head tag: ${html.includes('<head')}`, 'info');
+        addDebugLog(`🌐 Rendering method: ${isWebView ? 'Direct HTML (WebView)' : 'Iframe (Browser)'}`, 'info');
       } catch (err) {
         addDebugLog(`❌ Error loading HTML: ${err.message}`, 'error');
         addDebugLog(`❌ Failed to load accession_agreement.html: ${err.message}`, 'error');
@@ -361,6 +362,14 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setShowDebugConsole(false);
     }
   }, [isOpen, addDebugLog, isMobile, isWebView, zoom]);
+
+  // Track HTML content changes
+  useEffect(() => {
+    if (htmlContent) {
+      addDebugLog(`🔄 HTML content updated, length: ${htmlContent.length}`, 'info');
+      addDebugLog(`🎯 Rendering with method: ${isWebView ? 'Direct HTML' : 'Iframe'}`, 'info');
+    }
+  }, [htmlContent, isWebView, addDebugLog]);
 
   const handleAccept = useCallback(() => {
     if (agreed) {
@@ -689,37 +698,51 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     minHeight: isMobile ? '100vh' : 'auto', // Ensure full height on mobile
                   }}
                 >
-                  <iframe
-                    ref={iframeRef}
-                    srcDoc={htmlContent}
-                    className={`w-full ${isWebView ? 'webview-optimized' : ''}`}
-                    style={{ 
-                      height: `${iframeHeight}px`,
-                      border: 'none',
-                      display: 'block',
-                      WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
-                      ...(isWebView && {
-                        // WebView-specific optimizations
+                  {isWebView ? (
+                    // For WebView, use direct HTML rendering instead of iframe
+                    <div
+                      className="w-full webview-optimized"
+                      style={{
+                        height: `${iframeHeight}px`,
+                        overflow: 'auto',
+                        WebkitOverflowScrolling: 'touch',
                         transform: 'translate3d(0,0,0)',
                         WebkitTransform: 'translate3d(0,0,0)',
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
-                      })
-                    }}
-                    title="Filled Agreement Document"
-                    sandbox="allow-same-origin allow-scripts allow-forms"
-                    allow="fullscreen"
-                    onError={() => {
-                      addDebugLog('❌ Iframe load error - iframe failed to load content', 'error');
-                      addDebugLog(`🔍 Iframe srcDoc length: ${htmlContent.length}`, 'info');
-                      setIframeLoadError(true);
-                    }}
-                    onLoad={() => {
-                      addDebugLog('✅ Iframe loaded successfully - content displayed', 'success');
-                      addDebugLog(`🔍 Iframe dimensions: ${iframeRef.current?.offsetWidth}x${iframeRef.current?.offsetHeight}`, 'info');
-                      setIframeLoadError(false);
-                    }}
-                  />
+                      }}
+                      dangerouslySetInnerHTML={{ __html: htmlContent }}
+                      onLoad={() => {
+                        addDebugLog('✅ Direct HTML rendering completed in WebView', 'success');
+                      }}
+                    />
+                  ) : (
+                    // For regular browsers, use iframe
+                    <iframe
+                      ref={iframeRef}
+                      srcDoc={htmlContent}
+                      className="w-full"
+                      style={{ 
+                        height: `${iframeHeight}px`,
+                        border: 'none',
+                        display: 'block',
+                        WebkitOverflowScrolling: 'touch',
+                      }}
+                      title="Filled Agreement Document"
+                      sandbox="allow-same-origin allow-scripts allow-forms"
+                      allow="fullscreen"
+                      onError={() => {
+                        addDebugLog('❌ Iframe load error - iframe failed to load content', 'error');
+                        addDebugLog(`🔍 Iframe srcDoc length: ${htmlContent.length}`, 'info');
+                        setIframeLoadError(true);
+                      }}
+                      onLoad={() => {
+                        addDebugLog('✅ Iframe loaded successfully - content displayed', 'success');
+                        addDebugLog(`🔍 Iframe dimensions: ${iframeRef.current?.offsetWidth}x${iframeRef.current?.offsetHeight}`, 'info');
+                        setIframeLoadError(false);
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             </>
