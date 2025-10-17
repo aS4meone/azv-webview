@@ -77,6 +77,9 @@ importers:
       next-intl:
         specifier: ^4.1.0
         version: 4.1.0(next@15.3.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(typescript@5.8.3)
+      pdf-lib:
+        specifier: ^1.17.1
+        version: 1.17.1
       pdfjs-dist:
         specifier: ^5.3.31
         version: 5.3.31
@@ -776,6 +779,12 @@ packages:
 
   '@orval/zod@7.9.0':
     resolution: {integrity: sha512-LkkofL+iSswsBVWCr3bPZ6un8065wB7x34DZVnF/gN3kBxy8A35I9X0Eld4EajI/1rbMmxzt7wHUYAf5NlJWHQ==}
+
+  '@pdf-lib/standard-fonts@1.0.0':
+    resolution: {integrity: sha512-hU30BK9IUN/su0Mn9VdlVKsWBS6GyhVfqjwl1FjZN4TxP6cCw0jP2w7V3Hf5uX7M0AZJ16vey9yE0ny7Sa59ZA==}
+
+  '@pdf-lib/upng@1.0.1':
+    resolution: {integrity: sha512-dQK2FUMQtowVP00mtIksrlZhdFXQZPC+taih1q4CvPZ5vqdxR/LKBaFg0oAfzd1GlHZXXSPdQfzQnt+ViGvEIQ==}
 
   '@pdf-viewer/react@1.6.1':
     resolution: {integrity: sha512-R7/qnNwD83v4269M8jEeVOje9vr7+4hxlksKqcaOgEK6LL0EJA9rZ22BIpE2UZyUfEtOVZNCYQOQtgVBi6wTqA==}
@@ -3250,6 +3259,9 @@ packages:
     resolution: {integrity: sha512-+vnG6S4dYcYxZd+CZxzXCNKdELYZSKfohrk98yajCo1PtRoDgCTrrwOvK1GT0UoAdVszagDVllQc0U1vaX4NUQ==}
     engines: {node: '>=6'}
 
+  pdf-lib@1.17.1:
+    resolution: {integrity: sha512-V/mpyJAoTsN4cnP31vc0wfNA1+p20evqqnap0KLoRUN0Yk/p3wN52DOEsL4oBFcLdb76hlpKPtzJIgo67j/XLw==}
+
   pdfjs-dist@4.8.69:
     resolution: {integrity: sha512-IHZsA4T7YElCKNNXtiLgqScw4zPd3pG9do8UrznC757gMd7UPeHSL2qwNNMJo4r79fl8oj1Xx+1nh2YkzdMpLQ==}
     engines: {node: '>=18'}
@@ -4538,6 +4550,14 @@ snapshots:
       - encoding
       - openapi-types
       - supports-color
+
+  '@pdf-lib/standard-fonts@1.0.0':
+    dependencies:
+      pako: 1.0.11
+
+  '@pdf-lib/upng@1.0.1':
+    dependencies:
+      pako: 1.0.11
 
   '@pdf-viewer/react@1.6.1(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(pdfjs-dist@5.3.31)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -7326,6 +7346,13 @@ snapshots:
 
   path2d@0.2.2:
     optional: true
+
+  pdf-lib@1.17.1:
+    dependencies:
+      '@pdf-lib/standard-fonts': 1.0.0
+      '@pdf-lib/upng': 1.0.1
+      pako: 1.0.11
+      tslib: 1.14.1
 
   pdfjs-dist@4.8.69:
     optionalDependencies:

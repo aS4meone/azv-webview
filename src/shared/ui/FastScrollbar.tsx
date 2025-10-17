@@ -43,7 +43,8 @@ export const FastScrollbar: React.FC<FastScrollbarProps> = ({
     
     if (scrollable) {
       const thumbHeightRatio = clientHeight / scrollHeight;
-      const thumbHeight = Math.max(20, clientHeight * thumbHeightRatio);
+      // Увеличиваем минимальный размер ползунка для удобного скролла
+      const thumbHeight = Math.max(100, clientHeight * thumbHeightRatio);
       const thumbTop = (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - thumbHeight);
       
       setThumbHeight(thumbHeight);
@@ -152,7 +153,7 @@ export const FastScrollbar: React.FC<FastScrollbarProps> = ({
       {showScrollbar && (
         <div
           className={cn(
-            'w-3 flex-shrink-0 transition-opacity duration-200',
+            'w-5 flex-shrink-0 transition-opacity duration-200',
             isHovered || isDragging ? 'opacity-100' : 'opacity-70'
           )}
           onMouseEnter={() => setIsHovered(true)}
