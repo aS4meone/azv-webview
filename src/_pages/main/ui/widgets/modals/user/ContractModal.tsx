@@ -252,6 +252,10 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         setHtmlContent(html);
         setLoading(false);
         addDebugLog('✅ HTML content set successfully, ready for display', 'success');
+        addDebugLog(`📊 HTML content length: ${html.length} characters`, 'info');
+        addDebugLog(`🔍 HTML contains DOCTYPE: ${html.includes('<!DOCTYPE')}`, 'info');
+        addDebugLog(`🔍 HTML contains body tag: ${html.includes('<body')}`, 'info');
+        addDebugLog(`🔍 HTML contains head tag: ${html.includes('<head')}`, 'info');
       } catch (err) {
         addDebugLog(`❌ Error loading HTML: ${err.message}`, 'error');
         addDebugLog(`❌ Failed to load accession_agreement.html: ${err.message}`, 'error');
@@ -281,10 +285,14 @@ export const ContractModal: React.FC<ContractModalProps> = ({
             iframeDoc.body.offsetHeight,
             iframeDoc.documentElement.offsetHeight
           );
-          setIframeHeight(contentHeight + 50); // Add some padding
+          const newHeight = contentHeight + 50;
+          setIframeHeight(newHeight);
+          addDebugLog(`📏 Iframe height adjusted to: ${newHeight}px`, 'info');
+        } else {
+          addDebugLog('⚠️ Cannot access iframe document for height adjustment', 'warning');
         }
       } catch (err) {
-        console.error('Error adjusting iframe height:', err);
+        addDebugLog(`❌ Error adjusting iframe height: ${err.message}`, 'error');
         // Fallback to default height if we can't access iframe content
         setIframeHeight(2500);
       }
@@ -344,13 +352,15 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       addDebugLog('🚀 ContractModal opened - initializing state', 'info');
+      addDebugLog(`📱 Device info: Mobile=${isMobile}, WebView=${isWebView}`, 'info');
+      addDebugLog(`🔍 Initial zoom: ${Math.round(zoom * 100)}%`, 'info');
       setAgreed(false);
       setHasScrolledToEnd(false);
       setError(false);
       setIframeLoadError(false);
       setShowDebugConsole(false);
     }
-  }, [isOpen, addDebugLog]);
+  }, [isOpen, addDebugLog, isMobile, isWebView, zoom]);
 
   const handleAccept = useCallback(() => {
     if (agreed) {
@@ -375,16 +385,25 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   }, [hasScrolledToEnd, addDebugLog]);
 
   const handleZoomIn = useCallback(() => {
-    setZoom(prev => Math.min(prev + 0.1, 2)); // Max 200%
-  }, []);
+    setZoom(prev => {
+      const newZoom = Math.min(prev + 0.1, 2);
+      addDebugLog(`🔍 Zoom increased to: ${Math.round(newZoom * 100)}%`, 'info');
+      return newZoom;
+    });
+  }, [addDebugLog]);
 
   const handleZoomOut = useCallback(() => {
-    setZoom(prev => Math.max(prev - 0.1, 0.3)); // Min 30% for all devices
-  }, []);
+    setZoom(prev => {
+      const newZoom = Math.max(prev - 0.1, 0.3);
+      addDebugLog(`🔍 Zoom decreased to: ${Math.round(newZoom * 100)}%`, 'info');
+      return newZoom;
+    });
+  }, [addDebugLog]);
 
   const handleResetZoom = useCallback(() => {
+    addDebugLog('🔍 Zoom reset to: 30%', 'info');
     setZoom(0.3); // Reset to 30% for all devices
-  }, []);
+  }, [addDebugLog]);
 
   const handleDownloadHTML = useCallback(() => {
     const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -497,23 +516,44 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           </button>
         </div>
 
-        {/* Debug Console */}
+        {/* Debug Console - Fixed positioning */}
         {showDebugConsole && (
-          <div className="bg-gray-900 text-green-400 p-4 max-h-40 overflow-y-auto font-mono text-xs border-b">
+          <div className="absolute top-16 left-4 right-4 z-50 bg-gray-900 text-green-400 p-4 max-h-60 overflow-y-auto font-mono text-xs border rounded-lg shadow-lg">
             <div className="flex justify-between items-center mb-2">
               <span className="text-yellow-400 font-bold">🐛 DEBUG CONSOLE</span>
-              <button
-                onClick={() => setDebugLogs([])}
-                className="px-2 py-1 bg-red-600 text-white rounded text-xs"
-              >
-                Очистить
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    const allLogs = debugLogs.join('\n');
+                    navigator.clipboard.writeText(allLogs).then(() => {
+                      addDebugLog('📋 Логи скопированы в буфер обмена', 'success');
+                    }).catch(() => {
+                      addDebugLog('❌ Ошибка копирования логов', 'error');
+                    });
+                  }}
+                  className="px-2 py-1 bg-blue-600 text-white rounded text-xs"
+                >
+                  Копировать
+                </button>
+                <button
+                  onClick={() => setDebugLogs([])}
+                  className="px-2 py-1 bg-red-600 text-white rounded text-xs"
+                >
+                  Очистить
+                </button>
+                <button
+                  onClick={() => setShowDebugConsole(false)}
+                  className="px-2 py-1 bg-gray-600 text-white rounded text-xs"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
             {debugLogs.length === 0 ? (
               <div className="text-gray-500">Нет логов...</div>
             ) : (
               debugLogs.map((log, index) => (
-                <div key={index} className="mb-1">
+                <div key={index} className="mb-1 break-words">
                   {log}
                 </div>
               ))
@@ -522,7 +562,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         )}
 
         {/* HTML Content */}
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-hidden relative" style={{ marginTop: showDebugConsole ? '200px' : '0' }}>
           {loading ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12 h-full">
               <div className="flex items-center gap-3 text-gray-600">
@@ -671,10 +711,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     allow="fullscreen"
                     onError={() => {
                       addDebugLog('❌ Iframe load error - iframe failed to load content', 'error');
+                      addDebugLog(`🔍 Iframe srcDoc length: ${htmlContent.length}`, 'info');
                       setIframeLoadError(true);
                     }}
                     onLoad={() => {
                       addDebugLog('✅ Iframe loaded successfully - content displayed', 'success');
+                      addDebugLog(`🔍 Iframe dimensions: ${iframeRef.current?.offsetWidth}x${iframeRef.current?.offsetHeight}`, 'info');
                       setIframeLoadError(false);
                     }}
                   />
