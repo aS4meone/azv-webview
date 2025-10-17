@@ -251,17 +251,46 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta charset="UTF-8">
                 <style>
+                  * { box-sizing: border-box; }
+                  html, body { 
+                    margin: 0; 
+                    padding: 0; 
+                    width: 100%; 
+                    height: auto; 
+                    min-height: auto;
+                    position: relative;
+                    z-index: 1;
+                  }
                   body { 
                     font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
                     padding: 20px; 
                     line-height: 1.6;
                     font-size: 16px;
-                    margin: 0;
                     background: white;
+                    overflow: visible;
                   }
-                  .header { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-                  .content { margin-bottom: 20px; }
-                  .error { color: #d32f2f; background: #ffebee; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                  .header { 
+                    background: #f0f0f0; 
+                    padding: 15px; 
+                    margin-bottom: 20px; 
+                    border-radius: 8px; 
+                    position: relative;
+                    z-index: 1;
+                  }
+                  .content { 
+                    margin-bottom: 20px; 
+                    position: relative;
+                    z-index: 1;
+                  }
+                  .error { 
+                    color: #d32f2f; 
+                    background: #ffebee; 
+                    padding: 15px; 
+                    border-radius: 8px; 
+                    margin: 20px 0; 
+                    position: relative;
+                    z-index: 1;
+                  }
                 </style>
               </head>
               <body>
@@ -276,7 +305,6 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   <h3>⚠️ WebView режим</h3>
                   <p>Документ отображается в упрощенном виде, оптимизированном для мобильного приложения.</p>
                   <p>Для просмотра полного документа используйте кнопку "Открыть в браузере".</p>
-                  <p><small>Ошибка загрузки: ${err.message}</small></p>
                 </div>
                 <div class="content">
                   <h2>Основные условия договора:</h2>
@@ -401,10 +429,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setHasScrolledToEnd(false);
       setError(false);
       setIframeLoadError(false);
-      // For WebView, start with direct HTML mode
-      setUseDirectHTML(isWebView);
+      setUseDirectHTML(false); // Всегда начинаем с iframe, fallback только при ошибке
     }
-  }, [isOpen, isWebView]);
+  }, [isOpen]);
 
   const handleAccept = useCallback(() => {
     if (agreed) {
@@ -538,7 +565,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         </div>
 
         {/* HTML Content */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
           {loading ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12 h-full">
               <div className="flex items-center gap-3 text-gray-600">
@@ -619,98 +646,17 @@ export const ContractModal: React.FC<ContractModalProps> = ({
               </div>
             </div>
           ) : useDirectHTML ? (
-            <>
-              {/* Direct HTML rendering for WebView fallback */}
-              <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-3 flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  {isWebView ? "WebView режим: прямой HTML" : "Документ отображается в упрощенном режиме"}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setUseDirectHTML(false)}
-                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-700"
-                  >
-                    Попробовать iframe
-                  </button>
-                  {isWebView && (
-                    <button
-                      onClick={() => {
-                        // Force reload with simplified HTML
-                        setHtmlContent('');
-                        setLoading(true);
-                        setTimeout(() => {
-                          const simplifiedHTML = `
-                            <!DOCTYPE html>
-                            <html>
-                              <head>
-                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                <meta charset="UTF-8">
-                                <style>
-                                  body { 
-                                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-                                    padding: 20px; 
-                                    line-height: 1.6;
-                                    font-size: 16px;
-                                    margin: 0;
-                                    background: white;
-                                  }
-                                  .header { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-                                  .content { margin-bottom: 20px; }
-                                </style>
-                              </head>
-                              <body>
-                                <div class="header">
-                                  <h1>Договор аренды автотранспортного средства</h1>
-                                  <p><strong>Клиент:</strong> ${full_name}</p>
-                                  <p><strong>Логин:</strong> ${login}</p>
-                                  <p><strong>ID клиента:</strong> ${client_id}</p>
-                                  <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
-                                </div>
-                                <div class="content">
-                                  <h2>Основные условия договора:</h2>
-                                  <p>1. Арендатор: ${full_name}</p>
-                                  <p>2. Предмет аренды: Автотранспортное средство</p>
-                                  <p>3. Срок аренды: Согласно условиям приложения</p>
-                                  <p>4. Стоимость: Согласно тарифам</p>
-                                  <p>5. Ответственность: Согласно действующему законодательству</p>
-                                  
-                                  <h2>Обязательства сторон:</h2>
-                                  <p>• Арендатор обязуется использовать транспортное средство по назначению</p>
-                                  <p>• Арендатор несет ответственность за сохранность имущества</p>
-                                  <p>• Арендодатель предоставляет исправное транспортное средство</p>
-                                  
-                                  <h2>Заключение:</h2>
-                                  <p>Настоящий договор вступает в силу с момента подписания и действует до полного исполнения обязательств сторонами.</p>
-                                  
-                                  <div style="margin-top: 40px; padding: 20px; border: 2px solid #1976d2; border-radius: 8px; text-align: center;">
-                                    <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
-                                    <p><strong>Дата:</strong> ${new Date().toLocaleDateString('ru-RU')}</p>
-                                  </div>
-                                </div>
-                              </body>
-                            </html>
-                          `;
-                          setHtmlContent(simplifiedHTML);
-                          setLoading(false);
-                        }, 100);
-                      }}
-                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded text-sm text-blue-700"
-                    >
-                      Упрощенная версия
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div 
-                ref={scrollContainerRef}
-                className="w-full h-full p-4 max-h-[850px] overflow-auto"
-                onScroll={handleScroll}
-                style={{
-                  WebkitOverflowScrolling: 'touch',
-                }}
-                dangerouslySetInnerHTML={{ __html: htmlContent }}
-              />
-            </>
+            <div 
+              ref={scrollContainerRef}
+              className="w-full h-full p-4 max-h-[850px] overflow-auto"
+              onScroll={handleScroll}
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                position: 'relative',
+                zIndex: 1,
+              }}
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
           ) : (
             <>
               {/* Zoom Controls */}
@@ -745,18 +691,8 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     Сбросить
                   </button>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-gray-500">
-                    {isWebView ? "Проведите пальцем для прокрутки" : isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
-                  </div>
-                  {isWebView && (
-                    <button
-                      onClick={() => setUseDirectHTML(true)}
-                      className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                    >
-                      Показать как текст
-                    </button>
-                  )}
+                <div className="text-xs text-gray-500 text-center">
+                  {isWebView ? "Проведите пальцем для прокрутки" : isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
                 </div>
               </div>
 
@@ -818,7 +754,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           )}
         </div>
 
-        <div className="p-4 bg-white border-t border-gray-200">
+        <div className="p-4 bg-white border-t border-gray-200 relative z-10">
           {!hasScrolledToEnd && (
             <p className="text-xs text-gray-500 my-3">
               {t("widgets.modals.contract.readToEnd")}
