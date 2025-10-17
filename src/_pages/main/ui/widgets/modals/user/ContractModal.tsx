@@ -35,15 +35,17 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isWebView, setIsWebView] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
-  const [zoom, setZoom] = useState(0.3); // Will be updated when isMobile is determined
+  const [zoom, setZoom] = useState(0.3); // Default 30% for all devices
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeHeight, setIframeHeight] = useState<number>(2500);
   const [iframeLoadError, setIframeLoadError] = useState(false);
+  const [useDirectHTML, setUseDirectHTML] = useState(false);
 
   // Load and fill HTML
   useEffect(() => {
@@ -136,6 +138,20 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     -webkit-font-smoothing: antialiased;
                   }
                 }
+                /* WebView-specific fixes */
+                @media screen and (-webkit-min-device-pixel-ratio: 0) {
+                  body {
+                    -webkit-transform: translateZ(0);
+                    transform: translateZ(0);
+                  }
+                }
+                /* Force hardware acceleration for WebView */
+                .webview-optimized {
+                  -webkit-transform: translate3d(0,0,0);
+                  transform: translate3d(0,0,0);
+                  -webkit-backface-visibility: hidden;
+                  backface-visibility: hidden;
+                }
               </style>`
           );
         }
@@ -204,8 +220,22 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       const mobile = isMobileDevice || isSmallScreen;
       setIsMobile(mobile);
       
-      // Update zoom based on device type
-      setZoom(mobile ? 1.0 : 0.3);
+      // Check if running in WebView (iOS/Android app)
+      const isInWebView = !!(window as any).ReactNativeWebView || 
+                         !!(window as any).webkit?.messageHandlers ||
+                         /wv|WebView/i.test(navigator.userAgent);
+      setIsWebView(isInWebView);
+      
+      console.log('🔍 Device detection:', {
+        isMobile: mobile,
+        isWebView: isInWebView,
+        userAgent: navigator.userAgent,
+        hasReactNativeWebView: !!(window as any).ReactNativeWebView,
+        hasWebKitHandlers: !!(window as any).webkit?.messageHandlers
+      });
+      
+      // Keep zoom at 30% for all devices (WebView compatibility)
+      setZoom(0.3);
     };
 
     checkMobile();
@@ -223,6 +253,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setHasScrolledToEnd(false);
       setError(false);
       setIframeLoadError(false);
+      setUseDirectHTML(false);
     }
   }, [isOpen]);
 
@@ -246,12 +277,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   }, []);
 
   const handleZoomOut = useCallback(() => {
-    setZoom(prev => Math.max(prev - 0.1, isMobile ? 0.5 : 0.3)); // Min 50% on mobile, 30% on desktop
-  }, [isMobile]);
+    setZoom(prev => Math.max(prev - 0.1, 0.3)); // Min 30% for all devices
+  }, []);
 
   const handleResetZoom = useCallback(() => {
-    setZoom(isMobile ? 1.0 : 0.3); // Reset to 100% on mobile, 30% on desktop
-  }, [isMobile]);
+    setZoom(0.3); // Reset to 30% for all devices
+  }, []);
 
   const handleDownloadHTML = useCallback(() => {
     const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -401,7 +432,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 </div>
               )}
             </div>
-          ) : iframeLoadError ? (
+          ) : (iframeLoadError && !useDirectHTML) ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12 h-full">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
@@ -419,14 +450,49 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     Открыть в браузере
                   </button>
                   <button
-                    onClick={() => setIframeLoadError(false)}
+                    onClick={() => {
+                      setIframeLoadError(false);
+                      setUseDirectHTML(false);
+                    }}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm"
                   >
                     Попробовать снова
                   </button>
+                  {isWebView && (
+                    <button
+                      onClick={() => setUseDirectHTML(true)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm"
+                    >
+                      Показать как текст
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
+          ) : useDirectHTML ? (
+            <>
+              {/* Direct HTML rendering for WebView fallback */}
+              <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-3 flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Документ отображается в упрощенном режиме
+                </div>
+                <button
+                  onClick={() => setUseDirectHTML(false)}
+                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-700"
+                >
+                  Попробовать iframe
+                </button>
+              </div>
+              <div 
+                ref={scrollContainerRef}
+                className="w-full h-full p-4 max-h-[850px] overflow-auto"
+                onScroll={handleScroll}
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                }}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
+            </>
           ) : (
             <>
               {/* Zoom Controls */}
@@ -462,7 +528,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   </button>
                 </div>
                 <div className="text-xs text-gray-500">
-                  {isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
+                  {isWebView ? "Проведите пальцем для прокрутки" : isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
                 </div>
               </div>
 
@@ -486,19 +552,31 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   <iframe
                     ref={iframeRef}
                     srcDoc={htmlContent}
-                    className="w-full"
+                    className={`w-full ${isWebView ? 'webview-optimized' : ''}`}
                     style={{ 
                       height: `${iframeHeight}px`,
                       border: 'none',
                       display: 'block',
                       WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
+                      ...(isWebView && {
+                        // WebView-specific optimizations
+                        transform: 'translate3d(0,0,0)',
+                        WebkitTransform: 'translate3d(0,0,0)',
+                        backfaceVisibility: 'hidden',
+                        WebkitBackfaceVisibility: 'hidden',
+                      })
                     }}
                     title="Filled Agreement Document"
-                    sandbox="allow-same-origin allow-scripts"
+                    sandbox="allow-same-origin allow-scripts allow-forms"
                     allow="fullscreen"
                     onError={() => {
                       console.error('❌ Iframe load error');
                       setIframeLoadError(true);
+                      // For WebView, try direct HTML rendering as fallback
+                      if (isWebView) {
+                        console.log('🔄 WebView detected, trying direct HTML rendering');
+                        setUseDirectHTML(true);
+                      }
                     }}
                     onLoad={() => {
                       console.log('✅ Iframe loaded successfully');
