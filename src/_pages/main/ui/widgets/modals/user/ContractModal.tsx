@@ -45,7 +45,6 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeHeight, setIframeHeight] = useState<number>(2500);
   const [iframeLoadError, setIframeLoadError] = useState(false);
-  const [useDirectHTML, setUseDirectHTML] = useState(false);
 
   // Load and fill HTML
   useEffect(() => {
@@ -62,226 +61,88 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           hasWebKitHandlers: !!(window as any).webkit?.messageHandlers
         });
 
-        let html = '';
-
-        // For WebView, use simplified approach first
-        if (isWebView) {
-          console.log('🔄 WebView detected, using simplified HTML approach');
-          
-          // Create simplified HTML directly
-          html = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta charset="UTF-8">
-                <style>
-                  * { box-sizing: border-box; }
-                  html, body { 
-                    margin: 0; 
-                    padding: 0; 
-                    width: 100%; 
-                    height: auto; 
-                    min-height: auto;
-                    position: relative;
-                    z-index: 1;
-                  }
-                  body { 
-                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-                    padding: 20px; 
-                    line-height: 1.6;
-                    font-size: 16px;
-                    background: white;
-                    overflow: visible;
-                  }
-                  .header { 
-                    background: #f0f0f0; 
-                    padding: 15px; 
-                    margin-bottom: 20px; 
-                    border-radius: 8px; 
-                    position: relative;
-                    z-index: 1;
-                  }
-                  .content { 
-                    margin-bottom: 20px; 
-                    position: relative;
-                    z-index: 1;
-                  }
-                  .section {
-                    margin-bottom: 25px;
-                    padding: 15px;
-                    border: 1px solid #e0e0e0;
-                    border-radius: 8px;
-                    background: #fafafa;
-                  }
-                  .section h2 {
-                    color: #1976d2;
-                    margin-top: 0;
-                    margin-bottom: 15px;
-                    font-size: 18px;
-                  }
-                  .section p {
-                    margin-bottom: 10px;
-                    line-height: 1.6;
-                  }
-                  .signature {
-                    margin-top: 30px;
-                    padding: 20px;
-                    border: 2px solid #1976d2;
-                    border-radius: 8px;
-                    text-align: center;
-                    background: #f8f9ff;
-                  }
-                </style>
-              </head>
-              <body>
-                <div class="header">
-                  <h1>Договор аренды автотранспортного средства</h1>
-                  <p><strong>Клиент:</strong> ${full_name}</p>
-                  <p><strong>Логин:</strong> ${login}</p>
-                  <p><strong>ID клиента:</strong> ${client_id}</p>
-                  <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
-                </div>
+        // For WebView, try different approaches
+        let response;
+        try {
+          response = await fetch('/docs/new/accession_agreement.html', {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'Cache-Control': 'no-cache',
+            },
+            cache: 'no-cache'
+          });
+        } catch (fetchError) {
+          console.error('❌ Fetch error:', fetchError);
+          // Try alternative approach for WebView
+          if (isWebView) {
+            console.log('🔄 Trying XMLHttpRequest for WebView');
+            try {
+              const xhrResponse = await new Promise<string>((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', '/docs/new/accession_agreement.html', true);
+                xhr.setRequestHeader('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+                xhr.setRequestHeader('Cache-Control', 'no-cache');
                 
-                <div class="content">
-                  <div class="section">
-                    <h2>1. Предмет договора</h2>
-                    <p>1.1. Арендодатель предоставляет, а Арендатор принимает в аренду автотранспортное средство на условиях, определенных настоящим договором.</p>
-                    <p>1.2. Арендатор: ${full_name}</p>
-                    <p>1.3. Арендодатель: Товарищество с ограниченной ответственностью "AZV Motors"</p>
-                  </div>
-
-                  <div class="section">
-                    <h2>2. Срок аренды</h2>
-                    <p>2.1. Срок аренды определяется в соответствии с условиями приложения и может быть продлен по соглашению сторон.</p>
-                    <p>2.2. Аренда начинается с момента подписания настоящего договора.</p>
-                  </div>
-
-                  <div class="section">
-                    <h2>3. Стоимость и порядок расчетов</h2>
-                    <p>3.1. Стоимость аренды определяется в соответствии с действующими тарифами.</p>
-                    <p>3.2. Расчеты производятся в соответствии с условиями приложения.</p>
-                  </div>
-
-                  <div class="section">
-                    <h2>4. Обязательства сторон</h2>
-                    <p>4.1. Арендатор обязуется:</p>
-                    <p>• Использовать транспортное средство по назначению</p>
-                    <p>• Соблюдать правила дорожного движения</p>
-                    <p>• Нести ответственность за сохранность имущества</p>
-                    <p>• Своевременно производить платежи</p>
-                    
-                    <p>4.2. Арендодатель обязуется:</p>
-                    <p>• Предоставить исправное транспортное средство</p>
-                    <p>• Обеспечить техническое обслуживание</p>
-                    <p>• Соблюдать условия договора</p>
-                  </div>
-
-                  <div class="section">
-                    <h2>5. Ответственность</h2>
-                    <p>5.1. Стороны несут ответственность в соответствии с действующим законодательством Республики Казахстан.</p>
-                    <p>5.2. Арендатор несет полную материальную ответственность за ущерб, причиненный транспортному средству.</p>
-                  </div>
-
-                  <div class="section">
-                    <h2>6. Заключительные положения</h2>
-                    <p>6.1. Настоящий договор вступает в силу с момента подписания.</p>
-                    <p>6.2. Договор действует до полного исполнения обязательств сторонами.</p>
-                    <p>6.3. Все споры решаются путем переговоров, а при недостижении согласия - в судебном порядке.</p>
-                  </div>
-
-                  <div class="signature">
-                    <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
-                    <p><strong>Дата подписания:</strong> ${new Date().toLocaleDateString('ru-RU')}</p>
-                    <p><strong>Время подписания:</strong> ${new Date().toLocaleTimeString('ru-RU')}</p>
-                  </div>
-                </div>
-              </body>
-            </html>
-          `;
-          
-          console.log('✅ Simplified HTML created for WebView, length:', html.length);
-        } else {
-          // For regular browsers, try to load the full HTML file
-          try {
-            const response = await fetch('/docs/new/accession_agreement.html', {
-              method: 'GET',
-              headers: {
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Cache-Control': 'no-cache',
-              },
-              cache: 'no-cache'
-            });
-            
-            console.log('📡 Response status:', response.status, response.statusText);
+                xhr.onreadystatechange = function() {
+                  if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                      console.log('✅ XMLHttpRequest success');
+                      resolve(xhr.responseText);
+                    } else {
+                      console.error('❌ XMLHttpRequest error:', xhr.status, xhr.statusText);
+                      reject(new Error(`XMLHttpRequest failed: ${xhr.status} ${xhr.statusText}`));
+                    }
+                  }
+                };
+                
+                xhr.onerror = function() {
+                  console.error('❌ XMLHttpRequest network error');
+                  reject(new Error('XMLHttpRequest network error'));
+                };
+                
+                xhr.send();
+              });
+              
+              response = {
+                ok: true,
+                status: 200,
+                statusText: 'OK',
+                text: () => Promise.resolve(xhrResponse),
+                headers: new Headers()
+              } as any;
+              
+              console.log('✅ XMLHttpRequest loaded HTML, length:', xhrResponse.length);
+            } catch (xhrError) {
+              console.error('❌ XMLHttpRequest also failed:', xhrError);
+              throw new Error('Both fetch and XMLHttpRequest failed in WebView');
+            }
+          } else {
+            throw fetchError;
+          }
+        }
+        
+        console.log('📡 Response status:', response.status, response.statusText);
+        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (!response.ok) {
-              throw new Error(`Failed to load HTML file: ${response.status} ${response.statusText}`);
+          throw new Error(`Failed to load HTML file: ${response.status} ${response.statusText}`);
         }
 
-            html = await response.text();
-            console.log('📄 HTML loaded, length:', html.length);
+        let html = await response.text();
+        console.log('📄 HTML loaded, length:', html.length);
+        console.log('📄 HTML preview (first 200 chars):', html.substring(0, 200));
+        
+        // Additional validation for WebView
+        if (isWebView && (!html || html.length < 100)) {
+          console.warn('⚠️ HTML content seems too short for WebView, might be incomplete');
+        }
 
         // Replace placeholders with actual data
         html = html.replace(/\$\{full_name\}/g, full_name);
         html = html.replace(/\$\{login\}/g, login);
         html = html.replace(/\$\{client_id\}/g, client_id);
         html = html.replace(/\$\{digital_signature\}/g, digital_signature);
-          } catch (fetchError) {
-            console.error('❌ Fetch error, falling back to simplified HTML:', fetchError);
-            // Fallback to simplified HTML
-            html = `
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <meta charset="UTF-8">
-                  <style>
-                    body { 
-                      font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-                      padding: 20px; 
-                      line-height: 1.6;
-                      font-size: 16px;
-                      background: white;
-                    }
-                    .header { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-                    .content { margin-bottom: 20px; }
-                  </style>
-                </head>
-                <body>
-                  <div class="header">
-                    <h1>Договор аренды автотранспортного средства</h1>
-                    <p><strong>Клиент:</strong> ${full_name}</p>
-                    <p><strong>Логин:</strong> ${login}</p>
-                    <p><strong>ID клиента:</strong> ${client_id}</p>
-                    <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
-                  </div>
-                  <div class="content">
-                    <h2>Основные условия договора:</h2>
-                    <p>1. Арендатор: ${full_name}</p>
-                    <p>2. Предмет аренды: Автотранспортное средство</p>
-                    <p>3. Срок аренды: Согласно условиям приложения</p>
-                    <p>4. Стоимость: Согласно тарифам</p>
-                    <p>5. Ответственность: Согласно действующему законодательству</p>
-                    
-                    <h2>Обязательства сторон:</h2>
-                    <p>• Арендатор обязуется использовать транспортное средство по назначению</p>
-                    <p>• Арендатор несет ответственность за сохранность имущества</p>
-                    <p>• Арендодатель предоставляет исправное транспортное средство</p>
-                    
-                    <h2>Заключение:</h2>
-                    <p>Настоящий договор вступает в силу с момента подписания и действует до полного исполнения обязательств сторонами.</p>
-                    
-                    <div style="margin-top: 40px; padding: 20px; border: 2px solid #1976d2; border-radius: 8px; text-align: center;">
-                      <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
-                      <p><strong>Дата:</strong> ${new Date().toLocaleDateString('ru-RU')}</p>
-                    </div>
-                  </div>
-                </body>
-              </html>
-            `;
-          }
-        }
 
         // Add viewport meta tag and responsive styles if not present
         if (!html.includes('viewport')) {
@@ -372,6 +233,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         console.log('✅ HTML content set successfully');
       } catch (err) {
         console.error('❌ Error loading HTML:', err);
+        
+        // Show error for any failure to load the original HTML file
+        console.error('❌ Failed to load accession_agreement.html:', err);
         setError(true);
         setLoading(false);
       }
@@ -464,10 +328,8 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setHasScrolledToEnd(false);
       setError(false);
       setIframeLoadError(false);
-      // For WebView, always use direct HTML. For browsers, try iframe first
-      setUseDirectHTML(isWebView);
     }
-  }, [isOpen, isWebView]);
+  }, [isOpen]);
 
   const handleAccept = useCallback(() => {
     if (agreed) {
@@ -644,7 +506,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 </div>
               )}
             </div>
-          ) : (iframeLoadError && !useDirectHTML) ? (
+          ) : iframeLoadError ? (
             <div className="flex flex-col items-center justify-center gap-4 py-12 h-full">
               <div className="text-center space-y-4">
                 <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
@@ -664,35 +526,14 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   <button
                     onClick={() => {
                       setIframeLoadError(false);
-                      setUseDirectHTML(false);
                     }}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm"
                   >
                     Попробовать снова
                   </button>
-                  {isWebView && (
-                    <button
-                      onClick={() => setUseDirectHTML(true)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm"
-                    >
-                      Показать как текст
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
-          ) : useDirectHTML ? (
-            <div 
-              ref={scrollContainerRef}
-              className="w-full h-full p-4 max-h-[850px] overflow-auto"
-              onScroll={handleScroll}
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                position: 'relative',
-                zIndex: 1,
-              }}
-              dangerouslySetInnerHTML={{ __html: htmlContent }}
-            />
           ) : (
             <>
               {/* Zoom Controls */}
@@ -772,12 +613,6 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     onError={() => {
                       console.error('❌ Iframe load error');
                       setIframeLoadError(true);
-                      // For WebView, try direct HTML rendering as fallback
-                      if (isWebView) {
-                        console.log('🔄 WebView detected, switching to direct HTML rendering');
-                        setUseDirectHTML(true);
-                        setIframeLoadError(false); // Don't show error UI, just switch mode
-                      }
                     }}
                     onLoad={() => {
                       console.log('✅ Iframe loaded successfully');
