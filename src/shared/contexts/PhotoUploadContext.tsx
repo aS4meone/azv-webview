@@ -75,6 +75,7 @@ export const PhotoUploadProvider = ({
 
   const setUploadCompleted = () => {
     // ✅ Removed localStorage.setItem - state management only
+    console.log('📸 [PHOTO_UPLOAD] Setting all uploads as completed');
     setIsUserUploadRequired(false);
     setIsOwnerUploadRequired(false);
     setIsServiceUploadRequired(false);
@@ -84,6 +85,7 @@ export const PhotoUploadProvider = ({
   const setUploadRequired = (required: boolean) => {
     // ✅ Removed localStorage.setItem - state management only
     // This is simplified - caller should set specific upload requirement
+    console.log(`📸 [PHOTO_UPLOAD] Setting upload required: ${required}`);
     setIsUserUploadRequired(required);
     setIsOwnerUploadRequired(required);
     setIsServiceUploadRequired(required);

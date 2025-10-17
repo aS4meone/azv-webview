@@ -22,45 +22,49 @@ export async function performLogout(
   const { onComplete, onError } = options;
 
   try {
-    console.log("Starting logout process...");
+    console.log("🚪 [LOGOUT] Starting logout process...");
 
     // Step 1: Notify React Native WebView about logout (for push notifications)
     try {
+      console.log("📱 [LOGOUT] Notifying React Native about logout");
       sendLogoutToNative();
-      console.log("React Native notified about logout");
+      console.log("✅ [LOGOUT] React Native notified about logout");
     } catch (error) {
-      console.error("Error notifying React Native:", error);
+      console.error("❌ [LOGOUT] Error notifying React Native:", error);
       // Continue with logout even if notification fails
     }
 
     // Step 2: Clear FCM token via Flutter
     try {
+      console.log("🔥 [LOGOUT] Clearing FCM token via Flutter");
       await callFlutterLogout();
-      console.log("FCM token cleared successfully");
+      console.log("✅ [LOGOUT] FCM token cleared successfully");
     } catch (error) {
-      console.error("Error clearing FCM token:", error);
+      console.error("❌ [LOGOUT] Error clearing FCM token:", error);
       // Continue with logout even if FCM clearing fails
     }
 
     // Step 3: Clear local tokens
+    console.log("🔑 [LOGOUT] Clearing local tokens");
     clearTokens();
-    console.log("Local tokens cleared");
+    console.log("✅ [LOGOUT] Local tokens cleared");
 
     // Step 4: Clear mechanic tracking data
     try {
       if (typeof window !== "undefined") {
+        console.log("🔧 [LOGOUT] Clearing mechanic tracking data");
         localStorage.removeItem("tracking_car_id");
-        console.log("Mechanic tracking data cleared");
+        console.log("✅ [LOGOUT] Mechanic tracking data cleared");
       }
     } catch (error) {
-      console.error("Error clearing tracking data:", error);
+      console.error("❌ [LOGOUT] Error clearing tracking data:", error);
       // Continue with logout even if tracking clear fails
     }
 
-    console.log("Logout process completed successfully");
+    console.log("✅ [LOGOUT] Logout process completed successfully");
     onComplete?.();
   } catch (error) {
-    console.error("Error during logout process:", error);
+    console.error("❌ [LOGOUT] Error during logout process:", error);
     const logoutError =
       error instanceof Error ? error : new Error("Logout failed");
     onError?.(logoutError);

@@ -45,6 +45,16 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeHeight, setIframeHeight] = useState<number>(2500);
   const [iframeLoadError, setIframeLoadError] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const [showDebugConsole, setShowDebugConsole] = useState(false);
+
+  // Debug logging function
+  const addDebugLog = useCallback((message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info') => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
+    console.log(logEntry);
+    setDebugLogs(prev => [...prev.slice(-49), logEntry]); // Keep last 50 logs
+  }, []);
 
   // Load and fill HTML
   useEffect(() => {
@@ -52,17 +62,18 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       try {
         setLoading(true);
         setError(false);
+        setDebugLogs([]); // Clear previous logs
 
-        console.log('🔄 Loading HTML file from:', '/docs/new/accession_agreement.html');
-        console.log('🔍 WebView environment:', {
-          isWebView,
-          userAgent: navigator.userAgent,
-          hasReactNativeWebView: !!(window as any).ReactNativeWebView,
-          hasWebKitHandlers: !!(window as any).webkit?.messageHandlers
-        });
+        addDebugLog('🚀 Starting HTML loading process', 'info');
+        addDebugLog(`📁 Loading HTML file from: /docs/new/accession_agreement.html`, 'info');
+        addDebugLog(`🔍 WebView environment detected: ${isWebView}`, 'info');
+        addDebugLog(`📱 User Agent: ${navigator.userAgent}`, 'info');
+        addDebugLog(`🔧 ReactNativeWebView: ${!!(window as any).ReactNativeWebView}`, 'info');
+        addDebugLog(`🍎 WebKit Handlers: ${!!(window as any).webkit?.messageHandlers}`, 'info');
 
         // For WebView, try different approaches
         let response;
+        addDebugLog('🌐 Attempting to fetch HTML file using fetch API', 'info');
         try {
           response = await fetch('/docs/new/accession_agreement.html', {
             method: 'GET',
@@ -72,11 +83,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
             },
             cache: 'no-cache'
           });
+          addDebugLog(`✅ Fetch API successful: ${response.status} ${response.statusText}`, 'success');
         } catch (fetchError) {
-          console.error('❌ Fetch error:', fetchError);
+          addDebugLog(`❌ Fetch API failed: ${fetchError.message}`, 'error');
           // Try alternative approach for WebView
           if (isWebView) {
-            console.log('🔄 Trying XMLHttpRequest for WebView');
+            addDebugLog('🔄 WebView detected, trying XMLHttpRequest as fallback', 'warning');
             try {
               const xhrResponse = await new Promise<string>((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
@@ -87,17 +99,17 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 xhr.onreadystatechange = function() {
                   if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                      console.log('✅ XMLHttpRequest success');
+                      addDebugLog(`✅ XMLHttpRequest successful: ${xhr.status} ${xhr.statusText}`, 'success');
                       resolve(xhr.responseText);
                     } else {
-                      console.error('❌ XMLHttpRequest error:', xhr.status, xhr.statusText);
+                      addDebugLog(`❌ XMLHttpRequest failed: ${xhr.status} ${xhr.statusText}`, 'error');
                       reject(new Error(`XMLHttpRequest failed: ${xhr.status} ${xhr.statusText}`));
                     }
                   }
                 };
                 
                 xhr.onerror = function() {
-                  console.error('❌ XMLHttpRequest network error');
+                  addDebugLog('❌ XMLHttpRequest network error', 'error');
                   reject(new Error('XMLHttpRequest network error'));
                 };
                 
@@ -112,9 +124,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 headers: new Headers()
               } as any;
               
-              console.log('✅ XMLHttpRequest loaded HTML, length:', xhrResponse.length);
+              addDebugLog(`✅ XMLHttpRequest loaded HTML successfully, length: ${xhrResponse.length}`, 'success');
             } catch (xhrError) {
-              console.error('❌ XMLHttpRequest also failed:', xhrError);
+              addDebugLog(`❌ XMLHttpRequest also failed: ${xhrError.message}`, 'error');
               throw new Error('Both fetch and XMLHttpRequest failed in WebView');
             }
           } else {
@@ -122,27 +134,36 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           }
         }
         
-        console.log('📡 Response status:', response.status, response.statusText);
-        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+        addDebugLog(`📡 Response status: ${response.status} ${response.statusText}`, 'info');
+        addDebugLog(`📡 Response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`, 'info');
         
         if (!response.ok) {
+          addDebugLog(`❌ Response not OK: ${response.status} ${response.statusText}`, 'error');
           throw new Error(`Failed to load HTML file: ${response.status} ${response.statusText}`);
         }
 
         let html = await response.text();
-        console.log('📄 HTML loaded, length:', html.length);
-        console.log('📄 HTML preview (first 200 chars):', html.substring(0, 200));
+        addDebugLog(`📄 HTML loaded successfully, length: ${html.length}`, 'success');
+        addDebugLog(`📄 HTML preview (first 200 chars): ${html.substring(0, 200)}`, 'info');
         
         // Additional validation for WebView
         if (isWebView && (!html || html.length < 100)) {
-          console.warn('⚠️ HTML content seems too short for WebView, might be incomplete');
+          addDebugLog('⚠️ HTML content seems too short for WebView, might be incomplete', 'warning');
         }
 
         // Replace placeholders with actual data
+        addDebugLog('🔄 Replacing placeholders with actual data', 'info');
+        addDebugLog(`👤 Full name: ${full_name}`, 'info');
+        addDebugLog(`🔑 Login: ${login}`, 'info');
+        addDebugLog(`🆔 Client ID: ${client_id}`, 'info');
+        addDebugLog(`✍️ Digital signature: ${digital_signature}`, 'info');
+        
         html = html.replace(/\$\{full_name\}/g, full_name);
         html = html.replace(/\$\{login\}/g, login);
         html = html.replace(/\$\{client_id\}/g, client_id);
         html = html.replace(/\$\{digital_signature\}/g, digital_signature);
+        
+        addDebugLog('✅ Placeholders replaced successfully', 'success');
 
         // Add viewport meta tag and responsive styles if not present
         if (!html.includes('viewport')) {
@@ -230,12 +251,10 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 
         setHtmlContent(html);
         setLoading(false);
-        console.log('✅ HTML content set successfully');
+        addDebugLog('✅ HTML content set successfully, ready for display', 'success');
       } catch (err) {
-        console.error('❌ Error loading HTML:', err);
-        
-        // Show error for any failure to load the original HTML file
-        console.error('❌ Failed to load accession_agreement.html:', err);
+        addDebugLog(`❌ Error loading HTML: ${err.message}`, 'error');
+        addDebugLog(`❌ Failed to load accession_agreement.html: ${err.message}`, 'error');
         setError(true);
         setLoading(false);
       }
@@ -324,18 +343,23 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
+      addDebugLog('🚀 ContractModal opened - initializing state', 'info');
       setAgreed(false);
       setHasScrolledToEnd(false);
       setError(false);
       setIframeLoadError(false);
+      setShowDebugConsole(false);
     }
-  }, [isOpen]);
+  }, [isOpen, addDebugLog]);
 
   const handleAccept = useCallback(() => {
     if (agreed) {
+      addDebugLog('✅ User accepted the contract', 'success');
       onAccept();
+    } else {
+      addDebugLog('⚠️ User tried to accept but checkbox not checked', 'warning');
     }
-  }, [agreed, onAccept]);
+  }, [agreed, onAccept, addDebugLog]);
 
   const handleScroll = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -343,8 +367,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       const { scrollTop, scrollHeight, clientHeight } = container;
       const isScrolledToEnd = scrollTop + clientHeight >= scrollHeight - 20;
       setHasScrolledToEnd(isScrolledToEnd);
+      
+      if (isScrolledToEnd && !hasScrolledToEnd) {
+        addDebugLog('📜 User scrolled to end of document', 'info');
+      }
     }
-  }, []);
+  }, [hasScrolledToEnd, addDebugLog]);
 
   const handleZoomIn = useCallback(() => {
     setZoom(prev => Math.min(prev + 0.1, 2)); // Max 200%
@@ -371,8 +399,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   }, [htmlContent]);
 
   const handleOpenInBrowser = useCallback(() => {
+    addDebugLog('🌐 Opening document in external browser', 'info');
     window.open("/docs/new/accession_agreement.html", "_blank");
-  }, []);
+  }, [addDebugLog]);
 
   if (error) {
     return (
@@ -460,7 +489,37 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           <h2 className="text-lg font-semibold text-gray-900">
             {title || t("widgets.modals.contract.title")}
           </h2>
+          <button
+            onClick={() => setShowDebugConsole(!showDebugConsole)}
+            className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+          >
+            {showDebugConsole ? 'Скрыть логи' : 'Показать логи'}
+          </button>
         </div>
+
+        {/* Debug Console */}
+        {showDebugConsole && (
+          <div className="bg-gray-900 text-green-400 p-4 max-h-40 overflow-y-auto font-mono text-xs border-b">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-yellow-400 font-bold">🐛 DEBUG CONSOLE</span>
+              <button
+                onClick={() => setDebugLogs([])}
+                className="px-2 py-1 bg-red-600 text-white rounded text-xs"
+              >
+                Очистить
+              </button>
+            </div>
+            {debugLogs.length === 0 ? (
+              <div className="text-gray-500">Нет логов...</div>
+            ) : (
+              debugLogs.map((log, index) => (
+                <div key={index} className="mb-1">
+                  {log}
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
         {/* HTML Content */}
         <div className="flex-1 overflow-hidden relative">
@@ -611,11 +670,11 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     sandbox="allow-same-origin allow-scripts allow-forms"
                     allow="fullscreen"
                     onError={() => {
-                      console.error('❌ Iframe load error');
+                      addDebugLog('❌ Iframe load error - iframe failed to load content', 'error');
                       setIframeLoadError(true);
                     }}
                     onLoad={() => {
-                      console.log('✅ Iframe loaded successfully');
+                      addDebugLog('✅ Iframe loaded successfully - content displayed', 'success');
                       setIframeLoadError(false);
                     }}
                   />
