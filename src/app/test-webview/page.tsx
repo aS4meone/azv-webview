@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { WebViewDiagnostics } from "@/components/WebViewDiagnostics";
 
 export default function TestWebViewPage() {
   const [webViewInfo, setWebViewInfo] = useState<any>({});
@@ -68,6 +69,11 @@ export default function TestWebViewPage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Тест WebView</h1>
         
+        {/* WebView Diagnostics */}
+        <div className="mb-6">
+          <WebViewDiagnostics />
+        </div>
+
         {/* WebView Info */}
         <div className="bg-white rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Информация о среде выполнения:</h2>

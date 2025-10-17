@@ -55,9 +55,76 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         setError(false);
 
         console.log('🔄 Loading HTML file from:', '/docs/new/accession_agreement.html');
-        const response = await fetch('/docs/new/accession_agreement.html');
+        console.log('🔍 WebView environment:', {
+          isWebView,
+          userAgent: navigator.userAgent,
+          hasReactNativeWebView: !!(window as any).ReactNativeWebView,
+          hasWebKitHandlers: !!(window as any).webkit?.messageHandlers
+        });
+
+        // For WebView, try different approaches
+        let response;
+        try {
+          response = await fetch('/docs/new/accession_agreement.html', {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'Cache-Control': 'no-cache',
+            },
+            cache: 'no-cache'
+          });
+        } catch (fetchError) {
+          console.error('❌ Fetch error:', fetchError);
+          // Try alternative approach for WebView
+          if (isWebView) {
+            console.log('🔄 Trying XMLHttpRequest for WebView');
+            try {
+              const xhrResponse = await new Promise<string>((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', '/docs/new/accession_agreement.html', true);
+                xhr.setRequestHeader('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+                xhr.setRequestHeader('Cache-Control', 'no-cache');
+                
+                xhr.onreadystatechange = function() {
+                  if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                      console.log('✅ XMLHttpRequest success');
+                      resolve(xhr.responseText);
+                    } else {
+                      console.error('❌ XMLHttpRequest error:', xhr.status, xhr.statusText);
+                      reject(new Error(`XMLHttpRequest failed: ${xhr.status} ${xhr.statusText}`));
+                    }
+                  }
+                };
+                
+                xhr.onerror = function() {
+                  console.error('❌ XMLHttpRequest network error');
+                  reject(new Error('XMLHttpRequest network error'));
+                };
+                
+                xhr.send();
+              });
+              
+              response = {
+                ok: true,
+                status: 200,
+                statusText: 'OK',
+                text: () => Promise.resolve(xhrResponse),
+                headers: new Headers()
+              } as any;
+              
+              console.log('✅ XMLHttpRequest loaded HTML, length:', xhrResponse.length);
+            } catch (xhrError) {
+              console.error('❌ XMLHttpRequest also failed:', xhrError);
+              throw new Error('Both fetch and XMLHttpRequest failed in WebView');
+            }
+          } else {
+            throw fetchError;
+          }
+        }
         
         console.log('📡 Response status:', response.status, response.statusText);
+        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (!response.ok) {
           throw new Error(`Failed to load HTML file: ${response.status} ${response.statusText}`);
@@ -65,6 +132,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 
         let html = await response.text();
         console.log('📄 HTML loaded, length:', html.length);
+        console.log('📄 HTML preview (first 200 chars):', html.substring(0, 200));
+        
+        // Additional validation for WebView
+        if (isWebView && (!html || html.length < 100)) {
+          console.warn('⚠️ HTML content seems too short for WebView, might be incomplete');
+        }
 
         // Replace placeholders with actual data
         html = html.replace(/\$\{full_name\}/g, full_name);
@@ -161,6 +234,81 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         console.log('✅ HTML content set successfully');
       } catch (err) {
         console.error('❌ Error loading HTML:', err);
+        
+        // For WebView, try to load a simplified version
+        if (isWebView) {
+          console.log('🔄 WebView fallback: creating simplified HTML');
+          console.log('🔍 WebView error details:', {
+            error: err.message,
+            stack: err.stack,
+            name: err.name
+          });
+          
+          const simplifiedHTML = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta charset="UTF-8">
+                <style>
+                  body { 
+                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+                    padding: 20px; 
+                    line-height: 1.6;
+                    font-size: 16px;
+                    margin: 0;
+                    background: white;
+                  }
+                  .header { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+                  .content { margin-bottom: 20px; }
+                  .error { color: #d32f2f; background: #ffebee; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                </style>
+              </head>
+              <body>
+                <div class="header">
+                  <h1>Договор аренды автотранспортного средства</h1>
+                  <p><strong>Клиент:</strong> ${full_name}</p>
+                  <p><strong>Логин:</strong> ${login}</p>
+                  <p><strong>ID клиента:</strong> ${client_id}</p>
+                  <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
+                </div>
+                <div class="error">
+                  <h3>⚠️ WebView режим</h3>
+                  <p>Документ отображается в упрощенном виде, оптимизированном для мобильного приложения.</p>
+                  <p>Для просмотра полного документа используйте кнопку "Открыть в браузере".</p>
+                  <p><small>Ошибка загрузки: ${err.message}</small></p>
+                </div>
+                <div class="content">
+                  <h2>Основные условия договора:</h2>
+                  <p>1. Арендатор: ${full_name}</p>
+                  <p>2. Предмет аренды: Автотранспортное средство</p>
+                  <p>3. Срок аренды: Согласно условиям приложения</p>
+                  <p>4. Стоимость: Согласно тарифам</p>
+                  <p>5. Ответственность: Согласно действующему законодательству</p>
+                  
+                  <h2>Обязательства сторон:</h2>
+                  <p>• Арендатор обязуется использовать транспортное средство по назначению</p>
+                  <p>• Арендатор несет ответственность за сохранность имущества</p>
+                  <p>• Арендодатель предоставляет исправное транспортное средство</p>
+                  
+                  <h2>Заключение:</h2>
+                  <p>Настоящий договор вступает в силу с момента подписания и действует до полного исполнения обязательств сторонами.</p>
+                  
+                  <div style="margin-top: 40px; padding: 20px; border: 2px solid #1976d2; border-radius: 8px; text-align: center;">
+                    <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
+                    <p><strong>Дата:</strong> ${new Date().toLocaleDateString('ru-RU')}</p>
+                  </div>
+                </div>
+              </body>
+            </html>
+          `;
+          
+          setHtmlContent(simplifiedHTML);
+          setLoading(false);
+          console.log('✅ Simplified HTML content set for WebView');
+          return;
+        }
+        
         setError(true);
         setLoading(false);
       }
@@ -169,7 +317,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
     if (isOpen) {
       loadAndFillHTML();
     }
-  }, [isOpen, full_name, login, client_id, digital_signature]);
+  }, [isOpen, full_name, login, client_id, digital_signature, isWebView]);
 
   // Auto-adjust iframe height based on content
   useEffect(() => {
@@ -253,9 +401,10 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setHasScrolledToEnd(false);
       setError(false);
       setIframeLoadError(false);
-      setUseDirectHTML(false);
+      // For WebView, start with direct HTML mode
+      setUseDirectHTML(isWebView);
     }
-  }, [isOpen]);
+  }, [isOpen, isWebView]);
 
   const handleAccept = useCallback(() => {
     if (agreed) {
@@ -474,14 +623,83 @@ export const ContractModal: React.FC<ContractModalProps> = ({
               {/* Direct HTML rendering for WebView fallback */}
               <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-3 flex items-center justify-between">
                 <div className="text-sm text-gray-600">
-                  Документ отображается в упрощенном режиме
+                  {isWebView ? "WebView режим: прямой HTML" : "Документ отображается в упрощенном режиме"}
                 </div>
-                <button
-                  onClick={() => setUseDirectHTML(false)}
-                  className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-700"
-                >
-                  Попробовать iframe
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setUseDirectHTML(false)}
+                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-sm text-gray-700"
+                  >
+                    Попробовать iframe
+                  </button>
+                  {isWebView && (
+                    <button
+                      onClick={() => {
+                        // Force reload with simplified HTML
+                        setHtmlContent('');
+                        setLoading(true);
+                        setTimeout(() => {
+                          const simplifiedHTML = `
+                            <!DOCTYPE html>
+                            <html>
+                              <head>
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <meta charset="UTF-8">
+                                <style>
+                                  body { 
+                                    font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
+                                    padding: 20px; 
+                                    line-height: 1.6;
+                                    font-size: 16px;
+                                    margin: 0;
+                                    background: white;
+                                  }
+                                  .header { background: #f0f0f0; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+                                  .content { margin-bottom: 20px; }
+                                </style>
+                              </head>
+                              <body>
+                                <div class="header">
+                                  <h1>Договор аренды автотранспортного средства</h1>
+                                  <p><strong>Клиент:</strong> ${full_name}</p>
+                                  <p><strong>Логин:</strong> ${login}</p>
+                                  <p><strong>ID клиента:</strong> ${client_id}</p>
+                                  <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
+                                </div>
+                                <div class="content">
+                                  <h2>Основные условия договора:</h2>
+                                  <p>1. Арендатор: ${full_name}</p>
+                                  <p>2. Предмет аренды: Автотранспортное средство</p>
+                                  <p>3. Срок аренды: Согласно условиям приложения</p>
+                                  <p>4. Стоимость: Согласно тарифам</p>
+                                  <p>5. Ответственность: Согласно действующему законодательству</p>
+                                  
+                                  <h2>Обязательства сторон:</h2>
+                                  <p>• Арендатор обязуется использовать транспортное средство по назначению</p>
+                                  <p>• Арендатор несет ответственность за сохранность имущества</p>
+                                  <p>• Арендодатель предоставляет исправное транспортное средство</p>
+                                  
+                                  <h2>Заключение:</h2>
+                                  <p>Настоящий договор вступает в силу с момента подписания и действует до полного исполнения обязательств сторонами.</p>
+                                  
+                                  <div style="margin-top: 40px; padding: 20px; border: 2px solid #1976d2; border-radius: 8px; text-align: center;">
+                                    <p><strong>Цифровая подпись:</strong> ${digital_signature}</p>
+                                    <p><strong>Дата:</strong> ${new Date().toLocaleDateString('ru-RU')}</p>
+                                  </div>
+                                </div>
+                              </body>
+                            </html>
+                          `;
+                          setHtmlContent(simplifiedHTML);
+                          setLoading(false);
+                        }, 100);
+                      }}
+                      className="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded text-sm text-blue-700"
+                    >
+                      Упрощенная версия
+                    </button>
+                  )}
+                </div>
               </div>
               <div 
                 ref={scrollContainerRef}
@@ -527,8 +745,18 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     Сбросить
                   </button>
                 </div>
-                <div className="text-xs text-gray-500">
-                  {isWebView ? "Проведите пальцем для прокрутки" : isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-gray-500">
+                    {isWebView ? "Проведите пальцем для прокрутки" : isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
+                  </div>
+                  {isWebView && (
+                    <button
+                      onClick={() => setUseDirectHTML(true)}
+                      className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                    >
+                      Показать как текст
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -574,8 +802,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                       setIframeLoadError(true);
                       // For WebView, try direct HTML rendering as fallback
                       if (isWebView) {
-                        console.log('🔄 WebView detected, trying direct HTML rendering');
+                        console.log('🔄 WebView detected, switching to direct HTML rendering');
                         setUseDirectHTML(true);
+                        setIframeLoadError(false); // Don't show error UI, just switch mode
                       }
                     }}
                     onLoad={() => {
