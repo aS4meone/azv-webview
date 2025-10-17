@@ -15,10 +15,14 @@ import { useRouter } from "next/navigation";
 import { useUserStore } from "../stores/userStore";
 import { useModal } from "../ui/modal";
 
-export const USER_UPLOAD = "user-upload";
-export const OWNER_UPLOAD = "owner-upload";
-export const SERVICE_UPLOAD = "service-upload";
-export const DELIVERY_UPLOAD = "delivery-upload";
+// ℹ️ Removed localStorage constants - now relying on server-side photo upload flags
+// All photo upload status is tracked via API response fields:
+// - photo_before_selfie_uploaded
+// - photo_before_car_uploaded
+// - photo_before_interior_uploaded
+// - photo_after_selfie_uploaded
+// - photo_after_car_uploaded
+// - photo_after_interior_uploaded
 
 interface PhotoUploadContextType {
   isUserUploadRequired: boolean;
@@ -28,8 +32,8 @@ interface PhotoUploadContextType {
   isUserUploadStep2Required: boolean;
   isOwnerUploadStep2Required: boolean;
   isServiceUploadStep2Required: boolean;
-  setUploadCompleted: (uploadType: string) => void;
-  setUploadRequired: (uploadType: string, required: boolean) => void;
+  setUploadCompleted: () => void;
+  setUploadRequired: (required: boolean) => void;
   showUserUploadModal: () => void;
   showOwnerUploadModal: () => void;
   showServiceUploadModal: () => void;
@@ -37,7 +41,6 @@ interface PhotoUploadContextType {
   showUserUploadModalStep2: () => void;
   showOwnerUploadModalStep2: () => void;
   showServiceUploadModalStep2: () => void;
-  isPhotoUploadCompleted: (uploadType: string) => boolean;
   isInitialized: boolean;
 }
 
@@ -61,102 +64,51 @@ export const PhotoUploadProvider = ({
   const [isOwnerUploadStep2Required, setIsOwnerUploadStep2Required] = useState(false);
   const [isServiceUploadStep2Required, setIsServiceUploadStep2Required] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(true); // Always initialized, no localStorage check needed
   const { hideModal } = useModal();
   const { showModal } = useResponseModal();
   const { refreshUser } = useUserStore();
   const router = useRouter();
 
-  useEffect(() => {
-    const checkUploadRequirements = () => {
-      const userUpload = localStorage.getItem(USER_UPLOAD);
-      const ownerUpload = localStorage.getItem(OWNER_UPLOAD);
-      const serviceUpload = localStorage.getItem(SERVICE_UPLOAD);
-      const deliveryUpload = localStorage.getItem(DELIVERY_UPLOAD);
+  // ✅ Removed useEffect with localStorage checks
+  // Photo upload status is now managed purely through component state and server responses
 
-      // Если значение "true" - загрузка завершена (не требуется)
-      // Если значение "false" или null - загрузка требуется
-      // НО НЕ ПОКАЗЫВАЕМ модалки автоматически при первом запуске
-      setIsUserUploadRequired(false); // Не показываем автоматически
-      setIsOwnerUploadRequired(false); // Не показываем автоматически
-      setIsServiceUploadRequired(false); // Не показываем автоматически
-      setIsDeliveryUploadRequired(false); // Не показываем автоматически
-      
-      setIsInitialized(true);
-    };
-
-    checkUploadRequirements();
-  }, []);
-
-  const setUploadCompleted = (uploadType: string) => {
-    localStorage.setItem(uploadType, "true");
-
-    switch (uploadType) {
-      case USER_UPLOAD:
-        setIsUserUploadRequired(false);
-        break;
-      case OWNER_UPLOAD:
-        setIsOwnerUploadRequired(false);
-        break;
-      case SERVICE_UPLOAD:
-        setIsServiceUploadRequired(false);
-        break;
-      case DELIVERY_UPLOAD:
-        setIsDeliveryUploadRequired(false);
-        break;
-      default:
-        console.warn(`Unknown upload type: ${uploadType}`);
-    }
+  const setUploadCompleted = () => {
+    // ✅ Removed localStorage.setItem - state management only
+    setIsUserUploadRequired(false);
+    setIsOwnerUploadRequired(false);
+    setIsServiceUploadRequired(false);
+    setIsDeliveryUploadRequired(false);
   };
 
-  const setUploadRequired = (uploadType: string, required: boolean) => {
-    localStorage.setItem(uploadType, required ? "false" : "true");
-
-    switch (uploadType) {
-      case USER_UPLOAD:
-        setIsUserUploadRequired(required);
-        break;
-      case OWNER_UPLOAD:
-        setIsOwnerUploadRequired(required);
-        break;
-      case SERVICE_UPLOAD:
-        setIsServiceUploadRequired(required);
-        break;
-      case DELIVERY_UPLOAD:
-        setIsDeliveryUploadRequired(required);
-        break;
-      default:
-        console.warn(`Unknown upload type: ${uploadType}`);
-    }
+  const setUploadRequired = (required: boolean) => {
+    // ✅ Removed localStorage.setItem - state management only
+    // This is simplified - caller should set specific upload requirement
+    setIsUserUploadRequired(required);
+    setIsOwnerUploadRequired(required);
+    setIsServiceUploadRequired(required);
+    setIsDeliveryUploadRequired(required);
   };
 
   // Методы для программного показа модалок
   const showUserUploadModal = () => {
-    const userUpload = localStorage.getItem(USER_UPLOAD);
-    if (userUpload !== "true") {
-      setIsUserUploadRequired(true);
-    }
+    // ✅ Removed localStorage check - rely on server-side flags instead
+    setIsUserUploadRequired(true);
   };
 
   const showOwnerUploadModal = () => {
-    const ownerUpload = localStorage.getItem(OWNER_UPLOAD);
-    if (ownerUpload !== "true") {
-      setIsOwnerUploadRequired(true);
-    }
+    // ✅ Removed localStorage check - rely on server-side flags instead
+    setIsOwnerUploadRequired(true);
   };
 
   const showServiceUploadModal = () => {
-    const serviceUpload = localStorage.getItem(SERVICE_UPLOAD);
-    if (serviceUpload !== "true") {
-      setIsServiceUploadRequired(true);
-    }
+    // ✅ Removed localStorage check - rely on server-side flags instead
+    setIsServiceUploadRequired(true);
   };
 
   const showDeliveryUploadModal = () => {
-    const deliveryUpload = localStorage.getItem(DELIVERY_UPLOAD);
-    if (deliveryUpload !== "true") {
-      setIsDeliveryUploadRequired(true);
-    }
+    // ✅ Removed localStorage check - rely on server-side flags instead
+    setIsDeliveryUploadRequired(true);
   };
 
   const showUserUploadModalStep2 = () => {
@@ -165,11 +117,6 @@ export const PhotoUploadProvider = ({
 
   const showOwnerUploadModalStep2 = () => {
     setIsOwnerUploadStep2Required(true);
-  };
-
-  const isPhotoUploadCompleted = (uploadType: string): boolean => {
-    const value = localStorage.getItem(uploadType);
-    return value === "true";
   };
 
   const handleUserPhotoUpload = async (files: { [key: string]: File[] }) => {
@@ -219,7 +166,7 @@ export const PhotoUploadProvider = ({
       if (res.status === 200) {
         setIsLoading(false);
         setIsUserUploadStep2Required(false);
-        setUploadCompleted(USER_UPLOAD);
+        setUploadCompleted(); // ✅ Removed uploadType parameter
         showModal({
           type: "success",
           description: "Фотографии успешно загружены! Двигатель разблокирован.",
@@ -289,7 +236,7 @@ export const PhotoUploadProvider = ({
       if (res.status === 200) {
         setIsLoading(false);
         setIsOwnerUploadStep2Required(false);
-        setUploadCompleted(OWNER_UPLOAD);
+        setUploadCompleted(); // ✅ Removed uploadType parameter
         showModal({
           type: "success",
           description: "Фотографии успешно загружены! Двигатель разблокирован.",
@@ -360,7 +307,7 @@ export const PhotoUploadProvider = ({
       if (res.status === 200) {
         setIsLoading(false);
         setIsServiceUploadStep2Required(false);
-        setUploadCompleted(SERVICE_UPLOAD);
+        setUploadCompleted(); // ✅ Removed uploadType parameter
         showModal({
           type: "success",
           description: "Фотографии успешно загружены! Двигатель разблокирован.",
@@ -397,7 +344,7 @@ export const PhotoUploadProvider = ({
       const res = await mechanicApi.uploadBeforeDelivery(formData);
       if (res.status === 200) {
         setIsLoading(false);
-        setUploadCompleted(DELIVERY_UPLOAD);
+        setUploadCompleted(); // ✅ Removed uploadType parameter
         showModal({
           type: "success",
           description: "Фотографии доставки успешно загружены",
@@ -441,7 +388,6 @@ export const PhotoUploadProvider = ({
     showServiceUploadModalStep2,
     showUserUploadModalStep2,
     showOwnerUploadModalStep2,
-    isPhotoUploadCompleted,
     isInitialized,
   };
 
@@ -503,7 +449,7 @@ export const PhotoUploadProvider = ({
           config={baseConfigStep1}
           onPhotoUpload={handleServicePhotoUpload}
           isOpen={true}
-          onClose={() => setUploadRequired(SERVICE_UPLOAD, false)}
+          onClose={() => setUploadRequired(false)}
           isLoading={isLoading}
           isCloseable={false}
         />
@@ -527,7 +473,7 @@ export const PhotoUploadProvider = ({
           config={baseConfig}
           onPhotoUpload={handleDeliveryPhotoUpload}
           isOpen={true}
-          onClose={() => setUploadRequired(DELIVERY_UPLOAD, false)}
+          onClose={() => setUploadRequired(false)}
           isLoading={isLoading}
           isCloseable={false}
         />

@@ -8,7 +8,6 @@ import { ResponseBottomModalProps, useResponseModal } from "@/shared/ui/modal";
 import { IUser } from "@/shared/models/types/user";
 import { useUserStore } from "@/shared/stores/userStore";
 import {
-  SERVICE_UPLOAD,
   usePhotoUpload,
 } from "@/shared/contexts/PhotoUploadContext";
 import { mechanicApi, mechanicActionsApi } from "@/shared/api/routes/mechanic";
@@ -70,7 +69,7 @@ export const MechanicCarInWaitingModal = ({
       try {
         const res = await mechanicApi.startCheckCar(car.id);
         if (res.status === 200) {
-          setUploadRequired(SERVICE_UPLOAD, true);
+          setUploadRequired(true);
           setResponseModal({
             type: "success",
             isOpen: true,

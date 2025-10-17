@@ -14,6 +14,7 @@ export interface LogoutOptions {
  * Performs a complete logout process:
  * 1. Clears FCM token from Firebase via Flutter
  * 2. Clears local tokens from localStorage
+ * 3. Clears mechanic tracking data
  */
 export async function performLogout(
   options: LogoutOptions = {}
@@ -44,6 +45,17 @@ export async function performLogout(
     // Step 3: Clear local tokens
     clearTokens();
     console.log("Local tokens cleared");
+
+    // Step 4: Clear mechanic tracking data
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("tracking_car_id");
+        console.log("Mechanic tracking data cleared");
+      }
+    } catch (error) {
+      console.error("Error clearing tracking data:", error);
+      // Continue with logout even if tracking clear fails
+    }
 
     console.log("Logout process completed successfully");
     onComplete?.();

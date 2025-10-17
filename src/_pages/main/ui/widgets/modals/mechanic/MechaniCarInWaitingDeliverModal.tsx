@@ -13,7 +13,6 @@ import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadP
 import {
   baseConfigStep1,
   baseConfigStep2,
-  DELIVERY_UPLOAD,
   usePhotoUpload,
 } from "@/shared/contexts/PhotoUploadContext";
 import { mechanicApi } from "@/shared/api/routes/mechanic";

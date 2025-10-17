@@ -13,11 +13,9 @@ import { UploadPhotoClient as UploadPhoto } from "@/widgets/upload-photo/UploadP
 import {
   userConfigStep1,
   userConfigStep2,
-  OWNER_UPLOAD,
   ownerConfigStep1,
   ownerConfigStep2,
   usePhotoUpload,
-  USER_UPLOAD,
 } from "@/shared/contexts/PhotoUploadContext";
 import { CustomResponseModal } from "@/components/ui/custom-response-modal";
 import { useTranslations } from "next-intl";
@@ -54,7 +52,7 @@ export const UserCarInWaitingModal = ({
   // Для механиков используем allMechanicVehicles, для обычных пользователей - allVehicles
   const vehiclesData = user.role === UserRole.MECHANIC ? allMechanicVehicles : allVehicles;
   const car = vehiclesData.find(v => v.current_renter_id === user.id) || user.current_rental!.car_details;
-  const { setUploadRequired, isPhotoUploadCompleted } = usePhotoUpload();
+  const { setUploadRequired } = usePhotoUpload();
   const [responseModal, setResponseModal] =
     useState<ResponseBottomModalProps | null>(null);
 

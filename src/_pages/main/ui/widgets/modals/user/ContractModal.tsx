@@ -37,12 +37,13 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
-  const [zoom, setZoom] = useState(0.3); // Initial zoom level 30%
+  const [zoom, setZoom] = useState(0.3); // Will be updated when isMobile is determined
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [iframeHeight, setIframeHeight] = useState<number>(2500);
+  const [iframeLoadError, setIframeLoadError] = useState(false);
 
   // Load and fill HTML
   useEffect(() => {
@@ -51,13 +52,17 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         setLoading(true);
         setError(false);
 
+        console.log('🔄 Loading HTML file from:', '/docs/new/accession_agreement.html');
         const response = await fetch('/docs/new/accession_agreement.html');
         
+        console.log('📡 Response status:', response.status, response.statusText);
+        
         if (!response.ok) {
-          throw new Error('Failed to load HTML file');
+          throw new Error(`Failed to load HTML file: ${response.status} ${response.statusText}`);
         }
 
         let html = await response.text();
+        console.log('📄 HTML loaded, length:', html.length);
 
         // Replace placeholders with actual data
         html = html.replace(/\$\{full_name\}/g, full_name);
@@ -70,41 +75,66 @@ export const ContractModal: React.FC<ContractModalProps> = ({
           html = html.replace(
             '<head>',
             `<head>
-              <meta name="viewport" content="width=device-width, initial-scale=0.3, maximum-scale=3.0, user-scalable=yes">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes, viewport-fit=cover">
               <style>
-                body {
-                  margin: 0;
-                  padding: 10px;
+                * {
+                  box-sizing: border-box;
                 }
                 html, body {
-                  overflow-x: auto;
+                  margin: 0;
+                  padding: 0;
+                  width: 100%;
+                  height: 100%;
+                  overflow-x: hidden;
                   overflow-y: auto;
+                  -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                 }
-                /* Кастомный скролл для iframe */
+                body {
+                  padding: 16px;
+                  line-height: 1.6;
+                  font-size: 16px; /* iOS minimum readable font size */
+                }
+                /* iOS-optimized scrollbar */
                 ::-webkit-scrollbar {
-                  width: 16px;
-                  height: 16px;
+                  width: 8px;
+                  height: 8px;
                 }
                 ::-webkit-scrollbar-track {
-                  background: #f1f1f1;
-                  border-radius: 8px;
+                  background: transparent;
                 }
                 ::-webkit-scrollbar-thumb {
-                  background: #888;
-                  border-radius: 8px;
-                  border: 3px solid #f1f1f1;
-                  min-height: 80px;
+                  background: rgba(0,0,0,0.3);
+                  border-radius: 4px;
                 }
                 ::-webkit-scrollbar-thumb:hover {
-                  background: #555;
+                  background: rgba(0,0,0,0.5);
                 }
-                ::-webkit-scrollbar-thumb:active {
-                  background: #333;
+                /* Touch-friendly elements */
+                button, input, select, textarea {
+                  font-size: 16px; /* Prevent zoom on iOS */
+                  touch-action: manipulation;
                 }
-                /* Firefox */
-                * {
-                  scrollbar-width: auto;
-                  scrollbar-color: #888 #f1f1f1;
+                /* Ensure text is selectable on iOS */
+                p, div, span, td, th {
+                  -webkit-user-select: text;
+                  user-select: text;
+                }
+                /* Fix for iOS iframe rendering */
+                img {
+                  max-width: 100%;
+                  height: auto;
+                }
+                table {
+                  width: 100%;
+                  border-collapse: collapse;
+                }
+                /* iOS-specific fixes */
+                @supports (-webkit-touch-callout: none) {
+                  body {
+                    -webkit-text-size-adjust: 100%;
+                    -webkit-font-smoothing: antialiased;
+                  }
                 }
               </style>`
           );
@@ -112,8 +142,9 @@ export const ContractModal: React.FC<ContractModalProps> = ({
 
         setHtmlContent(html);
         setLoading(false);
+        console.log('✅ HTML content set successfully');
       } catch (err) {
-        console.error('Error loading HTML:', err);
+        console.error('❌ Error loading HTML:', err);
         setError(true);
         setLoading(false);
       }
@@ -170,7 +201,11 @@ export const ContractModal: React.FC<ContractModalProps> = ({
         navigator.userAgent
       );
       const isSmallScreen = window.innerWidth <= 768;
-      setIsMobile(isMobileDevice || isSmallScreen);
+      const mobile = isMobileDevice || isSmallScreen;
+      setIsMobile(mobile);
+      
+      // Update zoom based on device type
+      setZoom(mobile ? 1.0 : 0.3);
     };
 
     checkMobile();
@@ -187,6 +222,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
       setAgreed(false);
       setHasScrolledToEnd(false);
       setError(false);
+      setIframeLoadError(false);
     }
   }, [isOpen]);
 
@@ -210,12 +246,12 @@ export const ContractModal: React.FC<ContractModalProps> = ({
   }, []);
 
   const handleZoomOut = useCallback(() => {
-    setZoom(prev => Math.max(prev - 0.1, 0.3)); // Min 30%
-  }, []);
+    setZoom(prev => Math.max(prev - 0.1, isMobile ? 0.5 : 0.3)); // Min 50% on mobile, 30% on desktop
+  }, [isMobile]);
 
   const handleResetZoom = useCallback(() => {
-    setZoom(0.3); // Reset to 30%
-  }, []);
+    setZoom(isMobile ? 1.0 : 0.3); // Reset to 100% on mobile, 30% on desktop
+  }, [isMobile]);
 
   const handleDownloadHTML = useCallback(() => {
     const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -365,6 +401,32 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 </div>
               )}
             </div>
+          ) : iframeLoadError ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-12 h-full">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                  <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Проблема с отображением документа</h3>
+                <p className="text-gray-600 text-sm">Попробуйте открыть документ в браузере</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleOpenInBrowser}
+                    className="px-4 py-2 bg-[#1D77FF] text-white rounded-lg text-sm"
+                  >
+                    Открыть в браузере
+                  </button>
+                  <button
+                    onClick={() => setIframeLoadError(false)}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm"
+                  >
+                    Попробовать снова
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : (
             <>
               {/* Zoom Controls */}
@@ -400,7 +462,7 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                   </button>
                 </div>
                 <div className="text-xs text-gray-500">
-                  Используйте колесо мыши для прокрутки
+                  {isMobile ? "Проведите пальцем для прокрутки" : "Используйте колесо мыши для прокрутки"}
                 </div>
               </div>
 
@@ -409,12 +471,16 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                 ref={scrollContainerRef}
                 className="w-full h-full p-4 max-h-[850px]"
                 onScroll={handleScroll}
+                style={{
+                  WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
+                }}
               >
                 <div
                   style={{
                     transform: `scale(${zoom})`,
                     transformOrigin: 'top left',
                     width: `${100 / zoom}%`,
+                    minHeight: isMobile ? '100vh' : 'auto', // Ensure full height on mobile
                   }}
                 >
                   <iframe
@@ -424,10 +490,20 @@ export const ContractModal: React.FC<ContractModalProps> = ({
                     style={{ 
                       height: `${iframeHeight}px`,
                       border: 'none',
-                      display: 'block'
+                      display: 'block',
+                      WebkitOverflowScrolling: 'touch', // iOS smooth scrolling
                     }}
                     title="Filled Agreement Document"
-                    sandbox="allow-same-origin"
+                    sandbox="allow-same-origin allow-scripts"
+                    allow="fullscreen"
+                    onError={() => {
+                      console.error('❌ Iframe load error');
+                      setIframeLoadError(true);
+                    }}
+                    onLoad={() => {
+                      console.log('✅ Iframe loaded successfully');
+                      setIframeLoadError(false);
+                    }}
                   />
                 </div>
               </div>

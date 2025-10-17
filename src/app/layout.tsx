@@ -13,6 +13,7 @@ import {
 import { PhotoUploadProvider } from "@/shared/contexts/PhotoUploadContext";
 import { LanguageProvider } from "@/shared/contexts/LanguageContext";
 import { ReactNativeSyncProvider } from "@/shared/components/ReactNativeSyncProvider";
+import { LocalStorageCleanup } from "@/shared/components/LocalStorageCleanup";
 
 // Импортируем click fixer для автоматического исправления кликов в WebView
 import "@/shared/utils/clickFix";
@@ -66,6 +67,7 @@ export default async function RootLayout({
         className={`${montserrat.variable} antialiased`}
         suppressHydrationWarning
       >
+        <LocalStorageCleanup />
         <ResponseModalProvider>
           <ModalProvider>
             <NextIntlClientProvider locale={locale as "ru" | "en" | "kz"} messages={messages}>
